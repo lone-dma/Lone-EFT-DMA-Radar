@@ -61,7 +61,7 @@ namespace eft_dma_radar.DMA.ScatterAPI
         /// </summary>
         /// <param name="hScatter">Scatter read handle.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetResult(Vmmsharp.LeechCore.SCATTER_HANDLE hScatter)
+        public void SetResult(VmmSharpEx.LeechCore.SCATTER_HANDLE hScatter)
         {
             try
             {
@@ -80,7 +80,7 @@ namespace eft_dma_radar.DMA.ScatterAPI
         /// Set the Result from a Value Type.
         /// </summary>
         /// <param name="hScatter">Scatter read handle.</param>
-        private unsafe void SetValueResult(Vmmsharp.LeechCore.SCATTER_HANDLE hScatter)
+        private unsafe void SetValueResult(VmmSharpEx.LeechCore.SCATTER_HANDLE hScatter)
         {
             int cb = SizeChecker<T>.Size; // Also enforces type safety
 #pragma warning disable CS8500
@@ -104,7 +104,7 @@ namespace eft_dma_radar.DMA.ScatterAPI
         /// Set the Result from a Class Type.
         /// </summary>
         /// <param name="hScatter">Scatter read handle.</param>
-        private void SetClassResult(Vmmsharp.LeechCore.SCATTER_HANDLE hScatter)
+        private void SetClassResult(VmmSharpEx.LeechCore.SCATTER_HANDLE hScatter)
         {
             if (this is ScatterReadEntry<SharedArray<TrsX>> r1) // vertices
             {
@@ -162,7 +162,7 @@ namespace eft_dma_radar.DMA.ScatterAPI
         /// <param name="hScatter">Scatter read handle.</param>
         /// <param name="bufferIn">Result buffer</param>
         /// <exception cref="Exception"></exception>
-        private bool ProcessBytes<TBuf>(Vmmsharp.LeechCore.SCATTER_HANDLE hScatter, Span<TBuf> bufferIn)
+        private bool ProcessBytes<TBuf>(VmmSharpEx.LeechCore.SCATTER_HANDLE hScatter, Span<TBuf> bufferIn)
             where TBuf : unmanaged
         {
             var buffer = MemoryMarshal.Cast<TBuf, byte>(bufferIn);

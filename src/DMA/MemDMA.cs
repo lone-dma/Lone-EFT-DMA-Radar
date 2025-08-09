@@ -6,7 +6,7 @@ using eft_dma_radar.Tarkov.Loot;
 using eft_dma_radar.DMA.ScatterAPI;
 using eft_dma_radar.Misc;
 using eft_dma_radar.Unity;
-using Vmmsharp;
+using VmmSharpEx;
 using System.Drawing;
 using eft_dma_radar.Tarkov.Quests;
 
@@ -79,10 +79,8 @@ namespace eft_dma_radar.DMA
                     if (!File.Exists(MEMORY_MAP_FILE))
                     {
                         Debug.WriteLine("[DMA] No MemMap, attempting to generate...");
-                        _hVMM = new Vmm(
-                            initializePlugins: false,
-                            args: initArgs);
-                        var map = _hVMM.MapMemoryAsString() ??
+                        _hVMM = new Vmm(args: initArgs);
+                        var map = _hVMM.GetMemoryMap() ??
                             throw new InvalidOperationException("MapMemoryAsString FAIL");
                         var mapBytes = Encoding.ASCII.GetBytes(map);
                         if (!_hVMM.LeechCore.Command(LeechCore.LC_CMD_MEMMAP_SET, mapBytes, out _))
@@ -95,9 +93,7 @@ namespace eft_dma_radar.DMA
                         initArgs = initArgs.Concat(mapArgs).ToArray();
                     }
                 }
-                _hVMM ??= new Vmm(
-                            initializePlugins: false,
-                            args: initArgs);
+                _hVMM ??= new Vmm(args: initArgs);
                 SetupVmmRefresh();
                 ProcessStopped += MemDMA_ProcessStopped;
                 RaidStopped += MemDMA_RaidStopped;
@@ -542,7 +538,7 @@ namespace eft_dma_radar.DMA
             where T : unmanaged, allows ref struct
         {
             uint flags = useCache ? 0 : Vmm.FLAG_NOCACHE;
-            if (!_proc.MemReadRefAs<T>(addr, out var result, flags))
+            if (!_proc.MemReadValue<T>(addr, out var result, flags))
                 throw new VmmException("Memory Read Failed!");
             return result;
         }
@@ -556,13 +552,13 @@ namespace eft_dma_radar.DMA
             where T : unmanaged, allows ref struct
         {
             int cb = sizeof(T);
-            if (!_proc.MemReadRefAs<T>(addr, out var r1, Vmm.FLAG_NOCACHE))
+            if (!_proc.MemReadValue<T>(addr, out var r1, Vmm.FLAG_NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
-            if (!_proc.MemReadRefAs<T>(addr, out var r2, Vmm.FLAG_NOCACHE))
+            if (!_proc.MemReadValue<T>(addr, out var r2, Vmm.FLAG_NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
-            if (!_proc.MemReadRefAs<T>(addr, out var r3, Vmm.FLAG_NOCACHE))
+            if (!_proc.MemReadValue<T>(addr, out var r3, Vmm.FLAG_NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             var b1 = new ReadOnlySpan<byte>(&r1, cb);
             var b2 = new ReadOnlySpan<byte>(&r2, cb);
@@ -583,13 +579,13 @@ namespace eft_dma_radar.DMA
             where T : unmanaged, allows ref struct
         {
             int cb = sizeof(T);
-            if (!_proc.MemReadRefAs<T>(addr, out var r1, Vmm.FLAG_NOCACHE))
+            if (!_proc.MemReadValue<T>(addr, out var r1, Vmm.FLAG_NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
-            if (!_proc.MemReadRefAs<T>(addr, out var r2, Vmm.FLAG_NOCACHE))
+            if (!_proc.MemReadValue<T>(addr, out var r2, Vmm.FLAG_NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
-            if (!_proc.MemReadRefAs<T>(addr, out var r3, Vmm.FLAG_NOCACHE))
+            if (!_proc.MemReadValue<T>(addr, out var r3, Vmm.FLAG_NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             var b1 = new ReadOnlySpan<byte>(&r1, cb);
             var b2 = new ReadOnlySpan<byte>(&r2, cb);
