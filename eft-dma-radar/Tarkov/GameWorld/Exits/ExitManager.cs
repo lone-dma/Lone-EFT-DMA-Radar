@@ -1,6 +1,6 @@
-﻿using eft_dma_shared.Common.Misc;
-using eft_dma_shared.Common.DMA.ScatterAPI;
-using eft_dma_shared.Common.Unity.Collections;
+﻿using eft_dma_radar.DMA.ScatterAPI;
+using eft_dma_radar.Misc;
+using eft_dma_radar.Unity.Collections;
 
 namespace eft_dma_radar.Tarkov.GameWorld.Exits
 {
@@ -25,30 +25,33 @@ namespace eft_dma_radar.Tarkov.GameWorld.Exits
         private void Init()
         {
             var list = new List<IExitPoint>();
-            /// Exfils
             var exfilController = Memory.ReadPtr(_localGameWorld + Offsets.ClientLocalGameWorld.ExfilController, false);
-            var listOffset = _isPMC ?
+            /// Regular Exfils
+            var exfilArrOffset = _isPMC ?
                 Offsets.ExfilController.ExfiltrationPointArray : Offsets.ExfilController.ScavExfiltrationPointArray;
-            var exfilPoints = Memory.ReadPtr(exfilController + listOffset, false);
-            using var exfils = MemArray<ulong>.Get(exfilPoints, false);
+            var exfilPoints = Memory.ReadPtr(exfilController + exfilArrOffset, false);
+            using var exfilsLease = MemArray<ulong>.Lease(exfilPoints, false, out var exfils);
             ArgumentOutOfRangeException.ThrowIfZero(exfils.Count, nameof(exfils));
             foreach (var exfilAddr in exfils)
             {
                 var exfil = new Exfil(exfilAddr, _isPMC);
                 list.Add(exfil);
             }
-            /// Secret Extracts
-            var secretExfil = Memory.ReadPtr(exfilController + Offsets.ExfilController.SecretExfiltrationPointArray, false);
-            using var secrets = MemArray<ulong>.Get(secretExfil, false);
-            foreach (var secretAddr in secrets)
+            /// Secret Exfils
+            var secretExfilPoints = Memory.ReadValue<ulong>(exfilController + Offsets.ExfilController.SecretExfiltrationPointArray, false);
+            if (secretExfilPoints.IsValidVirtualAddress())
             {
-                var exfil = new Exfil(secretAddr, true);
-                list.Add(exfil);
+                using var secretExfilsLease = MemArray<ulong>.Lease(secretExfilPoints, false, out var secretExfils);
+                foreach (var secretExfil in secretExfils)
+                {
+                    var exfil = new SecretExfil(secretExfil);
+                    list.Add(exfil);
+                }
             }
             /// Transits
             var transitController = Memory.ReadPtr(_localGameWorld + Offsets.ClientLocalGameWorld.TransitController, false);
             var transitsPtr = Memory.ReadPtr(transitController + Offsets.TransitController.TransitPoints, false);
-            using var transits = MemDictionary<ulong, ulong>.Get(transitsPtr, false);
+            using var transitsLease = MemDictionary<ulong, ulong>.Lease(transitsPtr, false, out var transits);
             foreach (var dTransit in transits)
             {
                 var transit = new TransitPoint(dTransit.Value);
@@ -67,9 +70,8 @@ namespace eft_dma_radar.Tarkov.GameWorld.Exits
             {
                 if (_exits is null) // Initialize
                     Init();
-
                 ArgumentNullException.ThrowIfNull(_exits, nameof(_exits));
-                using var map = ScatterReadMap.Get();
+                using var mapLease = ScatterReadMap.Lease(out var map);
                 var round1 = map.AddRound();
                 for (int ix = 0; ix < _exits.Count; ix++)
                 {
@@ -81,7 +83,9 @@ namespace eft_dma_radar.Tarkov.GameWorld.Exits
                         round1[i].Callbacks += index =>
                         {
                             if (index.TryGetResult<int>(0, out var status))
+                            {
                                 exfil.Update((Enums.EExfiltrationStatus)status);
+                            }
                         };
                     }
                 }
@@ -89,7 +93,7 @@ namespace eft_dma_radar.Tarkov.GameWorld.Exits
             }
             catch (Exception ex)
             {
-                LoneLogging.WriteLine($"[ExitManager] Refresh Error: {ex}");
+                Debug.WriteLine($"[ExitManager] Refresh Error: {ex}");
             }
         }
 

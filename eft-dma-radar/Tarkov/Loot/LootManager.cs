@@ -1,16 +1,12 @@
 ﻿using System.Collections.Frozen;
-using eft_dma_shared.Common.Misc;
-using eft_dma_radar.Tarkov.EFTPlayer;
-
-using eft_dma_shared.Common.DMA;
-using eft_dma_shared.Common.DMA.ScatterAPI;
-using eft_dma_shared.Common.Misc.Data;
-using eft_dma_shared.Common.Unity;
-using eft_dma_shared.Common.Unity.Collections;
-using eft_dma_radar.UI.Pages;
-using eft_dma_radar.Tarkov.Features.MemoryWrites;
-using eft_dma_radar.Tarkov.Features;
-using eft_dma_radar.Tarkov.GameWorld;
+using eft_dma_radar.Misc;
+using eft_dma_radar.Tarkov.Player;
+using eft_dma_radar.UI.Loot;
+using eft_dma_radar.DMA;
+using eft_dma_radar.DMA.ScatterAPI;
+using eft_dma_radar.Unity;
+using eft_dma_radar.Unity.Collections;
+using eft_dma_radar.Tarkov.Data;
 
 namespace eft_dma_radar.Tarkov.Loot
 {
@@ -19,7 +15,6 @@ namespace eft_dma_radar.Tarkov.Loot
         #region Fields/Properties/Constructor
 
         private readonly ulong _lgw;
-        private readonly CancellationToken _ct;
         private readonly Lock _filterSync = new();
 
         /// <summary>
@@ -37,10 +32,9 @@ namespace eft_dma_radar.Tarkov.Loot
         /// </summary>
         public IReadOnlyList<StaticLootContainer> StaticLootContainers { get; private set; }
 
-        public LootManager(ulong localGameWorld, CancellationToken ct)
+        public LootManager(ulong localGameWorld)
         {
             _lgw = localGameWorld;
-            _ct = ct;
         }
 
         #endregion
@@ -57,10 +51,10 @@ namespace eft_dma_radar.Tarkov.Loot
             {
                 try
                 {
-                    var filter = LootFilterControl.Create();
+                    var filter = LootFilter.Create();
                     FilteredLoot = UnfilteredLoot?
                         .Where(x => filter(x))
-                        .OrderByDescending(x => x.Important || (Program.Config.QuestHelper.Enabled && x.IsQuestCondition))
+                        .OrderByDescending(x => x.Important || (App.Config.QuestHelper.Enabled && x.IsQuestCondition))
                         .ThenByDescending(x => x?.Price ?? 0)
                         .ToList();
                 }
@@ -75,11 +69,11 @@ namespace eft_dma_radar.Tarkov.Loot
         /// <summary>
         /// Refreshes loot, only call from a memory thread (Non-GUI).
         /// </summary>
-        public void Refresh()
+        public void Refresh(CancellationToken ct)
         {
             try
             {
-                GetLoot();
+                GetLoot(ct);
                 RefreshFilter();
             }
             catch (OperationCanceledException)
@@ -88,7 +82,7 @@ namespace eft_dma_radar.Tarkov.Loot
             }
             catch (Exception ex)
             {
-                LoneLogging.WriteLine($"CRITICAL ERROR - Failed to refresh loot: {ex}");
+                Debug.WriteLine($"CRITICAL ERROR - Failed to refresh loot: {ex}");
             }
         }
 
@@ -99,15 +93,15 @@ namespace eft_dma_radar.Tarkov.Loot
         /// <summary>
         /// Updates referenced Loot List with fresh values.
         /// </summary>
-        private void GetLoot()
+        private void GetLoot(CancellationToken ct)
         {
             var lootListAddr = Memory.ReadPtr(_lgw + Offsets.ClientLocalGameWorld.LootList);
-            using var lootList = MemList<ulong>.Get(lootListAddr);
+            using var lootListLease = MemList<ulong>.Lease(lootListAddr, true, out var lootList);
             var loot = new List<LootItem>(lootList.Count);
             var containers = new List<StaticLootContainer>(64);
             var deadPlayers = Memory.Players?
                 .Where(x => x.Corpse is not null)?.ToList();
-            using var map = ScatterReadMap.Get();
+            using var mapLease = ScatterReadMap.Lease(out var map);
             var round1 = map.AddRound();
             var round2 = map.AddRound();
             var round3 = map.AddRound();
@@ -115,7 +109,7 @@ namespace eft_dma_radar.Tarkov.Loot
             for (int ix = 0; ix < lootList.Count; ix++)
             {
                 var i = ix;
-                _ct.ThrowIfCancellationRequested();
+                ct.ThrowIfCancellationRequested();
                 var lootBase = lootList[i];
                 round1[i].AddEntry<MemPointer>(0, lootBase + ObjectClass.MonoBehaviourOffset); // MonoBehaviour
                 round1[i].AddEntry<MemPointer>(1, lootBase + ObjectClass.To_NamePtr[0]); // C1
@@ -154,12 +148,12 @@ namespace eft_dma_radar.Tarkov.Loot
                                             {
                                                 map.CompletionCallbacks += () => // Store this as callback, let scatter reads all finish first (benchmarked faster)
                                                 {
-                                                    _ct.ThrowIfCancellationRequested();
+                                                    ct.ThrowIfCancellationRequested();
                                                     try
                                                     {
                                                         ProcessLootIndex(loot, containers, deadPlayers,
                                                             interactiveClass, objectName,
-                                                            transformInternal, className, gameObject);
+                                                            transformInternal, className);
                                                     }
                                                     catch
                                                     {
@@ -176,15 +170,15 @@ namespace eft_dma_radar.Tarkov.Loot
             }
 
             map.Execute(); // execute scatter read
-            this.UnfilteredLoot = loot;
-            this.StaticLootContainers = containers;
+            UnfilteredLoot = loot;
+            StaticLootContainers = containers;
         }
 
         /// <summary>
         /// Process a single loot index.
         /// </summary>
-        private static void ProcessLootIndex(List<LootItem> loot, List<StaticLootContainer> containers, IReadOnlyList<Player> deadPlayers,
-            ulong interactiveClass, string objectName, ulong transformInternal, string className, ulong gameObject)
+        private static void ProcessLootIndex(List<LootItem> loot, List<StaticLootContainer> containers, IReadOnlyList<PlayerBase> deadPlayers,
+            ulong interactiveClass, string objectName, ulong transformInternal, string className)
         {
             var isCorpse = className.Contains("Corpse", StringComparison.OrdinalIgnoreCase);
             var isLooseLoot = className.Equals("ObservedLootItem", StringComparison.OrdinalIgnoreCase);
@@ -220,10 +214,9 @@ namespace eft_dma_radar.Tarkov.Loot
                     {
                         if (objectName.Equals("loot_collider", StringComparison.OrdinalIgnoreCase))
                         {
-                            loot.Add(new LootAirdrop()
+                            loot.Add(new LootAirdrop
                             {
-                                Position = pos,
-                                InteractiveClass = interactiveClass
+                                Position = pos
                             });
                         }
                         else
@@ -236,13 +229,13 @@ namespace eft_dma_radar.Tarkov.Loot
                             bool containerOpened = Memory.ReadValue<ulong>(interactiveClass + Offsets.LootableContainer.InteractingPlayer) != 0;
                             containers.Add(new StaticLootContainer(ownerItemBsgId, containerOpened)
                             {
-                                Position = pos,
-                                InteractiveClass = interactiveClass,
-                                GameObject = gameObject
+                                Position = pos
                             });
                         }
                     }
-                    catch { }
+                    catch
+                    {
+                    }
                 }
                 else if (isLooseLoot)
                 {
@@ -261,8 +254,7 @@ namespace eft_dma_radar.Tarkov.Loot
                         {
                             questItem = new QuestItem(entry)
                             {
-                                Position = pos,
-                                InteractiveClass = interactiveClass
+                                Position = pos
                             };
                         }
                         else
@@ -273,8 +265,7 @@ namespace eft_dma_radar.Tarkov.Loot
                                 shortName = "Item";
                             questItem = new QuestItem(id, $"Q_{shortName}")
                             {
-                                Position = pos,
-                                InteractiveClass = interactiveClass
+                                Position = pos
                             };
                         }
                         loot.Add(questItem);
@@ -285,14 +276,14 @@ namespace eft_dma_radar.Tarkov.Loot
                         {
                             loot.Add(new LootItem(entry)
                             {
-                                Position = pos,
-                                InteractiveClass = interactiveClass
+                                Position = pos
                             });
                         }
                     }
                 }
             }
         }
+
         private static readonly FrozenSet<string> _skipSlots = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "SecuredContainer", "Dogtag", "Compass", "Eyewear", "ArmBand"
@@ -304,7 +295,7 @@ namespace eft_dma_radar.Tarkov.Loot
         private static void GetItemsInSlots(ulong slotsPtr, List<LootItem> loot, bool isPMC)
         {
             var slotDict = new Dictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);
-            using var slots = MemArray<ulong>.Get(slotsPtr);
+            using var slotsLease = MemArray<ulong>.Lease(slotsPtr, true, out var slots);
 
             foreach (var slot in slots)
             {
@@ -367,7 +358,7 @@ namespace eft_dma_radar.Tarkov.Loot
         {
             ArgumentOutOfRangeException.ThrowIfZero(gridsArrayPtr, nameof(gridsArrayPtr));
             if (recurseDepth++ > 3) return; // Only recurse 3 layers deep (this should be plenty)
-            using var gridsArray = MemArray<ulong>.Get(gridsArrayPtr);
+            using var gridsArrayLease = MemArray<ulong>.Lease(gridsArrayPtr, true, out var gridsArray);
 
             try
             {
@@ -382,7 +373,7 @@ namespace eft_dma_radar.Tarkov.Loot
                     var itemListPtr =
                         Memory.ReadPtr(gridEnumerableClass +
                                        Offsets.GridContainedItems.Items); // -.GClass1797->list_0x18 // Offset: 0x0018 (Type: System.Collections.Generic.List<Item>)
-                    using var itemList = MemList<ulong>.Get(itemListPtr);
+                    using var itemListLease = MemList<ulong>.Lease(itemListPtr, true, out var itemList);
 
                     foreach (var childItem in itemList)
                         try
@@ -402,11 +393,17 @@ namespace eft_dma_radar.Tarkov.Loot
                             GetItemsInGrid(childGridsArrayPtr, containerLoot,
                                 recurseDepth); // Recursively add children to the entity
                         }
-                        catch { }
+                        catch
+                        {
+                        }
                 }
             }
-            catch { }
+            catch
+            {
+            }
         }
+
         #endregion
+
     }
 }

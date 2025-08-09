@@ -1,4 +1,4 @@
-﻿using eft_dma_shared.Common.Misc.Data;
+﻿using eft_dma_radar.Tarkov.Data.TarkovMarket;
 
 namespace eft_dma_radar.Tarkov.Loot
 {

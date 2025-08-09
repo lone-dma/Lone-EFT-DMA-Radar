@@ -1,4 +1,4 @@
-﻿using eft_dma_radar.Tarkov.EFTPlayer;
+﻿using eft_dma_radar.Tarkov.Player;
 
 namespace eft_dma_radar.Tarkov.Loot
 {
@@ -16,6 +16,6 @@ namespace eft_dma_radar.Tarkov.Loot
         /// <summary>
         /// Corpse container's associated player object (if any).
         /// </summary>
-        public Player PlayerObject { get; init; }
+        public PlayerBase PlayerObject { get; init; }
     }
 }

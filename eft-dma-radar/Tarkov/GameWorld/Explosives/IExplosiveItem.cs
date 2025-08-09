@@ -1,12 +1,9 @@
-﻿
-using eft_dma_radar.UI.ESP;
-using eft_dma_radar.UI.Misc;
-using eft_dma_shared.Common.Maps;
-using eft_dma_shared.Common.Unity;
+﻿using eft_dma_radar.UI.Skia.Maps;
+using eft_dma_radar.Unity;
 
 namespace eft_dma_radar.Tarkov.GameWorld.Explosives
 {
-    public interface IExplosiveItem : IWorldEntity, IMapEntity, IESPEntity
+    public interface IExplosiveItem : IWorldEntity, IMapEntity
     {
         /// <summary>
         /// Base address of the explosive item.

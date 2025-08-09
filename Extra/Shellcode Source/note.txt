@@ -1,5 +1,0 @@
-Here is the source for the shellcode bytes in Lone EFT DMA. I compile this to Release/x64 and then grab the function bytes from IDA64. This way I can work with these shells natively in C#.
-
-If you decide to modify these in any way, make sure the generated shellcode does not contain any RIP Addressing (relative instruction pointer), or your game will crash. Likewise using imports or anything that references globals in .rdata is a no go 
-
-You will notice that in AntiPage I manually resolve the VirtualQuery import

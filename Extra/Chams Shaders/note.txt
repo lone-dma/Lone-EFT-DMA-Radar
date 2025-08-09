@@ -1,5 +1,0 @@
-Here are some shaders you can use for chams. I am only using the Vis/Vischeck.
-
-If you want to use them on different Unity Versions, you will need to create an Asset Bundle in that version of Unity Editor (this is an exercise for the reader).
-
-Enjoy

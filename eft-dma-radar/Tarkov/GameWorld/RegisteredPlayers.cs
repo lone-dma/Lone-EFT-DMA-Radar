@@ -1,18 +1,18 @@
-﻿using eft_dma_shared.Common.Misc;
-using eft_dma_radar.Tarkov.EFTPlayer;
-using eft_dma_shared.Common.DMA.ScatterAPI;
-using eft_dma_shared.Common.Unity.Collections;
+﻿using eft_dma_radar.Misc;
+using eft_dma_radar.Tarkov.Player;
+using eft_dma_radar.DMA.ScatterAPI;
+using eft_dma_radar.Unity.Collections;
 
 namespace eft_dma_radar.Tarkov.GameWorld
 {
-    public sealed class RegisteredPlayers : IReadOnlyCollection<Player>
+    public sealed class RegisteredPlayers : IReadOnlyCollection<PlayerBase>
     {
         #region Fields/Properties/Constructor
 
         public static implicit operator ulong(RegisteredPlayers x) => x.Base;
         private ulong Base { get; }
         private readonly LocalGameWorld _game;
-        private readonly ConcurrentDictionary<ulong, Player> _players = new();
+        private readonly ConcurrentDictionary<ulong, PlayerBase> _players = new();
 
         /// <summary>
         /// LocalPlayer Instance.
@@ -40,7 +40,7 @@ namespace eft_dma_radar.Tarkov.GameWorld
         {
             try
             {
-                using var playersList = MemList<ulong>.Get(this, false); // Realtime Read
+                using var playersListLease = MemList<ulong>.Lease(this, false, out var playersList); // Realtime Read
                 var registered = playersList.Where(x => x != 0x0).ToHashSet();
                 /// Allocate New Players
                 foreach (var playerBase in registered)
@@ -51,20 +51,20 @@ namespace eft_dma_radar.Tarkov.GameWorld
                     {
                         if (existingPlayer.ErrorTimer.ElapsedMilliseconds >= 1500) // Erroring out a lot? Re-Alloc
                         {
-                            LoneLogging.WriteLine($"WARNING - Existing player '{existingPlayer.Name}' being re-allocated due to excessive errors...");
-                            Player.Allocate(_players, playerBase);
+                            Debug.WriteLine($"WARNING - Existing player '{existingPlayer.Name}' being re-allocated due to excessive errors...");
+                            PlayerBase.Allocate(_players, playerBase);
                         }
                         // Nothing else needs to happen here
                     }
                     else // Add New Player
-                        Player.Allocate(_players, playerBase);
+                        PlayerBase.Allocate(_players, playerBase);
                 }
                 /// Update Existing Players incl LocalPlayer
                 UpdateExistingPlayers(registered);
             }
             catch (Exception ex)
             {
-                LoneLogging.WriteLine($"CRITICAL ERROR - RegisteredPlayers Loop FAILED: {ex}");
+                Debug.WriteLine($"CRITICAL ERROR - RegisteredPlayers Loop FAILED: {ex}");
             }
         }
 
@@ -89,7 +89,7 @@ namespace eft_dma_radar.Tarkov.GameWorld
             var allPlayers = _players.Values;
             if (allPlayers.Count == 0)
                 return;
-            using var map = ScatterReadMap.Get();
+            using var mapLease = ScatterReadMap.Lease(out var map);
             var round1 = map.AddRound(false);
             int i = 0;
             foreach (var player in allPlayers)
@@ -109,13 +109,13 @@ namespace eft_dma_radar.Tarkov.GameWorld
             {
                 var btr = new BtrOperator(btrView, btrPlayerBase);
                 _players[btrPlayerBase] = btr;
-                LoneLogging.WriteLine("BTR Allocated!");
+                Debug.WriteLine("BTR Allocated!");
             }
         }
 
         #region IReadOnlyCollection
         public int Count => _players.Values.Count;
-        public IEnumerator<Player> GetEnumerator() =>
+        public IEnumerator<PlayerBase> GetEnumerator() =>
             _players.Values.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         #endregion

@@ -1,18 +1,19 @@
-﻿using eft_dma_shared.Common.Misc.Data;
+﻿using eft_dma_radar.Misc;
+using eft_dma_radar.Tarkov.Data.TarkovMarket;
 
 namespace eft_dma_radar.Tarkov.Loot
 {
     public class LootContainer : LootItem
     {
         private static readonly TarkovMarketItem _defaultItem = new();
-        private static readonly Predicate<LootItem> _pTrue = (x) => { return true; };
+        private static readonly Predicate<LootItem> _pTrue = x => { return true; };
         private Predicate<LootItem> _filter = _pTrue;
 
         public override string Name
         {
             get
             {
-                var items = this.FilteredLoot;
+                var items = FilteredLoot;
                 if (items is not null && items.Count() == 1)
                     return items.First().Name ?? "Loot";
                 return "Loot";
@@ -25,7 +26,7 @@ namespace eft_dma_radar.Tarkov.Loot
         public LootContainer(IReadOnlyList<LootItem> loot) : base(_defaultItem)
         {
             ArgumentNullException.ThrowIfNull(loot, nameof(loot));
-            this.Loot = loot;
+            Loot = loot;
         }
 
         /// <summary>

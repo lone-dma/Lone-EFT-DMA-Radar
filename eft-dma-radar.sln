@@ -1,51 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.35806.103 d17.14
+VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eft-dma-radar", "eft-dma-radar\eft-dma-radar.csproj", "{43A71BE8-F458-6F31-B2CF-332EA4C4CC2F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eft-dma-shared", "eft-dma-shared\eft-dma-shared.csproj", "{1FE841D8-C329-4E74-0C80-B3AC965CBBBE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "arena-dma-radar", "arena-dma-radar\arena-dma-radar.csproj", "{283C6925-1B9B-610D-1C04-CB340C624E2F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eft-dma-radar", "eft-dma-radar\eft-dma-radar.csproj", "{7F6D99FB-CD79-68B0-78DE-FDEB5E23FA1E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
-		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{43A71BE8-F458-6F31-B2CF-332EA4C4CC2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{43A71BE8-F458-6F31-B2CF-332EA4C4CC2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{43A71BE8-F458-6F31-B2CF-332EA4C4CC2F}.Debug|x64.ActiveCfg = Debug|x64
-		{43A71BE8-F458-6F31-B2CF-332EA4C4CC2F}.Debug|x64.Build.0 = Debug|x64
-		{43A71BE8-F458-6F31-B2CF-332EA4C4CC2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{43A71BE8-F458-6F31-B2CF-332EA4C4CC2F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{43A71BE8-F458-6F31-B2CF-332EA4C4CC2F}.Release|x64.ActiveCfg = Release|x64
-		{43A71BE8-F458-6F31-B2CF-332EA4C4CC2F}.Release|x64.Build.0 = Release|x64
-		{1FE841D8-C329-4E74-0C80-B3AC965CBBBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1FE841D8-C329-4E74-0C80-B3AC965CBBBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1FE841D8-C329-4E74-0C80-B3AC965CBBBE}.Debug|x64.ActiveCfg = Debug|x64
-		{1FE841D8-C329-4E74-0C80-B3AC965CBBBE}.Debug|x64.Build.0 = Debug|x64
-		{1FE841D8-C329-4E74-0C80-B3AC965CBBBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1FE841D8-C329-4E74-0C80-B3AC965CBBBE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1FE841D8-C329-4E74-0C80-B3AC965CBBBE}.Release|x64.ActiveCfg = Release|x64
-		{1FE841D8-C329-4E74-0C80-B3AC965CBBBE}.Release|x64.Build.0 = Release|x64
-		{283C6925-1B9B-610D-1C04-CB340C624E2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{283C6925-1B9B-610D-1C04-CB340C624E2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{283C6925-1B9B-610D-1C04-CB340C624E2F}.Debug|x64.ActiveCfg = Debug|x64
-		{283C6925-1B9B-610D-1C04-CB340C624E2F}.Debug|x64.Build.0 = Debug|x64
-		{283C6925-1B9B-610D-1C04-CB340C624E2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{283C6925-1B9B-610D-1C04-CB340C624E2F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{283C6925-1B9B-610D-1C04-CB340C624E2F}.Release|x64.ActiveCfg = Release|x64
-		{283C6925-1B9B-610D-1C04-CB340C624E2F}.Release|x64.Build.0 = Release|x64
+		{7F6D99FB-CD79-68B0-78DE-FDEB5E23FA1E}.Debug|x64.ActiveCfg = Debug|x64
+		{7F6D99FB-CD79-68B0-78DE-FDEB5E23FA1E}.Debug|x64.Build.0 = Debug|x64
+		{7F6D99FB-CD79-68B0-78DE-FDEB5E23FA1E}.Release|x64.ActiveCfg = Release|x64
+		{7F6D99FB-CD79-68B0-78DE-FDEB5E23FA1E}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {226CDDDB-E756-47FA-B12B-7CFB825527F3}
+		SolutionGuid = {9FE05244-9482-47D1-B12C-9357E58CD3AB}
 	EndGlobalSection
 EndGlobal

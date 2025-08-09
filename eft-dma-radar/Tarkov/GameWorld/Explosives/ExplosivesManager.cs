@@ -1,11 +1,11 @@
-﻿using eft_dma_shared.Common.Misc;
-using eft_dma_shared.Common.Unity.Collections;
+﻿using eft_dma_radar.Misc;
+using eft_dma_radar.Unity.Collections;
 
 namespace eft_dma_radar.Tarkov.GameWorld.Explosives
 {
     public sealed class ExplosivesManager : IReadOnlyCollection<IExplosiveItem>
     {
-        private static readonly uint[] _toSyncObjects = new uint[] { Offsets.ClientLocalGameWorld.SynchronizableObjectLogicProcessor, Offsets.SynchronizableObjectLogicProcessor.SynchronizableObjects };
+        private static readonly uint[] _toSyncObjects = new[] { Offsets.ClientLocalGameWorld.SynchronizableObjectLogicProcessor, Offsets.SynchronizableObjectLogicProcessor.SynchronizableObjects };
         private readonly ulong _localGameWorld;
         private readonly ConcurrentDictionary<ulong, IExplosiveItem> _explosives = new();
         private ulong _grenadesBase;
@@ -24,25 +24,26 @@ namespace eft_dma_radar.Tarkov.GameWorld.Explosives
         /// <summary>
         /// Check for "hot" explosives in LocalGameWorld if due.
         /// </summary>
-        public void Refresh()
+        public void Refresh(CancellationToken ct)
         {
             foreach (var explosive in _explosives.Values)
             {
+                ct.ThrowIfCancellationRequested();
                 try
                 {
                     explosive.Refresh();
                 }
                 catch (Exception ex)
                 {
-                    LoneLogging.WriteLine($"Error Refreshing Explosive @ 0x{explosive.Addr.ToString("X")}: {ex}");
+                    Debug.WriteLine($"Error Refreshing Explosive @ 0x{explosive.Addr.ToString("X")}: {ex}");
                 }
             }
-            GetGrenades();
-            GetTripwires();
-            GetMortarProjectiles();
+            GetGrenades(ct);
+            GetTripwires(ct);
+            GetMortarProjectiles(ct);
         }
 
-        private void GetGrenades()
+        private void GetGrenades(CancellationToken ct)
         {
             try
             {
@@ -50,9 +51,10 @@ namespace eft_dma_radar.Tarkov.GameWorld.Explosives
                 {
                     Init();
                 }
-                using var allGrenades = MemList<ulong>.Get(_grenadesBase, false);
+                using var allGrenadesLease = MemList<ulong>.Lease(_grenadesBase, false, out var allGrenades);
                 foreach (var grenadeAddr in allGrenades)
                 {
+                    ct.ThrowIfCancellationRequested();
                     try
                     {
                         if (!_explosives.ContainsKey(grenadeAddr))
@@ -63,25 +65,26 @@ namespace eft_dma_radar.Tarkov.GameWorld.Explosives
                     }
                     catch (Exception ex)
                     {
-                        LoneLogging.WriteLine($"Error Processing Grenade @ 0x{grenadeAddr.ToString("X")}: {ex}");
+                        Debug.WriteLine($"Error Processing Grenade @ 0x{grenadeAddr.ToString("X")}: {ex}");
                     }
                 }
             }
             catch (Exception ex)
             {
                 _grenadesBase = 0x0;
-                LoneLogging.WriteLine($"Grenades Error: {ex}");
+                Debug.WriteLine($"Grenades Error: {ex}");
             }
         }
 
-        private void GetTripwires()
+        private void GetTripwires(CancellationToken ct)
         {
             try
             {
                 var syncObjectsPtr = Memory.ReadPtrChain(_localGameWorld, _toSyncObjects);
-                using var syncObjects = MemList<ulong>.Get(syncObjectsPtr);
+                using var syncObjectsLease = MemList<ulong>.Lease(syncObjectsPtr, true, out var syncObjects);
                 foreach (var syncObject in syncObjects)
                 {
+                    ct.ThrowIfCancellationRequested();
                     try
                     {
                         var type = (Enums.SynchronizableObjectType)Memory.ReadValue<int>(syncObject + Offsets.SynchronizableObject.Type);
@@ -95,17 +98,17 @@ namespace eft_dma_radar.Tarkov.GameWorld.Explosives
                     }
                     catch (Exception ex)
                     {
-                        LoneLogging.WriteLine($"Error Processing SyncObject @ 0x{syncObject.ToString("X")}: {ex}");
+                        Debug.WriteLine($"Error Processing SyncObject @ 0x{syncObject.ToString("X")}: {ex}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                LoneLogging.WriteLine($"Sync Objects Error: {ex}");
+                Debug.WriteLine($"Sync Objects Error: {ex}");
             }
         }
 
-        private void GetMortarProjectiles()
+        private void GetMortarProjectiles(CancellationToken ct)
         {
             try
             {
@@ -115,9 +118,10 @@ namespace eft_dma_radar.Tarkov.GameWorld.Explosives
                     var activeProjectilesPtr = Memory.ReadValue<ulong>(clientShellingController + Offsets.ClientShellingController.ActiveClientProjectiles);
                     if (activeProjectilesPtr != 0x0)
                     {
-                        using var activeProjectiles = MemDictionary<int, ulong>.Get(activeProjectilesPtr);
+                        using var activeProjectilesLease = MemDictionary<int, ulong>.Lease(activeProjectilesPtr, true, out var activeProjectiles);
                         foreach (var activeProjectile in activeProjectiles)
                         {
+                            ct.ThrowIfCancellationRequested();
                             if (activeProjectile.Value == 0x0)
                                 continue;
                             try
@@ -130,7 +134,7 @@ namespace eft_dma_radar.Tarkov.GameWorld.Explosives
                             }
                             catch (Exception ex)
                             {
-                                LoneLogging.WriteLine($"Error Processing Mortar Projectile @ 0x{activeProjectile.Value.ToString("X")}: {ex}");
+                                Debug.WriteLine($"Error Processing Mortar Projectile @ 0x{activeProjectile.Value.ToString("X")}: {ex}");
                             }
                         }
                     }
@@ -138,7 +142,7 @@ namespace eft_dma_radar.Tarkov.GameWorld.Explosives
             }
             catch (Exception ex)
             {
-                LoneLogging.WriteLine($"Mortar Projectiles Error: {ex}");
+                Debug.WriteLine($"Mortar Projectiles Error: {ex}");
             }
         }
 
