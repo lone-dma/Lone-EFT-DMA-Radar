@@ -69,9 +69,6 @@ namespace eft_dma_radar
                 _mutex = new Mutex(true, MUTEX_ID, out bool singleton);
                 if (!singleton)
                     throw new InvalidOperationException("The Application Is Already Running!");
-#if !DEBUG
-                VerifyDependencies();
-#endif
                 Config = EftDmaConfig.Load();
                 ServiceProvider = BuildServiceProvider();
                 HttpClientFactory = ServiceProvider.GetRequiredService<IHttpClientFactory>();
@@ -219,34 +216,6 @@ namespace eft_dma_radar
             const uint timerResolutionMs = 5;
             if (TimeBeginPeriod(timerResolutionMs) != 0)
                 Debug.WriteLine($"WARNING: Unable to set timer resolution to {timerResolutionMs}ms. This may cause performance issues.");
-        }
-
-        /// <summary>
-        /// Validates that all startup dependencies are present.
-        /// </summary>
-        private static void VerifyDependencies()
-        {
-            var dependencies = new List<string>
-            {
-                "vmm.dll",
-                "leechcore.dll",
-                "FTD3XX.dll",
-                "symsrv.dll",
-                "dbghelp.dll",
-                "vcruntime140.dll",
-                "tinylz4.dll",
-                "libSkiaSharp.dll",
-                "libHarfBuzzSharp.dll",
-                "Maps.bin"
-            };
-
-            foreach (var dep in dependencies)
-                if (!File.Exists(dep))
-                    throw new FileNotFoundException($"Missing Dependency '{dep}'\n\n" +
-                                                    $"==Troubleshooting==\n" +
-                                                    $"1. Make sure that you unzipped the Client Files, and that all files are present in the same folder as the Radar Client (EXE).\n" +
-                                                    $"2. If using a shortcut, make sure the Current Working Directory (CWD) is set to the " +
-                                                    $"same folder that the Radar Client (EXE) is located in.");
         }
 
         [LibraryImport("kernel32.dll")]
