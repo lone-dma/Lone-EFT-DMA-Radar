@@ -80,8 +80,7 @@ namespace eft_dma_radar.DMA
                     {
                         Debug.WriteLine("[DMA] No MemMap, attempting to generate...");
                         _hVMM = new Vmm(args: initArgs);
-                        var map = _hVMM.GetMemoryMap() ??
-                            throw new InvalidOperationException("MapMemoryAsString FAIL");
+                        string map = _hVMM.GetMemoryMap();
                         var mapBytes = Encoding.ASCII.GetBytes(map);
                         if (!_hVMM.LeechCore.Command(LeechCore.LC_CMD_MEMMAP_SET, mapBytes, out _))
                             throw new InvalidOperationException("LC_CMD_MEMMAP_SET FAIL");
