@@ -9,6 +9,7 @@ using eft_dma_radar.Unity;
 using VmmSharpEx;
 using System.Drawing;
 using eft_dma_radar.Tarkov.Quests;
+using VmmSharpEx.Refresh;
 
 namespace eft_dma_radar.DMA
 {
@@ -24,7 +25,7 @@ namespace eft_dma_radar.DMA
         private const uint MAX_READ_SIZE = (uint)0x1000 * 1500;
         private static readonly ManualResetEvent _syncProcessRunning = new(false);
         private static readonly ManualResetEvent _syncInRaid = new(false);
-        private readonly Vmm _hVMM;
+        private readonly Vmm _vmm;
         private VmmProcess _proc;
         private bool _restartRadar;
 
@@ -79,12 +80,14 @@ namespace eft_dma_radar.DMA
                     if (!File.Exists(MEMORY_MAP_FILE))
                     {
                         Debug.WriteLine("[DMA] No MemMap, attempting to generate...");
-                        _hVMM = new Vmm(args: initArgs);
-                        string map = _hVMM.GetMemoryMap();
-                        var mapBytes = Encoding.ASCII.GetBytes(map);
-                        if (!_hVMM.LeechCore.Command(LeechCore.LC_CMD_MEMMAP_SET, mapBytes, out _))
-                            throw new InvalidOperationException("LC_CMD_MEMMAP_SET FAIL");
-                        File.WriteAllBytes(MEMORY_MAP_FILE, mapBytes);
+                        _vmm = new Vmm(args: initArgs)
+                        {
+                            EnableMemoryWriting = false
+                        };
+                        _vmm.SetupMemoryMap(
+                            strMap: out _,
+                            applyMap: true,
+                            outputFile: MEMORY_MAP_FILE);
                     }
                     else
                     {
@@ -92,8 +95,12 @@ namespace eft_dma_radar.DMA
                         initArgs = initArgs.Concat(mapArgs).ToArray();
                     }
                 }
-                _hVMM ??= new Vmm(args: initArgs);
-                SetupVmmRefresh();
+                _vmm ??= new Vmm(args: initArgs)
+                {
+                    EnableMemoryWriting = false
+                };
+                _vmm.RegisterAutoRefresh(RefreshOptions.MemoryPartial, TimeSpan.FromMilliseconds(300));
+                _vmm.RegisterAutoRefresh(RefreshOptions.TlbPartial, TimeSpan.FromSeconds(2));
                 ProcessStopped += MemDMA_ProcessStopped;
                 RaidStopped += MemDMA_RaidStopped;
                 // Start Memory Thread after successful startup
@@ -161,7 +168,7 @@ namespace eft_dma_radar.DMA
             {
                 try
                 {
-                    ForceFullRefresh();
+                    _vmm.ForceFullRefresh();
                     ResourceJanitor.Run();
                     LoadProcess();
                     LoadModules();
@@ -256,7 +263,7 @@ namespace eft_dma_radar.DMA
         private void LoadProcess()
         {
             
-            if (_hVMM.GetProcessByName(GAME_PROCESS_NAME) is not VmmProcess proc)
+            if (_vmm.GetProcessByName(GAME_PROCESS_NAME) is not VmmProcess proc)
                 throw new InvalidOperationException($"Unable to find '{GAME_PROCESS_NAME}'");
             _proc = proc;
         }
@@ -272,45 +279,6 @@ namespace eft_dma_radar.DMA
             ArgumentOutOfRangeException.ThrowIfZero(monoBase, nameof(monoBase));
             UnityBase = unityBase;
             MonoBase = monoBase;
-        }
-
-        #endregion
-
-        #region Vmm Refresh
-
-        private readonly System.Timers.Timer _memCacheRefreshTimer = new(TimeSpan.FromMilliseconds(300));
-        private readonly System.Timers.Timer _tlbRefreshTimer = new(TimeSpan.FromSeconds(2));
-
-        /// <summary>
-        /// Register Vmm Refreshing (we only refresh what/when we want)
-        /// </summary>
-        private void SetupVmmRefresh()
-        {
-            _memCacheRefreshTimer.Elapsed += MemCacheRefreshTimer_Elapsed;
-            _tlbRefreshTimer.Elapsed += TlbRefreshTimer_Elapsed;
-            _memCacheRefreshTimer.Start();
-            _tlbRefreshTimer.Start();
-        }
-
-        private void MemCacheRefreshTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            if (!_hVMM.SetConfig(Vmm.CONFIG_OPT_REFRESH_FREQ_MEM_PARTIAL, 1))
-                Debug.WriteLine("WARNING: Vmm MEM CACHE Refresh (Partial) Failed!");
-        }
-
-        private void TlbRefreshTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            if (!_hVMM.SetConfig(Vmm.CONFIG_OPT_REFRESH_FREQ_TLB_PARTIAL, 1))
-                Debug.WriteLine("WARNING: Vmm TLB Refresh (Partial) Failed!");
-        }
-
-        /// <summary>
-        /// Manually Force a Full Vmm Refresh.
-        /// </summary>
-        private void ForceFullRefresh()
-        {
-            if (!_hVMM.SetConfig(Vmm.CONFIG_OPT_REFRESH_ALL, 1))
-                Debug.WriteLine("WARNING: Vmm FULL Refresh Failed!");
         }
 
         #endregion
@@ -425,7 +393,7 @@ namespace eft_dma_radar.DMA
                 return;
 
             uint flags = useCache ? 0 : Vmm.FLAG_NOCACHE;
-            using var hScatter = _proc.MemReadScatter2(flags, pagesToRead.ToArray());
+            using var hScatter = _proc.MemReadScatter(flags, pagesToRead.ToArray());
 
             foreach (var entry in entries) // Second loop through all entries - PARSE RESULTS
             {
@@ -641,12 +609,12 @@ namespace eft_dma_radar.DMA
         /// <exception cref="OperationCanceledException"></exception>
         public void ThrowIfProcessNotRunning()
         {
-            ForceFullRefresh();
+            _vmm.ForceFullRefresh();
             for (int i = 0; i < 5; i++)
             {
                 try
                 {
-                    if (_hVMM.GetProcessByName(GAME_PROCESS_NAME) is not VmmProcess proc)
+                    if (_vmm.GetProcessByName(GAME_PROCESS_NAME) is not VmmProcess proc)
                         continue;
                     if (proc.PID != _proc.PID)
                         continue;
@@ -744,7 +712,7 @@ namespace eft_dma_radar.DMA
         {
             if (Interlocked.Exchange(ref _disposed, true) == false)
             {
-                _hVMM.Dispose();
+                _vmm.Dispose();
             }
         }
 
