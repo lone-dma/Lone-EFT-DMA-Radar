@@ -263,7 +263,7 @@ namespace eft_dma_radar.DMA
         private void LoadProcess()
         {
             
-            if (_vmm.GetProcessByName(GAME_PROCESS_NAME) is not VmmProcess proc)
+            if (_vmm.CreateProcess(GAME_PROCESS_NAME) is not VmmProcess proc)
                 throw new InvalidOperationException($"Unable to find '{GAME_PROCESS_NAME}'");
             _proc = proc;
         }
@@ -614,9 +614,8 @@ namespace eft_dma_radar.DMA
             {
                 try
                 {
-                    if (_vmm.GetProcessByName(GAME_PROCESS_NAME) is not VmmProcess proc)
-                        continue;
-                    if (proc.PID != _proc.PID)
+                    uint pid = _vmm.GetPidFromName(GAME_PROCESS_NAME);
+                    if (pid != _proc.PID)
                         continue;
                     return;
                 }
