@@ -1,5 +1,4 @@
 ﻿using eft_dma_radar.Misc.Pools;
-using Microsoft.Extensions.ObjectPool;
 
 namespace eft_dma_radar.DMA.ScatterAPI
 {
@@ -22,6 +21,6 @@ namespace eft_dma_radar.DMA.ScatterAPI
         /// Parse the memory buffer and set the result value.
         /// </summary>
         /// <param name="hScatter">Scatter read handle.</param>
-        void SetResult(VmmSharpEx.LeechCore.SCATTER_HANDLE hScatter);
+        void SetResult(VmmSharpEx.LeechCore.LcScatterHandle hScatter);
     }
 }
