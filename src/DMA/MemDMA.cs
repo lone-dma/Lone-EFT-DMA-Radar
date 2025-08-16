@@ -10,6 +10,7 @@ using VmmSharpEx;
 using System.Drawing;
 using eft_dma_radar.Tarkov.Quests;
 using VmmSharpEx.Refresh;
+using VmmSharpEx.Options;
 
 namespace eft_dma_radar.DMA
 {
@@ -392,7 +393,7 @@ namespace eft_dma_radar.DMA
             if (pagesToRead.Count == 0)
                 return;
 
-            uint flags = useCache ? 0 : Vmm.FLAG_NOCACHE;
+            var flags = useCache ? VmmFlags.None : VmmFlags.NOCACHE;
             using var hScatter = _vmm.MemReadScatter(_pid, flags, pagesToRead.ToArray());
 
             foreach (var entry in entries) // Second loop through all entries - PARSE RESULTS
@@ -428,7 +429,7 @@ namespace eft_dma_radar.DMA
         {
             uint cb = (uint)(SizeChecker<T>.Size * buffer.Length);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(cb, MAX_READ_SIZE, nameof(cb));
-            uint flags = useCache ? 0 : Vmm.FLAG_NOCACHE;
+            var flags = useCache ? VmmFlags.None : VmmFlags.NOCACHE;
 
             if (!_vmm.MemReadSpan(_pid, addr, buffer, out uint cbRead, flags))
                 throw new VmmException("Memory Read Failed!");
@@ -454,17 +455,17 @@ namespace eft_dma_radar.DMA
             var buffer2 = new T[buffer1.Length].AsSpan();
             var buffer3 = new T[buffer1.Length].AsSpan();
             uint cbRead;
-            if (!_vmm.MemReadSpan(_pid, addr, buffer3, out cbRead, Vmm.FLAG_NOCACHE))
+            if (!_vmm.MemReadSpan(_pid, addr, buffer3, out cbRead, VmmFlags.NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             if (cbRead != cb)
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
-            if (!_vmm.MemReadSpan(_pid, addr, buffer2, out cbRead, Vmm.FLAG_NOCACHE))
+            if (!_vmm.MemReadSpan(_pid, addr, buffer2, out cbRead, VmmFlags.NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             if (cbRead != cb)
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
-            if (!_vmm.MemReadSpan(_pid, addr, buffer1, out cbRead, Vmm.FLAG_NOCACHE))
+            if (!_vmm.MemReadSpan(_pid, addr, buffer1, out cbRead, VmmFlags.NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             if (cbRead != cb)
                 throw new VmmException("Memory Read Failed!");
@@ -504,7 +505,7 @@ namespace eft_dma_radar.DMA
         public T ReadValue<T>(ulong addr, bool useCache = true)
             where T : unmanaged, allows ref struct
         {
-            uint flags = useCache ? 0 : Vmm.FLAG_NOCACHE;
+            var flags = useCache ? VmmFlags.None : VmmFlags.NOCACHE;
             if (!_vmm.MemReadValue<T>(_pid, addr, out var result, flags))
                 throw new VmmException("Memory Read Failed!");
             return result;
@@ -519,13 +520,13 @@ namespace eft_dma_radar.DMA
             where T : unmanaged, allows ref struct
         {
             int cb = sizeof(T);
-            if (!_vmm.MemReadValue<T>(_pid, addr, out var r1, Vmm.FLAG_NOCACHE))
+            if (!_vmm.MemReadValue<T>(_pid, addr, out var r1, VmmFlags.NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
-            if (!_vmm.MemReadValue<T>(_pid, addr, out var r2, Vmm.FLAG_NOCACHE))
+            if (!_vmm.MemReadValue<T>(_pid, addr, out var r2, VmmFlags.NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
-            if (!_vmm.MemReadValue<T>(_pid, addr, out var r3, Vmm.FLAG_NOCACHE))
+            if (!_vmm.MemReadValue<T>(_pid, addr, out var r3, VmmFlags.NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             var b1 = new ReadOnlySpan<byte>(&r1, cb);
             var b2 = new ReadOnlySpan<byte>(&r2, cb);
@@ -546,13 +547,13 @@ namespace eft_dma_radar.DMA
             where T : unmanaged, allows ref struct
         {
             int cb = sizeof(T);
-            if (!_vmm.MemReadValue<T>(_pid, addr, out var r1, Vmm.FLAG_NOCACHE))
+            if (!_vmm.MemReadValue<T>(_pid, addr, out var r1, VmmFlags.NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
-            if (!_vmm.MemReadValue<T>(_pid, addr, out var r2, Vmm.FLAG_NOCACHE))
+            if (!_vmm.MemReadValue<T>(_pid, addr, out var r2, VmmFlags.NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
-            if (!_vmm.MemReadValue<T>(_pid, addr, out var r3, Vmm.FLAG_NOCACHE))
+            if (!_vmm.MemReadValue<T>(_pid, addr, out var r3, VmmFlags.NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             var b1 = new ReadOnlySpan<byte>(&r1, cb);
             var b2 = new ReadOnlySpan<byte>(&r2, cb);
