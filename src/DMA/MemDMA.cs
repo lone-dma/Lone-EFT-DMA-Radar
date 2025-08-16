@@ -26,7 +26,7 @@ namespace eft_dma_radar.DMA
         private static readonly ManualResetEvent _syncProcessRunning = new(false);
         private static readonly ManualResetEvent _syncInRaid = new(false);
         private readonly Vmm _vmm;
-        private VmmProcess _proc;
+        private uint _pid;
         private bool _restartRadar;
 
         public string MapID => Game?.MapID;
@@ -246,7 +246,7 @@ namespace eft_dma_radar.DMA
             this.Ready = default;
             UnityBase = default;
             MonoBase = default;
-            _proc = default;
+            _pid = default;
             MonoLib.Reset();
             InputManager.Reset();
         }
@@ -263,9 +263,9 @@ namespace eft_dma_radar.DMA
         private void LoadProcess()
         {
             
-            if (_vmm.CreateProcess(GAME_PROCESS_NAME) is not VmmProcess proc)
+            if (_vmm.PidGetFromName(GAME_PROCESS_NAME, out uint pid))
                 throw new InvalidOperationException($"Unable to find '{GAME_PROCESS_NAME}'");
-            _proc = proc;
+            _pid = pid;
         }
 
         /// <summary>
@@ -273,9 +273,9 @@ namespace eft_dma_radar.DMA
         /// </summary>
         private void LoadModules()
         {
-            var unityBase = _proc.GetModuleBase("UnityPlayer.dll");
+            var unityBase = _vmm.ProcessGetModuleBase(_pid, "UnityPlayer.dll");
             ArgumentOutOfRangeException.ThrowIfZero(unityBase, nameof(unityBase));
-            var monoBase = _proc.GetModuleBase("mono-2.0-bdwgc.dll");
+            var monoBase = _vmm.ProcessGetModuleBase(_pid, "mono-2.0-bdwgc.dll");
             ArgumentOutOfRangeException.ThrowIfZero(monoBase, nameof(monoBase));
             UnityBase = unityBase;
             MonoBase = monoBase;
@@ -393,7 +393,7 @@ namespace eft_dma_radar.DMA
                 return;
 
             uint flags = useCache ? 0 : Vmm.FLAG_NOCACHE;
-            using var hScatter = _proc.MemReadScatter(flags, pagesToRead.ToArray());
+            using var hScatter = _vmm.MemReadScatter(_pid, flags, pagesToRead.ToArray());
 
             foreach (var entry in entries) // Second loop through all entries - PARSE RESULTS
             {
@@ -413,7 +413,7 @@ namespace eft_dma_radar.DMA
         /// <param name="va"></param>
         public void ReadCache(params ulong[] va)
         {
-            _proc.MemPrefetchPages(va);
+            _vmm.MemPrefetchPages(_pid, va);
         }
 
         /// <summary>
@@ -430,7 +430,7 @@ namespace eft_dma_radar.DMA
             ArgumentOutOfRangeException.ThrowIfGreaterThan(cb, MAX_READ_SIZE, nameof(cb));
             uint flags = useCache ? 0 : Vmm.FLAG_NOCACHE;
 
-            if (!_proc.MemReadSpan(addr, buffer, out uint cbRead, flags))
+            if (!_vmm.MemReadSpan(_pid, addr, buffer, out uint cbRead, flags))
                 throw new VmmException("Memory Read Failed!");
 
             if (cbRead == 0)
@@ -454,17 +454,17 @@ namespace eft_dma_radar.DMA
             var buffer2 = new T[buffer1.Length].AsSpan();
             var buffer3 = new T[buffer1.Length].AsSpan();
             uint cbRead;
-            if (!_proc.MemReadSpan(addr, buffer3, out cbRead, Vmm.FLAG_NOCACHE))
+            if (!_vmm.MemReadSpan(_pid, addr, buffer3, out cbRead, Vmm.FLAG_NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             if (cbRead != cb)
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
-            if (!_proc.MemReadSpan(addr, buffer2, out cbRead, Vmm.FLAG_NOCACHE))
+            if (!_vmm.MemReadSpan(_pid, addr, buffer2, out cbRead, Vmm.FLAG_NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             if (cbRead != cb)
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
-            if (!_proc.MemReadSpan(addr, buffer1, out cbRead, Vmm.FLAG_NOCACHE))
+            if (!_vmm.MemReadSpan(_pid, addr, buffer1, out cbRead, Vmm.FLAG_NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             if (cbRead != cb)
                 throw new VmmException("Memory Read Failed!");
@@ -505,7 +505,7 @@ namespace eft_dma_radar.DMA
             where T : unmanaged, allows ref struct
         {
             uint flags = useCache ? 0 : Vmm.FLAG_NOCACHE;
-            if (!_proc.MemReadValue<T>(addr, out var result, flags))
+            if (!_vmm.MemReadValue<T>(_pid, addr, out var result, flags))
                 throw new VmmException("Memory Read Failed!");
             return result;
         }
@@ -519,13 +519,13 @@ namespace eft_dma_radar.DMA
             where T : unmanaged, allows ref struct
         {
             int cb = sizeof(T);
-            if (!_proc.MemReadValue<T>(addr, out var r1, Vmm.FLAG_NOCACHE))
+            if (!_vmm.MemReadValue<T>(_pid, addr, out var r1, Vmm.FLAG_NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
-            if (!_proc.MemReadValue<T>(addr, out var r2, Vmm.FLAG_NOCACHE))
+            if (!_vmm.MemReadValue<T>(_pid, addr, out var r2, Vmm.FLAG_NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
-            if (!_proc.MemReadValue<T>(addr, out var r3, Vmm.FLAG_NOCACHE))
+            if (!_vmm.MemReadValue<T>(_pid, addr, out var r3, Vmm.FLAG_NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             var b1 = new ReadOnlySpan<byte>(&r1, cb);
             var b2 = new ReadOnlySpan<byte>(&r2, cb);
@@ -546,13 +546,13 @@ namespace eft_dma_radar.DMA
             where T : unmanaged, allows ref struct
         {
             int cb = sizeof(T);
-            if (!_proc.MemReadValue<T>(addr, out var r1, Vmm.FLAG_NOCACHE))
+            if (!_vmm.MemReadValue<T>(_pid, addr, out var r1, Vmm.FLAG_NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
-            if (!_proc.MemReadValue<T>(addr, out var r2, Vmm.FLAG_NOCACHE))
+            if (!_vmm.MemReadValue<T>(_pid, addr, out var r2, Vmm.FLAG_NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
-            if (!_proc.MemReadValue<T>(addr, out var r3, Vmm.FLAG_NOCACHE))
+            if (!_vmm.MemReadValue<T>(_pid, addr, out var r3, Vmm.FLAG_NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             var b1 = new ReadOnlySpan<byte>(&r1, cb);
             var b2 = new ReadOnlySpan<byte>(&r2, cb);
@@ -614,9 +614,10 @@ namespace eft_dma_radar.DMA
             {
                 try
                 {
-                    uint pid = _vmm.GetPidFromName(GAME_PROCESS_NAME);
-                    if (pid != _proc.PID)
-                        continue;
+                    if (!_vmm.PidGetFromName(GAME_PROCESS_NAME, out uint pid))
+                        throw new InvalidOperationException();
+                    if (pid != _pid)
+                        throw new InvalidOperationException();
                     return;
                 }
                 catch
