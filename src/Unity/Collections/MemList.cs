@@ -44,7 +44,7 @@ namespace eft_dma_radar.Unity.Collections
                 if (count == 0)
                     return;
                 var listBase = Memory.ReadPtr(addr + ArrOffset, useCache) + ArrStartOffset;
-                Memory.ReadBuffer(listBase, Span, useCache);
+                Memory.ReadSpan(listBase, Span, useCache);
             }
             catch
             {

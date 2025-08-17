@@ -276,7 +276,7 @@ namespace eft_dma_radar.Unity
         private int[] ReadIndices()
         {
             var indices = new int[Index + 1];
-            Memory.ReadBuffer(IndicesAddr, indices.AsSpan(), _useCache);
+            Memory.ReadSpan(IndicesAddr, indices.AsSpan(), _useCache);
             return indices;
         }
 
@@ -288,7 +288,7 @@ namespace eft_dma_radar.Unity
             var vertices = SharedArray<TrsX>.Get(Index + 1);
             try
             {
-                Memory.ReadBuffer(VerticesAddr, vertices.Span, _useCache);
+                Memory.ReadSpan(VerticesAddr, vertices.Span, _useCache);
             }
             catch
             {

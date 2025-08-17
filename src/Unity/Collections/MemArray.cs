@@ -56,7 +56,7 @@ namespace eft_dma_radar.Unity.Collections
                 Initialize(count);
                 if (count == 0)
                     return;
-                Memory.ReadBuffer(addr + ArrBaseOffset, Span, useCache);
+                Memory.ReadSpan(addr + ArrBaseOffset, Span, useCache);
             }
             catch
             {
@@ -80,7 +80,7 @@ namespace eft_dma_radar.Unity.Collections
                 Initialize(count);
                 if (count == 0)
                     return;
-                Memory.ReadBuffer(addr, Span, useCache);
+                Memory.ReadSpan(addr, Span, useCache);
             }
             catch
             {
