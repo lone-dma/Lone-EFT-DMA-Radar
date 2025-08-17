@@ -151,7 +151,7 @@ namespace eft_dma_radar.Unity
             int size = componentArr.Size <= 0x1000 ?
                 (int)componentArr.Size : 0x1000;
             using var compsBufLease = SharedArray<ComponentArrayEntry>.Lease(size, out var compsBuf);
-            Memory.ReadBuffer(componentArr.ArrayBase, compsBuf.Span);
+            Memory.ReadSpan(componentArr.ArrayBase, compsBuf.Span);
             foreach (var comp in compsBuf)
             {
                 var compClass = Memory.ReadPtr(comp.Component + MonoBehaviour.ObjectClassOffset);

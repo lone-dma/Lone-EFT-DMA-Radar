@@ -46,7 +46,7 @@ namespace eft_dma_radar.Unity.Collections
                 if (count == 0)
                     return;
                 var dictBase = Memory.ReadPtr(addr + EntriesOffset, useCache) + EntriesStartOffset;
-                Memory.ReadBuffer(dictBase, Span, useCache); // Single read into mem buffer
+                Memory.ReadSpan(dictBase, Span, useCache); // Single read into mem buffer
             }
             catch
             {

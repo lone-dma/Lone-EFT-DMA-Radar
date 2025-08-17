@@ -393,7 +393,7 @@ namespace eft_dma_radar.DMA
             if (pagesToRead.Count == 0)
                 return;
 
-            var flags = useCache ? VmmFlags.None : VmmFlags.NOCACHE;
+            var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
             using var hScatter = _vmm.MemReadScatter(_pid, flags, pagesToRead.ToArray());
 
             foreach (var entry in entries) // Second loop through all entries - PARSE RESULTS
@@ -422,16 +422,16 @@ namespace eft_dma_radar.DMA
         /// </summary>
         /// <typeparam name="T">Value Type <typeparamref name="T"/></typeparam>
         /// <param name="addr">Virtual Address to read from.</param>
-        /// <param name="buffer">Buffer to receive memory read in.</param>
+        /// <param name="span">Buffer to receive memory read in.</param>
         /// <param name="useCache">Use caching for this read.</param>
-        public void ReadBuffer<T>(ulong addr, Span<T> buffer, bool useCache = true, bool allowPartialRead = false)
+        public void ReadSpan<T>(ulong addr, Span<T> span, bool useCache = true, bool allowPartialRead = false)
             where T : unmanaged
         {
-            uint cb = (uint)(SizeChecker<T>.Size * buffer.Length);
+            uint cb = (uint)(SizeChecker<T>.Size * span.Length);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(cb, MAX_READ_SIZE, nameof(cb));
-            var flags = useCache ? VmmFlags.None : VmmFlags.NOCACHE;
+            var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
 
-            if (!_vmm.MemReadSpan(_pid, addr, buffer, out uint cbRead, flags))
+            if (!_vmm.MemReadSpan(_pid, addr, span, out uint cbRead, flags))
                 throw new VmmException("Memory Read Failed!");
 
             if (cbRead == 0)
@@ -445,15 +445,14 @@ namespace eft_dma_radar.DMA
         /// </summary>
         /// <typeparam name="T">Value Type <typeparamref name="T"/></typeparam>
         /// <param name="addr">Virtual Address to read from.</param>
-        /// <param name="buffer1">Buffer to receive memory read in.</param>
-        /// <param name="useCache">Use caching for this read.</param>
-        public void ReadBufferEnsure<T>(ulong addr, Span<T> buffer1)
+        /// <param name="span">Buffer to receive memory read in.</param>
+        public void ReadSpanEnsure<T>(ulong addr, Span<T> span)
             where T : unmanaged
         {
-            uint cb = (uint)(SizeChecker<T>.Size * buffer1.Length);
+            uint cb = (uint)(SizeChecker<T>.Size * span.Length);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(cb, MAX_READ_SIZE, nameof(cb));
-            var buffer2 = new T[buffer1.Length].AsSpan();
-            var buffer3 = new T[buffer1.Length].AsSpan();
+            var buffer2 = new T[span.Length].AsSpan();
+            var buffer3 = new T[span.Length].AsSpan();
             uint cbRead;
             if (!_vmm.MemReadSpan(_pid, addr, buffer3, out cbRead, VmmFlags.NOCACHE))
                 throw new VmmException("Memory Read Failed!");
@@ -465,11 +464,11 @@ namespace eft_dma_radar.DMA
             if (cbRead != cb)
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
-            if (!_vmm.MemReadSpan(_pid, addr, buffer1, out cbRead, VmmFlags.NOCACHE))
+            if (!_vmm.MemReadSpan(_pid, addr, span, out cbRead, VmmFlags.NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             if (cbRead != cb)
                 throw new VmmException("Memory Read Failed!");
-            if (!buffer1.SequenceEqual(buffer2) || !buffer1.SequenceEqual(buffer3) || !buffer2.SequenceEqual(buffer3))
+            if (!span.SequenceEqual(buffer2) || !span.SequenceEqual(buffer3) || !buffer2.SequenceEqual(buffer3))
             {
                 throw new VmmException("Memory Read Failed!");
             }
@@ -505,7 +504,7 @@ namespace eft_dma_radar.DMA
         public T ReadValue<T>(ulong addr, bool useCache = true)
             where T : unmanaged, allows ref struct
         {
-            var flags = useCache ? VmmFlags.None : VmmFlags.NOCACHE;
+            var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
             if (!_vmm.MemReadValue<T>(_pid, addr, out var result, flags))
                 throw new VmmException("Memory Read Failed!");
             return result;
@@ -575,7 +574,7 @@ namespace eft_dma_radar.DMA
             ArgumentOutOfRangeException.ThrowIfGreaterThan(length, 0x1000, nameof(length));
             Span<byte> buffer = stackalloc byte[length];
             buffer.Clear();
-            ReadBuffer(addr, buffer, useCache, true);
+            ReadSpan(addr, buffer, useCache, true);
             var nullIndex = buffer.IndexOf((byte)0);
             return nullIndex >= 0
                 ? Encoding.UTF8.GetString(buffer.Slice(0, nullIndex))
@@ -593,7 +592,7 @@ namespace eft_dma_radar.DMA
             ArgumentOutOfRangeException.ThrowIfGreaterThan(length, 0x1000, nameof(length));
             Span<byte> buffer = stackalloc byte[length];
             buffer.Clear();
-            ReadBuffer(addr + 0x14, buffer, useCache, true);
+            ReadSpan(addr + 0x14, buffer, useCache, true);
             var nullIndex = buffer.FindUtf16NullTerminatorIndex();
             return nullIndex >= 0
                 ? Encoding.Unicode.GetString(buffer.Slice(0, nullIndex))

@@ -115,7 +115,7 @@ namespace eft_dma_radar.Unity
                 ArgumentOutOfRangeException.ThrowIfGreaterThan(length, 0x1000, nameof(length));
                 Span<byte> buffer = stackalloc byte[length];
                 buffer.Clear();
-                Memory.ReadBuffer(addr, buffer);
+                Memory.ReadSpan(addr, buffer);
                 if (buffer[0] >= 0xE0)
                 {
                     var nullIndex = buffer.IndexOf((byte)0);
