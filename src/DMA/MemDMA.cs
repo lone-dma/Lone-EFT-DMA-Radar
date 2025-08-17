@@ -264,7 +264,7 @@ namespace eft_dma_radar.DMA
         private void LoadProcess()
         {
             
-            if (_vmm.PidGetFromName(GAME_PROCESS_NAME, out uint pid))
+            if (!_vmm.PidGetFromName(GAME_PROCESS_NAME, out uint pid))
                 throw new InvalidOperationException($"Unable to find '{GAME_PROCESS_NAME}'");
             _pid = pid;
         }
