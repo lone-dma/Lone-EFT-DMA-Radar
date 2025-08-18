@@ -181,7 +181,7 @@ namespace eft_dma_radar.DMA.ScatterAPI
                 ulong pageAddr = basePageAddr + 0x1000 * (uint)p; // get current page addr
                 if (hScatter.Results.TryGetValue(pageAddr, out var scatter)) // retrieve page of mem needed
                 {
-                    scatter.Page
+                    scatter.Data
                         .Slice((int)pageOffset, (int)cb)
                         .CopyTo(buffer.Slice(bytesCopied, (int)cb)); // Copy bytes to buffer
                     bytesCopied += (int)cb;

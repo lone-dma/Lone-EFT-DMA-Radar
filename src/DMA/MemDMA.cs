@@ -100,8 +100,8 @@ namespace eft_dma_radar.DMA
                 {
                     EnableMemoryWriting = false
                 };
-                _vmm.RegisterAutoRefresh(RefreshOptions.MemoryPartial, TimeSpan.FromMilliseconds(300));
-                _vmm.RegisterAutoRefresh(RefreshOptions.TlbPartial, TimeSpan.FromSeconds(2));
+                _vmm.RegisterAutoRefresh(RefreshOption.MemoryPartial, TimeSpan.FromMilliseconds(300));
+                _vmm.RegisterAutoRefresh(RefreshOption.TlbPartial, TimeSpan.FromSeconds(2));
                 ProcessStopped += MemDMA_ProcessStopped;
                 RaidStopped += MemDMA_RaidStopped;
                 // Start Memory Thread after successful startup
