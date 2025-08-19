@@ -364,15 +364,19 @@ namespace eft_dma_radar.DMA
         /// Designed to run without throwing unhandled exceptions, which will ensure the maximum amount of
         /// reads are completed OK even if a couple fail.
         /// </summary>
-        public void ReadScatter(IScatterEntry[] entries, bool useCache = true)
+        [ThreadStatic]
+        private static HashSet<ulong> _pagesTls;
+
+        public void ReadScatter(IReadOnlyList<IScatterEntry> entries, bool useCache = true)
         {
-            if (entries is null || entries.Length == 0)
+            if (entries is null || entries.Count == 0)
                 return;
 
-            var pagesToRead = new HashSet<ulong>(entries.Length * 2); // Some reads may span two pages
+            _pagesTls ??= new HashSet<ulong>(512);
+            _pagesTls.Clear();
 
             // Setup pages to read
-            for (int i = 0; i < entries.Length; i++)
+            for (int i = 0; i < entries.Count; i++)
             {
                 var entry = entries[i];
 
@@ -387,18 +391,18 @@ namespace eft_dma_radar.DMA
 
                 for (uint p = 0; p < numPages; p++)
                 {
-                    pagesToRead.Add(basePage + 0x1000ul * p);
+                    _pagesTls.Add(basePage + 0x1000ul * p);
                 }
             }
 
-            if (pagesToRead.Count == 0)
+            if (_pagesTls.Count == 0)
                 return;
 
             var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
             // Read pages
-            using var hScatter = _vmm.MemReadScatter(_pid, flags, pagesToRead.ToArray());
+            using var hScatter = _vmm.MemReadScatter(_pid, flags, _pagesTls.ToArray());
             // Set results
-            for (int i = 0; i < entries.Length; i++)
+            for (int i = 0; i < entries.Count; i++)
             {
                 var entry = entries[i];
                 if (entry.IsFailed)
