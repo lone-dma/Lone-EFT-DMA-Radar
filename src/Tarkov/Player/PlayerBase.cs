@@ -60,9 +60,11 @@ namespace eft_dma_radar.Tarkov.Player
         #region Static Interfaces
 
         public static implicit operator ulong(PlayerBase x) => x.Base;
-        private static readonly ConcurrentDictionary<ulong, Stopwatch> _rateLimit = new();
+        private static readonly long _rateLimitWindowTicks = (long)(Stopwatch.Frequency * 0.5d); // 500ms
+
         protected static readonly GroupManager _groups = new();
         protected static int _playerScavNumber;
+        private static long _last;
 
         /// <summary>
         /// Resets/Updates 'static' assets in preparation for a new game/raid instance.
@@ -70,7 +72,7 @@ namespace eft_dma_radar.Tarkov.Player
         public static void Reset()
         {
             _groups.Clear();
-            _rateLimit.Clear();
+            _last = 0;
             _playerScavNumber = 0;
         }
 
@@ -83,14 +85,15 @@ namespace eft_dma_radar.Tarkov.Player
         /// </summary>
         /// <param name="playerDict">Player Dictionary collection to add the newly allocated player to.</param>
         /// <param name="playerBase">Player base memory address.</param>
-        /// <param name="initialPosition">Initial position to be set (Optional). Usually for reallocations.</param>
         public static void Allocate(ConcurrentDictionary<ulong, PlayerBase> playerDict, ulong playerBase)
         {
-            var sw = _rateLimit.AddOrUpdate(playerBase,
-                key => new Stopwatch(),
-                (key, oldValue) => oldValue);
-            if (sw.IsRunning && sw.Elapsed.TotalMilliseconds < 500f)
+            long now = Stopwatch.GetTimestamp();
+
+            if (unchecked(now - _last) < _rateLimitWindowTicks)
+            {
                 return;
+            }    
+
             try
             {
                 var player = AllocateInternal(playerBase);
@@ -103,7 +106,8 @@ namespace eft_dma_radar.Tarkov.Player
             }
             finally
             {
-                sw.Restart();
+                // Update last-attempt timestamp even on failure to avoid thrashing.
+                _last = now;
             }
         }
 
