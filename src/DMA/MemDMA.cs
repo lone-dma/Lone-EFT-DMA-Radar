@@ -367,16 +367,16 @@ namespace eft_dma_radar.DMA
         [ThreadStatic]
         private static HashSet<ulong> _pagesTls;
 
-        public void ReadScatter(IReadOnlyList<IScatterEntry> entries, bool useCache = true)
+        public void ReadScatter(ReadOnlySpan<IScatterEntry> entries, bool useCache = true)
         {
-            if (entries is null || entries.Count == 0)
+            if (entries.Length == 0)
                 return;
 
             _pagesTls ??= new HashSet<ulong>(512);
             _pagesTls.Clear();
 
             // Setup pages to read
-            for (int i = 0; i < entries.Count; i++)
+            for (int i = 0; i < entries.Length; i++)
             {
                 var entry = entries[i];
 
@@ -402,7 +402,7 @@ namespace eft_dma_radar.DMA
             // Read pages
             using var hScatter = _vmm.MemReadScatter(_pid, flags, _pagesTls.ToArray());
             // Set results
-            for (int i = 0; i < entries.Count; i++)
+            for (int i = 0; i < entries.Length; i++)
             {
                 var entry = entries[i];
                 if (entry.IsFailed)
