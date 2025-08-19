@@ -60,11 +60,11 @@ namespace eft_dma_radar.Tarkov.Player
         #region Static Interfaces
 
         public static implicit operator ulong(PlayerBase x) => x.Base;
-        private static readonly long _rateLimitWindowTicks = (long)(Stopwatch.Frequency * 0.5d); // 500ms
+        private static readonly long _rateLimitTicks = (long)(Stopwatch.Frequency * 0.5d); // 500ms
+        private static readonly ConcurrentDictionary<ulong, long> _rateLimit = new();
 
         protected static readonly GroupManager _groups = new();
         protected static int _playerScavNumber;
-        private static long _last;
 
         /// <summary>
         /// Resets/Updates 'static' assets in preparation for a new game/raid instance.
@@ -72,7 +72,7 @@ namespace eft_dma_radar.Tarkov.Player
         public static void Reset()
         {
             _groups.Clear();
-            _last = 0;
+            _rateLimit.Clear();
             _playerScavNumber = 0;
         }
 
@@ -89,7 +89,7 @@ namespace eft_dma_radar.Tarkov.Player
         {
             long now = Stopwatch.GetTimestamp();
 
-            if (unchecked(now - _last) < _rateLimitWindowTicks)
+            if (_rateLimit.TryGetValue(playerBase, out var last) && unchecked(now - last) < _rateLimitTicks)
             {
                 return;
             }    
@@ -107,7 +107,7 @@ namespace eft_dma_radar.Tarkov.Player
             finally
             {
                 // Update last-attempt timestamp even on failure to avoid thrashing.
-                _last = now;
+                _rateLimit[playerBase] = now;
             }
         }
 
