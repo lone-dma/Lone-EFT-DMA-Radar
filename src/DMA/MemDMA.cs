@@ -366,40 +366,44 @@ namespace eft_dma_radar.DMA
         /// </summary>
         public void ReadScatter(IScatterEntry[] entries, bool useCache = true)
         {
-            if (entries.Length == 0)
+            if (entries is null || entries.Length == 0)
                 return;
-            var pagesToRead = new HashSet<ulong>(entries.Length); // Will contain each unique page only once to prevent reading the same page multiple times
-            foreach (var entry in entries) // First loop through all entries - GET INFO
+
+            var pagesToRead = new HashSet<ulong>(entries.Length * 2); // Some reads may span two pages
+
+            // Setup pages to read
+            for (int i = 0; i < entries.Length; i++)
             {
-                // INTEGRITY CHECK - Make sure the read is valid and within range
-                if (entry.Address == 0x0 || entry.CB == 0 || (uint)entry.CB > MAX_READ_SIZE)
+                var entry = entries[i];
+
+                if (entry.Address == 0x0 || entry.CB <= 0 || (uint)entry.CB > MAX_READ_SIZE)
                 {
-                    //Debug.WriteLine($"[Scatter Read] Out of bounds read @ 0x{entry.Address.ToString("X")} ({entry.CB})");
                     entry.IsFailed = true;
                     continue;
                 }
 
-                // get the number of pages
                 uint numPages = ADDRESS_AND_SIZE_TO_SPAN_PAGES(entry.Address, (uint)entry.CB);
                 ulong basePage = PAGE_ALIGN(entry.Address);
 
-                //loop all the pages we would need
-                for (int p = 0; p < numPages; p++)
+                for (uint p = 0; p < numPages; p++)
                 {
-                    ulong page = basePage + 0x1000 * (uint)p;
-                    pagesToRead.Add(page);
+                    pagesToRead.Add(basePage + 0x1000ul * p);
                 }
             }
+
             if (pagesToRead.Count == 0)
                 return;
 
             var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
+            // Read pages
             using var hScatter = _vmm.MemReadScatter(_pid, flags, pagesToRead.ToArray());
-
-            foreach (var entry in entries) // Second loop through all entries - PARSE RESULTS
+            // Set results
+            for (int i = 0; i < entries.Length; i++)
             {
+                var entry = entries[i];
                 if (entry.IsFailed)
                     continue;
+
                 entry.SetResult(hScatter);
             }
         }
