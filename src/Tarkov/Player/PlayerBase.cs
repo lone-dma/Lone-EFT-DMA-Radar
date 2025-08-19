@@ -181,9 +181,9 @@ namespace eft_dma_radar.Tarkov.Player
         public virtual Skeleton Skeleton => throw new NotImplementedException(nameof(Skeleton));
 
         /// <summary>
-        /// Duration of consecutive errors.
+        /// TRUE if critical memory reads (position/rotation) have failed.
         /// </summary>
-        public Stopwatch ErrorTimer { get; } = new();
+        public bool IsError { get; set; }
 
         /// <summary>
         /// Player's Gear/Loadout Information and contained items.
@@ -505,10 +505,7 @@ namespace eft_dma_radar.Tarkov.Player
                     }
                 }
 
-                if (p1 && p2)
-                    ErrorTimer.Reset();
-                else
-                    ErrorTimer.Start();
+                IsError = !(p1 && p2);
             };
         }
 
@@ -809,7 +806,7 @@ namespace eft_dma_radar.Tarkov.Player
                     if (!App.Config.UI.HideNames) // show full names & info
                     {
                         string name = null;
-                        if (ErrorTimer.ElapsedMilliseconds > 100)
+                        if (IsError)
                             name = "ERROR"; // In case POS stops updating, let us know!
                         else
                             name = Name;
@@ -828,7 +825,7 @@ namespace eft_dma_radar.Tarkov.Player
                     else // just height, distance
                     {
                         lines.Add($"{(int)Math.Round(height)},{(int)Math.Round(dist)}");
-                        if (ErrorTimer.ElapsedMilliseconds > 100)
+                        if (IsError)
                             lines[0] = "ERROR"; // In case POS stops updating, let us know!
                     }
 
