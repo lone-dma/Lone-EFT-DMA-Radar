@@ -1,5 +1,4 @@
-﻿using eft_dma_radar.Misc;
-using eft_dma_radar.Tarkov.Player;
+﻿using eft_dma_radar.Tarkov.Player;
 using eft_dma_radar.DMA.ScatterAPI;
 using eft_dma_radar.Unity.Collections;
 
@@ -47,17 +46,10 @@ namespace eft_dma_radar.Tarkov.GameWorld
                 {
                     if (playerBase == LocalPlayer) // Skip LocalPlayer, already allocated
                         continue;
-                    if (_players.TryGetValue(playerBase, out var existingPlayer)) // Player already exists, check for problems
+                    if (!_players.ContainsKey(playerBase)) // Add New Player
                     {
-                        if (existingPlayer.ErrorTimer.ElapsedMilliseconds >= 1500) // Erroring out a lot? Re-Alloc
-                        {
-                            Debug.WriteLine($"WARNING - Existing player '{existingPlayer.Name}' being re-allocated due to excessive errors...");
-                            PlayerBase.Allocate(_players, playerBase);
-                        }
-                        // Nothing else needs to happen here
-                    }
-                    else // Add New Player
                         PlayerBase.Allocate(_players, playerBase);
+                    }
                 }
                 /// Update Existing Players incl LocalPlayer
                 UpdateExistingPlayers(registered);
