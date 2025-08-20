@@ -1,9 +1,6 @@
 ﻿using eft_dma_radar.UI.Radar;
 using eft_dma_radar.UI.Radar.ViewModels;
-using eft_dma_radar.UI.Radar.Views;
 using System.Windows.Input;
-using System.Windows.Interop;
-using static SDK.Offsets;
 
 namespace eft_dma_radar
 {
@@ -12,11 +9,26 @@ namespace eft_dma_radar
     /// </summary>
     public sealed partial class MainWindow : Window
     {
+        private readonly CancellationTokenSource _cts;
+        /// <summary>
+        /// Global Singleton instance of the MainWindow.
+        /// </summary>
         public static MainWindow Instance { get; private set; }
+        /// <summary>
+        /// ViewModel for the MainWindow.
+        /// </summary>
         public MainWindowViewModel ViewModel { get; }
+        /// <summary>
+        /// Will be cancelled when the MainWindow is closing down.
+        /// </summary>
+        public CancellationToken CancellationToken { get; }
         public MainWindow()
         {
+            if (Instance is not null)
+                throw new InvalidOperationException("MainWindow instance already exists. Only one instance is allowed.");
             InitializeComponent();
+            _cts = new();
+            this.CancellationToken = _cts.Token;
             DataContext = ViewModel = new MainWindowViewModel(this);
             this.Width = App.Config.UI.WindowSize.Width;
             this.Height = App.Config.UI.WindowSize.Height;
@@ -49,7 +61,8 @@ namespace eft_dma_radar
                 }
 
                 Memory.Dispose(); // Close FPGA
-                Instance = null;
+                _cts.Cancel(); // Cancel any ongoing GUI operations
+                _cts.Dispose();
             }
             finally
             {

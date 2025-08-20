@@ -123,7 +123,6 @@ namespace eft_dma_radar.UI.Radar.ViewModels
         #region Fields/Properties/Startup
 
         private readonly RadarTab _parent;
-        private readonly Stopwatch _fpsSw = Stopwatch.StartNew();
         private int _fps = 0;
         private bool _mouseDown;
         private IMouseoverEntity _mouseOverItem;
@@ -151,6 +150,7 @@ namespace eft_dma_radar.UI.Radar.ViewModels
             parent.Radar.MouseUp += Radar_MouseUp;
             parent.Radar.MouseLeave += Radar_MouseLeave;
             _ = OnStartupAsync();
+            _ = RunFpsCounterAsync();
         }
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace eft_dma_radar.UI.Radar.ViewModels
             // Begin draw
             try
             {
-                SetFPS(inRaid);
+                Interlocked.Increment(ref _fps); // Increment FPS counter
                 SetMapName();
                 /// Check for map switch
                 string mapID = MapID; // Cache ref
@@ -517,23 +517,19 @@ namespace eft_dma_radar.UI.Radar.ViewModels
         /// <summary>
         /// Set the FPS Counter.
         /// </summary>
-        private void SetFPS(bool inRaid)
+        private async Task RunFpsCounterAsync()
         {
-            if (_fpsSw.Elapsed > TimeSpan.FromSeconds(1))
+            var ct = MainWindow.Instance.CancellationToken;
+            using var timer = new PeriodicTimer(period: TimeSpan.FromSeconds(1));
+            while (await timer.WaitForNextTickAsync(ct))
             {
                 int fps = Interlocked.Exchange(ref _fps, 0); // Get FPS -> Reset FPS counter
-                string title = App.Name;
-                if (inRaid)
-                {
-                    title += $" ({fps} fps)";
-                }
+                string title = $"{App.Name} ({fps} fps)";
                 if (MainWindow.Instance is MainWindow mainWindow)
                 {
                     mainWindow.Title = title; // Set new window title
                 }
-                _fpsSw.Restart();
             }
-            _fps++;
         }
 
         /// <summary>
