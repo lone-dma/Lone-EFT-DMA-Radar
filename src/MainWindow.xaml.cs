@@ -29,13 +29,13 @@ namespace eft_dma_radar
             InitializeComponent();
             _cts = new();
             this.CancellationToken = _cts.Token;
-            DataContext = ViewModel = new MainWindowViewModel(this);
             this.Width = App.Config.UI.WindowSize.Width;
             this.Height = App.Config.UI.WindowSize.Height;
             if (App.Config.UI.WindowMaximized)
                 this.WindowState = WindowState.Maximized;
             else
                 this.WindowState = WindowState.Normal;
+            DataContext = ViewModel = new MainWindowViewModel(this);
             Instance = this;
         }
 
