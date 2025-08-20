@@ -16,21 +16,10 @@ namespace eft_dma_radar
         [MaybeNull]
         public static MainWindow Instance { get; private set; }
 
-        private static readonly CancellationTokenSource _cts;
-        /// <summary>
-        /// Will be cancelled when the MainWindow is closing down.
-        /// </summary>
-        public static CancellationToken CancellationToken { get; }
         /// <summary>
         /// ViewModel for the MainWindow.
         /// </summary>
         public MainWindowViewModel ViewModel { get; }
-
-        static MainWindow()
-        {
-            _cts = new();
-            CancellationToken = _cts.Token;
-        }
 
         public MainWindow()
         {
@@ -72,8 +61,6 @@ namespace eft_dma_radar
             }
             finally
             {
-                _cts.Cancel(); // Cancel any ongoing GUI operations
-                _cts.Dispose();
                 base.OnClosing(e);
             }
         }
