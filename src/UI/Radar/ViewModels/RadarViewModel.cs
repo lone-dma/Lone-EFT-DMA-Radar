@@ -519,9 +519,8 @@ namespace eft_dma_radar.UI.Radar.ViewModels
         /// </summary>
         private async Task RunFpsCounterAsync()
         {
-            var ct = MainWindow.CancellationToken;
             using var timer = new PeriodicTimer(period: TimeSpan.FromSeconds(1));
-            while (await timer.WaitForNextTickAsync(ct))
+            while (await timer.WaitForNextTickAsync())
             {
                 int fps = Interlocked.Exchange(ref _fps, 0); // Get FPS -> Reset FPS counter
                 string title = $"{App.Name} ({fps} fps)";
