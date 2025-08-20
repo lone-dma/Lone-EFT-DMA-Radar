@@ -1,5 +1,6 @@
 ﻿using eft_dma_radar.UI.Radar;
 using eft_dma_radar.UI.Radar.ViewModels;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
 
 namespace eft_dma_radar
@@ -12,6 +13,7 @@ namespace eft_dma_radar
         /// <summary>
         /// Global Singleton instance of the MainWindow.
         /// </summary>
+        [MaybeNull]
         public static MainWindow Instance { get; private set; }
 
         private static readonly CancellationTokenSource _cts;
