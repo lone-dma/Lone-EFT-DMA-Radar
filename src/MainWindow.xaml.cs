@@ -9,19 +9,21 @@ namespace eft_dma_radar
     /// </summary>
     public sealed partial class MainWindow : Window
     {
-        private readonly CancellationTokenSource _cts;
         /// <summary>
         /// Global Singleton instance of the MainWindow.
         /// </summary>
         public static MainWindow Instance { get; private set; }
-        /// <summary>
-        /// ViewModel for the MainWindow.
-        /// </summary>
-        public MainWindowViewModel ViewModel { get; }
+
+        private readonly CancellationTokenSource _cts;
         /// <summary>
         /// Will be cancelled when the MainWindow is closing down.
         /// </summary>
         public CancellationToken CancellationToken { get; }
+        /// <summary>
+        /// ViewModel for the MainWindow.
+        /// </summary>
+        public MainWindowViewModel ViewModel { get; }
+
         public MainWindow()
         {
             if (Instance is not null)
