@@ -115,22 +115,20 @@ namespace eft_dma_radar
         /// <summary>
         /// Configure Program Startup.
         /// </summary>
-        private async Task ConfigureProgramAsync(LoadingWindow loadingWindow)
+        private async Task ConfigureProgramAsync(LoadingWindow loadingWindow) =>
+        await Task.Run(async () =>
         {
             await loadingWindow.ViewModel.UpdateProgressAsync(15, "Loading Tarkov.Dev Data...");
             await EftDataManager.ModuleInitAsync(loadingWindow);
             await loadingWindow.ViewModel.UpdateProgressAsync(35, "Loading Map Assets...");
-            await Task.Run(() => EftMapManager.ModuleInit());
+            EftMapManager.ModuleInit();
             await loadingWindow.ViewModel.UpdateProgressAsync(50, "Starting DMA Connection...");
-            await Task.Run(() => MemoryInterface.ModuleInit());
+            MemoryInterface.ModuleInit();
             await loadingWindow.ViewModel.UpdateProgressAsync(75, "Loading Remaining Modules...");
-            await Task.Run(() =>
-            {
-                RuntimeHelpers.RunClassConstructor(typeof(ColorPickerViewModel).TypeHandle);
-            });
+            RuntimeHelpers.RunClassConstructor(typeof(ColorPickerViewModel).TypeHandle);
             await loadingWindow.ViewModel.UpdateProgressAsync(100, "Loading Completed!");
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-        }
+        });
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
