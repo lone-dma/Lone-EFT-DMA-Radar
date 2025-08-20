@@ -519,7 +519,7 @@ namespace eft_dma_radar.UI.Radar.ViewModels
         /// </summary>
         private async Task RunFpsCounterAsync()
         {
-            var ct = MainWindow.Instance.CancellationToken;
+            var ct = MainWindow.CancellationToken;
             using var timer = new PeriodicTimer(period: TimeSpan.FromSeconds(1));
             while (await timer.WaitForNextTickAsync(ct))
             {

@@ -14,23 +14,27 @@ namespace eft_dma_radar
         /// </summary>
         public static MainWindow Instance { get; private set; }
 
-        private readonly CancellationTokenSource _cts;
+        private static readonly CancellationTokenSource _cts;
         /// <summary>
         /// Will be cancelled when the MainWindow is closing down.
         /// </summary>
-        public CancellationToken CancellationToken { get; }
+        public static CancellationToken CancellationToken { get; }
         /// <summary>
         /// ViewModel for the MainWindow.
         /// </summary>
         public MainWindowViewModel ViewModel { get; }
+
+        static MainWindow()
+        {
+            _cts = new();
+            CancellationToken = _cts.Token;
+        }
 
         public MainWindow()
         {
             if (Instance is not null)
                 throw new InvalidOperationException("MainWindow instance already exists. Only one instance is allowed.");
             InitializeComponent();
-            _cts = new();
-            this.CancellationToken = _cts.Token;
             this.Width = App.Config.UI.WindowSize.Width;
             this.Height = App.Config.UI.WindowSize.Height;
             if (App.Config.UI.WindowMaximized)
