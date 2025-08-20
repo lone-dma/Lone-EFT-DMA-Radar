@@ -69,11 +69,11 @@ namespace eft_dma_radar
                 }
 
                 Memory.Dispose(); // Close FPGA
-                _cts.Cancel(); // Cancel any ongoing GUI operations
-                _cts.Dispose();
             }
             finally
             {
+                _cts.Cancel(); // Cancel any ongoing GUI operations
+                _cts.Dispose();
                 base.OnClosing(e);
             }
         }
