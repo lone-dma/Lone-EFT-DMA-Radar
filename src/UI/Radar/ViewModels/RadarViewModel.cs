@@ -123,6 +123,7 @@ namespace eft_dma_radar.UI.Radar.ViewModels
         #region Fields/Properties/Startup
 
         private readonly RadarTab _parent;
+        private readonly PeriodicTimer _periodicTimer = new PeriodicTimer(period: TimeSpan.FromSeconds(1));
         private int _fps = 0;
         private bool _mouseDown;
         private IMouseoverEntity _mouseOverItem;
@@ -150,7 +151,7 @@ namespace eft_dma_radar.UI.Radar.ViewModels
             parent.Radar.MouseUp += Radar_MouseUp;
             parent.Radar.MouseLeave += Radar_MouseLeave;
             _ = OnStartupAsync();
-            _ = RunFpsCounterAsync();
+            _ = RunPeriodicTimerAsync();
         }
 
         /// <summary>
@@ -402,28 +403,23 @@ namespace eft_dma_radar.UI.Radar.ViewModels
 
         #region Status Messages
 
-        private readonly Stopwatch _statusSw = Stopwatch.StartNew();
         private int _statusOrder = 1; // Backing field dont use
         /// <summary>
         /// Status order for rotating status message animation.
         /// </summary>
         private int StatusOrder
         {
-            get
+            get => _statusOrder;
+            set
             {
-                if (_statusSw.Elapsed > TimeSpan.FromSeconds(1))
+                if (_statusOrder >= 3) // Reset status order to beginning
                 {
-                    if (_statusOrder == 3) // Reset status order to beginning
-                    {
-                        _statusOrder = 1;
-                    }
-                    else // Increment
-                    {
-                        _statusOrder++;
-                    }
-                    _statusSw.Restart();
+                    _statusOrder = 1;
                 }
-                return _statusOrder;
+                else // Increment
+                {
+                    _statusOrder++;
+                }
             }
         }
 
@@ -517,11 +513,13 @@ namespace eft_dma_radar.UI.Radar.ViewModels
         /// <summary>
         /// Set the FPS Counter.
         /// </summary>
-        private async Task RunFpsCounterAsync()
+        private async Task RunPeriodicTimerAsync()
         {
-            using var timer = new PeriodicTimer(period: TimeSpan.FromSeconds(1));
-            while (await timer.WaitForNextTickAsync())
+            while (await _periodicTimer.WaitForNextTickAsync())
             {
+                // Increment status order
+                StatusOrder++;
+                // Parse FPS and set window title
                 int fps = Interlocked.Exchange(ref _fps, 0); // Get FPS -> Reset FPS counter
                 string title = $"{App.Name} ({fps} fps)";
                 if (MainWindow.Instance is MainWindow mainWindow)
