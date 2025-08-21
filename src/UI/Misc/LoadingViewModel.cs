@@ -1,7 +1,8 @@
 ﻿namespace eft_dma_radar.UI.Misc
 {
-    public class LoadingViewModel : INotifyPropertyChanged
+    public class LoadingViewModel : INotifyPropertyChanged, IDisposable
     {
+        private readonly PeriodicTimer _intervalTimer = new(TimeSpan.FromMilliseconds(233));
         private readonly LoadingWindow _parent;
 
         public LoadingViewModel(LoadingWindow parent)
@@ -57,7 +58,12 @@
                 Progress = percent;
                 StatusText = status;
             });
-            await Task.Delay(233);
+            await _intervalTimer.WaitForNextTickAsync();
+        }
+
+        public void Dispose()
+        {
+            _intervalTimer.Dispose();
         }
     }
 }

@@ -17,6 +17,7 @@
             if (Interlocked.Exchange(ref _disposed, true) == false)
             {
                 this.Close();
+                ViewModel.Dispose();
             }
         }
     }
