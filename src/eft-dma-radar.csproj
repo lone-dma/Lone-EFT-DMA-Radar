@@ -59,7 +59,7 @@
 		<PackageReference Include="Svg.Skia" Version="3.0.5" />
 		<PackageReference Include="Extended.Wpf.Toolkit" Version="4.7.25104.5739" />
 		<PackageReference Include="TwitchLib.Api" Version="3.9.0" />
-		<PackageReference Include="VmmSharpEx" Version="2.2.9363.941" />
+		<PackageReference Include="VmmSharpEx" Version="2.2.9364.26" />
 	</ItemGroup>
 	
 </Project>

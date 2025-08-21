@@ -85,8 +85,7 @@ namespace eft_dma_radar.DMA
                         {
                             EnableMemoryWriting = false
                         };
-                        _vmm.SetupMemoryMap(
-                            strMap: out _,
+                        _ = _vmm.SetupMemoryMap(
                             applyMap: true,
                             outputFile: MEMORY_MAP_FILE);
                     }
