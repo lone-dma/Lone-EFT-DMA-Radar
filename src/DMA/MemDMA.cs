@@ -598,9 +598,7 @@ namespace eft_dma_radar.DMA
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsValidVirtualAddress(ulong va)
         {
-            if (va < 0x100000 || va >= 0x7FFFFFFFFFFF)
-                return false;
-            return true;
+            return va >= 0x10000 && ((long)va << 16) >> 16 == (long)va;
         }
 
         /// <summary>
