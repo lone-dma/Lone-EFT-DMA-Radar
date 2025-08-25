@@ -299,17 +299,7 @@ namespace eft_dma_radar.Unity
         /// </summary>
         public SharedArray<TrsX> ReadVertices()
         {
-            var vertices = new SharedArray<TrsX>(Index + 1);
-            try
-            {
-                Memory.ReadSpan(VerticesAddr, vertices.Span, _useCache);
-            }
-            catch
-            {
-                vertices.Dispose();
-                throw;
-            }
-            return vertices;
+            return Memory.ReadArray<TrsX>(VerticesAddr, Index + 1, _useCache);
         }
         #endregion
 
