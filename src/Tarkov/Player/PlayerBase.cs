@@ -416,7 +416,7 @@ namespace eft_dma_radar.Tarkov.Player
             }
             else if (IsAlive) // Not in list, but alive
             {
-                index.AddValueEntry<ulong>(0, CorpseAddr);
+                index.AddValueEntry<VmmPointer>(0, CorpseAddr);
                 index.Completed += (sender, x1) =>
                 {
                     if (x1.TryGetValue<VmmPointer>(0, out var corpsePtr))
