@@ -417,7 +417,7 @@ namespace eft_dma_radar.Misc
         public static void ThrowIfInvalidVirtualAddress(this ulong va)
         {
             if (!MemDMA.IsValidVirtualAddress(va))
-                throw new InvalidOperationException($"Invalid Virtual Address: 0x{va:X}");
+                throw new InvalidOperationException($"Invalid Virtual Address 0x{va:X}");
         }
 
         /// <summary>
@@ -429,7 +429,7 @@ namespace eft_dma_radar.Misc
         public static void ThrowIfInvalidVirtualAddress(this ulong va, string message)
         {
             if (!MemDMA.IsValidVirtualAddress(va))
-                throw new InvalidOperationException($"Invalid Virtual Address: 0x{va:X} [{message}]");
+                throw new InvalidOperationException($"Invalid Virtual Address 0x{va:X} [{message}]");
         }
     }
 
