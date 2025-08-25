@@ -1,5 +1,4 @@
 ﻿using eft_dma_radar.Misc;
-using eft_dma_radar.Misc.Pools;
 using eft_dma_radar.Tarkov.Data.TarkovMarket;
 using eft_dma_radar.Tarkov.Loot;
 using eft_dma_radar.Tarkov.Player.Plugins;

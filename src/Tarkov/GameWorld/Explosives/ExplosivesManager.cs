@@ -51,7 +51,7 @@ namespace eft_dma_radar.Tarkov.GameWorld.Explosives
                 {
                     Init();
                 }
-                using var allGrenadesLease = MemList<ulong>.Lease(_grenadesBase, false, out var allGrenades);
+                using var allGrenades = new UnityList<ulong>(_grenadesBase, false);
                 foreach (var grenadeAddr in allGrenades)
                 {
                     ct.ThrowIfCancellationRequested();
@@ -81,7 +81,7 @@ namespace eft_dma_radar.Tarkov.GameWorld.Explosives
             try
             {
                 var syncObjectsPtr = Memory.ReadPtrChain(_localGameWorld, _toSyncObjects);
-                using var syncObjectsLease = MemList<ulong>.Lease(syncObjectsPtr, true, out var syncObjects);
+                using var syncObjects = new UnityList<ulong>(syncObjectsPtr, true);
                 foreach (var syncObject in syncObjects)
                 {
                     ct.ThrowIfCancellationRequested();
@@ -118,7 +118,7 @@ namespace eft_dma_radar.Tarkov.GameWorld.Explosives
                     var activeProjectilesPtr = Memory.ReadValue<ulong>(clientShellingController + Offsets.ClientShellingController.ActiveClientProjectiles);
                     if (activeProjectilesPtr != 0x0)
                     {
-                        using var activeProjectilesLease = MemDictionary<int, ulong>.Lease(activeProjectilesPtr, true, out var activeProjectiles);
+                        using var activeProjectiles = new UnityDictionary<int, ulong>(activeProjectilesPtr, true);
                         foreach (var activeProjectile in activeProjectiles)
                         {
                             ct.ThrowIfCancellationRequested();

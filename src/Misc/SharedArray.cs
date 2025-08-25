@@ -1,12 +1,10 @@
-﻿using Microsoft.Extensions.ObjectPool;
-
-namespace eft_dma_radar.Misc.Pools
+﻿namespace eft_dma_radar.Misc
 {
     /// <summary>
     /// Represents a flexible array buffer that uses the Shared Array Pool.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class SharedArray<T> : IEnumerable<T>, IPooledObject
+    public class SharedArray<T> : IEnumerable<T>, IDisposable
         where T : unmanaged
     {
         private T[] _arr;
@@ -21,49 +19,20 @@ namespace eft_dma_radar.Misc.Pools
         /// </summary>
         public ReadOnlySpan<T> ReadOnlySpan => _arr.AsSpan(0, Count);
 
-        [Obsolete("You must lease this object via Lease() or Get()")]
-        public SharedArray() { }
-
         /// <summary>
-        /// Get a SharedArray <typeparamref name="T"/> lease from the object pool.
+        /// Construct a new SharedArray with a defined length.
         /// </summary>
-        /// <param name="count">Number of elements in the array.</param>
-        /// <param name="value">Leased value (out)</param>
-        /// <returns>Leased SharedArray <typeparamref name="T"/> instance.</returns>
-        public static ObjectPoolLease<SharedArray<T>> Lease(int count, out SharedArray<T> value)
+        /// <param name="count">Number of array elements.</param>
+        public SharedArray(int count) 
         {
-            var lease = ObjectPoolLease<SharedArray<T>>.Create(out value);
-            try
-            {
-                value.Initialize(count);
-                return lease;
-            }
-            catch
-            {
-                lease.Dispose();
-                throw;
-            }
+            Initialize(count);
         }
 
         /// <summary>
-        /// Get a SharedArray <typeparamref name="T"/> from the object pool.
+        /// Constructor for derived classes.
+        /// Be sure to call <see cref="Initialize(int)"/> in the derived class."/>
         /// </summary>
-        /// <param name="count">Number of elements in the array.</param>
-        /// <returns>Rented SharedArray <typeparamref name="T"/> instance.</returns>
-        public static SharedArray<T> Get(int count)
-        {
-            var arr = MyObjectPool<SharedArray<T>>.Instance.Get();
-            try
-            {
-                arr.Initialize(count);
-                return arr;
-            }
-            catch
-            {
-                arr.Return();
-                throw;
-            }
-        }
+        protected SharedArray() { }
 
         /// <summary>
         /// Initialize the array to a defined length.
@@ -71,13 +40,22 @@ namespace eft_dma_radar.Misc.Pools
         /// <param name="count">Number of elements in the array.</param>
         protected void Initialize(int count)
         {
-            if (_arr is not null)
-                throw new InvalidOperationException("Shared Array Pool is already rented!");
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
             Count = count;
             _arr = ArrayPool<T>.Shared.Rent(count); // Will throw exception on negative counts
         }
 
+        public void Dispose()
+        {
+            if (Interlocked.Exchange(ref _arr, null) is T[] arr)
+            {
+                ArrayPool<T>.Shared.Return(arr);
+            }
+        }
+
+
         #region IReadOnlyList
+
         public int Count { get; private set; }
 
         public ref T this[int index] => ref Span[index]; // Modified from default implementation.
@@ -133,24 +111,6 @@ namespace eft_dma_radar.Misc.Pools
             public readonly void Dispose()
             {
             }
-        }
-        #endregion
-
-        #region ObjectPool
-
-        public virtual void Return()
-        {
-            MyObjectPool<SharedArray<T>>.Instance.Return(this);
-        }
-
-        public bool TryReset()
-        {
-            if (Interlocked.Exchange(ref _arr, null) is T[] arr)
-            {
-                ArrayPool<T>.Shared.Return(arr);
-            }
-            Count = default;
-            return true;
         }
 
         #endregion

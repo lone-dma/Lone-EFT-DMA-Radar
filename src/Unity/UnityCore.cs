@@ -1,5 +1,5 @@
 ﻿using eft_dma_radar.DMA;
-using eft_dma_radar.Misc.Pools;
+using eft_dma_radar.Misc;
 using SkiaSharp;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -150,7 +150,7 @@ namespace eft_dma_radar.Unity
             var componentArr = Memory.ReadValue<ComponentArray>(gameObject + ComponentsOffset);
             int size = componentArr.Size <= 0x1000 ?
                 (int)componentArr.Size : 0x1000;
-            using var compsBufLease = SharedArray<ComponentArrayEntry>.Lease(size, out var compsBuf);
+            using var compsBuf = new SharedArray<ComponentArrayEntry>(size);
             Memory.ReadSpan(componentArr.ArrayBase, compsBuf.Span);
             foreach (var comp in compsBuf)
             {

@@ -515,6 +515,31 @@ namespace eft_dma_radar.DMA
         }
 
         /// <summary>
+        /// Read an array of type <typeparamref name="T"/> from memory.
+        /// IMPORTANT: You must call <see cref="Dispose"/> on the returned SharedArray when done."/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="addr">Address to read from.</param>
+        /// <param name="count">Number of array elements to read.</param>
+        /// <param name="useCache">Use caching for this read.</param>
+        /// <returns><see cref="SharedArray{T}"/> value.</returns>
+        public SharedArray<T> ReadArray<T>(ulong addr, int count, bool useCache = true)
+            where T : unmanaged
+        {
+            var arr = new SharedArray<T>(count);
+            try
+            {
+                ReadSpan(addr, arr.Span, useCache);
+                return arr;
+            }
+            catch
+            {
+                arr.Dispose();
+                throw;
+            }
+        }
+
+        /// <summary>
         /// Read null terminated string (utf-8/default).
         /// </summary>
         /// <param name="length">Number of bytes to read.</param>

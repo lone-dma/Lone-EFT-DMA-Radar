@@ -38,7 +38,7 @@ namespace eft_dma_radar.Tarkov.GameWorld
         {
             try
             {
-                using var playersListLease = MemList<ulong>.Lease(this, false, out var playersList); // Realtime Read
+                using var playersList = new UnityList<ulong>(this, false); // Realtime Read
                 var registered = playersList.Where(x => x != 0x0).ToHashSet();
                 /// Allocate New Players
                 foreach (var playerBase in registered)
@@ -66,7 +66,7 @@ namespace eft_dma_radar.Tarkov.GameWorld
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public int GetPlayerCount()
         {
-            var count = Memory.ReadValue<int>(this + MemList<byte>.CountOffset, false);
+            var count = Memory.ReadValue<int>(this + UnityList<byte>.CountOffset, false);
             if (count < 0 || count > 256)
                 throw new ArgumentOutOfRangeException(nameof(count));
             return count;

@@ -83,7 +83,7 @@ namespace eft_dma_radar.Tarkov.Player.Plugins
                     try
                     {
                         var chambers = Memory.ReadPtr(itemBase + Offsets.LootItemWeapon.Chambers);
-                        var slotPtr = Memory.ReadPtr(chambers + MemList<byte>.ArrStartOffset + 0 * 0x8); // One in the chamber ;)
+                        var slotPtr = Memory.ReadPtr(chambers + UnityList<byte>.ArrStartOffset + 0 * 0x8); // One in the chamber ;)
                         var slotItem = Memory.ReadPtr(slotPtr + Offsets.Slot.ContainedItem);
                         var ammoTemplate = Memory.ReadPtr(slotItem + Offsets.LootItem.Template);
                         var ammoIDPtr = Memory.ReadValue<Types.MongoID>(ammoTemplate + Offsets.ItemTemplate._id);

@@ -95,7 +95,7 @@ namespace eft_dma_radar.Tarkov.Quests
             var masterItems = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var masterLocations = new List<QuestLocation>();
             var questsData = Memory.ReadPtr(_profile + Offsets.Profile.QuestsData);
-            using var questsDataListLease = MemList<ulong>.Lease(questsData, true, out var questsDataList);
+            using var questsDataList = new UnityList<ulong>(questsData, true);
             foreach (var qDataEntry in questsDataList) // GCLass1BBF
             {
                 try
@@ -104,7 +104,7 @@ namespace eft_dma_radar.Tarkov.Quests
                     if (qStatus != 2) // 2 == Started
                         continue;
                     var completedPtr = Memory.ReadPtr(qDataEntry + Offsets.QuestData.CompletedConditions);
-                    using var completedHSLease = MemHashSet<Types.MongoID>.Lease(completedPtr, true, out var completedHS);
+                    using var completedHS = new UnityHashSet<Types.MongoID>(completedPtr, true);
                     var completedConditions = new HashSet<string>();
                     foreach (var c in completedHS)
                     {
@@ -120,11 +120,11 @@ namespace eft_dma_radar.Tarkov.Quests
                     var qTemplate = Memory.ReadPtr(qDataEntry + Offsets.QuestData.Template); // GClass1BF4
                     var qConditions =
                         Memory.ReadPtr(qTemplate + Offsets.QuestTemplate.Conditions); // EFT.Quests.QuestConditionsList
-                    using var qCondDictLease = MemDictionary<int, ulong>.Lease(qConditions, true, out var qCondDict);
+                    using var qCondDict = new UnityDictionary<int, ulong>(qConditions, true);
                     foreach (var qDicCondEntry in qCondDict)
                     {
                         var condListPtr = Memory.ReadPtr(qDicCondEntry.Value + Offsets.QuestConditionsContainer.ConditionsList);
-                        using var condListLease = MemList<ulong>.Lease(condListPtr, true, out var condList);
+                        using var condList = new UnityList<ulong>(condListPtr, true);
                         foreach (var condition in condList)
                             GetQuestConditions(qID, condition, completedConditions, masterItems, masterLocations);
                     }
@@ -166,7 +166,7 @@ namespace eft_dma_radar.Tarkov.Quests
                 {
                     var targetArray =
                         Memory.ReadPtr(condition + Offsets.QuestConditionFindItem.target); // this is a typical unity array[] at 0x48
-                    using var targetsLease = MemArray<ulong>.Lease(targetArray, true, out var targets);
+                    using var targets = new UnityArray<ulong>(targetArray, true);
                     foreach (var targetPtr in targets)
                     {
                         var target = Memory.ReadUnityString(targetPtr);
@@ -199,7 +199,7 @@ namespace eft_dma_radar.Tarkov.Quests
                 {
                     var conditionsPtr = Memory.ReadPtr(condition + Offsets.QuestConditionCounterCreator.Conditions);
                     var conditionsListPtr = Memory.ReadPtr(conditionsPtr + Offsets.QuestConditionsContainer.ConditionsList);
-                    using var counterListLease = MemList<ulong>.Lease(conditionsListPtr, true, out var counterList);
+                    using var counterList = new UnityList<ulong>(conditionsListPtr, true);
                     foreach (var childCond in counterList)
                         GetQuestConditions(questID, childCond, completedConditions, items, locations);
                 }

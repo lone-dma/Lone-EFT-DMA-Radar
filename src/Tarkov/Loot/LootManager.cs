@@ -95,7 +95,7 @@ namespace eft_dma_radar.Tarkov.Loot
         private void GetLoot(CancellationToken ct)
         {
             var lootListAddr = Memory.ReadPtr(_lgw + Offsets.ClientLocalGameWorld.LootList);
-            using var lootListLease = MemList<ulong>.Lease(lootListAddr, true, out var lootList);
+            using var lootList = new UnityList<ulong>(lootListAddr, true);
             var loot = new List<LootItem>(lootList.Count);
             var containers = new List<StaticLootContainer>(64);
             var deadPlayers = Memory.Players?
@@ -294,7 +294,7 @@ namespace eft_dma_radar.Tarkov.Loot
         private static void GetItemsInSlots(ulong slotsPtr, List<LootItem> loot, bool isPMC)
         {
             var slotDict = new Dictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);
-            using var slotsLease = MemArray<ulong>.Lease(slotsPtr, true, out var slots);
+            using var slots = new UnityArray<ulong>(slotsPtr, true);
 
             foreach (var slot in slots)
             {
@@ -357,7 +357,7 @@ namespace eft_dma_radar.Tarkov.Loot
         {
             ArgumentOutOfRangeException.ThrowIfZero(gridsArrayPtr, nameof(gridsArrayPtr));
             if (recurseDepth++ > 3) return; // Only recurse 3 layers deep (this should be plenty)
-            using var gridsArrayLease = MemArray<ulong>.Lease(gridsArrayPtr, true, out var gridsArray);
+            using var gridsArray = new UnityArray<ulong>(gridsArrayPtr, true);
 
             try
             {
@@ -372,7 +372,7 @@ namespace eft_dma_radar.Tarkov.Loot
                     var itemListPtr =
                         Memory.ReadPtr(gridEnumerableClass +
                                        Offsets.GridContainedItems.Items); // -.GClass1797->list_0x18 // Offset: 0x0018 (Type: System.Collections.Generic.List<Item>)
-                    using var itemListLease = MemList<ulong>.Lease(itemListPtr, true, out var itemList);
+                    using var itemList = new UnityList<ulong>(itemListPtr, true);
 
                     foreach (var childItem in itemList)
                         try

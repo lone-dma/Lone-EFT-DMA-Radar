@@ -1,7 +1,6 @@
 ﻿using eft_dma_radar.DMA;
 using eft_dma_radar.ESP;
 using eft_dma_radar.Misc;
-using eft_dma_radar.Misc.Pools;
 using eft_dma_radar.Tarkov.Player;
 using eft_dma_radar.Unity;
 using eft_dma_radar.Unity.Collections;
@@ -74,7 +73,7 @@ namespace eft_dma_radar.Tarkov.GameWorld
                 if (OpticCameraActive)
                 {
                     var opticsPtr = Memory.ReadPtr(localPlayer.PWA + Offsets.ProceduralWeaponAnimation._optics);
-                    using var opticsLease = MemList<VmmPointer>.Lease(opticsPtr, true, out var optics);
+                    using var optics = new UnityList<VmmPointer>(opticsPtr, true);
                     if (optics.Count > 0)
                     {
                         var pSightComponent = Memory.ReadPtr(optics[0] + Offsets.SightNBone.Mod);
@@ -148,14 +147,13 @@ namespace eft_dma_radar.Tarkov.GameWorld
 
             public readonly float GetZoomLevel()
             {
-                using var zoomArrayLease = SightInterface.Zooms;
-                var zoomArray = zoomArrayLease.Value;
+                using var zoomArray = SightInterface.Zooms;
                 if (SelectedScope >= zoomArray.Count || SelectedScope is < 0 or > 10)
                     return -1.0f;
-                using var selectedScopeModesLease = MemArray<int>.Lease(pScopeSelectedModes, false, out var selectedScopeModes);
+                using var selectedScopeModes = new UnityArray<int>(pScopeSelectedModes, false);
                 int selectedScopeMode = SelectedScope >= selectedScopeModes.Count ?
                     0 : selectedScopeModes[SelectedScope];
-                ulong zoomAddr = zoomArray[SelectedScope] + MemArray<float>.ArrBaseOffset + (uint)selectedScopeMode * 0x4;
+                ulong zoomAddr = zoomArray[SelectedScope] + UnityArray<float>.ArrBaseOffset + (uint)selectedScopeMode * 0x4;
 
                 float zoomLevel = Memory.ReadValue<float>(zoomAddr, false);
                 if (zoomLevel.IsNormalOrZero() && zoomLevel is >= 0f and < 100f)
@@ -174,8 +172,8 @@ namespace eft_dma_radar.Tarkov.GameWorld
         {
             [FieldOffset((int)Offsets.SightInterface.Zooms)] private readonly ulong pZooms;
 
-            public readonly ObjectPoolLease<MemArray<ulong>> Zooms =>
-                MemArray<ulong>.Lease(pZooms, true, out _);
+            public readonly UnityArray<ulong> Zooms =>
+                new UnityArray<ulong>(pZooms, true);
         }
 
         #region Static Interfaces

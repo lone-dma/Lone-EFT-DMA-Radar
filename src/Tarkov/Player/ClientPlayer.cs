@@ -165,7 +165,7 @@ namespace eft_dma_radar.Tarkov.Player
         /// <returns>Array of offsets for transform internal chain.</returns>
         public override uint[] GetTransformInternalChain(Bones bone)
         {
-            return new uint[] { Offsets.Player._playerBody, PlayerBody.SkeletonRootJoint, DizSkinningSkeleton._values, MemList<byte>.ArrOffset, MemList<byte>.ArrStartOffset + (uint)bone * 0x8, 0x10 };
+            return new uint[] { Offsets.Player._playerBody, PlayerBody.SkeletonRootJoint, DizSkinningSkeleton._values, UnityList<byte>.ArrOffset, UnityList<byte>.ArrStartOffset + (uint)bone * 0x8, 0x10 };
         }
     }
 }
