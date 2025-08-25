@@ -412,24 +412,24 @@ namespace eft_dma_radar.Misc
         /// Throws an exception if the Virtual Address is invalid.
         /// </summary>
         /// <param name="va">Virtual address to validate.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ThrowIfInvalidVirtualAddress(this ulong va)
         {
             if (!MemDMA.IsValidVirtualAddress(va))
-                throw new ArgumentException($"Invalid Virtual Address: 0x{va.ToString("X")}");
+                throw new InvalidOperationException($"Invalid Virtual Address: 0x{va.ToString("X")}");
         }
 
         /// <summary>
         /// Throws an exception if the Virtual Address is invalid.
         /// </summary>
         /// <param name="va">Virtual address to validate.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ThrowIfInvalidVirtualAddress(this ulong va, string message)
         {
             if (!MemDMA.IsValidVirtualAddress(va))
-                throw new ArgumentException($"Invalid Virtual Address: 0x{va.ToString("X")} [{message}]");
+                throw new InvalidOperationException($"Invalid Virtual Address: 0x{va.ToString("X")} [{message}]");
         }
     }
 
