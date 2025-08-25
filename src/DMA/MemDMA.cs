@@ -516,9 +516,10 @@ namespace eft_dma_radar.DMA
 
         /// <summary>
         /// Read an array of type <typeparamref name="T"/> from memory.
+        /// The first element begins reading at 0x0 and the array is assumed to be contiguous.
         /// IMPORTANT: You must call <see cref="Dispose"/> on the returned SharedArray when done."/>
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">Value type to read.</typeparam>
         /// <param name="addr">Address to read from.</param>
         /// <param name="count">Number of array elements to read.</param>
         /// <param name="useCache">Use caching for this read.</param>
