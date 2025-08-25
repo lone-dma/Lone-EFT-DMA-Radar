@@ -458,8 +458,8 @@ namespace eft_dma_radar.DMA
         /// </summary>
         public ulong ReadPtr(ulong addr, bool useCache = true)
         {
-            var pointer = ReadValue<ulong>(addr, useCache);
-            pointer.ThrowIfInvalidVirtualAddress();
+            var pointer = ReadValue<VmmPointer>(addr, useCache);
+            pointer.ThrowIfInvalid();
             return pointer;
         }
 
