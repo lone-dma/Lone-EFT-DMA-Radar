@@ -425,6 +425,32 @@ namespace eft_dma_radar.DMA
         }
 
         /// <summary>
+        /// Read an array of type <typeparamref name="T"/> from memory.
+        /// The first element begins reading at 0x0 and the array is assumed to be contiguous.
+        /// IMPORTANT: You must call <see cref="Dispose"/> on the returned SharedArray when done."/>
+        /// </summary>
+        /// <typeparam name="T">Value type to read.</typeparam>
+        /// <param name="addr">Address to read from.</param>
+        /// <param name="count">Number of array elements to read.</param>
+        /// <param name="useCache">Use caching for this read.</param>
+        /// <returns><see cref="SharedArray{T}"/> value.</returns>
+        public SharedArray<T> ReadArray<T>(ulong addr, int count, bool useCache = true)
+            where T : unmanaged
+        {
+            var arr = new SharedArray<T>(count);
+            try
+            {
+                ReadSpan(addr, arr.Span, useCache);
+                return arr;
+            }
+            catch
+            {
+                arr.Dispose();
+                throw;
+            }
+        }
+
+        /// <summary>
         /// Read a chain of pointers and get the final result.
         /// </summary>
         public ulong ReadPtrChain(ulong addr, uint[] offsets, bool useCache = true)
@@ -512,32 +538,6 @@ namespace eft_dma_radar.DMA
                 throw new VmmException("Memory Read Failed!");
             }
             result = r1;
-        }
-
-        /// <summary>
-        /// Read an array of type <typeparamref name="T"/> from memory.
-        /// The first element begins reading at 0x0 and the array is assumed to be contiguous.
-        /// IMPORTANT: You must call <see cref="Dispose"/> on the returned SharedArray when done."/>
-        /// </summary>
-        /// <typeparam name="T">Value type to read.</typeparam>
-        /// <param name="addr">Address to read from.</param>
-        /// <param name="count">Number of array elements to read.</param>
-        /// <param name="useCache">Use caching for this read.</param>
-        /// <returns><see cref="SharedArray{T}"/> value.</returns>
-        public SharedArray<T> ReadArray<T>(ulong addr, int count, bool useCache = true)
-            where T : unmanaged
-        {
-            var arr = new SharedArray<T>(count);
-            try
-            {
-                ReadSpan(addr, arr.Span, useCache);
-                return arr;
-            }
-            catch
-            {
-                arr.Dispose();
-                throw;
-            }
         }
 
         /// <summary>
