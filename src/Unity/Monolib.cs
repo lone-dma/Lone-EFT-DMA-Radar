@@ -1,7 +1,7 @@
-﻿using eft_dma_radar.DMA.ScatterAPI;
-using eft_dma_radar.DMA;
+﻿using eft_dma_radar.DMA;
 using eft_dma_radar.Misc;
 using eft_dma_radar.Unity.Collections;
+using VmmSharpEx;
 
 namespace eft_dma_radar.Unity
 {
@@ -200,7 +200,7 @@ namespace eft_dma_radar.Unity
                 ulong monoImageSetPtrBase = Memory.MonoBase + 0x751980; // img_set_cache (MonoImageSet)
 
                 using var monoImageSetPtrArrayLease = MemArray<ulong>.Lease(monoImageSetPtrBase, 1103, true, out var monoImageSetPtrArray);
-                using var mapOuterLease = ScatterReadMap.Lease(out var mapOuter);
+                using var mapOuter = Memory.GetScatterMap();
                 var r1 = mapOuter.AddRound();
                 var r2 = mapOuter.AddRound();
                 var r3 = mapOuter.AddRound();
@@ -210,29 +210,29 @@ namespace eft_dma_radar.Unity
                     ulong monoImageSetPtr = monoImageSetPtrArray[i];
                     if (monoImageSetPtr == 0x0)
                         continue;
-                    r1[i].AddEntry<MemPointer>(0, monoImageSetPtr + 0x28); // gclass_cache
-                    r1[i].Callbacks += x1 =>
+                    r1[i].AddValueEntry<VmmPointer>(0, monoImageSetPtr + 0x28); // gclass_cache
+                    r1[i].Completed += (sender, x1) =>
                     {
                         if (foundCount == classNames.Length)
                         {
                             return;
                         }
-                        if (x1.TryGetResult<MemPointer>(0, out var gclassCache))
+                        if (x1.TryGetValue<VmmPointer>(0, out var gclassCache))
                         {
-                            r2[i].AddEntry<MemPointer>(1, gclassCache + 0x0);
-                            r2[i].Callbacks += x2 =>
+                            r2[i].AddValueEntry<VmmPointer>(1, gclassCache + 0x0);
+                            r2[i].Completed += (sender, x2) =>
                             {
-                                if (x2.TryGetResult<MemPointer>(1, out var table))
+                                if (x2.TryGetValue<VmmPointer>(1, out var table))
                                 {
-                                    r3[i].AddEntry<SingletonHashTable>(2, table);
-                                    r3[i].Callbacks += x3 =>
+                                    r3[i].AddValueEntry<SingletonHashTable>(2, table);
+                                    r3[i].Completed += (sender, x3) =>
                                     {
-                                        if (x3.TryGetResult<SingletonHashTable>(2, out var tableData))
+                                        if (x3.TryGetValue<SingletonHashTable>(2, out var tableData))
                                         {
                                             if (tableData.TableSize > 100000 || tableData.KVS == 0x0)
                                                 return;
                                             using var genericClassPtrArrayLease = MemArray<GenericClassPtrEntry>.Lease(tableData.KVS, tableData.TableSize, true, out var genericClassPtrArray);
-                                            using var mapInnerLease = ScatterReadMap.Lease(out var mapInner);
+                                            using var mapInner = Memory.GetScatterMap();
                                             var r11 = mapInner.AddRound();
                                             var r22 = mapInner.AddRound();
                                             for (int iix = 0; iix < genericClassPtrArray.Count; iix++)
@@ -241,19 +241,19 @@ namespace eft_dma_radar.Unity
                                                 var genericClassPtr = genericClassPtrArray[ii];
                                                 if (genericClassPtr.Ptr == 0x0)
                                                     continue;
-                                                r11[ii].AddEntry<MemPointer>(0, genericClassPtr.Ptr + 0x20);
-                                                r11[ii].Callbacks += x11 =>
+                                                r11[ii].AddValueEntry<VmmPointer>(0, genericClassPtr.Ptr + 0x20);
+                                                r11[ii].Completed += (sender, x11) =>
                                                 {
                                                     if (foundCount == classNames.Length)
                                                     {
                                                         return;
                                                     }
-                                                    if (x11.TryGetResult<MemPointer>(0, out var classPtr))
+                                                    if (x11.TryGetValue<VmmPointer>(0, out var classPtr))
                                                     {
-                                                        r22[ii].AddEntry<MonoClass>(1, classPtr);
-                                                        r22[ii].Callbacks += x22 =>
+                                                        r22[ii].AddValueEntry<MonoClass>(1, classPtr);
+                                                        r22[ii].Completed += (sender, x22) =>
                                                         {
-                                                            if (x22.TryGetResult<MonoClass>(1, out var monoClass))
+                                                            if (x22.TryGetValue<MonoClass>(1, out var monoClass))
                                                             {
                                                                 if ((monoClass.Inited & 1) != 1 ||           // !class->inited
                                                                     (monoClass.Flags & 0x100000) != 0 ||     // class->exception_type != MONO_EXCEPTION_NONE

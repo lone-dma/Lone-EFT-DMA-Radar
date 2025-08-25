@@ -1,4 +1,5 @@
 ﻿global using static eft_dma_radar.DMA.MemoryInterface;
+using VmmSharpEx.Scatter;
 
 namespace eft_dma_radar.DMA
 {
@@ -15,6 +16,7 @@ namespace eft_dma_radar.DMA
         public static void ModuleInit()
         {
             Memory = new MemDMA();
+            IScatterEntry.MaxReadSize = MemDMA.MAX_READ_SIZE;
             Debug.WriteLine("DMA Initialized!");
         }
     }

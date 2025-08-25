@@ -1,5 +1,4 @@
 ﻿using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.DMA.ScatterAPI;
 using eft_dma_radar.Unity.Collections;
 
 namespace eft_dma_radar.Tarkov.GameWorld
@@ -81,7 +80,7 @@ namespace eft_dma_radar.Tarkov.GameWorld
             var allPlayers = _players.Values;
             if (allPlayers.Count == 0)
                 return;
-            using var mapLease = ScatterReadMap.Lease(out var map);
+            using var map = Memory.GetScatterMap();
             var round1 = map.AddRound(false);
             int i = 0;
             foreach (var player in allPlayers)

@@ -1,8 +1,7 @@
-﻿using eft_dma_radar.DMA.ScatterAPI;
-using eft_dma_radar.UI.Data;
-using eft_dma_radar.UI.Radar.ViewModels;
+﻿using eft_dma_radar.UI.Radar.ViewModels;
 using eft_dma_radar.Unity;
 using eft_dma_radar.Unity.Collections;
+using VmmSharpEx.Scatter;
 
 namespace eft_dma_radar.Tarkov.Player
 {

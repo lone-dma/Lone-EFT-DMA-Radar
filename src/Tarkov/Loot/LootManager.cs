@@ -2,11 +2,10 @@
 using eft_dma_radar.Misc;
 using eft_dma_radar.Tarkov.Player;
 using eft_dma_radar.UI.Loot;
-using eft_dma_radar.DMA;
-using eft_dma_radar.DMA.ScatterAPI;
 using eft_dma_radar.Unity;
 using eft_dma_radar.Unity.Collections;
 using eft_dma_radar.Tarkov.Data;
+using VmmSharpEx;
 
 namespace eft_dma_radar.Tarkov.Loot
 {
@@ -101,7 +100,7 @@ namespace eft_dma_radar.Tarkov.Loot
             var containers = new List<StaticLootContainer>(64);
             var deadPlayers = Memory.Players?
                 .Where(x => x.Corpse is not null)?.ToList();
-            using var mapLease = ScatterReadMap.Lease(out var map);
+            using var map = Memory.GetScatterMap();
             var round1 = map.AddRound();
             var round2 = map.AddRound();
             var round3 = map.AddRound();
@@ -111,42 +110,42 @@ namespace eft_dma_radar.Tarkov.Loot
                 var i = ix;
                 ct.ThrowIfCancellationRequested();
                 var lootBase = lootList[i];
-                round1[i].AddEntry<MemPointer>(0, lootBase + ObjectClass.MonoBehaviourOffset); // MonoBehaviour
-                round1[i].AddEntry<MemPointer>(1, lootBase + ObjectClass.To_NamePtr[0]); // C1
-                round1[i].Callbacks += x1 =>
+                round1[i].AddValueEntry<VmmPointer>(0, lootBase + ObjectClass.MonoBehaviourOffset); // MonoBehaviour
+                round1[i].AddValueEntry<VmmPointer>(1, lootBase + ObjectClass.To_NamePtr[0]); // C1
+                round1[i].Completed += (sender, x1) =>
                 {
-                    if (x1.TryGetResult<MemPointer>(0, out var monoBehaviour) && x1.TryGetResult<MemPointer>(1, out var c1))
+                    if (x1.TryGetValue<VmmPointer>(0, out var monoBehaviour) && x1.TryGetValue<VmmPointer>(1, out var c1))
                     {
-                        round2[i].AddEntry<MemPointer>(2,
+                        round2[i].AddValueEntry<VmmPointer>(2,
                             monoBehaviour + MonoBehaviour.ObjectClassOffset); // InteractiveClass
-                        round2[i].AddEntry<MemPointer>(3, monoBehaviour + MonoBehaviour.GameObjectOffset); // GameObject
-                        round2[i].AddEntry<MemPointer>(4, c1 + ObjectClass.To_NamePtr[1]); // C2
-                        round2[i].Callbacks += x2 =>
+                        round2[i].AddValueEntry<VmmPointer>(3, monoBehaviour + MonoBehaviour.GameObjectOffset); // GameObject
+                        round2[i].AddValueEntry<VmmPointer>(4, c1 + ObjectClass.To_NamePtr[1]); // C2
+                        round2[i].Completed += (sender, x2) =>
                         {
-                            if (x2.TryGetResult<MemPointer>(2, out var interactiveClass) &&
-                                x2.TryGetResult<MemPointer>(3, out var gameObject) &&
-                                x2.TryGetResult<MemPointer>(4, out var c2))
+                            if (x2.TryGetValue<VmmPointer>(2, out var interactiveClass) &&
+                                x2.TryGetValue<VmmPointer>(3, out var gameObject) &&
+                                x2.TryGetValue<VmmPointer>(4, out var c2))
                             {
-                                round3[i].AddEntry<MemPointer>(5, c2 + ObjectClass.To_NamePtr[2]); // ClassNamePtr
-                                round3[i].AddEntry<MemPointer>(6, gameObject + GameObject.ComponentsOffset); // Components
-                                round3[i].AddEntry<MemPointer>(7, gameObject + GameObject.NameOffset); // PGameObjectName
-                                round3[i].Callbacks += x3 =>
+                                round3[i].AddValueEntry<VmmPointer>(5, c2 + ObjectClass.To_NamePtr[2]); // ClassNamePtr
+                                round3[i].AddValueEntry<VmmPointer>(6, gameObject + GameObject.ComponentsOffset); // Components
+                                round3[i].AddValueEntry<VmmPointer>(7, gameObject + GameObject.NameOffset); // PGameObjectName
+                                round3[i].Completed += (sender, x3) =>
                                 {
-                                    if (x3.TryGetResult<MemPointer>(5, out var classNamePtr) &&
-                                        x3.TryGetResult<MemPointer>(6, out var components)
-                                        && x3.TryGetResult<MemPointer>(7, out var pGameObjectName))
+                                    if (x3.TryGetValue<VmmPointer>(5, out var classNamePtr) &&
+                                        x3.TryGetValue<VmmPointer>(6, out var components)
+                                        && x3.TryGetValue<VmmPointer>(7, out var pGameObjectName))
                                     {
-                                        round4[i].AddEntry<UTF8String>(8, classNamePtr, 64); // ClassName
-                                        round4[i].AddEntry<UTF8String>(9, pGameObjectName, 64); // ObjectName
-                                        round4[i].AddEntry<MemPointer>(10,
+                                        round4[i].AddStringEntry(8, classNamePtr, 64, Encoding.UTF8); // ClassName
+                                        round4[i].AddStringEntry(9, pGameObjectName, 64, Encoding.UTF8); // ObjectName
+                                        round4[i].AddValueEntry<VmmPointer>(10,
                                             components + 0x8); // T1
-                                        round4[i].Callbacks += x4 =>
+                                        round4[i].Completed += (sender, x4) =>
                                         {
-                                            if (x4.TryGetResult<UTF8String>(8, out var className) &&
-                                                x4.TryGetResult<UTF8String>(9, out var objectName) &&
-                                                x4.TryGetResult<MemPointer>(10, out var transformInternal))
+                                            if (x4.TryGetString(8, out var className) &&
+                                                x4.TryGetString(9, out var objectName) &&
+                                                x4.TryGetValue<VmmPointer>(10, out var transformInternal))
                                             {
-                                                map.CompletionCallbacks += () => // Store this as callback, let scatter reads all finish first (benchmarked faster)
+                                                map.Completed += (sender, _) => // Store this as callback, let scatter reads all finish first (benchmarked faster)
                                                 {
                                                     ct.ThrowIfCancellationRequested();
                                                     try

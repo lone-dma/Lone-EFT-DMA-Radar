@@ -1,6 +1,5 @@
 ﻿using eft_dma_radar.Misc;
 using eft_dma_radar.Misc.Pools;
-using SkiaSharp;
 
 namespace eft_dma_radar.Unity
 {
@@ -49,12 +48,16 @@ namespace eft_dma_radar.Unity
         /// Update Transform's World Position.
         /// </summary>
         /// <returns>Ref to World Position</returns>
-        public ref Vector3 UpdatePosition(SharedArray<TrsX> vertices = null)
+        public ref Vector3 UpdatePosition(Span<TrsX> vertices = default)
         {
             SharedArray<TrsX> standaloneVerticesLease = null;
             try
             {
-                vertices ??= standaloneVerticesLease = ReadVertices();
+                if (vertices.IsEmpty)
+                {
+                    standaloneVerticesLease = ReadVertices();
+                    vertices = standaloneVerticesLease.Span;
+                }
 
                 var worldPos = vertices[Index].t;
                 int index = Indices[Index];
@@ -85,12 +88,16 @@ namespace eft_dma_radar.Unity
         /// Get Transform's World Rotation.
         /// </summary>
         /// <returns>World Rotation</returns>
-        public Quaternion GetRotation(SharedArray<TrsX> vertices = null)
+        public Quaternion GetRotation(Span<TrsX> vertices = default)
         {
             SharedArray<TrsX> standaloneVertices = null;
             try
             {
-                vertices ??= standaloneVertices = ReadVertices();
+                if (vertices.IsEmpty)
+                {
+                    standaloneVertices = ReadVertices();
+                    vertices = standaloneVertices.Span;
+                }
 
                 var worldRot = vertices[Index].q;
                 int index = Indices[Index];
@@ -161,12 +168,16 @@ namespace eft_dma_radar.Unity
         /// </summary>
         /// <param name="localPoint">Local Point</param>
         /// <returns>World Point.</returns>
-        public Vector3 TransformPoint(Vector3 localPoint, SharedArray<TrsX> vertices = null)
+        public Vector3 TransformPoint(Vector3 localPoint, Span<TrsX> vertices = default)
         {
             SharedArray<TrsX> standaloneVertices = null;
             try
             {
-                vertices ??= standaloneVertices = ReadVertices();
+                if (vertices.IsEmpty)
+                {
+                    standaloneVertices = ReadVertices();
+                    vertices = standaloneVertices.Span;
+                }
 
                 var worldPos = localPoint;
                 int index = Index;
@@ -197,12 +208,16 @@ namespace eft_dma_radar.Unity
         /// </summary>
         /// <param name="worldPoint">World Point</param>
         /// <returns>Local Point</returns>
-        public Vector3 InverseTransformPoint(Vector3 worldPoint, SharedArray<TrsX> vertices = null)
+        public Vector3 InverseTransformPoint(Vector3 worldPoint, Span<TrsX> vertices = default)
         {
             SharedArray<TrsX> standaloneVertices = null;
             try
             {
-                vertices ??= standaloneVertices = ReadVertices();
+                if (vertices.IsEmpty)
+                {
+                    standaloneVertices = ReadVertices();
+                    vertices = standaloneVertices.Span;
+                }
 
                 var worldPos = vertices[Index].t;
                 var worldRot = vertices[Index].q;

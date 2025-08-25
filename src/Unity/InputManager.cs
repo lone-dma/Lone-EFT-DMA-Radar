@@ -1,6 +1,6 @@
 ﻿using eft_dma_radar.UI.Hotkeys;
 using eft_dma_radar.DMA;
-using eft_dma_radar.DMA.ScatterAPI;
+using VmmSharpEx.Scatter;
 
 namespace eft_dma_radar.Unity
 {
@@ -69,7 +69,7 @@ namespace eft_dma_radar.Unity
         {
             if (HotkeyManagerViewModel.Hotkeys.Count > 0)
             {
-                using var mapLease = ScatterReadMap.Lease(out var map);
+                using var map = Memory.GetScatterMap();
                 var round1 = map.AddRound(false);
                 int i = 0;
                 var currentKeyState = Memory.ReadPtr(_inputManager + UnityOffsets.UnityInputManager.CurrentKeyState);
@@ -96,10 +96,10 @@ namespace eft_dma_radar.Unity
             ulong v10 = currentKeyState;
 
             uint v11 = v3 & 0x1F;
-            sr.AddEntry<uint>(0, v10 + v6 * 0x4); // v10[v6] = Result
-            sr.Callbacks += x2 =>
+            sr.AddValueEntry<uint>(0, v10 + v6 * 0x4); // v10[v6] = Result
+            sr.Completed += (sender, x1) =>
             {
-                if (x2.TryGetResult<uint>(0, out var v12))
+                if (x1.TryGetValue<uint>(0, out var v12))
                 {
                     bool isKeyDown = (v12 & 1u << (int)v11) != 0;
                     action.Execute(isKeyDown);

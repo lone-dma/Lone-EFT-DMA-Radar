@@ -1,4 +1,4 @@
-﻿using eft_dma_radar.DMA.ScatterAPI;
+﻿using VmmSharpEx.Scatter;
 
 namespace eft_dma_radar.Tarkov.Player
 {
@@ -32,10 +32,10 @@ namespace eft_dma_radar.Tarkov.Player
         /// <param name="index">Scatter read index to read off of.</param>
         public override void OnRealtimeLoop(ScatterReadIndex index, bool espRunning)
         {
-            index.AddEntry<Vector3>(0, _btrView + Offsets.BTRView._targetPosition);
-            index.Callbacks += x1 =>
+            index.AddValueEntry<Vector3>(0, _btrView + Offsets.BTRView._targetPosition);
+            index.Completed += (sender, x1) =>
             {
-                if (x1.TryGetResult<Vector3>(0, out var position))
+                if (x1.TryGetValue<Vector3>(0, out var position))
                     _position = position;
             };
         }

@@ -1,7 +1,7 @@
-﻿using eft_dma_radar.DMA;
-using eft_dma_radar.DMA.ScatterAPI;
-using eft_dma_radar.Unity;
+﻿using eft_dma_radar.Unity;
 using eft_dma_radar.Unity.Collections;
+using VmmSharpEx;
+using VmmSharpEx.Scatter;
 
 namespace eft_dma_radar.Tarkov.Player
 {
@@ -85,10 +85,10 @@ namespace eft_dma_radar.Tarkov.Player
         /// <param name="index"></param>
         public override void OnRealtimeLoop(ScatterReadIndex index, bool espRunning)
         {
-            index.AddEntry<MemPointer>(-11, HandsControllerAddr);
-            index.Callbacks += x1 =>
+            index.AddValueEntry<VmmPointer>(-11, HandsControllerAddr);
+            index.Completed += (sender, x1) =>
             {
-                if (x1.TryGetResult<MemPointer>(-11, out var handsController))
+                if (x1.TryGetValue<VmmPointer>(-11, out var handsController))
                     LocalPlayer.HandsController = handsController;
             };
             base.OnRealtimeLoop(index, espRunning);
