@@ -50,13 +50,13 @@ namespace eft_dma_radar.Unity
         /// <returns>Ref to World Position</returns>
         public ref Vector3 UpdatePosition(Span<TrsX> vertices = default)
         {
-            SharedArray<TrsX> standaloneVerticesLease = null;
+            SharedArray<TrsX> standaloneVertices = null;
             try
             {
                 if (vertices.IsEmpty)
                 {
-                    standaloneVerticesLease = ReadVertices();
-                    vertices = standaloneVerticesLease.Span;
+                    standaloneVertices = ReadVertices();
+                    vertices = standaloneVertices.Span;
                 }
 
                 var worldPos = vertices[Index].t;
@@ -80,7 +80,7 @@ namespace eft_dma_radar.Unity
             }
             finally
             {
-                standaloneVerticesLease?.Return();
+                standaloneVertices?.Return();
             }
         }
 
