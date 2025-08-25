@@ -468,7 +468,7 @@ namespace eft_dma_radar.Tarkov.Player
                 if (!espRunning && tr.Key is not Bones.HumanBase)
                     continue;
                 index.AddArrayEntry<TrsX>((int)(uint)tr.Key, tr.Value.VerticesAddr,
-                    (3 * tr.Value.Index + 3) * 16); // ESP Vertices
+                    tr.Value.Index + 1); // ESP Vertices
             }
 
             index.Completed += (sender, x1) =>
