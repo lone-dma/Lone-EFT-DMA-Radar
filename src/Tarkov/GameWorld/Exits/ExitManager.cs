@@ -1,6 +1,6 @@
-﻿using eft_dma_radar.DMA.ScatterAPI;
-using eft_dma_radar.Misc;
+﻿using eft_dma_radar.Misc;
 using eft_dma_radar.Unity.Collections;
+using VmmSharpEx.Scatter;
 
 namespace eft_dma_radar.Tarkov.GameWorld.Exits
 {
@@ -71,7 +71,7 @@ namespace eft_dma_radar.Tarkov.GameWorld.Exits
                 if (_exits is null) // Initialize
                     Init();
                 ArgumentNullException.ThrowIfNull(_exits, nameof(_exits));
-                using var mapLease = ScatterReadMap.Lease(out var map);
+                using var map = Memory.GetScatterMap();
                 var round1 = map.AddRound();
                 for (int ix = 0; ix < _exits.Count; ix++)
                 {
@@ -79,10 +79,10 @@ namespace eft_dma_radar.Tarkov.GameWorld.Exits
                     var entry = _exits[i];
                     if (entry is Exfil exfil)
                     {
-                        round1[i].AddEntry<int>(0, exfil + Offsets.Exfil._status);
-                        round1[i].Callbacks += index =>
+                        round1[i].AddValueEntry<int>(0, exfil + Offsets.Exfil._status);
+                        round1[i].Completed += (sender, index) =>
                         {
-                            if (index.TryGetResult<int>(0, out var status))
+                            if (index.TryGetValue<int>(0, out var status))
                             {
                                 exfil.Update((Enums.EExfiltrationStatus)status);
                             }

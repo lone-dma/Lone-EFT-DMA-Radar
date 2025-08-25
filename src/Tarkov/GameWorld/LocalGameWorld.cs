@@ -2,11 +2,11 @@
 using eft_dma_radar.Tarkov.GameWorld.Exits;
 using eft_dma_radar.Tarkov.GameWorld.Explosives;
 using eft_dma_radar.Tarkov.Loot;
-using eft_dma_radar.DMA.ScatterAPI;
 using eft_dma_radar.Unity;
 using eft_dma_radar.Tarkov.Quests;
 using eft_dma_radar.Misc.Workers;
 using eft_dma_radar.Tarkov.Data;
+using eft_dma_radar.DMA;
 
 namespace eft_dma_radar.Tarkov.GameWorld
 {
@@ -258,7 +258,7 @@ namespace eft_dma_radar.Tarkov.GameWorld
                     return;
                 }
 
-                using var scatterMapLease = ScatterReadMap.Lease(out var scatterMap);
+                using var scatterMap = Memory.GetScatterMap();
                 var round1 = scatterMap.AddRound(false);
                 if (espRunning && CameraManager is CameraManager cm)
                 {
@@ -359,7 +359,7 @@ namespace eft_dma_radar.Tarkov.GameWorld
                     .Where(x => x.IsActive && x.IsAlive && x is not BtrOperator);
                 if (players.Any()) // at least 1 player
                 {
-                    using var scatterMapLease = ScatterReadMap.Lease(out var scatterMap);
+                    using var scatterMap = Memory.GetScatterMap();
                     var round1 = scatterMap.AddRound();
                     var round2 = scatterMap.AddRound();
                     int i = 0;

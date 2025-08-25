@@ -3,7 +3,6 @@ using eft_dma_radar.Tarkov.GameWorld;
 using eft_dma_radar.Tarkov.GameWorld.Exits;
 using eft_dma_radar.Tarkov.GameWorld.Explosives;
 using eft_dma_radar.Tarkov.Loot;
-using eft_dma_radar.DMA.ScatterAPI;
 using eft_dma_radar.Misc;
 using eft_dma_radar.Unity;
 using VmmSharpEx;
@@ -11,6 +10,7 @@ using System.Drawing;
 using eft_dma_radar.Tarkov.Quests;
 using VmmSharpEx.Refresh;
 using VmmSharpEx.Options;
+using VmmSharpEx.Scatter;
 
 namespace eft_dma_radar.DMA
 {
@@ -23,7 +23,7 @@ namespace eft_dma_radar.DMA
 
         private const string MEMORY_MAP_FILE = "mmap.txt";
         private const string GAME_PROCESS_NAME = "EscapeFromTarkov.exe";
-        private const uint MAX_READ_SIZE = (uint)0x1000 * 1500;
+        internal const uint MAX_READ_SIZE = (uint)0x1000 * 1500;
         private static readonly ManualResetEvent _syncProcessRunning = new(false);
         private static readonly ManualResetEvent _syncInRaid = new(false);
         private readonly Vmm _vmm;
@@ -356,63 +356,6 @@ namespace eft_dma_radar.DMA
 
         #endregion
 
-        #region Scatter Read
-
-        /// <summary>
-        /// Performs multiple reads in one sequence, significantly faster than single reads.
-        /// Designed to run without throwing unhandled exceptions, which will ensure the maximum amount of
-        /// reads are completed OK even if a couple fail.
-        /// </summary>
-        [ThreadStatic]
-        private static HashSet<ulong> _pagesTls;
-
-        public void ReadScatter(ReadOnlySpan<IScatterEntry> entries, bool useCache = true)
-        {
-            if (entries.Length == 0)
-                return;
-
-            _pagesTls ??= new HashSet<ulong>(512);
-            _pagesTls.Clear();
-
-            // Setup pages to read
-            for (int i = 0; i < entries.Length; i++)
-            {
-                var entry = entries[i];
-
-                if (entry.Address == 0x0 || entry.CB <= 0 || (uint)entry.CB > MAX_READ_SIZE)
-                {
-                    entry.IsFailed = true;
-                    continue;
-                }
-
-                uint numPages = ADDRESS_AND_SIZE_TO_SPAN_PAGES(entry.Address, (uint)entry.CB);
-                ulong basePage = PAGE_ALIGN(entry.Address);
-
-                for (uint p = 0; p < numPages; p++)
-                {
-                    _pagesTls.Add(basePage + 0x1000ul * p);
-                }
-            }
-
-            if (_pagesTls.Count == 0)
-                return;
-
-            var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
-            // Read pages
-            using var hScatter = _vmm.MemReadScatter(_pid, flags, _pagesTls.ToArray());
-            // Set results
-            for (int i = 0; i < entries.Length; i++)
-            {
-                var entry = entries[i];
-                if (entry.IsFailed)
-                    continue;
-
-                entry.SetResult(hScatter);
-            }
-        }
-
-        #endregion
-
         #region Read Methods
 
         /// <summary>
@@ -609,6 +552,11 @@ namespace eft_dma_radar.DMA
         #endregion
 
         #region Misc
+        /// <summary>
+        /// Get a new ScatterReadMap instance for performing batched reads.
+        /// </summary>
+        /// <returns></returns>
+        public ScatterReadMap GetScatterMap() => new(_vmm, _pid);
 
         /// <summary>
         /// Throws a special exception if no longer in game.

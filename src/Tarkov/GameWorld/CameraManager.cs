@@ -1,5 +1,4 @@
 ﻿using eft_dma_radar.DMA;
-using eft_dma_radar.DMA.ScatterAPI;
 using eft_dma_radar.ESP;
 using eft_dma_radar.Misc;
 using eft_dma_radar.Misc.Pools;
@@ -7,6 +6,8 @@ using eft_dma_radar.Tarkov.Player;
 using eft_dma_radar.Unity;
 using eft_dma_radar.Unity.Collections;
 using System.Drawing;
+using VmmSharpEx;
+using VmmSharpEx.Scatter;
 
 namespace eft_dma_radar.Tarkov.GameWorld
 {
@@ -73,7 +74,7 @@ namespace eft_dma_radar.Tarkov.GameWorld
                 if (OpticCameraActive)
                 {
                     var opticsPtr = Memory.ReadPtr(localPlayer.PWA + Offsets.ProceduralWeaponAnimation._optics);
-                    using var opticsLease = MemList<MemPointer>.Lease(opticsPtr, true, out var optics);
+                    using var opticsLease = MemList<VmmPointer>.Lease(opticsPtr, true, out var optics);
                     if (optics.Count > 0)
                     {
                         var pSightComponent = Memory.ReadPtr(optics[0] + Offsets.SightNBone.Mod);
@@ -104,10 +105,10 @@ namespace eft_dma_radar.Tarkov.GameWorld
             ulong vmAddr = IsADS && IsScoped
                 ? OpticCamera + UnityOffsets.Camera.ViewMatrix
                 : FPSCamera + UnityOffsets.Camera.ViewMatrix;
-            index.AddEntry<Matrix4x4>(0, vmAddr); // View Matrix
-            index.Callbacks += x1 =>
+            index.AddValueEntry<Matrix4x4>(0, vmAddr); // View Matrix
+            index.Completed += (sender, x1) =>
             {
-                ref Matrix4x4 vm = ref x1.GetRef<Matrix4x4>(0);
+                ref Matrix4x4 vm = ref x1.GetValueRef<Matrix4x4>(0);
                 if (!Unsafe.IsNullRef(ref vm))
                 {
                     float zoom = App.Config.EspWidget.Zoom;
@@ -121,13 +122,13 @@ namespace eft_dma_radar.Tarkov.GameWorld
             };
             if (IsScoped)
             {
-                index.AddEntry<float>(1, FPSCamera + UnityOffsets.Camera.FOV); // FOV
-                index.AddEntry<float>(2, FPSCamera + UnityOffsets.Camera.AspectRatio); // Aspect
-                index.Callbacks += x2 =>
+                index.AddValueEntry<float>(1, FPSCamera + UnityOffsets.Camera.FOV); // FOV
+                index.AddValueEntry<float>(2, FPSCamera + UnityOffsets.Camera.AspectRatio); // Aspect
+                index.Completed += (sender, x2) =>
                 {
-                    if (x2.TryGetResult<float>(1, out var fov))
+                    if (x2.TryGetValue<float>(1, out var fov))
                         _fov = fov;
-                    if (x2.TryGetResult<float>(2, out var aspect))
+                    if (x2.TryGetValue<float>(2, out var aspect))
                         _aspect = aspect;
                 };
             }
