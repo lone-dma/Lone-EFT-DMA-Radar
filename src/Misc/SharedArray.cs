@@ -7,17 +7,17 @@
     public class SharedArray<T> : IEnumerable<T>, IDisposable
         where T : unmanaged
     {
-        private T[] _arr;
+        private IMemoryOwner<T> _mem;
 
         /// <summary>
         /// Returns a Span <typeparamref name="T"/> over this instance.
         /// </summary>
-        public Span<T> Span => _arr.AsSpan(0, Count);
+        public Span<T> Span => _mem.Memory.Span.Slice(0, Count);
 
         /// <summary>
         /// Returns a ReadOnlySpan <typeparamref name="T"/> over this instance.
         /// </summary>
-        public ReadOnlySpan<T> ReadOnlySpan => _arr.AsSpan(0, Count);
+        public ReadOnlySpan<T> ReadOnlySpan => _mem.Memory.Span.Slice(0, Count);
 
         /// <summary>
         /// Construct a new SharedArray with a defined length.
@@ -41,16 +41,14 @@
         protected void Initialize(int count)
         {
             ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
+            _mem = MemoryPool<T>.Shared.Rent(count);
             Count = count;
-            _arr = ArrayPool<T>.Shared.Rent(count); // Will throw exception on negative counts
         }
 
         public void Dispose()
         {
-            if (Interlocked.Exchange(ref _arr, null) is T[] arr)
-            {
-                ArrayPool<T>.Shared.Return(arr);
-            }
+            _mem?.Dispose();
+            _mem = null;
         }
 
 
@@ -66,20 +64,20 @@
         [Obsolete("This implementation uses a slower interface enumerator. Use GetEnumerator() for better performance.")]
         IEnumerator<T> IEnumerable<T>.GetEnumerator() // For LINQ and other interface compatibility.
         {
-            int count = Count;
-            for (int i = 0; i < count; i++)
+            var mem = _mem.Memory.Slice(0, Count);
+            for (int i = 0; i < mem.Length; i++)
             {
-                yield return _arr[i];
+                yield return mem.Span[i];
             }
         }
 
         [Obsolete("This implementation uses a slower interface enumerator. Use GetEnumerator() for better performance.")]
         IEnumerator IEnumerable.GetEnumerator() // For LINQ and other interface compatibility.
         {
-            int count = Count;
-            for (int i = 0; i < count; i++)
+            var mem = _mem.Memory.Slice(0, Count);
+            for (int i = 0; i < mem.Length; i++)
             {
-                yield return _arr[i];
+                yield return mem.Span[i];
             }
         }
 

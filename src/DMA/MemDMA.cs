@@ -549,7 +549,6 @@ namespace eft_dma_radar.DMA
         /// </summary>
         public string ReadUnityString(ulong addr, int length = 128, bool useCache = true)
         {
-
             if (length % 2 != 0)
                 length++;
             ArgumentOutOfRangeException.ThrowIfGreaterThan(length, 0x1000, nameof(length));
