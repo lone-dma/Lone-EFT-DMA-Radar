@@ -440,7 +440,11 @@ namespace eft_dma_radar.DMA
             var arr = new SharedArray<T>(count);
             try
             {
-                ReadSpan(addr, arr.Span, useCache);
+                ReadSpan(
+                    addr: addr,
+                    span: arr.Span, 
+                    useCache: useCache,
+                    allowPartialRead: false);
                 return arr;
             }
             catch
