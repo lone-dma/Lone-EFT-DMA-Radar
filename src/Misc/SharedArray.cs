@@ -15,11 +15,6 @@
         public Span<T> Span => _mem.Memory.Span.Slice(0, Count);
 
         /// <summary>
-        /// Returns a ReadOnlySpan <typeparamref name="T"/> over this instance.
-        /// </summary>
-        public ReadOnlySpan<T> ReadOnlySpan => _mem.Memory.Span.Slice(0, Count);
-
-        /// <summary>
         /// Construct a new SharedArray with a defined length.
         /// </summary>
         /// <param name="count">Number of array elements.</param>
