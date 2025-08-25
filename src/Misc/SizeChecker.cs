@@ -2,7 +2,6 @@
 {
     /// <summary>
     /// Caches Type Sizes of value types.
-    /// Regulates type safety for situations where you cannot enforce types at compile time.
     /// </summary>
     /// <typeparam name="T">Type to check.</typeparam>
     internal static class SizeChecker<T>
