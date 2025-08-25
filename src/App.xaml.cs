@@ -142,11 +142,6 @@ namespace eft_dma_radar
         private static IServiceProvider BuildServiceProvider()
         {
             var services = new ServiceCollection();
-            services.AddSingleton<ObjectPoolProvider>(sp =>
-                new DefaultObjectPoolProvider
-                {
-                    MaximumRetained = int.MaxValue - 1 // No maximum limit.
-                });
             ConfigureHttpClientFactory(services);
             return services.BuildServiceProvider();
         }
