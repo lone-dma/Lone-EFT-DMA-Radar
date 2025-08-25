@@ -54,7 +54,6 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
 		<PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.8.0" />
-		<PackageReference Include="Microsoft.Extensions.ObjectPool" Version="9.0.8" />
 		<PackageReference Include="SkiaSharp.Views.WPF" Version="3.119.0" />
 		<PackageReference Include="Svg.Skia" Version="3.0.6" />
 		<PackageReference Include="Extended.Wpf.Toolkit" Version="4.7.25104.5739" />
