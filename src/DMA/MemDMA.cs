@@ -505,33 +505,6 @@ namespace eft_dma_radar.DMA
         }
 
         /// <summary>
-        /// Read byref value type/struct from specified address multiple times to ensure the read is correct.
-        /// </summary>
-        /// <typeparam name="T">Specified Value Type.</typeparam>
-        /// <param name="addr">Address to read from.</param>
-        public unsafe void ReadValueEnsure<T>(ulong addr, out T result)
-            where T : unmanaged, allows ref struct
-        {
-            int cb = sizeof(T);
-            if (!_vmm.MemReadValue<T>(_pid, addr, out var r1, VmmFlags.NOCACHE))
-                throw new VmmException("Memory Read Failed!");
-            Thread.SpinWait(5);
-            if (!_vmm.MemReadValue<T>(_pid, addr, out var r2, VmmFlags.NOCACHE))
-                throw new VmmException("Memory Read Failed!");
-            Thread.SpinWait(5);
-            if (!_vmm.MemReadValue<T>(_pid, addr, out var r3, VmmFlags.NOCACHE))
-                throw new VmmException("Memory Read Failed!");
-            var b1 = new ReadOnlySpan<byte>(&r1, cb);
-            var b2 = new ReadOnlySpan<byte>(&r2, cb);
-            var b3 = new ReadOnlySpan<byte>(&r3, cb);
-            if (!b1.SequenceEqual(b2) || !b1.SequenceEqual(b3) || !b2.SequenceEqual(b3))
-            {
-                throw new VmmException("Memory Read Failed!");
-            }
-            result = r1;
-        }
-
-        /// <summary>
         /// Read null terminated string (utf-8/default).
         /// </summary>
         /// <param name="length">Number of bytes to read.</param>
