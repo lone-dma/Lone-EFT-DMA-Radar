@@ -30,7 +30,7 @@ namespace eft_dma_radar.Tarkov.GameWorld.Exits
             var exfilArrOffset = _isPMC ?
                 Offsets.ExfilController.ExfiltrationPointArray : Offsets.ExfilController.ScavExfiltrationPointArray;
             var exfilPoints = Memory.ReadPtr(exfilController + exfilArrOffset, false);
-            using var exfilsLease = MemArray<ulong>.Lease(exfilPoints, false, out var exfils);
+            using var exfils = new UnityArray<ulong>(exfilPoints, false);
             ArgumentOutOfRangeException.ThrowIfZero(exfils.Count, nameof(exfils));
             foreach (var exfilAddr in exfils)
             {
@@ -41,7 +41,7 @@ namespace eft_dma_radar.Tarkov.GameWorld.Exits
             var secretExfilPoints = Memory.ReadValue<ulong>(exfilController + Offsets.ExfilController.SecretExfiltrationPointArray, false);
             if (secretExfilPoints.IsValidVirtualAddress())
             {
-                using var secretExfilsLease = MemArray<ulong>.Lease(secretExfilPoints, false, out var secretExfils);
+                using var secretExfils = new UnityArray<ulong>(secretExfilPoints, false);
                 foreach (var secretExfil in secretExfils)
                 {
                     var exfil = new SecretExfil(secretExfil);
@@ -51,7 +51,7 @@ namespace eft_dma_radar.Tarkov.GameWorld.Exits
             /// Transits
             var transitController = Memory.ReadPtr(_localGameWorld + Offsets.ClientLocalGameWorld.TransitController, false);
             var transitsPtr = Memory.ReadPtr(transitController + Offsets.TransitController.TransitPoints, false);
-            using var transitsLease = MemDictionary<ulong, ulong>.Lease(transitsPtr, false, out var transits);
+            using var transits = new UnityDictionary<ulong, ulong>(transitsPtr, false);
             foreach (var dTransit in transits)
             {
                 var transit = new TransitPoint(dTransit.Value);

@@ -199,7 +199,7 @@ namespace eft_dma_radar.Unity
 
                 ulong monoImageSetPtrBase = Memory.MonoBase + 0x751980; // img_set_cache (MonoImageSet)
 
-                using var monoImageSetPtrArrayLease = MemArray<ulong>.Lease(monoImageSetPtrBase, 1103, true, out var monoImageSetPtrArray);
+                using var monoImageSetPtrArray = Memory.ReadArray<ulong>(monoImageSetPtrBase, 1103, true);
                 using var mapOuter = Memory.GetScatterMap();
                 var r1 = mapOuter.AddRound();
                 var r2 = mapOuter.AddRound();
@@ -231,7 +231,7 @@ namespace eft_dma_radar.Unity
                                         {
                                             if (tableData.TableSize > 100000 || tableData.KVS == 0x0)
                                                 return;
-                                            using var genericClassPtrArrayLease = MemArray<GenericClassPtrEntry>.Lease(tableData.KVS, tableData.TableSize, true, out var genericClassPtrArray);
+                                            using var genericClassPtrArray = Memory.ReadArray<GenericClassPtrEntry>(tableData.KVS, tableData.TableSize, true);
                                             using var mapInner = Memory.GetScatterMap();
                                             var r11 = mapInner.AddRound();
                                             var r22 = mapInner.AddRound();

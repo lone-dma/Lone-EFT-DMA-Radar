@@ -1,5 +1,4 @@
 ﻿using eft_dma_radar.Misc;
-using eft_dma_radar.Misc.Pools;
 
 namespace eft_dma_radar.Unity
 {
@@ -80,7 +79,7 @@ namespace eft_dma_radar.Unity
             }
             finally
             {
-                standaloneVertices?.Return();
+                standaloneVertices?.Dispose();
             }
         }
 
@@ -117,7 +116,7 @@ namespace eft_dma_radar.Unity
             }
             finally
             {
-                standaloneVertices?.Return();
+                standaloneVertices?.Dispose();
             }
         }
 
@@ -199,7 +198,7 @@ namespace eft_dma_radar.Unity
             }
             finally
             {
-                standaloneVertices?.Return();
+                standaloneVertices?.Dispose();
             }
         }
 
@@ -245,7 +244,7 @@ namespace eft_dma_radar.Unity
             }
             finally
             {
-                standaloneVertices?.Return();
+                standaloneVertices?.Dispose();
             }
         }
         #endregion
@@ -300,14 +299,14 @@ namespace eft_dma_radar.Unity
         /// </summary>
         public SharedArray<TrsX> ReadVertices()
         {
-            var vertices = SharedArray<TrsX>.Get(Index + 1);
+            var vertices = new SharedArray<TrsX>(Index + 1);
             try
             {
                 Memory.ReadSpan(VerticesAddr, vertices.Span, _useCache);
             }
             catch
             {
-                vertices.Return();
+                vertices.Dispose();
                 throw;
             }
             return vertices;

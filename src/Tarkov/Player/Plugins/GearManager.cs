@@ -23,7 +23,7 @@ namespace eft_dma_radar.Tarkov.Player.Plugins
             var inventory = Memory.ReadPtr(inventorycontroller + Offsets.InventoryController.Inventory);
             var equipment = Memory.ReadPtr(inventory + Offsets.Inventory.Equipment);
             var slots = Memory.ReadPtr(equipment + Offsets.Equipment.Slots);
-            using var slotsArrayLease = MemArray<ulong>.Lease(slots, true, out var slotsArray);
+            using var slotsArray = new UnityArray<ulong>(slots, true);
 
             foreach (var slotPtr in slotsArray)
             {
@@ -109,7 +109,7 @@ namespace eft_dma_radar.Tarkov.Player.Plugins
             try
             {
                 var parentSlots = Memory.ReadPtr(lootItemBase + Offsets.LootItemMod.Slots);
-                using var slotsArrayLease = MemArray<ulong>.Lease(parentSlots, true, out var slotsArray);
+                using var slotsArray = new UnityArray<ulong>(parentSlots, true);
                 var slotDict = new Dictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);
 
                 foreach (var slotPtr in slotsArray)
