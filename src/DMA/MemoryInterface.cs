@@ -15,8 +15,8 @@ namespace eft_dma_radar.DMA
         /// </summary>
         public static void ModuleInit()
         {
-            Memory = new MemDMA();
             ScatterReadMap.MaxReadSize = MemDMA.MAX_READ_SIZE;
+            Memory = new MemDMA();
             Debug.WriteLine("DMA Initialized!");
         }
     }
