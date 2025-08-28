@@ -1,7 +1,6 @@
 ﻿using eft_dma_radar.Misc;
 using eft_dma_radar.Tarkov.Data.TarkovMarket;
 using eft_dma_radar.Tarkov.Loot;
-using eft_dma_radar.Tarkov.Player.Plugins;
 using eft_dma_radar.UI.Radar;
 using eft_dma_radar.UI.Radar.ViewModels;
 using eft_dma_radar.UI.Skia;
