@@ -1,61 +1,66 @@
-﻿using eft_dma_radar.Misc;
-
-namespace eft_dma_radar.Tarkov.Player.Plugins
+﻿namespace eft_dma_radar.Tarkov.Player.Plugins
 {
-    /// <summary>
-    /// Contains 'High Alert' Feature Code.
-    /// Used for Radar Aimlines and ESP Feature.
-    /// </summary>
     internal static class HighAlert
     {
         /// <summary>
-        /// Checks if a source target is facing the destination target.
-        /// Part of the High Alert Feature Module.
+        /// True if <paramref name="source"/> is facing <paramref name="target"/>.
         /// </summary>
-        /// <param name="source">Source Target.</param>
-        /// <param name="target">Destination Target.</param>
-        /// <param name="maxDist">(Optional) Max distance to perform this check on. If exceeded returns false.</param>
-        /// <returns>True if source is facing the destination target, otherwise False.</returns>
         public static bool IsFacingTarget(this PlayerBase source, PlayerBase target, float? maxDist = null)
         {
-            var distance = Vector3.Distance(source.Position, target.Position);
-            if (maxDist is float maxDistFloat && distance > maxDistFloat)
-                return false;
+            Vector3 delta = target.Position - source.Position;
 
-            // Calculate the 3D vector from source to target (including vertical component)
-            var directionToTarget = Vector3.Normalize(target.Position - source.Position);
+            if (maxDist is float m)
+            {
+                float maxDistSq = m * m;
+                float distSq = Vector3.Dot(delta, delta);
+                if (distSq > maxDistSq) return false;
+            }
 
-            // Convert source rotation to a direction vector
-            var sourceDirection = Vector3.Normalize(RotationToDirection(source.Rotation));
+            float distance = delta.Length();
+            if (distance <= 1e-6f)
+                return true;
 
-            // Calculate the angle between source direction and the direction to the target
-            var dotProduct = Vector3.Dot(sourceDirection, directionToTarget);
-            var angle = (float)Math.Acos(dotProduct); // Result in radians
+            Vector3 fwd = RotationToDirection(source.Rotation);
 
-            // Convert angle to degrees for easier interpretation (optional)
-            var angleInDegrees = angle * (180f / (float)Math.PI);
+            float cosAngle = Vector3.Dot(fwd, delta) / distance;
 
-            var angleThreshold =
-                31.3573 - 3.51726 *
-                Math.Log(Math.Abs(0.626957 - 15.6948 * distance)); // Max degrees variance based on distance variable
-            if (angleThreshold < 1f)
-                angleThreshold = 1f; // Non linear equation, handle low/negative results
+            const float A = 31.3573f;
+            const float B = 3.51726f;
+            const float C = 0.626957f;
+            const float D = 15.6948f;
 
-            return angleInDegrees <= angleThreshold;
+            float x = MathF.Abs(C - D * distance);
+            float angleDeg = A - B * MathF.Log(MathF.Max(x, 1e-6f));
+            if (angleDeg < 1f) angleDeg = 1f;
+            if (angleDeg > 179f) angleDeg = 179f;
+
+            float cosThreshold = MathF.Cos(angleDeg * (MathF.PI / 180f));
+            return cosAngle >= cosThreshold;
         }
 
         public static Vector3 RotationToDirection(Vector2 rotation)
         {
-            // Convert rotation (yaw, pitch) to a direction vector
-            // This might need adjustments based on how you define rotation
-            var yaw = rotation.X.ToRadians();
-            var pitch = rotation.Y.ToRadians();
-            Vector3 direction;
-            direction.X = (float)(Math.Cos(pitch) * Math.Sin(yaw));
-            direction.Y = (float)Math.Sin(-pitch); // Negative pitch because in Unity, as pitch increases, we look down
-            direction.Z = (float)(Math.Cos(pitch) * Math.Cos(yaw));
+            float yaw = rotation.X * (MathF.PI / 180f);
+            float pitch = rotation.Y * (MathF.PI / 180f);
 
-            return Vector3.Normalize(direction);
+            float cp = MathF.Cos(pitch);
+            float sp = MathF.Sin(pitch);
+            float sy = MathF.Sin(yaw);
+            float cy = MathF.Cos(yaw);
+
+            var dir = new Vector3(
+                cp * sy,
+               -sp,
+                cp * cy
+            );
+
+            float lenSq = Vector3.Dot(dir, dir);
+            if (lenSq > 0f && MathF.Abs(lenSq - 1f) > 1e-4f)
+            {
+                float invLen = 1f / MathF.Sqrt(lenSq);
+                dir *= invLen;
+            }
+            return dir;
         }
     }
 }
