@@ -2,7 +2,7 @@
 using eft_dma_radar.Tarkov.Loot;
 using eft_dma_radar.Unity.Collections;
 
-namespace eft_dma_radar.Tarkov.Player.Plugins
+namespace eft_dma_radar.Tarkov.Player
 {
     public sealed class HandsManager
     {
