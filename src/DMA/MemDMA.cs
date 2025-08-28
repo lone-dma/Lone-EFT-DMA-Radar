@@ -513,7 +513,7 @@ namespace eft_dma_radar.DMA
         {
             ArgumentOutOfRangeException.ThrowIfGreaterThan(length, 0x1000, nameof(length));
             var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
-            return _vmm.MemReadString(_pid, addr, (uint)length, Encoding.UTF8, flags) ??
+            return _vmm.MemReadString(_pid, addr, length, Encoding.UTF8, flags) ??
                 throw new VmmException("Memory Read Failed!");
         }
 
@@ -526,7 +526,7 @@ namespace eft_dma_radar.DMA
                 length++;
             ArgumentOutOfRangeException.ThrowIfGreaterThan(length, 0x1000, nameof(length));
             var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
-            return _vmm.MemReadString(_pid, addr + 0x14, (uint)length, Encoding.Unicode, flags) ??
+            return _vmm.MemReadString(_pid, addr + 0x14, length, Encoding.Unicode, flags) ??
                 throw new VmmException("Memory Read Failed!");
         }
 
