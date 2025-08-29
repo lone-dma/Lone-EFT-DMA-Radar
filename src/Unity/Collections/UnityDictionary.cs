@@ -23,16 +23,6 @@ namespace eft_dma_radar.Unity.Collections
         /// <param name="useCache">Perform cached reading.</param>
         public UnityDictionary(ulong addr, bool useCache = true) : base()
         {
-            Initialize(addr, useCache);
-        }
-
-        /// <summary>
-        /// Initializer for Unity Dictionary
-        /// </summary>
-        /// <param name="addr">Base Address for this collection.</param>
-        /// <param name="useCache">Perform cached reading.</param>
-        private void Initialize(ulong addr, bool useCache = true)
-        {
             try
             {
                 var count = Memory.ReadValue<int>(addr + CountOffset, useCache);
