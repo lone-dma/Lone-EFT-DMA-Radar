@@ -40,16 +40,8 @@
             Count = count;
         }
 
-#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
-        public void Dispose()
-#pragma warning restore CA1816 // Dispose methods should call SuppressFinalize
-        {
-            _mem?.Dispose();
-            _mem = null;
-        }
 
-
-        #region IReadOnlyList
+        #region Interfaces
 
         public int Count { get; private set; }
 
@@ -75,6 +67,14 @@
             {
                 yield return mem.Span[i];
             }
+        }
+
+#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
+        public void Dispose()
+#pragma warning restore CA1816 // Dispose methods should call SuppressFinalize
+        {
+            _mem?.Dispose();
+            _mem = null;
         }
 
         #endregion
