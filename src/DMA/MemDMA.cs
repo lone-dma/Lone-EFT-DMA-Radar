@@ -23,7 +23,7 @@ namespace eft_dma_radar.DMA
 
         private const string MEMORY_MAP_FILE = "mmap.txt";
         private const string GAME_PROCESS_NAME = "EscapeFromTarkov.exe";
-        internal const uint MAX_READ_SIZE = (uint)0x1000 * 1500;
+        internal const uint MAX_READ_SIZE = 0x1000u * 1500u;
         private static readonly ManualResetEvent _syncProcessRunning = new(false);
         private static readonly ManualResetEvent _syncInRaid = new(false);
         private readonly Vmm _vmm;
