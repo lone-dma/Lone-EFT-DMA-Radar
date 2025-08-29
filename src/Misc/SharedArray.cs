@@ -4,7 +4,7 @@
     /// Represents a flexible array buffer that uses the Shared Array Pool.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class SharedArray<T> : IEnumerable<T>, IDisposable
+    public class SharedArray<T> : IReadOnlyList<T>, IEnumerable<T>, IDisposable
         where T : unmanaged
     {
         private IMemoryOwner<T> _mem;
@@ -53,10 +53,9 @@
 
         public int Count { get; private set; }
 
-        public ref T this[int index] => ref Span[index]; // Modified from default implementation.
+        public T this[int index] => Span[index];
 
-        public Enumerator GetEnumerator() =>
-            new Enumerator(Span);
+        public Span<T>.Enumerator GetEnumerator() => Span.GetEnumerator(); // Use the Span enumerator for better performance.
 
         [Obsolete("This implementation uses a slower interface enumerator. Use GetEnumerator() for better performance.")]
         IEnumerator<T> IEnumerable<T>.GetEnumerator() // For LINQ and other interface compatibility.
@@ -75,36 +74,6 @@
             for (int i = 0; i < mem.Length; i++)
             {
                 yield return mem.Span[i];
-            }
-        }
-
-        /// <summary>
-        /// Custom high perf stackonly SharedArray <typeparamref name="T"/> Enumerator.
-        /// </summary>
-        public ref struct Enumerator
-        {
-            private readonly Span<T> _span;
-            private int _index = -1;
-
-            public Enumerator(Span<T> span)
-            {
-                _span = span;
-            }
-
-            public readonly ref T Current => ref _span[_index];
-
-            public bool MoveNext()
-            {
-                return ++_index < _span.Length;
-            }
-
-            public void Reset()
-            {
-                _index = -1;
-            }
-
-            public readonly void Dispose()
-            {
             }
         }
 
