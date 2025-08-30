@@ -1,5 +1,3 @@
-# eft-dma-radar
+# eft-dma-radar-lite
 
-My custom lone-dma fork.
-
-[Discuss on UC](https://www.unknowncheats.me/forum/escape-from-tarkov/712525-eft-dma-radar-lite-wpf.html)
+Custom Lone DMA fork that is **Radar Only/No Memwrites**.
