@@ -24,6 +24,17 @@
         }
 
         /// <summary>
+        /// Construct a new SharedArray from an existing memory owner.
+        /// This class will become the new owner.
+        /// </summary>
+        /// <param name="mem">Existing <see cref="IMemoryOwner{T}"/> instance. This class will become the new owner.</param>
+        public SharedArray(IMemoryOwner<T> mem)
+        {
+            _mem = mem;
+            Count = mem.Memory.Length;
+        }
+
+        /// <summary>
         /// Constructor for derived classes.
         /// Be sure to call <see cref="Initialize(int)"/> in the derived class."/>
         /// </summary>
