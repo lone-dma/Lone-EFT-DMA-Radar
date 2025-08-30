@@ -421,24 +421,14 @@ namespace eft_dma_radar.DMA
         /// <param name="addr">Address to read from.</param>
         /// <param name="count">Number of array elements to read.</param>
         /// <param name="useCache">Use caching for this read.</param>
-        /// <returns><see cref="SharedArray{T}"/> value.</returns>
+        /// <returns><see cref="SharedArray{T}"/> value. Be sure to call <see cref="SharedArray{T}.Dispose"/>!</returns>
         public SharedArray<T> ReadArray<T>(ulong addr, int count, bool useCache = true)
             where T : unmanaged
         {
-            var arr = new SharedArray<T>(count);
-            try
-            {
-                ReadSpan(
-                    addr: addr,
-                    span: arr.Span, 
-                    useCache: useCache);
-                return arr;
-            }
-            catch
-            {
-                arr.Dispose();
-                throw;
-            }
+            var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
+            var arr = _vmm.MemReadPooledArray<T>(_pid, addr, count, flags) ??
+                throw new VmmException("Memory Read Failed!");
+            return new SharedArray<T>(arr);
         }
 
         /// <summary>
