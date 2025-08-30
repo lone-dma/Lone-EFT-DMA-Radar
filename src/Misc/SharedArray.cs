@@ -32,6 +32,7 @@
         {
             _mem = mem;
             Count = mem.Memory.Length;
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(Count, 16384, nameof(Count));
         }
 
         /// <summary>
@@ -80,12 +81,13 @@
             }
         }
 
-#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
         public void Dispose()
-#pragma warning restore CA1816 // Dispose methods should call SuppressFinalize
         {
-            _mem?.Dispose();
-            _mem = null;
+            if (Interlocked.Exchange(ref _mem, null) is IMemoryOwner<T> mem)
+            {
+                mem.Dispose();
+                GC.SuppressFinalize(this);
+            }
         }
 
         #endregion
