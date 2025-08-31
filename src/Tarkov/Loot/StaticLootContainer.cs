@@ -30,6 +30,9 @@ namespace eft_dma_radar.Tarkov.Loot
             }
         }
 
+        /// <summary>
+        /// Refresh the Searched status of this container.
+        /// </summary>
         public void RefreshSearchedStatus()
         {
             try
