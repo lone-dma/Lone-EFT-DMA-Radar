@@ -47,7 +47,7 @@ namespace eft_dma_radar.Tarkov.Loot
                 try
                 {
                     var filter = LootFilter.Create();
-                    FilteredLoot = _loot?.Values?
+                    FilteredLoot = _loot.Values?
                         .Where(x => filter(x))
                         .OrderByDescending(x => x.Important || (App.Config.QuestHelper.Enabled && x.IsQuestCondition))
                         .ThenByDescending(x => x?.Price ?? 0)
