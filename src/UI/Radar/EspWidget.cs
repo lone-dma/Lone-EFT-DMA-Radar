@@ -46,7 +46,7 @@ namespace eft_dma_radar.UI.Radar
         /// <summary>
         /// All Static Containers on the map.
         /// </summary>
-        private static IEnumerable<StaticLootContainer> Containers => Memory.Loot?.StaticLootContainers;
+        private static IEnumerable<StaticLootContainer> Containers => Memory.Loot?.StaticContainers;
 
         public override void Draw(SKCanvas canvas)
         {
