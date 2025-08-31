@@ -59,7 +59,7 @@ namespace eft_dma_radar.UI.Radar.ViewModels
         /// <summary>
         /// All Static Containers on the map.
         /// </summary>
-        private static IEnumerable<StaticLootContainer> Containers => Memory?.Loot?.StaticLootContainers;
+        private static IEnumerable<StaticLootContainer> Containers => Memory?.Loot?.StaticContainers;
 
         /// <summary>
         /// All Players in Local Game World (including dead/exfil'd) 'Player' collection.
