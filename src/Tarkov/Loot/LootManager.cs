@@ -316,8 +316,6 @@ namespace eft_dma_radar.Tarkov.Loot
                     var id = Memory.ReadUnityString(idPtr.StringID);
                     if (EftDataManager.AllItems.TryGetValue(id, out var entry))
                         loot.Add(new LootItem(entry));
-                    var childGrids = Memory.ReadPtr(containedItem + Offsets.LootItemMod.Grids);
-                    GetItemsInGrid(childGrids, loot); // Recurse the grids (if possible)
                 }
                 catch
                 {
@@ -335,67 +333,6 @@ namespace eft_dma_radar.Tarkov.Loot
             try
             {
                 GetItemsInSlots(slots, loot, isPMC);
-            }
-            catch
-            {
-            }
-        }
-
-        #endregion
-
-        #region Static Public Methods
-
-        ///This method recursively searches grids. Grids work as follows:
-        ///Take a Groundcache which holds a Blackrock which holds a pistol.
-        ///The Groundcache will have 1 grid array, this method searches for whats inside that grid.
-        ///Then it finds a Blackrock. This method then invokes itself recursively for the Blackrock.
-        ///The Blackrock has 11 grid arrays (not to be confused with slots!! - a grid array contains slots. Look at the blackrock and you'll see it has 20 slots but 11 grids).
-        ///In one of those grid arrays is a pistol. This method would recursively search through each item it finds
-        ///To Do: add slot logic, so we can recursively search through the pistols slots...maybe it has a high value scope or something.
-        public static void GetItemsInGrid(ulong gridsArrayPtr, List<LootItem> containerLoot,
-            int recurseDepth = 0)
-        {
-            ArgumentOutOfRangeException.ThrowIfZero(gridsArrayPtr, nameof(gridsArrayPtr));
-            if (recurseDepth++ > 3) return; // Only recurse 3 layers deep (this should be plenty)
-            using var gridsArray = new UnityArray<ulong>(gridsArrayPtr, true);
-
-            try
-            {
-                // Check all sections of the container
-                foreach (var grid in gridsArray)
-                {
-                    var gridEnumerableClass =
-                        Memory.ReadPtr(grid +
-                                       Offsets.Grids
-                                           .ContainedItems); // -.GClass178A->gClass1797_0x40 // Offset: 0x0040 (Type: -.GClass1797)
-
-                    var itemListPtr =
-                        Memory.ReadPtr(gridEnumerableClass +
-                                       Offsets.GridContainedItems.Items); // -.GClass1797->list_0x18 // Offset: 0x0018 (Type: System.Collections.Generic.List<Item>)
-                    using var itemList = new UnityList<ulong>(itemListPtr, true);
-
-                    foreach (var childItem in itemList)
-                        try
-                        {
-                            var childItemTemplate =
-                                Memory.ReadPtr(childItem +
-                                               Offsets.LootItem
-                                                   .Template); // EFT.InventoryLogic.Item->_template // Offset: 0x0038 (Type: EFT.InventoryLogic.ItemTemplate)
-                            var childItemIdPtr = Memory.ReadValue<Types.MongoID>(childItemTemplate + Offsets.ItemTemplate._id);
-                            var childItemIdStr = Memory.ReadUnityString(childItemIdPtr.StringID);
-                            if (EftDataManager.AllItems.TryGetValue(childItemIdStr, out var entry))
-                                containerLoot.Add(new LootItem(entry));
-
-                            // Check to see if the child item has children
-                            // Don't throw on nullPtr since GetItemsInGrid needs to record the current item still
-                            var childGridsArrayPtr = Memory.ReadValue<ulong>(childItem + Offsets.LootItemMod.Grids); // Pointer
-                            GetItemsInGrid(childGridsArrayPtr, containerLoot,
-                                recurseDepth); // Recursively add children to the entity
-                        }
-                        catch
-                        {
-                        }
-                }
             }
             catch
             {
