@@ -59,44 +59,30 @@ namespace eft_dma_radar.Tarkov.Player
         {
             var loot = new List<LootItem>();
             foreach (var slot in Slots)
+            {
                 try
                 {
                     if (_isPMC && slot.Key == "Scabbard")
+                    {
                         continue; // skip pmc scabbard
+                    }
                     var containedItem = Memory.ReadPtr(slot.Value + Offsets.Slot.ContainedItem);
                     var inventorytemplate = Memory.ReadPtr(containedItem + Offsets.LootItem.Template);
                     var idPtr = Memory.ReadValue<Types.MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
                     var id = Memory.ReadUnityString(idPtr.StringID);
                     if (EftDataManager.AllItems.TryGetValue(id, out var entry1))
                         loot.Add(new LootItem(entry1));
-                    try // Get all items on player
-                    {
-                        var grids = Memory.ReadValue<ulong>(containedItem + Offsets.LootItemMod.Grids);
-                        LootManager.GetItemsInGrid(grids, loot);
-                    }
-                    catch
-                    {
-                    }
 
                     if (EftDataManager.AllItems.TryGetValue(id, out var entry2))
                     {
-                        if (slot.Key == "FirstPrimaryWeapon" || slot.Key == "SecondPrimaryWeapon" ||
-                            slot.Key == "Headwear") // Only interested in weapons / helmets
+                        if (slot.Key == "FirstPrimaryWeapon" || slot.Key == "SecondPrimaryWeapon") // Only interested in weapons / helmets
                         {
-                            try
-                            {
-                                RecursePlayerGearSlots(containedItem, loot);
-                            }
-                            catch
-                            {
-                            }
+                            RecursePlayerGearSlots(containedItem, loot);
                         }
                     }
                 }
-                catch
-                {
-                } // Skip over empty slots
-
+                catch { } // Skip over empty slots
+            }
             Loot = loot.OrderLoot().ToList();
             Value = loot.Sum(x => x.Price); // Get value of player's loot/gear
         }
@@ -120,6 +106,7 @@ namespace eft_dma_radar.Tarkov.Player
                 }
 
                 foreach (var slotName in slotDict.Keys)
+                {
                     try
                     {
                         if (slotDict.TryGetValue(slotName, out var slot))
@@ -133,13 +120,10 @@ namespace eft_dma_radar.Tarkov.Player
                             RecursePlayerGearSlots(containedItem, loot);
                         }
                     }
-                    catch
-                    {
-                    } // Skip over empty slots
+                    catch { } // Skip over empty slots
+                }
             }
-            catch
-            {
-            }
+            catch { }
         }
     }
 }
