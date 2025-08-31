@@ -179,7 +179,7 @@ namespace eft_dma_radar.Tarkov.Loot
                                                             TransformInternal = transformInternal,
                                                             ClassName = className
                                                         };
-                                                        ProcessLootIndex(ref @params, _loot);
+                                                        ProcessLootIndex(ref @params);
                                                     }
                                                     catch
                                                     {
@@ -200,7 +200,7 @@ namespace eft_dma_radar.Tarkov.Loot
         /// <summary>
         /// Process a single loot index.
         /// </summary>
-        private static void ProcessLootIndex(ref LootIndexParams p, ConcurrentDictionary<ulong, LootItem> loot)
+        private void ProcessLootIndex(ref LootIndexParams p)
         {
             var isCorpse = p.ClassName.Contains("Corpse", StringComparison.OrdinalIgnoreCase);
             var isLooseLoot = p.ClassName.Equals("ObservedLootItem", StringComparison.OrdinalIgnoreCase);
@@ -225,7 +225,7 @@ namespace eft_dma_radar.Tarkov.Loot
                         Position = pos,
                         PlayerObject = player
                     };
-                    _ = loot.TryAdd(p.ItemBase, corpse);
+                    _ = _loot.TryAdd(p.ItemBase, corpse);
                     if (player is not null)
                     {
                         player.LootObject = corpse;
@@ -237,7 +237,7 @@ namespace eft_dma_radar.Tarkov.Loot
                     {
                         if (p.ObjectName.Equals("loot_collider", StringComparison.OrdinalIgnoreCase))
                         {
-                            _ = loot.TryAdd(p.ItemBase, new LootAirdrop
+                            _ = _loot.TryAdd(p.ItemBase, new LootAirdrop
                             {
                                 Position = pos
                             });
@@ -249,7 +249,7 @@ namespace eft_dma_radar.Tarkov.Loot
                             var ownerItemTemplate = Memory.ReadPtr(ownerItemBase + Offsets.LootItem.Template);
                             var ownerItemBsgIdPtr = Memory.ReadValue<Types.MongoID>(ownerItemTemplate + Offsets.ItemTemplate._id);
                             var ownerItemBsgId = Memory.ReadUnityString(ownerItemBsgIdPtr.StringID);
-                            _ = loot.TryAdd(p.ItemBase, new StaticLootContainer(ownerItemBsgId, interactiveClass)
+                            _ = _loot.TryAdd(p.ItemBase, new StaticLootContainer(ownerItemBsgId, interactiveClass)
                             {
                                 Position = pos
                             });
@@ -290,13 +290,13 @@ namespace eft_dma_radar.Tarkov.Loot
                                 Position = pos
                             };
                         }
-                        _ = loot.TryAdd(p.ItemBase, questItem);
+                        _ = _loot.TryAdd(p.ItemBase, questItem);
                     }
                     else // Regular Loose Loot Item
                     {
                         if (EftDataManager.AllItems.TryGetValue(id, out var entry))
                         {
-                            _ = loot.TryAdd(p.ItemBase, new LootItem(entry)
+                            _ = _loot.TryAdd(p.ItemBase, new LootItem(entry)
                             {
                                 Position = pos
                             });
