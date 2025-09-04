@@ -246,7 +246,7 @@ namespace eft_dma_radar.Tarkov.Player
         /// <summary>
         /// Refresh Player Information.
         /// </summary>
-        public override void OnRegRefresh(ScatterReadIndex index, IReadOnlySet<ulong> registered, bool? isActiveParam = null)
+        public override void OnRegRefresh(ScatterReadIndex index, ISet<ulong> registered, bool? isActiveParam = null)
         {
             if (isActiveParam is not bool isActive)
                 isActive = registered.Contains(this);
