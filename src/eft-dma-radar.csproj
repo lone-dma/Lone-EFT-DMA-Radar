@@ -60,6 +60,10 @@
 		<PackageReference Include="Extended.Wpf.Toolkit" Version="4.7.25104.5739" />
 		<PackageReference Include="TwitchLib.Api" Version="3.9.0" />
 		<PackageReference Include="VmmSharpEx" Version="2.5.9377.1110" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+		<PackageReference Include="Open.Nat.imerzan" Version="2.2.0" />
 	</ItemGroup>
 	
 </Project>

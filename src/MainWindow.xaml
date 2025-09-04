@@ -15,11 +15,15 @@
     </d:Window.DataContext>
     <Grid>
         <TabControl Margin="0">
-            <TabItem Header="Radar" x:Name="RadarTab">
-                <tabs:RadarTab x:Name="Radar"/>
+            <TabItem Header="Radar"
+                     x:Name="RadarTab">
+                <tabs:RadarTab x:Name="Radar" />
+            </TabItem>
+            <TabItem Header="Web Radar">
+                <tabs:WebRadarTab x:Name="WebRadar" />
             </TabItem>
             <TabItem Header="Settings">
-                <tabs:SettingsTab x:Name="Settings"/>
+                <tabs:SettingsTab x:Name="Settings" />
             </TabItem>
             <TabItem Header="Player History">
                 <tabs:PlayerHistoryTab x:Name="PlayerHistory"/>
