@@ -1,4 +1,5 @@
-﻿using eft_dma_radar.Tarkov.Player;
+﻿using Collections.Pooled;
+using eft_dma_radar.Tarkov.Player;
 using eft_dma_radar.Unity.Collections;
 
 namespace eft_dma_radar.Tarkov.GameWorld
@@ -39,7 +40,7 @@ namespace eft_dma_radar.Tarkov.GameWorld
             try
             {
                 using var playersList = new UnityList<ulong>(this, false); // Realtime Read
-                var registered = playersList.Where(x => x != 0x0).ToHashSet();
+                using var registered = playersList.Where(x => x != 0x0).ToPooledSet();
                 /// Allocate New Players
                 foreach (var playerBase in registered)
                 {
@@ -75,7 +76,7 @@ namespace eft_dma_radar.Tarkov.GameWorld
         /// <summary>
         /// Scans the existing player list and updates Players as needed.
         /// </summary>
-        private void UpdateExistingPlayers(IReadOnlySet<ulong> registered)
+        private void UpdateExistingPlayers(ISet<ulong> registered)
         {
             var allPlayers = _players.Values;
             if (allPlayers.Count == 0)

@@ -1,4 +1,5 @@
-﻿using eft_dma_radar.UI.Skia;
+﻿using Collections.Pooled;
+using eft_dma_radar.UI.Skia;
 using SkiaSharp.Views.WPF;
 using Svg.Skia;
 using System.IO.Compression;
@@ -65,14 +66,14 @@ namespace eft_dma_radar.UI.Skia.Maps
 
         public void Draw(SKCanvas canvas, float playerHeight, SKRect mapBounds, SKRect windowBounds)
         {
-            var layers = _layers // Use overridden equality operators
+            using var layers = _layers // Use overridden equality operators
                 .Where(layer => layer.IsHeightInRange(playerHeight))
                 .Order()
-                .ToArray();
+                .ToPooledList();
             foreach (var layer in layers)
             {
                 SKPaint paint;
-                if (layers.Length > 1 && layer != layers.Last() && !(layer.IsBaseLayer && layers.Any(x => !x.DimBaseLayer)))
+                if (layers.Count > 1 && layer != layers.Last() && !(layer.IsBaseLayer && layers.Any(x => !x.DimBaseLayer)))
                 {
                     paint = SKPaints.PaintBitmapAlpha;
                 }
