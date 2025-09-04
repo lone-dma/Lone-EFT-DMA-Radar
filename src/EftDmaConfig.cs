@@ -51,6 +51,13 @@ namespace eft_dma_radar
         public UIConfig UI { get; private set; } = new();
 
         /// <summary>
+        /// Web Radar Config
+        /// </summary>
+        [JsonPropertyName("webRadar")]
+        [JsonInclude]
+        public WebRadarConfig WebRadar { get; private set; } = new();
+
+        /// <summary>
         /// Loot Config
         /// </summary>
         [JsonPropertyName("loot")]
@@ -593,6 +600,33 @@ namespace eft_dma_radar
         /// </summary>
         [JsonPropertyName("apiKey")]
         public string ApiKey { get; set; } = null;
+    }
+
+    /// <summary>
+    /// Configuration for Web Radar.
+    /// </summary>
+    public sealed class WebRadarConfig
+    {
+        /// <summary>
+        /// True if UPnP should be enabled.
+        /// </summary>
+        [JsonPropertyName("upnp")]
+        public bool UPnP { get; set; } = true;
+        /// <summary>
+        /// IP to bind to.
+        /// </summary>
+        [JsonPropertyName("host")]
+        public string IP { get; set; } = "0.0.0.0";
+        /// <summary>
+        /// TCP Port to bind to.
+        /// </summary>
+        [JsonPropertyName("port")]
+        public string Port { get; set; } = Random.Shared.Next(50000, 60000).ToString();
+        /// <summary>
+        /// Server Tick Rate (Hz).
+        /// </summary>
+        [JsonPropertyName("tickRate")]
+        public string TickRate { get; set; } = "60";
     }
 
     /// <summary>
