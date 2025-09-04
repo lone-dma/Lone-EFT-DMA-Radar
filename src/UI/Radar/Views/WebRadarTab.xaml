@@ -48,23 +48,28 @@
                                    ToolTip="Interface or hostname to bind. Use 0.0.0.0 to listen on all interfaces." />
                         <TextBox Width="150"
                                  Margin="0,0,12,8"
+                                 ToolTip="Interface or hostname to bind. Use 0.0.0.0 to listen on all interfaces."
                                  IsEnabled="{Binding UiEnabled}"
                                  Text="{Binding BindAddress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                         <!-- Port -->
                         <TextBlock Text="Port"
+                                   ToolTip="TCP Port to listen on. This will need to be forwarded in your router, or via UPnP."
                                    VerticalAlignment="Center"
                                    Margin="0,0,4,8" />
                         <TextBox Width="80"
                                  Margin="0,0,12,8"
+                                 ToolTip="TCP Port to listen on. This will need to be forwarded in your router, or via UPnP."
                                  IsEnabled="{Binding UiEnabled}"
                                  Text="{Binding Port, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                         <!-- Tick Rate -->
                         <TextBlock Text="Tick Rate (hz)"
+                                   ToolTip="Broadcast rate (per second) for Web Radar Updates."
                                    VerticalAlignment="Center"
                                    Margin="0,0,4,8" />
                         <TextBox Width="80"
+                                 ToolTip="Broadcast rate (per second) for Web Radar Updates."
                                  Margin="0,0,12,8"
                                  IsEnabled="{Binding UiEnabled}"
                                  Text="{Binding TickRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -72,6 +77,7 @@
                         <!-- Password -->
                         <TextBlock Text="Password"
                                    VerticalAlignment="Center"
+                                   ToolTip="Password required by clients."
                                    Margin="0,0,4,8" />
                         <TextBox Width="140"
                                  IsReadOnly="True"
@@ -84,7 +90,7 @@
                         <TextBlock VerticalAlignment="Center"
                                    Margin="0,0,6,8">
                             <Hyperlink Command="{Binding CopyUrlCommand}"
-                                       ToolTip="Open the server URL in your browser.">
+                                       ToolTip="Copy Web Radar URL to Clipboard.">
                                 <Run Text="{Binding ServerUrl}" />
                             </Hyperlink>
                         </TextBlock>

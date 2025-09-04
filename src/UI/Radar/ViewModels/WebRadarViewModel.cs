@@ -37,7 +37,7 @@ namespace eft_dma_radar.UI.Radar.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"ERROR Starting Web Radar Server: {ex.Message}", App.Name, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"ERROR Starting Web Radar Server: {ex.Message}", "Web Radar", MessageBoxButton.OK, MessageBoxImage.Error);
                 StartButtonText = "Start";
                 UiEnabled = true;
             }
