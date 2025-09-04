@@ -1,8 +1,9 @@
-﻿using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.UI.Skia;
+﻿using Collections.Pooled;
 using eft_dma_radar.Misc;
-using eft_dma_radar.UI.Skia.Maps;
 using eft_dma_radar.Tarkov.Data;
+using eft_dma_radar.Tarkov.Player;
+using eft_dma_radar.UI.Skia;
+using eft_dma_radar.UI.Skia.Maps;
 
 namespace eft_dma_radar.Tarkov.Loot
 {
@@ -77,7 +78,7 @@ namespace eft_dma_radar.Tarkov.Loot
 
         public override void DrawMouseover(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
-            var lines = new List<string>
+            using var lines = new PooledList<string>
             {
                 Name
             };

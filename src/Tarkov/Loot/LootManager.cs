@@ -1,4 +1,5 @@
-﻿using eft_dma_radar.Misc;
+﻿using Collections.Pooled;
+using eft_dma_radar.Misc;
 using eft_dma_radar.Tarkov.Data;
 using eft_dma_radar.Tarkov.Player;
 using eft_dma_radar.UI.Loot;
@@ -113,7 +114,6 @@ namespace eft_dma_radar.Tarkov.Loot
                 }
             }
             // Proceed to get new loot
-            var containers = new List<StaticLootContainer>(64);
             var deadPlayers = Memory.Players?
                 .Where(x => x.Corpse is not null)?.ToList();
             using var map = Memory.GetScatterMap();
@@ -316,7 +316,7 @@ namespace eft_dma_radar.Tarkov.Loot
         /// </summary>
         private static void GetItemsInSlots(ulong slotsPtr, List<LootItem> loot, bool isPMC)
         {
-            var slotDict = new Dictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);
+            using var slotDict = new PooledDictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);
             using var slots = new UnityArray<ulong>(slotsPtr, true);
 
             foreach (var slot in slots)
