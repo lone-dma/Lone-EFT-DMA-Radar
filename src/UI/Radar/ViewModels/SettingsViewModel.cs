@@ -1,4 +1,5 @@
-﻿using eft_dma_radar.Tarkov.Data;
+﻿using Collections.Pooled;
+using eft_dma_radar.Tarkov.Data;
 using eft_dma_radar.Tarkov.GameWorld;
 using eft_dma_radar.Tarkov.Quests;
 using eft_dma_radar.UI.ColorPicker;
@@ -40,8 +41,8 @@ namespace eft_dma_radar.UI.Radar.ViewModels
                 Memory.QuestManager?.CurrentQuests is IReadOnlyDictionary<string, QuestEntry> quests)
             {
                 var currentQuests = CurrentQuests.ToList(); // snapshot
-                var currentIds = new HashSet<string>(currentQuests.Select(q => q.Id), StringComparer.OrdinalIgnoreCase);
-                var desiredIds = new HashSet<string>(quests.Keys, StringComparer.OrdinalIgnoreCase);
+                using var currentIds = new PooledSet<string>(currentQuests.Select(q => q.Id), StringComparer.OrdinalIgnoreCase);
+                using var desiredIds = new PooledSet<string>(quests.Keys, StringComparer.OrdinalIgnoreCase);
 
                 // remove stale
                 foreach (var q in currentQuests.Where(q => !desiredIds.Contains(q.Id)))

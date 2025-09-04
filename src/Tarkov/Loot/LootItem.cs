@@ -1,11 +1,12 @@
-﻿using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.UI.Loot;
-using eft_dma_radar.UI.Radar;
-using eft_dma_radar.Unity;
-using eft_dma_radar.UI.Skia;
+﻿using Collections.Pooled;
 using eft_dma_radar.Misc;
 using eft_dma_radar.Tarkov.Data.TarkovMarket;
+using eft_dma_radar.Tarkov.Player;
+using eft_dma_radar.UI.Loot;
+using eft_dma_radar.UI.Radar;
+using eft_dma_radar.UI.Skia;
 using eft_dma_radar.UI.Skia.Maps;
+using eft_dma_radar.Unity;
 
 namespace eft_dma_radar.Tarkov.Loot
 {
@@ -274,7 +275,7 @@ namespace eft_dma_radar.Tarkov.Loot
         {
             if (this is LootContainer container)
             {
-                var lines = new List<string>();
+                using var lines = new PooledList<string>();
                 var loot = container.FilteredLoot;
                 if (container is LootCorpse corpse) // Draw corpse loot
                 {

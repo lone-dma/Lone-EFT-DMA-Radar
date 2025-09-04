@@ -1,8 +1,9 @@
-﻿using System.Collections.Frozen;
+﻿using Collections.Pooled;
 using eft_dma_radar.Misc;
 using eft_dma_radar.Tarkov.Data;
 using eft_dma_radar.Tarkov.Loot;
 using eft_dma_radar.Unity.Collections;
+using System.Collections.Frozen;
 
 namespace eft_dma_radar.Tarkov.Player
 {
@@ -57,7 +58,7 @@ namespace eft_dma_radar.Tarkov.Player
 
         public void Refresh()
         {
-            var loot = new List<LootItem>();
+            using var loot = new PooledList<LootItem>();
             foreach (var slot in Slots)
             {
                 try
@@ -90,13 +91,13 @@ namespace eft_dma_radar.Tarkov.Player
         /// <summary>
         /// Checks a 'Primary' weapon for Ammo Type, and Thermal Scope.
         /// </summary>
-        private static void RecursePlayerGearSlots(ulong lootItemBase, List<LootItem> loot)
+        private static void RecursePlayerGearSlots(ulong lootItemBase, IList<LootItem> loot)
         {
             try
             {
                 var parentSlots = Memory.ReadPtr(lootItemBase + Offsets.LootItemMod.Slots);
                 using var slotsArray = new UnityArray<ulong>(parentSlots, true);
-                var slotDict = new Dictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);
+                using var slotDict = new PooledDictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);
 
                 foreach (var slotPtr in slotsArray)
                 {

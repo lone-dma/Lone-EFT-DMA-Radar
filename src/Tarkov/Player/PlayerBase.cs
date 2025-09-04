@@ -1,4 +1,5 @@
-﻿using eft_dma_radar.Misc;
+﻿using Collections.Pooled;
+using eft_dma_radar.Misc;
 using eft_dma_radar.Tarkov.Data.TarkovMarket;
 using eft_dma_radar.Tarkov.Loot;
 using eft_dma_radar.UI.Radar;
@@ -803,7 +804,7 @@ namespace eft_dma_radar.Tarkov.Player
                         return;
                     var height = Position.Y - localPlayer.Position.Y;
                     var dist = Vector3.Distance(localPlayer.Position, Position);
-                    var lines = new List<string>();
+                    using var lines = new PooledList<string>();
                     if (!App.Config.UI.HideNames) // show full names & info
                     {
                         string name = null;
@@ -898,7 +899,7 @@ namespace eft_dma_radar.Tarkov.Player
         /// <summary>
         /// Draws Player Text on this location.
         /// </summary>
-        private void DrawPlayerText(SKCanvas canvas, SKPoint point, List<string> lines)
+        private void DrawPlayerText(SKCanvas canvas, SKPoint point, IList<string> lines)
         {
             var paints = GetPaints();
             if (RadarViewModel.MouseoverGroup is int grp && grp == GroupID)
@@ -951,7 +952,7 @@ namespace eft_dma_radar.Tarkov.Player
         {
             if (this == localPlayer)
                 return;
-            var lines = new List<string>();
+            using var lines = new PooledList<string>();
             var name = App.Config.UI.HideNames && IsHuman ? "<Hidden>" : Name;
             string health = null;
             if (this is ObservedPlayer observed)

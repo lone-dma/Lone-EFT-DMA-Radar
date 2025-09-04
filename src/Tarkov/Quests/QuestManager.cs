@@ -1,4 +1,5 @@
 ﻿using System.Collections.Frozen;
+using Collections.Pooled;
 using eft_dma_radar.Tarkov.Data;
 using eft_dma_radar.Unity;
 using eft_dma_radar.Unity.Collections;
@@ -91,7 +92,7 @@ namespace eft_dma_radar.Tarkov.Quests
         {
             if (_rateLimit.IsRunning && _rateLimit.Elapsed.TotalSeconds < 2d)
                 return;
-            var currentQuests = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            using var currentQuests = new PooledSet<string>(StringComparer.OrdinalIgnoreCase);
             var masterItems = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var masterLocations = new List<QuestLocation>();
             var questsData = Memory.ReadPtr(_profile + Offsets.Profile.QuestsData);
@@ -105,7 +106,7 @@ namespace eft_dma_radar.Tarkov.Quests
                         continue;
                     var completedPtr = Memory.ReadPtr(qDataEntry + Offsets.QuestData.CompletedConditions);
                     using var completedHS = new UnityHashSet<Types.MongoID>(completedPtr, true);
-                    var completedConditions = new HashSet<string>();
+                    using var completedConditions = new PooledSet<string>();
                     foreach (var c in completedHS)
                     {
                         var completedCond = Memory.ReadUnityString(c.Value.StringID);
@@ -152,7 +153,7 @@ namespace eft_dma_radar.Tarkov.Quests
             _rateLimit.Restart();
         }
 
-        private static void GetQuestConditions(string questID, ulong condition, HashSet<string> completedConditions,
+        private static void GetQuestConditions(string questID, ulong condition, ISet<string> completedConditions,
             HashSet<string> items, List<QuestLocation> locations)
         {
             try

@@ -1,4 +1,5 @@
-﻿using eft_dma_radar.Misc;
+﻿using Collections.Pooled;
+using eft_dma_radar.Misc;
 using eft_dma_radar.Tarkov.Data;
 using eft_dma_radar.Tarkov.Player;
 using eft_dma_radar.UI.Radar;
@@ -59,7 +60,7 @@ namespace eft_dma_radar.Tarkov.Quests
 
         public void DrawMouseover(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
-            string[] lines = new[] { Name };
+            using var lines = new PooledList<string>() { Name };
             Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams).DrawMouseoverText(canvas, lines);
         }
 
