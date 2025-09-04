@@ -33,7 +33,7 @@ namespace eft_dma_radar.UI.Radar.ViewModels
                 var externalIP = await WebRadarServer.GetExternalIPAsync();
                 await WebRadarServer.StartAsync(bindIP, port, tickRate, UpnpEnabled);
                 StartButtonText = "Running...";
-                ServerUrl = $"http://webradar.lone-dma.org/?host={externalIP}&port={port}&password={Password}";
+                ServerUrl = $"http://dc64dcid9fd4.cloudfront.net/?host={externalIP}&port={port}&password={Password}";
             }
             catch (Exception ex)
             {
