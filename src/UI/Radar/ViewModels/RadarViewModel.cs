@@ -1,4 +1,5 @@
-﻿using eft_dma_radar.Misc;
+﻿using Collections.Pooled;
+using eft_dma_radar.Misc;
 using eft_dma_radar.Tarkov.Data;
 using eft_dma_radar.Tarkov.GameWorld.Exits;
 using eft_dma_radar.Tarkov.GameWorld.Explosives;
@@ -352,7 +353,7 @@ namespace eft_dma_radar.UI.Radar.ViewModels
                             .Where(x => x.IsHumanHostileActive && x.GroupID != -1);
                         if (groupedPlayers is not null)
                         {
-                            var groups = groupedPlayers.Select(x => x.GroupID).ToHashSet();
+                            using var groups = groupedPlayers.Select(x => x.GroupID).ToPooledSet();
                             foreach (var grp in groups)
                             {
                                 var grpMembers = groupedPlayers.Where(x => x.GroupID == grp);

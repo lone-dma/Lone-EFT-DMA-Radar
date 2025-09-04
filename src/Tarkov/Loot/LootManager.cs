@@ -105,7 +105,7 @@ namespace eft_dma_radar.Tarkov.Loot
                 addr: lootListAddr, 
                 useCache: true);
             // Remove any loot no longer present
-            var lootListHs = lootList.ToHashSet();
+            using var lootListHs = lootList.ToPooledSet();
             foreach (var existing in _loot.Keys) 
             {
                 if (!lootListHs.Contains(existing))
@@ -114,8 +114,8 @@ namespace eft_dma_radar.Tarkov.Loot
                 }
             }
             // Proceed to get new loot
-            var deadPlayers = Memory.Players?
-                .Where(x => x.Corpse is not null)?.ToList();
+            using var deadPlayers = Memory.Players?
+                .Where(x => x.Corpse is not null)?.ToPooledList();
             using var map = Memory.GetScatterMap();
             var round1 = map.AddRound();
             var round2 = map.AddRound();

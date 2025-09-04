@@ -1,4 +1,5 @@
-﻿using eft_dma_radar.Tarkov.Loot;
+﻿using Collections.Pooled;
+using eft_dma_radar.Tarkov.Loot;
 using eft_dma_radar.UI.Radar;
 
 namespace eft_dma_radar.UI.Loot
@@ -56,7 +57,7 @@ namespace eft_dma_radar.UI.Loot
             }
             else // Loot Search
             {
-                var names = search!.Split(',').Select(a => a.Trim()).ToArray();
+                using var names = search!.Split(',').Select(a => a.Trim()).ToPooledList();
                 Predicate<LootItem> p = x => // Search Predicate
                 {
                     return names.Any(a => x.Name.Contains(a, StringComparison.OrdinalIgnoreCase));

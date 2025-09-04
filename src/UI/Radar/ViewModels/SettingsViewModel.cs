@@ -40,7 +40,7 @@ namespace eft_dma_radar.UI.Radar.ViewModels
             if (e.NewValue is bool visible && visible &&
                 Memory.QuestManager?.CurrentQuests is IReadOnlyDictionary<string, QuestEntry> quests)
             {
-                var currentQuests = CurrentQuests.ToList(); // snapshot
+                using var currentQuests = CurrentQuests.ToPooledList(); // snapshot
                 using var currentIds = new PooledSet<string>(currentQuests.Select(q => q.Id), StringComparer.OrdinalIgnoreCase);
                 using var desiredIds = new PooledSet<string>(quests.Keys, StringComparer.OrdinalIgnoreCase);
 

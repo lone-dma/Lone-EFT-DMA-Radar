@@ -405,7 +405,7 @@ namespace eft_dma_radar.Tarkov.Player
         /// <param name="index"></param>
         /// <param name="registered"></param>
         /// <param name="isActiveParam"></param>
-        public virtual void OnRegRefresh(ScatterReadIndex index, IReadOnlySet<ulong> registered, bool? isActiveParam = null)
+        public virtual void OnRegRefresh(ScatterReadIndex index, ISet<ulong> registered, bool? isActiveParam = null)
         {
             if (isActiveParam is not bool isActive)
                 isActive = registered.Contains(this);
