@@ -3,8 +3,10 @@
 namespace eft_dma_radar.WebRadar.Data
 {
     [MessagePackObject]
-    public sealed class WebRadarUpdate
+    public struct WebRadarUpdate
     {
+        public WebRadarUpdate() { }
+
         /// <summary>
         /// Update version (used for ordering).
         /// </summary>
