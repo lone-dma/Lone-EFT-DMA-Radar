@@ -1,7 +1,7 @@
-﻿using eft_dma_radar.UI.Radar.ViewModels;
+﻿using EftDmaRadarLite.UI.Radar.ViewModels;
 using System.Windows.Controls;
 
-namespace eft_dma_radar.UI.Radar.Views
+namespace EftDmaRadarLite.UI.Radar.Views
 {
     /// <summary>
     /// Interaction logic for PlayerWatchlistTab.xaml

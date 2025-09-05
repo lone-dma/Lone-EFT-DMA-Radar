@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.UI.Data
+﻿namespace EftDmaRadarLite.UI.Data
 {
     /// <summary>
     /// JSON Wrapper for Player Watchlist.

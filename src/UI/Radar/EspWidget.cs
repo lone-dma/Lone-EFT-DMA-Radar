@@ -1,10 +1,10 @@
-﻿using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.Tarkov.GameWorld;
-using eft_dma_radar.Tarkov.Loot;
-using eft_dma_radar.UI.Skia;
+﻿using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.Tarkov.GameWorld;
+using EftDmaRadarLite.Tarkov.Loot;
+using EftDmaRadarLite.UI.Skia;
 using SkiaSharp.Views.WPF;
 
-namespace eft_dma_radar.UI.Radar
+namespace EftDmaRadarLite.UI.Radar
 {
     public sealed class EspWidget : SKWidgetControl
     {

@@ -1,7 +1,7 @@
-﻿using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.Unity;
+﻿using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.Unity;
 
-namespace eft_dma_radar.UI.Skia.Maps
+namespace EftDmaRadarLite.UI.Skia.Maps
 {
     /// <summary>
     /// Defines an entity that can be drawn on the 2D Radar Map.

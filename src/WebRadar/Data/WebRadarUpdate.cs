@@ -1,6 +1,6 @@
 ﻿using MessagePack;
 
-namespace eft_dma_radar.WebRadar.Data
+namespace EftDmaRadarLite.WebRadar.Data
 {
     [MessagePackObject]
     public sealed class WebRadarUpdate

@@ -1,6 +1,6 @@
-﻿using eft_dma_radar.Unity;
+﻿using EftDmaRadarLite.Unity;
 
-namespace eft_dma_radar.UI.Hotkeys
+namespace EftDmaRadarLite.UI.Hotkeys
 {
     /// <summary>
     /// Combo Box Wrapper for UnityKeyCode Enums for Hotkey Manager.

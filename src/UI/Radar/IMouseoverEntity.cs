@@ -1,7 +1,7 @@
-﻿using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.UI.Skia.Maps;
+﻿using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.UI.Skia.Maps;
 
-namespace eft_dma_radar.UI.Radar
+namespace EftDmaRadarLite.UI.Radar
 {
     /// <summary>
     /// Defines a Radar Map Mouseover Entity.

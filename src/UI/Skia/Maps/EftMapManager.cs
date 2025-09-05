@@ -1,7 +1,7 @@
 ﻿using System.Collections.Frozen;
 using System.IO.Compression;
 
-namespace eft_dma_radar.UI.Skia.Maps
+namespace EftDmaRadarLite.UI.Skia.Maps
 {
     /// <summary>
     /// Maintains Map Resources for this application.

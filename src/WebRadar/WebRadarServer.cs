@@ -1,7 +1,7 @@
-﻿using eft_dma_radar.Misc;
-using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.WebRadar.Data;
-using eft_dma_radar.WebRadar.MessagePack;
+﻿using EftDmaRadarLite.Misc;
+using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.WebRadar.Data;
+using EftDmaRadarLite.WebRadar.MessagePack;
 using MessagePack;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,7 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Open.Nat;
 using System.Net.Sockets;
 
-namespace eft_dma_radar.WebRadar
+namespace EftDmaRadarLite.WebRadar
 {
     internal static class WebRadarServer
     {

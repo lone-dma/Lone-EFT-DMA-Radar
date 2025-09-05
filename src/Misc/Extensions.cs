@@ -1,10 +1,10 @@
-﻿using eft_dma_radar.DMA;
-using eft_dma_radar.Tarkov.Loot;
-using eft_dma_radar.UI.Skia;
-using eft_dma_radar.UI.Skia.Maps;
+﻿using EftDmaRadarLite.DMA;
+using EftDmaRadarLite.Tarkov.Loot;
+using EftDmaRadarLite.UI.Skia;
+using EftDmaRadarLite.UI.Skia.Maps;
 using System.Net.Http.Headers;
 
-namespace eft_dma_radar.Misc
+namespace EftDmaRadarLite.Misc
 {
     /// <summary>
     /// Extension methods go here.

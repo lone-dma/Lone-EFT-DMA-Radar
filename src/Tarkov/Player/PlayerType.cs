@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.Tarkov.Player
+﻿namespace EftDmaRadarLite.Tarkov.Player
 {
     /// <summary>
     /// Defines Player Unit Type (Player,PMC,Scav,etc.)

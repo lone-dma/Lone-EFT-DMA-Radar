@@ -1,6 +1,6 @@
-﻿using eft_dma_radar.UI.Loot;
+﻿using EftDmaRadarLite.UI.Loot;
 
-namespace eft_dma_radar.UI.Radar.ViewModels
+namespace EftDmaRadarLite.UI.Radar.ViewModels
 {
     public sealed class RadarOverlayViewModel : INotifyPropertyChanged
     {

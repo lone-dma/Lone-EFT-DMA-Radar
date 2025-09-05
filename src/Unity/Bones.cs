@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace eft_dma_radar.Unity
+namespace EftDmaRadarLite.Unity
 {
     /// <summary>
     /// Bones Index for Player Transforms.

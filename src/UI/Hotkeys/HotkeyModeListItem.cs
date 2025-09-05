@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.UI.Hotkeys
+﻿namespace EftDmaRadarLite.UI.Hotkeys
 {
     public sealed class HotkeyModeListItem
     {

@@ -1,7 +1,7 @@
-﻿using eft_dma_radar.Misc;
-using eft_dma_radar.Tarkov.Data.TarkovMarket;
+﻿using EftDmaRadarLite.Misc;
+using EftDmaRadarLite.Tarkov.Data.TarkovMarket;
 
-namespace eft_dma_radar.Tarkov.Loot
+namespace EftDmaRadarLite.Tarkov.Loot
 {
     public class LootContainer : LootItem
     {

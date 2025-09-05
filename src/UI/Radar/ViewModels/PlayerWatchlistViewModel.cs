@@ -1,8 +1,8 @@
 ﻿using System.Collections.ObjectModel;
-using eft_dma_radar.UI.Data;
-using eft_dma_radar.UI.Radar.Views;
+using EftDmaRadarLite.UI.Data;
+using EftDmaRadarLite.UI.Radar.Views;
 
-namespace eft_dma_radar.UI.Radar.ViewModels
+namespace EftDmaRadarLite.UI.Radar.ViewModels
 {
     public sealed class PlayerWatchlistViewModel : INotifyPropertyChanged
     {

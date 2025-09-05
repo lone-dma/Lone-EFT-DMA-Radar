@@ -1,6 +1,6 @@
-﻿using eft_dma_radar.Tarkov.Data;
+﻿using EftDmaRadarLite.Tarkov.Data;
 
-namespace eft_dma_radar.UI.Loot
+namespace EftDmaRadarLite.UI.Loot
 {
     /// <summary>
     /// JSON Wrapper for Important Loot, now with INotifyPropertyChanged.

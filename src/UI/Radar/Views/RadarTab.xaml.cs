@@ -1,8 +1,8 @@
-﻿using eft_dma_radar.UI.Radar.ViewModels;
+﻿using EftDmaRadarLite.UI.Radar.ViewModels;
 using SkiaSharp.Views.WPF;
 using System.Windows.Controls;
 
-namespace eft_dma_radar.UI.Radar.Views
+namespace EftDmaRadarLite.UI.Radar.Views
 {
     /// <summary>
     /// Interaction logic for RadarTab.xaml

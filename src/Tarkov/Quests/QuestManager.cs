@@ -1,10 +1,10 @@
 ﻿using System.Collections.Frozen;
 using Collections.Pooled;
-using eft_dma_radar.Tarkov.Data;
-using eft_dma_radar.Unity;
-using eft_dma_radar.Unity.Collections;
+using EftDmaRadarLite.Tarkov.Data;
+using EftDmaRadarLite.Unity;
+using EftDmaRadarLite.Unity.Collections;
 
-namespace eft_dma_radar.Tarkov.Quests
+namespace EftDmaRadarLite.Tarkov.Quests
 {
     public sealed class QuestManager
     {

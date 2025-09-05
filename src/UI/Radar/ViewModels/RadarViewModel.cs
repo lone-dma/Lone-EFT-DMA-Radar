@@ -1,19 +1,19 @@
 ﻿using Collections.Pooled;
-using eft_dma_radar.Misc;
-using eft_dma_radar.Tarkov.Data;
-using eft_dma_radar.Tarkov.GameWorld.Exits;
-using eft_dma_radar.Tarkov.GameWorld.Explosives;
-using eft_dma_radar.Tarkov.Loot;
-using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.Tarkov.Quests;
-using eft_dma_radar.UI.Loot;
-using eft_dma_radar.UI.Radar.Views;
-using eft_dma_radar.UI.Skia;
-using eft_dma_radar.UI.Skia.Maps;
+using EftDmaRadarLite.Misc;
+using EftDmaRadarLite.Tarkov.Data;
+using EftDmaRadarLite.Tarkov.GameWorld.Exits;
+using EftDmaRadarLite.Tarkov.GameWorld.Explosives;
+using EftDmaRadarLite.Tarkov.Loot;
+using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.Tarkov.Quests;
+using EftDmaRadarLite.UI.Loot;
+using EftDmaRadarLite.UI.Radar.Views;
+using EftDmaRadarLite.UI.Skia;
+using EftDmaRadarLite.UI.Skia.Maps;
 using SkiaSharp.Views.WPF;
 using System.Windows.Controls;
 
-namespace eft_dma_radar.UI.Radar.ViewModels
+namespace EftDmaRadarLite.UI.Radar.ViewModels
 {
     public sealed class RadarViewModel
     {

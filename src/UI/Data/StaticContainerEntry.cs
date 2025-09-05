@@ -1,6 +1,6 @@
-﻿using eft_dma_radar.Tarkov.Data.TarkovMarket;
+﻿using EftDmaRadarLite.Tarkov.Data.TarkovMarket;
 
-namespace eft_dma_radar.UI.Data
+namespace EftDmaRadarLite.UI.Data
 {
     public sealed class StaticContainerEntry : INotifyPropertyChanged
     {

@@ -1,6 +1,6 @@
-﻿using eft_dma_radar.Misc;
+﻿using EftDmaRadarLite.Misc;
 
-namespace eft_dma_radar.Unity.Collections
+namespace EftDmaRadarLite.Unity.Collections
 {
     /// <summary>
     /// DMA Wrapper for a C# List

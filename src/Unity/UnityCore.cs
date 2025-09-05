@@ -1,11 +1,11 @@
-﻿using eft_dma_radar.DMA;
-using eft_dma_radar.Misc;
+﻿using EftDmaRadarLite.DMA;
+using EftDmaRadarLite.Misc;
 using SkiaSharp;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace eft_dma_radar.Unity
+namespace EftDmaRadarLite.Unity
 {
     /// <summary>
     /// Unity Game Object Manager. Contains all Game Objects.
@@ -110,7 +110,7 @@ namespace eft_dma_radar.Unity
         public static ulong GetComponent(ulong behaviour, string className)
         {
             var go = Memory.ReadPtr(behaviour + GameObjectOffset);
-            return eft_dma_radar.Unity.GameObject.GetComponent(go, className);
+            return EftDmaRadarLite.Unity.GameObject.GetComponent(go, className);
         }
     }
 

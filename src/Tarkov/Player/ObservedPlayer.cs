@@ -1,9 +1,9 @@
-﻿using eft_dma_radar.UI.Radar.ViewModels;
-using eft_dma_radar.Unity;
-using eft_dma_radar.Unity.Collections;
+﻿using EftDmaRadarLite.UI.Radar.ViewModels;
+using EftDmaRadarLite.Unity;
+using EftDmaRadarLite.Unity.Collections;
 using VmmSharpEx.Scatter;
 
-namespace eft_dma_radar.Tarkov.Player
+namespace EftDmaRadarLite.Tarkov.Player
 {
     public class ObservedPlayer : PlayerBase
     {

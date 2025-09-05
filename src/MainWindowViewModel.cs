@@ -1,8 +1,8 @@
-﻿using eft_dma_radar.ESP;
-using eft_dma_radar.UI.Hotkeys;
-using eft_dma_radar.UI.Radar.ViewModels;
+﻿using EftDmaRadarLite.ESP;
+using EftDmaRadarLite.UI.Hotkeys;
+using EftDmaRadarLite.UI.Radar.ViewModels;
 
-namespace eft_dma_radar
+namespace EftDmaRadarLite
 {
     public sealed class MainWindowViewModel
     {

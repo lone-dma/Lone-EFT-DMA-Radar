@@ -1,15 +1,15 @@
 ﻿using Collections.Pooled;
-using eft_dma_radar.Misc;
-using eft_dma_radar.Tarkov.Data;
-using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.UI.Loot;
-using eft_dma_radar.UI.Radar.ViewModels;
-using eft_dma_radar.Unity;
-using eft_dma_radar.Unity.Collections;
+using EftDmaRadarLite.Misc;
+using EftDmaRadarLite.Tarkov.Data;
+using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.UI.Loot;
+using EftDmaRadarLite.UI.Radar.ViewModels;
+using EftDmaRadarLite.Unity;
+using EftDmaRadarLite.Unity.Collections;
 using System.Collections.Frozen;
 using VmmSharpEx;
 
-namespace eft_dma_radar.Tarkov.Loot
+namespace EftDmaRadarLite.Tarkov.Loot
 {
     public sealed class LootManager
     {

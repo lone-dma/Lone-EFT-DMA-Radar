@@ -1,7 +1,7 @@
-﻿using eft_dma_radar.Misc;
+﻿using EftDmaRadarLite.Misc;
 using VmmSharpEx;
 
-namespace eft_dma_radar.Unity
+namespace EftDmaRadarLite.Unity
 {
     internal static class MonoLib
     {

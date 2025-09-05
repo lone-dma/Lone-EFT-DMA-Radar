@@ -1,8 +1,8 @@
 ﻿using Collections.Pooled;
-using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.Unity.Collections;
+using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.Unity.Collections;
 
-namespace eft_dma_radar.Tarkov.GameWorld
+namespace EftDmaRadarLite.Tarkov.GameWorld
 {
     public sealed class RegisteredPlayers : IReadOnlyCollection<PlayerBase>
     {

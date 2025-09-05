@@ -1,8 +1,8 @@
-﻿using eft_dma_radar.Misc;
-using eft_dma_radar.Unity.Collections;
+﻿using EftDmaRadarLite.Misc;
+using EftDmaRadarLite.Unity.Collections;
 using VmmSharpEx.Scatter;
 
-namespace eft_dma_radar.Tarkov.GameWorld.Exits
+namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
 {
     /// <summary>
     /// List of PMC/Scav 'Exits' in Local Game World and their position/status.

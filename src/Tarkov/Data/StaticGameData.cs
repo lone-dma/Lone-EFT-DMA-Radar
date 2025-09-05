@@ -1,6 +1,6 @@
 ﻿using System.Collections.Frozen;
 
-namespace eft_dma_radar.Tarkov.Data
+namespace EftDmaRadarLite.Tarkov.Data
 {
     /// <summary>
     /// Contains Static Game Data.

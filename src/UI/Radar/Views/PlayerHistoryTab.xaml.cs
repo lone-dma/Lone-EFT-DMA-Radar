@@ -1,8 +1,8 @@
-﻿using eft_dma_radar.UI.Radar.ViewModels;
+﻿using EftDmaRadarLite.UI.Radar.ViewModels;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace eft_dma_radar.UI.Radar.Views
+namespace EftDmaRadarLite.UI.Radar.Views
 {
     /// <summary>
     /// Interaction logic for PlayerHistoryTab.xaml

@@ -1,8 +1,8 @@
-﻿using eft_dma_radar.UI.Misc;
-using eft_dma_radar.UI.Skia.Maps;
+﻿using EftDmaRadarLite.UI.Misc;
+using EftDmaRadarLite.UI.Skia.Maps;
 using System.Windows.Input;
 
-namespace eft_dma_radar.UI.Radar.ViewModels
+namespace EftDmaRadarLite.UI.Radar.ViewModels
 {
     public sealed class MapSetupHelperViewModel : INotifyPropertyChanged
     {

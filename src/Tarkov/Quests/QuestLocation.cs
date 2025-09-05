@@ -1,13 +1,13 @@
 ﻿using Collections.Pooled;
-using eft_dma_radar.Misc;
-using eft_dma_radar.Tarkov.Data;
-using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.UI.Radar;
-using eft_dma_radar.UI.Skia;
-using eft_dma_radar.UI.Skia.Maps;
-using eft_dma_radar.Unity;
+using EftDmaRadarLite.Misc;
+using EftDmaRadarLite.Tarkov.Data;
+using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.UI.Radar;
+using EftDmaRadarLite.UI.Skia;
+using EftDmaRadarLite.UI.Skia.Maps;
+using EftDmaRadarLite.Unity;
 
-namespace eft_dma_radar.Tarkov.Quests
+namespace EftDmaRadarLite.Tarkov.Quests
 {
     /// <summary>
     /// Wraps a Mouseoverable Quest Location marker onto the Map GUI.

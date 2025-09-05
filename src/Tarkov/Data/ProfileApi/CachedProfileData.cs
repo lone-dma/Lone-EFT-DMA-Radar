@@ -1,6 +1,6 @@
-﻿using eft_dma_radar.Tarkov.Data.ProfileApi.Schema;
+﻿using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
 
-namespace eft_dma_radar.Tarkov.Data.ProfileApi
+namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
 {
     public sealed class CachedProfileData
     {

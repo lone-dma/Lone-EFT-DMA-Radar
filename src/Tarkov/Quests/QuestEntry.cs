@@ -1,6 +1,6 @@
-﻿using eft_dma_radar.Tarkov.Data;
+﻿using EftDmaRadarLite.Tarkov.Data;
 
-namespace eft_dma_radar.Tarkov.Quests
+namespace EftDmaRadarLite.Tarkov.Quests
 {
     /// <summary>
     /// One-Way Binding Only

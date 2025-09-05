@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.UI.Loot
+﻿namespace EftDmaRadarLite.UI.Loot
 {
     public enum LootPriceMode
     {

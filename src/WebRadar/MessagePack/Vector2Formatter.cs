@@ -1,7 +1,7 @@
 ﻿using MessagePack;
 using MessagePack.Formatters;
 
-namespace eft_dma_radar.WebRadar.MessagePack
+namespace EftDmaRadarLite.WebRadar.MessagePack
 {
     public class Vector2Formatter : IMessagePackFormatter<Vector2>
     {

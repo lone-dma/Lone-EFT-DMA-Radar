@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace eft_dma_radar.Misc
+namespace EftDmaRadarLite.Misc
 {
     internal static class Utilities
     {

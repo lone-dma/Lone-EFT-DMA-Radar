@@ -1,15 +1,15 @@
-﻿using eft_dma_radar.UI.Loot;
-using eft_dma_radar.DMA;
-using eft_dma_radar.UI.ColorPicker;
-using eft_dma_radar.UI.Data;
+﻿using EftDmaRadarLite.UI.Loot;
+using EftDmaRadarLite.DMA;
+using EftDmaRadarLite.UI.ColorPicker;
+using EftDmaRadarLite.UI.Data;
 using System.Collections.ObjectModel;
-using eft_dma_radar.Tarkov.Data.ProfileApi;
-using eft_dma_radar.Twitch;
-using eft_dma_radar.Misc.JSON;
-using eft_dma_radar.Misc;
-using eft_dma_radar.Unity;
+using EftDmaRadarLite.Tarkov.Data.ProfileApi;
+using EftDmaRadarLite.Twitch;
+using EftDmaRadarLite.Misc.JSON;
+using EftDmaRadarLite.Misc;
+using EftDmaRadarLite.Unity;
 
-namespace eft_dma_radar
+namespace EftDmaRadarLite
 {
     /// <summary>
     /// Global Program Configuration (Config.json)

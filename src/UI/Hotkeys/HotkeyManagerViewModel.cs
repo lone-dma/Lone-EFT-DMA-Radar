@@ -1,11 +1,11 @@
-﻿using eft_dma_radar.Misc;
-using eft_dma_radar.UI.Misc;
-using eft_dma_radar.Unity;
+﻿using EftDmaRadarLite.Misc;
+using EftDmaRadarLite.UI.Misc;
+using EftDmaRadarLite.Unity;
 using System;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
-namespace eft_dma_radar.UI.Hotkeys
+namespace EftDmaRadarLite.UI.Hotkeys
 {
     public sealed class HotkeyManagerViewModel : INotifyPropertyChanged
     {

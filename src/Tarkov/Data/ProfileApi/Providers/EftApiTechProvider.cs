@@ -1,9 +1,9 @@
-﻿using eft_dma_radar.Misc;
-using eft_dma_radar.Tarkov.Data.ProfileApi;
-using eft_dma_radar.Tarkov.Data.ProfileApi.Schema;
+﻿using EftDmaRadarLite.Misc;
+using EftDmaRadarLite.Tarkov.Data.ProfileApi;
+using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
 using System.Net.Http;
 
-namespace eft_dma_radar.Tarkov.Data.ProfileApi.Providers
+namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 {
     public sealed class EftApiTechProvider : IProfileApiProvider
     {

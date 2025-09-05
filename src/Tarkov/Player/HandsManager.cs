@@ -1,8 +1,8 @@
-﻿using eft_dma_radar.Tarkov.Data;
-using eft_dma_radar.Tarkov.Loot;
-using eft_dma_radar.Unity.Collections;
+﻿using EftDmaRadarLite.Tarkov.Data;
+using EftDmaRadarLite.Tarkov.Loot;
+using EftDmaRadarLite.Unity.Collections;
 
-namespace eft_dma_radar.Tarkov.Player
+namespace EftDmaRadarLite.Tarkov.Player
 {
     public sealed class HandsManager
     {

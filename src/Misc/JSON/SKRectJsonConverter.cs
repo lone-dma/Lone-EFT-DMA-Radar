@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.Misc.JSON
+﻿namespace EftDmaRadarLite.Misc.JSON
 {
     public class SKRectJsonConverter : JsonConverter<SKRect>
     {

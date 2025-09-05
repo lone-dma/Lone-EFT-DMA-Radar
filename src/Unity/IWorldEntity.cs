@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace eft_dma_radar.Unity
+namespace EftDmaRadarLite.Unity
 {
     /// <summary>
     /// Defines an Entity that has a 3D GameWorld Position.

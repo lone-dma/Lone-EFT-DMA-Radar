@@ -1,7 +1,7 @@
-﻿using eft_dma_radar.Tarkov.Player;
+﻿using EftDmaRadarLite.Tarkov.Player;
 using MessagePack;
 
-namespace eft_dma_radar.WebRadar.Data
+namespace EftDmaRadarLite.WebRadar.Data
 {
     [MessagePackObject]
     public readonly struct WebRadarPlayer

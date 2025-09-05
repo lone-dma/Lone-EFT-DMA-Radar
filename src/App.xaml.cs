@@ -1,4 +1,4 @@
-﻿global using eft_dma_radar.Common;
+﻿global using EftDmaRadarLite.Common;
 global using SDK;
 global using SkiaSharp;
 global using SkiaSharp.Views.Desktop;
@@ -18,13 +18,12 @@ global using System.Text;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
 global using System.Windows;
-using eft_dma_radar.DMA;
-using eft_dma_radar.Tarkov.Data;
-using eft_dma_radar.UI.ColorPicker;
-using eft_dma_radar.UI.Misc;
-using eft_dma_radar.UI.Skia.Maps;
+using EftDmaRadarLite.DMA;
+using EftDmaRadarLite.Tarkov.Data;
+using EftDmaRadarLite.UI.ColorPicker;
+using EftDmaRadarLite.UI.Misc;
+using EftDmaRadarLite.UI.Skia.Maps;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.ObjectPool;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.Versioning;
@@ -32,14 +31,14 @@ using System.Security.Authentication;
 
 [assembly: SupportedOSPlatform("Windows")]
 
-namespace eft_dma_radar
+namespace EftDmaRadarLite
 {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
-        internal const string Name = "EFT DMA Radar";
+        internal const string Name = "EFT DMA Radar Lite";
         private const string MUTEX_ID = "0f908ff7-e614-6a93-60a3-cee36c9cea91";
         private static readonly Mutex _mutex;
 

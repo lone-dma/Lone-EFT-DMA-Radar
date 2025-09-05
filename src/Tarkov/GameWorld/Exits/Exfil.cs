@@ -1,13 +1,13 @@
-﻿using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.UI.Radar;
-using eft_dma_radar.Unity;
-using eft_dma_radar.Unity.Collections;
-using eft_dma_radar.UI.Skia;
-using eft_dma_radar.Misc;
-using eft_dma_radar.UI.Skia.Maps;
-using eft_dma_radar.Tarkov.Data;
+﻿using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.UI.Radar;
+using EftDmaRadarLite.Unity;
+using EftDmaRadarLite.Unity.Collections;
+using EftDmaRadarLite.UI.Skia;
+using EftDmaRadarLite.Misc;
+using EftDmaRadarLite.UI.Skia.Maps;
+using EftDmaRadarLite.Tarkov.Data;
 
-namespace eft_dma_radar.Tarkov.GameWorld.Exits
+namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
 {
     public class Exfil : IExitPoint, IWorldEntity, IMapEntity, IMouseoverEntity
     {

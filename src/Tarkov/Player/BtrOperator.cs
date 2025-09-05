@@ -1,6 +1,6 @@
 ﻿using VmmSharpEx.Scatter;
 
-namespace eft_dma_radar.Tarkov.Player
+namespace EftDmaRadarLite.Tarkov.Player
 {
     /// <summary>
     /// BTR Bot Operator.

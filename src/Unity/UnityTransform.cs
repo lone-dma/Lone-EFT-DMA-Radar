@@ -1,6 +1,6 @@
-﻿using eft_dma_radar.Misc;
+﻿using EftDmaRadarLite.Misc;
 
-namespace eft_dma_radar.Unity
+namespace EftDmaRadarLite.Unity
 {
     public sealed class UnityTransform
     {

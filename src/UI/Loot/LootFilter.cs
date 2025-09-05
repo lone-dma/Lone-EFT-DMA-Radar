@@ -1,8 +1,8 @@
 ﻿using Collections.Pooled;
-using eft_dma_radar.Tarkov.Loot;
-using eft_dma_radar.UI.Radar;
+using EftDmaRadarLite.Tarkov.Loot;
+using EftDmaRadarLite.UI.Radar;
 
-namespace eft_dma_radar.UI.Loot
+namespace EftDmaRadarLite.UI.Loot
 {
     /// <summary>
     /// Enumerable Loot Filter Class.

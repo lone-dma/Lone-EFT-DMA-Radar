@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.ESP
+﻿namespace EftDmaRadarLite.ESP
 {
     /// <summary>
     /// Defines a transposed Matrix4x4 for ESP Operations (only contains necessary fields).

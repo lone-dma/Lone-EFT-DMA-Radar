@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.WebRadar.Data
+﻿namespace EftDmaRadarLite.WebRadar.Data
 {
     /// <summary>
     /// Defines Player Unit Type (Player,PMC,Scav,etc.)

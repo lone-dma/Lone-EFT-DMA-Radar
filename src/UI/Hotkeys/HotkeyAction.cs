@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.UI.Hotkeys
+﻿namespace EftDmaRadarLite.UI.Hotkeys
 {
     /// <summary>
     /// Links a Unity Hotkey to it's Action Controller.
