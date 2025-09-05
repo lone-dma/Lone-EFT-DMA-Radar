@@ -1,14 +1,14 @@
-﻿using eft_dma_radar.DMA;
-using eft_dma_radar.ESP;
-using eft_dma_radar.Misc;
-using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.Unity;
-using eft_dma_radar.Unity.Collections;
+﻿using EftDmaRadarLite.DMA;
+using EftDmaRadarLite.ESP;
+using EftDmaRadarLite.Misc;
+using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.Unity;
+using EftDmaRadarLite.Unity.Collections;
 using System.Drawing;
 using VmmSharpEx;
 using VmmSharpEx.Scatter;
 
-namespace eft_dma_radar.Tarkov.GameWorld
+namespace EftDmaRadarLite.Tarkov.GameWorld
 {
     public sealed class CameraManager
     {

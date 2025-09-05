@@ -1,7 +1,7 @@
-﻿using eft_dma_radar.Misc;
+﻿using EftDmaRadarLite.Misc;
 using SkiaSharp.Views.WPF;
 
-namespace eft_dma_radar.UI.Skia
+namespace EftDmaRadarLite.UI.Skia
 {
     public abstract class SKWidgetControl : IDisposable
     {

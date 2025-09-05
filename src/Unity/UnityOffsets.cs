@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.Unity
+﻿namespace EftDmaRadarLite.Unity
 {
     public readonly struct UnityOffsets
     {

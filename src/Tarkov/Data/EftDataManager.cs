@@ -1,8 +1,8 @@
-﻿using eft_dma_radar.Tarkov.Data.TarkovMarket;
-using eft_dma_radar.UI.Misc;
+﻿using EftDmaRadarLite.Tarkov.Data.TarkovMarket;
+using EftDmaRadarLite.UI.Misc;
 using System.Collections.Frozen;
 
-namespace eft_dma_radar.Tarkov.Data
+namespace EftDmaRadarLite.Tarkov.Data
 {
     internal static class EftDataManager
     {
@@ -105,7 +105,7 @@ namespace eft_dma_radar.Tarkov.Data
 
         private static async Task<string> GetDefaultDataAsync()
         {
-            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("eft_dma_radar.DEFAULT_DATA.json"))
+            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("EftDmaRadarLite.DEFAULT_DATA.json"))
             {
                 var data = new byte[stream!.Length];
                 await stream.ReadExactlyAsync(data);

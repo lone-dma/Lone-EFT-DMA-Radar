@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eft-dma-radar", "eft-dma-radar.csproj", "{7F6D99FB-CD79-68B0-78DE-FDEB5E23FA1E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eft-dma-radar-lite", "eft-dma-radar-lite.csproj", "{7F6D99FB-CD79-68B0-78DE-FDEB5E23FA1E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

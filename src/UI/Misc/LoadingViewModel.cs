@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.UI.Misc
+﻿namespace EftDmaRadarLite.UI.Misc
 {
     public class LoadingViewModel : INotifyPropertyChanged, IDisposable
     {

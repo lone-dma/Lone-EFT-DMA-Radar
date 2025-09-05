@@ -1,7 +1,7 @@
-﻿using eft_dma_radar.UI.Skia.Maps;
-using eft_dma_radar.Unity;
+﻿using EftDmaRadarLite.UI.Skia.Maps;
+using EftDmaRadarLite.Unity;
 
-namespace eft_dma_radar.Tarkov.GameWorld.Explosives
+namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 {
     public interface IExplosiveItem : IWorldEntity, IMapEntity
     {

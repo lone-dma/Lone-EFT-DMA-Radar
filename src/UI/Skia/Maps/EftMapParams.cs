@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.UI.Skia.Maps
+﻿namespace EftDmaRadarLite.UI.Skia.Maps
 {
     /// <summary>
     /// Contains multiple map parameters used by the GUI.

@@ -1,11 +1,11 @@
 ﻿using Collections.Pooled;
-using eft_dma_radar.Misc;
-using eft_dma_radar.Tarkov.Data;
-using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.UI.Skia;
-using eft_dma_radar.UI.Skia.Maps;
+using EftDmaRadarLite.Misc;
+using EftDmaRadarLite.Tarkov.Data;
+using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.UI.Skia;
+using EftDmaRadarLite.UI.Skia.Maps;
 
-namespace eft_dma_radar.Tarkov.Loot
+namespace EftDmaRadarLite.Tarkov.Loot
 {
     public sealed class StaticLootContainer : LootContainer
     {

@@ -1,9 +1,9 @@
-﻿using eft_dma_radar.UI.Radar;
-using eft_dma_radar.UI.Radar.ViewModels;
+﻿using EftDmaRadarLite.UI.Radar;
+using EftDmaRadarLite.UI.Radar.ViewModels;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
 
-namespace eft_dma_radar
+namespace EftDmaRadarLite
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

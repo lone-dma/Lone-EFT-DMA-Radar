@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.Tarkov.Loot
+﻿namespace EftDmaRadarLite.Tarkov.Loot
 {
     public sealed class LootAirdrop : LootContainer
     {

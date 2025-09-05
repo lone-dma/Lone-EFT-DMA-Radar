@@ -1,10 +1,10 @@
-﻿using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.UI.Data;
-using eft_dma_radar.UI.Misc;
-using eft_dma_radar.UI.Radar.Views;
+﻿using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.UI.Data;
+using EftDmaRadarLite.UI.Misc;
+using EftDmaRadarLite.UI.Radar.Views;
 using System.Collections.ObjectModel;
 
-namespace eft_dma_radar.UI.Radar.ViewModels
+namespace EftDmaRadarLite.UI.Radar.ViewModels
 {
     public sealed class PlayerHistoryViewModel : INotifyPropertyChanged
     {

@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.Misc
+﻿namespace EftDmaRadarLite.Misc
 {
     /// <summary>
     /// Represents a flexible array buffer that uses the Shared Array Pool.

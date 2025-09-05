@@ -2,7 +2,7 @@
 using MessagePack;
 using MessagePack.Resolvers;
 
-namespace eft_dma_radar.WebRadar.MessagePack
+namespace EftDmaRadarLite.WebRadar.MessagePack
 {
     public static class ResolverGenerator
     {

@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.DMA
+﻿namespace EftDmaRadarLite.DMA
 {
     /// <summary>
     /// FPGA Read Algorithm

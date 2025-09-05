@@ -1,8 +1,8 @@
-﻿using eft_dma_radar.UI.Radar;
-using eft_dma_radar.UI.Skia.Maps;
-using eft_dma_radar.Unity;
+﻿using EftDmaRadarLite.UI.Radar;
+using EftDmaRadarLite.UI.Skia.Maps;
+using EftDmaRadarLite.Unity;
 
-namespace eft_dma_radar.Tarkov.GameWorld.Exits
+namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
 {
     /// <summary>
     /// Defines a contract for a point that can be used to exit the map.

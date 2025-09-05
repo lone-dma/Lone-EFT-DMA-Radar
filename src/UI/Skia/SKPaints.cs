@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.UI.Skia
+﻿namespace EftDmaRadarLite.UI.Skia
 {
     internal static class SKPaints
     {

@@ -1,11 +1,11 @@
-﻿using eft_dma_radar.UI.Misc;
-using eft_dma_radar.UI.Skia;
+﻿using EftDmaRadarLite.UI.Misc;
+using EftDmaRadarLite.UI.Skia;
 using SkiaSharp.Views.WPF;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace eft_dma_radar.UI.ColorPicker
+namespace EftDmaRadarLite.UI.ColorPicker
 {
     public sealed class ColorPickerViewModel : INotifyPropertyChanged
     {

@@ -1,18 +1,18 @@
-﻿using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.Tarkov.GameWorld;
-using eft_dma_radar.Tarkov.GameWorld.Exits;
-using eft_dma_radar.Tarkov.GameWorld.Explosives;
-using eft_dma_radar.Tarkov.Loot;
-using eft_dma_radar.Misc;
-using eft_dma_radar.Unity;
+﻿using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.Tarkov.GameWorld;
+using EftDmaRadarLite.Tarkov.GameWorld.Exits;
+using EftDmaRadarLite.Tarkov.GameWorld.Explosives;
+using EftDmaRadarLite.Tarkov.Loot;
+using EftDmaRadarLite.Misc;
+using EftDmaRadarLite.Unity;
 using VmmSharpEx;
 using System.Drawing;
-using eft_dma_radar.Tarkov.Quests;
+using EftDmaRadarLite.Tarkov.Quests;
 using VmmSharpEx.Refresh;
 using VmmSharpEx.Options;
 using VmmSharpEx.Scatter;
 
-namespace eft_dma_radar.DMA
+namespace EftDmaRadarLite.DMA
 {
     /// <summary>
     /// DMA Memory Module.

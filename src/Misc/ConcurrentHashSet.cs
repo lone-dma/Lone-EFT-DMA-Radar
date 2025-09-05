@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.Misc
+﻿namespace EftDmaRadarLite.Misc
 {
     [JsonConverter(typeof(ConcurrentHashSetConverterFactory))]
     public class ConcurrentHashSet<T> : ICollection<T>, IReadOnlyCollection<T>, ISet<T>, IReadOnlySet<T>, IEnumerable<T>

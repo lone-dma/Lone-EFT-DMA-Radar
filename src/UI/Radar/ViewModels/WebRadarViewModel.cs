@@ -1,8 +1,8 @@
-﻿using eft_dma_radar.UI.Misc;
-using eft_dma_radar.WebRadar;
+﻿using EftDmaRadarLite.UI.Misc;
+using EftDmaRadarLite.WebRadar;
 using System.Windows.Input;
 
-namespace eft_dma_radar.UI.Radar.ViewModels
+namespace EftDmaRadarLite.UI.Radar.ViewModels
 {
     public sealed class WebRadarViewModel : INotifyPropertyChanged
     {

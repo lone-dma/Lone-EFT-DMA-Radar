@@ -1,10 +1,10 @@
 ﻿using Collections.Pooled;
-using eft_dma_radar.UI.Skia;
+using EftDmaRadarLite.UI.Skia;
 using SkiaSharp.Views.WPF;
 using Svg.Skia;
 using System.IO.Compression;
 
-namespace eft_dma_radar.UI.Skia.Maps
+namespace EftDmaRadarLite.UI.Skia.Maps
 {
     /// <summary>
     /// SVG Map Implementation.

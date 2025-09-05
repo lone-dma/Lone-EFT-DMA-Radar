@@ -1,9 +1,9 @@
-﻿using eft_dma_radar.Tarkov.Data;
-using eft_dma_radar.Tarkov.Data.ProfileApi;
-using eft_dma_radar.Tarkov.Data.ProfileApi.Schema;
-using eft_dma_radar.Twitch;
+﻿using EftDmaRadarLite.Tarkov.Data;
+using EftDmaRadarLite.Tarkov.Data.ProfileApi;
+using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
+using EftDmaRadarLite.Twitch;
 
-namespace eft_dma_radar.Tarkov.Player
+namespace EftDmaRadarLite.Tarkov.Player
 {
     public sealed class PlayerProfile : INotifyPropertyChanged
     {

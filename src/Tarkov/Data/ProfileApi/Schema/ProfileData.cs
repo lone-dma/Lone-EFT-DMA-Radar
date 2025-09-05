@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.Tarkov.Data.ProfileApi.Schema
+﻿namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema
 {
     public sealed class ProfileData
     {

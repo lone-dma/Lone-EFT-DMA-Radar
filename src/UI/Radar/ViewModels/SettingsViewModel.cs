@@ -1,17 +1,17 @@
 ﻿using Collections.Pooled;
-using eft_dma_radar.Tarkov.Data;
-using eft_dma_radar.Tarkov.GameWorld;
-using eft_dma_radar.Tarkov.Quests;
-using eft_dma_radar.UI.ColorPicker;
-using eft_dma_radar.UI.Data;
-using eft_dma_radar.UI.Hotkeys;
-using eft_dma_radar.UI.Misc;
-using eft_dma_radar.UI.Radar.Views;
-using eft_dma_radar.UI.Skia;
+using EftDmaRadarLite.Tarkov.Data;
+using EftDmaRadarLite.Tarkov.GameWorld;
+using EftDmaRadarLite.Tarkov.Quests;
+using EftDmaRadarLite.UI.ColorPicker;
+using EftDmaRadarLite.UI.Data;
+using EftDmaRadarLite.UI.Hotkeys;
+using EftDmaRadarLite.UI.Misc;
+using EftDmaRadarLite.UI.Radar.Views;
+using EftDmaRadarLite.UI.Skia;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
-namespace eft_dma_radar.UI.Radar.ViewModels
+namespace EftDmaRadarLite.UI.Radar.ViewModels
 {
     public sealed class SettingsViewModel : INotifyPropertyChanged
     {

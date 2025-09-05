@@ -1,4 +1,4 @@
-namespace eft_dma_radar.Tarkov.Data.TarkovMarket
+namespace EftDmaRadarLite.Tarkov.Data.TarkovMarket
 {
     internal static class TarkovMarketJob
     {

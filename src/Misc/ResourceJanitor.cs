@@ -1,7 +1,7 @@
-﻿using eft_dma_radar.DMA;
+﻿using EftDmaRadarLite.DMA;
 using System.Runtime;
 
-namespace eft_dma_radar.Common
+namespace EftDmaRadarLite.Common
 {
     internal static partial class ResourceJanitor
     {

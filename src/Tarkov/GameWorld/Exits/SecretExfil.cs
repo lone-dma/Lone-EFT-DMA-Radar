@@ -1,6 +1,6 @@
-﻿using eft_dma_radar.UI.Skia;
+﻿using EftDmaRadarLite.UI.Skia;
 
-namespace eft_dma_radar.Tarkov.GameWorld.Exits
+namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
 {
     public sealed class SecretExfil : Exfil
     {

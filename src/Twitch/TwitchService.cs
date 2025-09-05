@@ -3,7 +3,7 @@ using TwitchLib.Api;
 using TwitchLib.Api.Core;
 using TwitchLib.Api.Core.Exceptions;
 
-namespace eft_dma_radar.Twitch
+namespace EftDmaRadarLite.Twitch
 {
     internal static class TwitchService
     {

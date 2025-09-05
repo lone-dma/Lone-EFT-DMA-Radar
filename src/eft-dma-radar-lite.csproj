@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0-windows</TargetFramework>
-    <RootNamespace>eft_dma_radar</RootNamespace>
+    <RootNamespace>EftDmaRadarLite</RootNamespace>
     <Nullable>warnings</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>

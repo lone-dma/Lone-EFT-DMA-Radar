@@ -1,8 +1,8 @@
-﻿using eft_dma_radar.DMA;
-using eft_dma_radar.Tarkov.Data.ProfileApi.Providers;
-using eft_dma_radar.Tarkov.Player;
+﻿using EftDmaRadarLite.DMA;
+using EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers;
+using EftDmaRadarLite.Tarkov.Player;
 
-namespace eft_dma_radar.Tarkov.Data.ProfileApi
+namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
 {
     internal static class EFTProfileService
     {

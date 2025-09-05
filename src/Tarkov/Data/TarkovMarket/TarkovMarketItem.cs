@@ -1,6 +1,6 @@
-﻿using eft_dma_radar.UI.Loot;
+﻿using EftDmaRadarLite.UI.Loot;
 
-namespace eft_dma_radar.Tarkov.Data.TarkovMarket
+namespace EftDmaRadarLite.Tarkov.Data.TarkovMarket
 {
     /// <summary>
     /// Class JSON Representation of Tarkov Market Data.

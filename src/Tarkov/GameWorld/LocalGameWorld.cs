@@ -1,14 +1,14 @@
-﻿using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.Tarkov.GameWorld.Exits;
-using eft_dma_radar.Tarkov.GameWorld.Explosives;
-using eft_dma_radar.Tarkov.Loot;
-using eft_dma_radar.Unity;
-using eft_dma_radar.Tarkov.Quests;
-using eft_dma_radar.Misc.Workers;
-using eft_dma_radar.Tarkov.Data;
-using eft_dma_radar.DMA;
+﻿using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.Tarkov.GameWorld.Exits;
+using EftDmaRadarLite.Tarkov.GameWorld.Explosives;
+using EftDmaRadarLite.Tarkov.Loot;
+using EftDmaRadarLite.Unity;
+using EftDmaRadarLite.Tarkov.Quests;
+using EftDmaRadarLite.Misc.Workers;
+using EftDmaRadarLite.Tarkov.Data;
+using EftDmaRadarLite.DMA;
 
-namespace eft_dma_radar.Tarkov.GameWorld
+namespace EftDmaRadarLite.Tarkov.GameWorld
 {
     /// <summary>
     /// Class containing Game (Raid) instance.

@@ -1,6 +1,6 @@
-﻿using eft_dma_radar.Tarkov.Data;
+﻿using EftDmaRadarLite.Tarkov.Data;
 
-namespace eft_dma_radar.UI.Skia.Maps
+namespace EftDmaRadarLite.UI.Skia.Maps
 {
     /// <summary>
     /// Defines a .JSON Map Config File

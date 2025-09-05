@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.Twitch
+﻿namespace EftDmaRadarLite.Twitch
 {
     public sealed class CachedTwitchEntry
     {

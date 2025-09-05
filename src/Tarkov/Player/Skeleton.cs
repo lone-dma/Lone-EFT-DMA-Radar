@@ -1,7 +1,7 @@
-﻿using eft_dma_radar.Tarkov.GameWorld;
-using eft_dma_radar.Unity;
+﻿using EftDmaRadarLite.Tarkov.GameWorld;
+using EftDmaRadarLite.Unity;
 
-namespace eft_dma_radar.Tarkov.Player
+namespace EftDmaRadarLite.Tarkov.Player
 {
     /// <summary>
     /// Contains abstractions for drawing Player Skeletons.
@@ -40,7 +40,7 @@ namespace eft_dma_radar.Tarkov.Player
             _ = Root.UpdatePosition();
             var bones = new Dictionary<Bones, UnityTransform>(AllSkeletonBones.Length + 1)
             {
-                [eft_dma_radar.Unity.Bones.HumanBase] = Root
+                [EftDmaRadarLite.Unity.Bones.HumanBase] = Root
             };
             foreach (var bone in AllSkeletonBones.Span)
             {
@@ -59,7 +59,7 @@ namespace eft_dma_radar.Tarkov.Player
             Debug.WriteLine($"Attempting to get new {bone} Transform for Player '{_player.Name}'...");
             var transform = new UnityTransform(_bones[bone].TransformInternal);
             _bones[bone] = transform;
-            if (bone is eft_dma_radar.Unity.Bones.HumanBase)
+            if (bone is EftDmaRadarLite.Unity.Bones.HumanBase)
                 Root = transform;
             Debug.WriteLine($"[OK] New {bone} Transform for Player '{_player.Name}'");
         }
@@ -152,22 +152,22 @@ namespace eft_dma_radar.Tarkov.Player
         /// </summary>
         public enum SkeletonBones : uint
         {
-            Head = eft_dma_radar.Unity.Bones.HumanHead,
-            Neck = eft_dma_radar.Unity.Bones.HumanNeck,
-            UpperTorso = eft_dma_radar.Unity.Bones.HumanSpine3,
-            MidTorso = eft_dma_radar.Unity.Bones.HumanSpine2,
-            LowerTorso = eft_dma_radar.Unity.Bones.HumanSpine1,
-            LeftShoulder = eft_dma_radar.Unity.Bones.HumanLCollarbone,
-            RightShoulder = eft_dma_radar.Unity.Bones.HumanRCollarbone,
-            LeftElbow = eft_dma_radar.Unity.Bones.HumanLForearm2,
-            RightElbow = eft_dma_radar.Unity.Bones.HumanRForearm2,
-            LeftHand = eft_dma_radar.Unity.Bones.HumanLPalm,
-            RightHand = eft_dma_radar.Unity.Bones.HumanRPalm,
-            Pelvis = eft_dma_radar.Unity.Bones.HumanPelvis,
-            LeftKnee = eft_dma_radar.Unity.Bones.HumanLThigh2,
-            RightKnee = eft_dma_radar.Unity.Bones.HumanRThigh2,
-            LeftFoot = eft_dma_radar.Unity.Bones.HumanLFoot,
-            RightFoot = eft_dma_radar.Unity.Bones.HumanRFoot
+            Head = EftDmaRadarLite.Unity.Bones.HumanHead,
+            Neck = EftDmaRadarLite.Unity.Bones.HumanNeck,
+            UpperTorso = EftDmaRadarLite.Unity.Bones.HumanSpine3,
+            MidTorso = EftDmaRadarLite.Unity.Bones.HumanSpine2,
+            LowerTorso = EftDmaRadarLite.Unity.Bones.HumanSpine1,
+            LeftShoulder = EftDmaRadarLite.Unity.Bones.HumanLCollarbone,
+            RightShoulder = EftDmaRadarLite.Unity.Bones.HumanRCollarbone,
+            LeftElbow = EftDmaRadarLite.Unity.Bones.HumanLForearm2,
+            RightElbow = EftDmaRadarLite.Unity.Bones.HumanRForearm2,
+            LeftHand = EftDmaRadarLite.Unity.Bones.HumanLPalm,
+            RightHand = EftDmaRadarLite.Unity.Bones.HumanRPalm,
+            Pelvis = EftDmaRadarLite.Unity.Bones.HumanPelvis,
+            LeftKnee = EftDmaRadarLite.Unity.Bones.HumanLThigh2,
+            RightKnee = EftDmaRadarLite.Unity.Bones.HumanRThigh2,
+            LeftFoot = EftDmaRadarLite.Unity.Bones.HumanLFoot,
+            RightFoot = EftDmaRadarLite.Unity.Bones.HumanRFoot
         }
     }
 }

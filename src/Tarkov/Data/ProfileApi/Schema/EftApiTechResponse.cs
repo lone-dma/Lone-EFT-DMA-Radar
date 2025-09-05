@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.Tarkov.Data.ProfileApi.Schema
+﻿namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema
 {
     /// <summary>
     /// Profile response from eft-api.tech

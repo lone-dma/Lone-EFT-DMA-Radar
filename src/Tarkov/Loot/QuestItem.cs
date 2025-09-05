@@ -1,6 +1,6 @@
-﻿using eft_dma_radar.Tarkov.Data.TarkovMarket;
+﻿using EftDmaRadarLite.Tarkov.Data.TarkovMarket;
 
-namespace eft_dma_radar.Tarkov.Loot
+namespace EftDmaRadarLite.Tarkov.Loot
 {
     /// <summary>
     /// Defines a static/dynamic spawn Quest Item (not normal loot).

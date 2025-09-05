@@ -1,8 +1,8 @@
-﻿using eft_dma_radar.UI.Hotkeys;
-using eft_dma_radar.DMA;
+﻿using EftDmaRadarLite.UI.Hotkeys;
+using EftDmaRadarLite.DMA;
 using VmmSharpEx.Scatter;
 
-namespace eft_dma_radar.Unity
+namespace EftDmaRadarLite.Unity
 {
     internal static class InputManager
     {

@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.Misc.Workers
+﻿namespace EftDmaRadarLite.Misc.Workers
 {
     /// <summary>
     /// Contains arguments for Worker Thread API.

@@ -1,9 +1,9 @@
-﻿using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.UI.Skia;
-using eft_dma_radar.Tarkov.Data.TarkovMarket;
+﻿using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.UI.Skia;
+using EftDmaRadarLite.Tarkov.Data.TarkovMarket;
 using SkiaSharp.Views.WPF;
 
-namespace eft_dma_radar.UI.Radar
+namespace EftDmaRadarLite.UI.Radar
 {
     public sealed class PlayerInfoWidget : SKWidgetControl
     {

@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.UI.ColorPicker
+﻿namespace EftDmaRadarLite.UI.ColorPicker
 {
     public class ColorDictionaryConverter
         : JsonConverter<ConcurrentDictionary<ColorPickerOption, string>>

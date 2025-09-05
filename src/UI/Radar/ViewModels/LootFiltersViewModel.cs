@@ -1,13 +1,13 @@
-﻿using eft_dma_radar.Tarkov.Data;
-using eft_dma_radar.Tarkov.Data.TarkovMarket;
-using eft_dma_radar.UI.Loot;
-using eft_dma_radar.UI.Misc;
-using eft_dma_radar.UI.Radar.Views;
+﻿using EftDmaRadarLite.Tarkov.Data;
+using EftDmaRadarLite.Tarkov.Data.TarkovMarket;
+using EftDmaRadarLite.UI.Loot;
+using EftDmaRadarLite.UI.Misc;
+using EftDmaRadarLite.UI.Radar.Views;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
 using System.Windows.Input;
 
-namespace eft_dma_radar.UI.Radar.ViewModels
+namespace EftDmaRadarLite.UI.Radar.ViewModels
 {
     public sealed class LootFiltersViewModel : INotifyPropertyChanged
     {

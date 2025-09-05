@@ -1,6 +1,6 @@
-﻿using eft_dma_radar.UI.Radar;
+﻿using EftDmaRadarLite.UI.Radar;
 
-namespace eft_dma_radar.UI.Hotkeys
+namespace EftDmaRadarLite.UI.Hotkeys
 {
     /// <summary>
     /// Wraps a Unity Hotkey/Event Delegate, and maintains it's State.

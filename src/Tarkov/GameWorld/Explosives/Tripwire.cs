@@ -1,10 +1,10 @@
-﻿using eft_dma_radar.Unity;
-using eft_dma_radar.Tarkov.Player;
-using eft_dma_radar.UI.Skia;
-using eft_dma_radar.Misc;
-using eft_dma_radar.UI.Skia.Maps;
+﻿using EftDmaRadarLite.Unity;
+using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.UI.Skia;
+using EftDmaRadarLite.Misc;
+using EftDmaRadarLite.UI.Skia.Maps;
 
-namespace eft_dma_radar.Tarkov.GameWorld.Explosives
+namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 {
     /// <summary>
     /// Represents a Tripwire (with attached Grenade) in Local Game World.

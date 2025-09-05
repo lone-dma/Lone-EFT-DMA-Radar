@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.UI.ColorPicker
+﻿namespace EftDmaRadarLite.UI.ColorPicker
 {
     /// <summary>
     /// Interaction logic for ColorPickerWindow.xaml

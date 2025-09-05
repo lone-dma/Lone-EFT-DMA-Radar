@@ -1,7 +1,7 @@
-﻿using eft_dma_radar.Misc;
+﻿using EftDmaRadarLite.Misc;
 using System.Windows.Input;
 
-namespace eft_dma_radar.UI.Misc
+namespace EftDmaRadarLite.UI.Misc
 {
     public sealed class InputBoxViewModel : INotifyPropertyChanged
     {

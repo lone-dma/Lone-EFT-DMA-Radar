@@ -1,7 +1,7 @@
-﻿global using static eft_dma_radar.DMA.MemoryInterface;
+﻿global using static EftDmaRadarLite.DMA.MemoryInterface;
 using VmmSharpEx.Scatter;
 
-namespace eft_dma_radar.DMA
+namespace EftDmaRadarLite.DMA
 {
     internal static class MemoryInterface
     {

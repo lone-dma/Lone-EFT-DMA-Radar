@@ -1,4 +1,4 @@
-﻿namespace eft_dma_radar.Misc
+﻿namespace EftDmaRadarLite.Misc
 {
     /// <summary>
     /// Caches Type Sizes of value types.

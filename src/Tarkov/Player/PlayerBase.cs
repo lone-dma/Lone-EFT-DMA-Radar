@@ -1,17 +1,17 @@
 ﻿using Collections.Pooled;
-using eft_dma_radar.Misc;
-using eft_dma_radar.Tarkov.Data.TarkovMarket;
-using eft_dma_radar.Tarkov.Loot;
-using eft_dma_radar.UI.Radar;
-using eft_dma_radar.UI.Radar.ViewModels;
-using eft_dma_radar.UI.Skia;
-using eft_dma_radar.UI.Skia.Maps;
-using eft_dma_radar.Unity;
+using EftDmaRadarLite.Misc;
+using EftDmaRadarLite.Tarkov.Data.TarkovMarket;
+using EftDmaRadarLite.Tarkov.Loot;
+using EftDmaRadarLite.UI.Radar;
+using EftDmaRadarLite.UI.Radar.ViewModels;
+using EftDmaRadarLite.UI.Skia;
+using EftDmaRadarLite.UI.Skia.Maps;
+using EftDmaRadarLite.Unity;
 using VmmSharpEx;
 using VmmSharpEx.Scatter;
-using static eft_dma_radar.Unity.UnityTransform;
+using static EftDmaRadarLite.Unity.UnityTransform;
 
-namespace eft_dma_radar.Tarkov.Player
+namespace EftDmaRadarLite.Tarkov.Player
 {
     /// <summary>
     /// Base class for Tarkov Players.

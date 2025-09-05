@@ -1,6 +1,6 @@
-﻿using eft_dma_radar.Unity;
+﻿using EftDmaRadarLite.Unity;
 
-namespace eft_dma_radar.UI.Hotkeys
+namespace EftDmaRadarLite.UI.Hotkeys
 {
     /// <summary>
     /// ListBox wrapper for Hotkey/Action Entries in Hotkey Manager.

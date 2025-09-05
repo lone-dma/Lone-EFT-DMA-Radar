@@ -2,7 +2,7 @@
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace eft_dma_radar.UI.Misc
+namespace EftDmaRadarLite.UI.Misc
 {
     /// <summary>
     /// Converts a hex/color‐name string ↔ System.Windows.Media.Color.
