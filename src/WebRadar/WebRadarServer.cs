@@ -197,7 +197,12 @@ namespace eft_dma_radar.WebRadar
                 var upnp = await GetNatDeviceAsync();
 
                 // Create New Mapping
-                await upnp.CreatePortMapAsync(new Mapping(Protocol.Tcp, port, port, 86400, "Eft Web Radar"));
+                await upnp.CreatePortMapAsync(new Mapping(
+                    protocol: Protocol.Tcp, 
+                    privatePort: port, 
+                    publicPort: port, 
+                    lifetime: 86400, 
+                    description: ""));
             }
             catch (Exception ex)
             {
