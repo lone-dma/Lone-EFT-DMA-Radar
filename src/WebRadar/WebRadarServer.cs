@@ -73,7 +73,7 @@ namespace eft_dma_radar.WebRadar
                 })
                 .Build();
 
-            host.Start();
+            await host.StartAsync();
 
             // Start the server worker
             _ = WorkerRoutineAsync(host, tickRate).ConfigureAwait(false);
