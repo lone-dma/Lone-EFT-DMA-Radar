@@ -33,15 +33,12 @@ namespace eft_dma_radar.WebRadar
             if (upnp)
                 await ConfigureUPnPAsync(port);
             var host = Host.CreateDefaultBuilder()
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseKestrel()
-                        .ConfigureServices(services =>
-                        {
-                            services.AddSignalR(options =>
-                            {
-                                options.MaximumReceiveMessageSize = 1024 * 128; // Set the maximum message size to 128KB
-                            })
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseKestrel()
+                    .ConfigureServices(services =>
+                    {
+                        services.AddSignalR()
                             .AddMessagePackProtocol(options =>
                             {
                                 options.SerializerOptions = MessagePackSerializerOptions.Standard
@@ -49,34 +46,34 @@ namespace eft_dma_radar.WebRadar
                                     .WithCompression(MessagePackCompression.Lz4BlockArray)
                                     .WithResolver(ResolverGenerator.Instance);
                             });
-                            services.AddCors(options =>
-                            {
-                                options.AddDefaultPolicy(builder =>
-                                {
-                                    builder.AllowAnyOrigin()
-                                           .AllowAnyHeader()
-                                           .AllowAnyMethod()
-                                           .SetIsOriginAllowedToAllowWildcardSubdomains();
-                                });
-                            });
-                        })
-                        .Configure(app =>
+                        services.AddCors(options =>
                         {
-                            app.UseCors();
-                            app.UseRouting();
-                            app.UseEndpoints(endpoints =>
+                            options.AddDefaultPolicy(builder =>
                             {
-                                endpoints.MapHub<RadarServerHub>("/hub/006d97cd-1ceb-4bc2-8cb1-3b8329ee3fdb");
+                                builder.AllowAnyOrigin()
+                                        .AllowAnyHeader()
+                                        .AllowAnyMethod()
+                                        .SetIsOriginAllowedToAllowWildcardSubdomains();
                             });
-                        })
-                        .UseUrls($"http://{FormatIPForURL(ip)}:{port}");
-                })
-                .Build();
+                        });
+                    })
+                    .Configure(app =>
+                    {
+                        app.UseCors();
+                        app.UseRouting();
+                        app.UseEndpoints(endpoints =>
+                        {
+                            endpoints.MapHub<RadarServerHub>("/hub/006d97cd-1ceb-4bc2-8cb1-3b8329ee3fdb");
+                        });
+                    })
+                    .UseUrls($"http://{FormatIPForURL(ip)}:{port}");
+            })
+            .Build();
 
             await host.StartAsync();
 
             // Start the server worker
-            _ = WorkerRoutineAsync(host, tickRate).ConfigureAwait(false);
+            _ = Task.Run(() => WorkerRoutineAsync(host, tickRate));
         }
 
         /// <summary>
@@ -98,14 +95,14 @@ namespace eft_dma_radar.WebRadar
         /// <summary>
         /// Web Radar Server Worker Thread.
         /// </summary>
-        private static async Task WorkerRoutineAsync(IHost host, TimeSpan tickrate)
+        private static async Task WorkerRoutineAsync(IHost host, TimeSpan tickRate)
         {
             try
             {
                 var update = new WebRadarUpdate();
                 var hubContext = host.Services.GetRequiredService<IHubContext<RadarServerHub>>();
-                using var timer = new PeriodicTimer(tickrate);
-                while (await timer.WaitForNextTickAsync().ConfigureAwait(false)) // Wait for specified interval to regulate Tick Rate
+                using var timer = new PeriodicTimer(tickRate);
+                while (await timer.WaitForNextTickAsync()) // Wait for specified interval to regulate Tick Rate
                 {
                     try
                     {
@@ -122,7 +119,7 @@ namespace eft_dma_radar.WebRadar
                             update.Players = null;
                         }
                         update.Version++;
-                        await hubContext.Clients.All.SendAsync("RadarUpdate", update).ConfigureAwait(false);
+                        await hubContext.Clients.All.SendAsync("RadarUpdate", update);
                     }
                     catch { }
                 }
@@ -154,7 +151,7 @@ namespace eft_dma_radar.WebRadar
             }
             catch (SocketException ex)
             {
-                throw new Exception($"Invalid Bind Parameters. Use your Radar PC's Local LAN IP (example: 192.168.1.100), and a port number between 50000-60000.\n" +
+                throw new InvalidOperationException($"Invalid Bind Parameters. Use a valid Bind IP (ex: 0.0.0.0), and a port number between 50000-60000.\n" +
                     $"SocketException: {ex.Message}");
             }
         }
@@ -206,7 +203,7 @@ namespace eft_dma_radar.WebRadar
             }
             catch (Exception ex)
             {
-                throw new Exception($"ERROR Setting up UPnP: {ex.Message}");
+                throw new InvalidOperationException($"ERROR Setting up UPnP: {ex.Message}");
             }
         }
 

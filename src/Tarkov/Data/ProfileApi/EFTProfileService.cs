@@ -20,16 +20,12 @@ namespace eft_dma_radar.Tarkov.Data.ProfileApi
         {
             RuntimeHelpers.RunClassConstructor(typeof(EftApiTechProvider).TypeHandle);
             RuntimeHelpers.RunClassConstructor(typeof(TarkovDevProvider).TypeHandle);
-            new Thread(Worker)
-            {
-                Priority = ThreadPriority.Lowest,
-                IsBackground = true
-            }.Start();
             MemDMA.ProcessStopped += MemDMA_ProcessStopped;
             // Cleanup Cache
             var expiredProfiles = Cache.Where(x => x.Value.IsExpired);
             foreach (var expired in expiredProfiles)
                 Cache.TryRemove(expired.Key, out _);
+            _ = Task.Run(WorkerRoutineAsync);
         }
 
         private static void MemDMA_ProcessStopped(object sender, EventArgs e)
@@ -60,24 +56,24 @@ namespace eft_dma_radar.Tarkov.Data.ProfileApi
         #endregion
 
         #region Internal API
-        private static void Worker()
+
+        private static async Task WorkerRoutineAsync()
         {
             while (true)
             {
                 try
                 {
-                    if (MemDMA.WaitForProcess())
+                    while (!Memory.InRaid)
+                        await Task.Delay(TimeSpan.FromSeconds(1));
+                    CancellationToken ct;
+                    lock (_syncRoot)
                     {
-                        CancellationToken ct;
-                        lock (_syncRoot)
-                        {
-                            ct = _cts.Token;
-                        }
-                        while (_profiles.TryDequeue(out var profile))
-                        {
-                            ct.ThrowIfCancellationRequested();
-                            ProcessProfileAsync(profile, ct).GetAwaiter().GetResult();
-                        }
+                        ct = _cts.Token;
+                    }
+                    while (_profiles.TryDequeue(out var profile))
+                    {
+                        ct.ThrowIfCancellationRequested();
+                        await ProcessProfileAsync(profile, ct);
                     }
                 }
                 catch (Exception ex)
