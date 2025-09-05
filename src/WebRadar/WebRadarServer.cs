@@ -113,7 +113,7 @@ namespace eft_dma_radar.WebRadar
                         {
                             update.InGame = true;
                             update.MapID = Memory.MapID;
-                            update.Players = players.Select(p => WebRadarPlayer.CreateFromPlayer(p));
+                            update.Players = players.Select(p => WebRadarPlayer.Create(p));
                         }
                         else
                         {
