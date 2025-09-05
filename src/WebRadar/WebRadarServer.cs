@@ -15,16 +15,10 @@ namespace eft_dma_radar.WebRadar
 {
     internal static class WebRadarServer
     {
-        private static readonly WebRadarUpdate _update = new();
-        private static TimeSpan _tickRate;
-        private static IHost _webHost;
-
         /// <summary>
         /// Password for this Server.
         /// </summary>
         public static string Password { get; } = Utilities.GetRandomPassword(10);
-
-        #region Public API
 
         /// <summary>
         /// Startup web server for Web Radar.
@@ -35,11 +29,10 @@ namespace eft_dma_radar.WebRadar
         /// <param name="upnp">True if Port Forwarding should be setup via UPnP.</param>
         public static async Task StartAsync(string ip, int port, TimeSpan tickRate, bool upnp)
         {
-            _tickRate = tickRate;
             ThrowIfInvalidBindParameters(ip, port);
             if (upnp)
                 await ConfigureUPnPAsync(port);
-            _webHost = Host.CreateDefaultBuilder()
+            var host = Host.CreateDefaultBuilder()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseKestrel()
@@ -80,13 +73,67 @@ namespace eft_dma_radar.WebRadar
                 })
                 .Build();
 
-            _webHost.Start();
+            host.Start();
 
             // Start the background worker
-            new Thread(Worker)
+            new Thread(() => Worker(host, tickRate))
             {
                 IsBackground = true
             }.Start();
+        }
+
+        /// <summary>
+        /// Get the External IP of the user running the Server.
+        /// </summary>
+        /// <returns>External WAN IP.</returns>
+        public static async Task<string> GetExternalIPAsync()
+        {
+            try
+            {
+                return await QueryUPnPForIPAsync();
+            }
+            catch
+            {
+                return "127.0.0.1";
+            }
+        }
+
+        /// <summary>
+        /// Web Radar Server Worker Thread.
+        /// </summary>
+        private static async void Worker(IHost host, TimeSpan tickrate)
+        {
+            try
+            {
+                var update = new WebRadarUpdate();
+                var hubContext = host.Services.GetRequiredService<IHubContext<RadarServerHub>>();
+                using var timer = new PeriodicTimer(tickrate);
+                while (await timer.WaitForNextTickAsync()) // Wait for specified interval to regulate Tick Rate
+                {
+                    try
+                    {
+                        if (Memory.InRaid && Memory.Players is IReadOnlyCollection<PlayerBase> players && players.Count > 0)
+                        {
+                            update.InGame = true;
+                            update.MapID = Memory.MapID;
+                            update.Players = players.Select(p => WebRadarPlayer.CreateFromPlayer(p));
+                        }
+                        else
+                        {
+                            update.InGame = false;
+                            update.MapID = null;
+                            update.Players = null;
+                        }
+                        update.Version++;
+                        await hubContext.Clients.All.SendAsync("RadarUpdate", update);
+                    }
+                    catch { }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Unhandled Exception in WebRadarServer Worker Thread.", ex);
+            }
         }
 
         /// <summary>
@@ -112,63 +159,6 @@ namespace eft_dma_radar.WebRadar
             {
                 throw new Exception($"Invalid Bind Parameters. Use your Radar PC's Local LAN IP (example: 192.168.1.100), and a port number between 50000-60000.\n" +
                     $"SocketException: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Get the External IP of the user running the Server.
-        /// </summary>
-        /// <returns>External WAN IP.</returns>
-        public static async Task<string> GetExternalIPAsync()
-        {
-            try
-            {
-                return await QueryUPnPForIPAsync();
-            }
-            catch
-            {
-                return "127.0.0.1";
-            }
-        }
-
-        #endregion
-
-        #region Private API
-
-        /// <summary>
-        /// Web Radar Server Worker Thread.
-        /// </summary>
-        private static async void Worker()
-        {
-            try
-            {
-                var hubContext = _webHost.Services.GetRequiredService<IHubContext<RadarServerHub>>();
-                using var timer = new PeriodicTimer(_tickRate);
-                while (await timer.WaitForNextTickAsync()) // Wait for specified interval to regulate Tick Rate
-                {
-                    try
-                    {
-                        if (Memory.InRaid && Memory.Players is IReadOnlyCollection<PlayerBase> players && players.Count > 0)
-                        {
-                            _update.InGame = true;
-                            _update.MapID = Memory.MapID;
-                            _update.Players = players.Select(p => WebRadarPlayer.CreateFromPlayer(p));
-                        }
-                        else
-                        {
-                            _update.InGame = false;
-                            _update.MapID = null;
-                            _update.Players = null;
-                        }
-                        _update.Version++;
-                        await hubContext.Clients.All.SendAsync("RadarUpdate", _update);
-                    }
-                    catch { }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException("Unhandled Exception in WebRadarServer Worker Thread.", ex);
             }
         }
 
@@ -246,6 +236,5 @@ namespace eft_dma_radar.WebRadar
             }
         }
 
-        #endregion
     }
 }
