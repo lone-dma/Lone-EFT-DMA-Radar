@@ -75,11 +75,8 @@ namespace eft_dma_radar.WebRadar
 
             host.Start();
 
-            // Start the background worker
-            new Thread(() => Worker(host, tickRate))
-            {
-                IsBackground = true
-            }.Start();
+            // Start the server worker
+            _ = WorkerRoutineAsync(host, tickRate).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -101,14 +98,14 @@ namespace eft_dma_radar.WebRadar
         /// <summary>
         /// Web Radar Server Worker Thread.
         /// </summary>
-        private static async void Worker(IHost host, TimeSpan tickrate)
+        private static async Task WorkerRoutineAsync(IHost host, TimeSpan tickrate)
         {
             try
             {
                 var update = new WebRadarUpdate();
                 var hubContext = host.Services.GetRequiredService<IHubContext<RadarServerHub>>();
                 using var timer = new PeriodicTimer(tickrate);
-                while (await timer.WaitForNextTickAsync()) // Wait for specified interval to regulate Tick Rate
+                while (await timer.WaitForNextTickAsync().ConfigureAwait(false)) // Wait for specified interval to regulate Tick Rate
                 {
                     try
                     {
@@ -125,14 +122,14 @@ namespace eft_dma_radar.WebRadar
                             update.Players = null;
                         }
                         update.Version++;
-                        await hubContext.Clients.All.SendAsync("RadarUpdate", update);
+                        await hubContext.Clients.All.SendAsync("RadarUpdate", update).ConfigureAwait(false);
                     }
                     catch { }
                 }
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("Unhandled Exception in WebRadarServer Worker Thread.", ex);
+                MessageBox.Show($"WebRadarServer Worker Thread Crashed:\n{ex}", "Web Radar Server", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
