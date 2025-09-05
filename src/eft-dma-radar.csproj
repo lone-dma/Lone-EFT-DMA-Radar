@@ -63,7 +63,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="9.0.8" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.8" />
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-		<PackageReference Include="Open.Nat.V2" Version="3.0.0" />
+		<PackageReference Include="Open.Nat.V2" Version="3.0.1" />
 	</ItemGroup>
 	
 </Project>
