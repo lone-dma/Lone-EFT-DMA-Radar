@@ -27,7 +27,7 @@ namespace eft_dma_radar.UI.Radar.ViewModels
             StartButtonText = "Starting...";
             try
             {
-                var tickRate = TimeSpan.FromMilliseconds(1000d / int.Parse(TickRate));
+                var tickRate = TimeSpan.FromSeconds(1) / int.Parse(TickRate);
                 string bindIP = BindAddress.Trim();
                 int port = int.Parse(Port);
                 var externalIP = await WebRadarServer.GetExternalIPAsync();
