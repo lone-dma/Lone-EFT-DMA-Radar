@@ -161,7 +161,7 @@ namespace SDK
 		public readonly partial struct ObservedPlayerController
 		{
 			public const uint Player = 0x10; // EFT.NextObservedPlayer.ObservedPlayerView
-			public static readonly uint[] MovementController = new uint[] { 0xC8, 0x10 }; // -.\uED66, -.\uED68
+			public static uint[] MovementController { get; } = new uint[] { 0xC8, 0x10 }; // -.\uED66, -.\uED68
 			public const uint HandsController = 0xD8; // -.\uED50
 			public const uint InfoContainer = 0xE8; // -.\uED59
 			public const uint HealthController = 0xF0; // -.\uE446

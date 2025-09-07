@@ -50,7 +50,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
             _parent = parent;
             if (IsDetonated)
                 throw new InvalidOperationException("Grenade is already detonated.");
-            PosAddr = Memory.ReadPtrChain(baseAddr, _toPosChain, false);
+            PosAddr = Memory.ReadPtrChain(baseAddr, false, _toPosChain);
             Refresh();
         }
 
