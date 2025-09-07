@@ -1,9 +1,9 @@
 ﻿namespace EftDmaRadarLite.Misc
 {
     /// <summary>
-    /// Represents a flexible array buffer that uses the Shared Array Pool.
+    /// Represents the base implementation of a pooled array of unmanaged types.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">Unmanaged value type.</typeparam>
     public abstract class PooledArray<T> : IReadOnlyList<T>, IEnumerable<T>, IDisposable
         where T : unmanaged
     {
@@ -21,10 +21,10 @@
         protected PooledArray() { }
 
         /// <summary>
-        /// Construct a new SharedArray from an existing rented array.
-        /// This class will become the new array owner.
+        /// Construct a new PooledArray from an existing *rented* array via <see cref="ArrayPool{T}.Shared"/>.
+        /// This class will handle returning the array to the pool when disposed.
         /// </summary>
-        /// <param name="array">Existing <see cref="T[]"/> instance. This class will become the new owner.</param>
+        /// <param name="array">Existing rented <see cref="T[]"/> instance. This class will handle returning the array to the pool when disposed.</param>
         protected PooledArray(T[] array, int count)
         {
             _array = array;
