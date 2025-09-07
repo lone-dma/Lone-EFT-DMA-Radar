@@ -11,6 +11,7 @@ using EftDmaRadarLite.Tarkov.Quests;
 using VmmSharpEx.Refresh;
 using VmmSharpEx.Options;
 using VmmSharpEx.Scatter;
+using VmmSharpEx.Pools;
 
 namespace EftDmaRadarLite.DMA
 {
@@ -415,20 +416,20 @@ namespace EftDmaRadarLite.DMA
         /// <summary>
         /// Read an array of type <typeparamref name="T"/> from memory.
         /// The first element begins reading at 0x0 and the array is assumed to be contiguous.
-        /// IMPORTANT: You must call <see cref="Dispose"/> on the returned SharedArray when done."/>
+        /// IMPORTANT: You must call <see cref="IDisposable.Dispose"/> on the returned SharedArray when done."/>
         /// </summary>
         /// <typeparam name="T">Value type to read.</typeparam>
         /// <param name="addr">Address to read from.</param>
         /// <param name="count">Number of array elements to read.</param>
         /// <param name="useCache">Use caching for this read.</param>
-        /// <returns><see cref="SharedArray{T}"/> value. Be sure to call <see cref="SharedArray{T}.Dispose"/>!</returns>
-        public SharedArray<T> ReadArray<T>(ulong addr, int count, bool useCache = true)
+        /// <returns><see cref="IVmmPooledArray{T}"/> value. Be sure to call <see cref="IDisposable.Dispose"/>!</returns>
+        public IVmmPooledArray<T> ReadArray<T>(ulong addr, int count, bool useCache = true)
             where T : unmanaged
         {
             var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
             var arr = _vmm.MemReadPooledArray<T>(_pid, addr, count, flags) ??
                 throw new VmmException("Memory Read Failed!");
-            return new SharedArray<T>(arr);
+            return arr;
         }
 
 

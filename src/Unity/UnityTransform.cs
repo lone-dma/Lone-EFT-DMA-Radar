@@ -1,4 +1,5 @@
 ﻿using EftDmaRadarLite.Misc;
+using VmmSharpEx.Pools;
 
 namespace EftDmaRadarLite.Unity
 {
@@ -49,7 +50,7 @@ namespace EftDmaRadarLite.Unity
         /// <returns>Ref to World Position</returns>
         public ref Vector3 UpdatePosition(Span<TrsX> vertices = default)
         {
-            SharedArray<TrsX> standaloneVertices = null;
+            IVmmPooledArray<TrsX> standaloneVertices = null;
             try
             {
                 if (vertices.IsEmpty)
@@ -89,7 +90,7 @@ namespace EftDmaRadarLite.Unity
         /// <returns>World Rotation</returns>
         public Quaternion GetRotation(Span<TrsX> vertices = default)
         {
-            SharedArray<TrsX> standaloneVertices = null;
+            IVmmPooledArray<TrsX> standaloneVertices = null;
             try
             {
                 if (vertices.IsEmpty)
@@ -169,7 +170,7 @@ namespace EftDmaRadarLite.Unity
         /// <returns>World Point.</returns>
         public Vector3 TransformPoint(Vector3 localPoint, Span<TrsX> vertices = default)
         {
-            SharedArray<TrsX> standaloneVertices = null;
+            IVmmPooledArray<TrsX> standaloneVertices = null;
             try
             {
                 if (vertices.IsEmpty)
@@ -209,7 +210,7 @@ namespace EftDmaRadarLite.Unity
         /// <returns>Local Point</returns>
         public Vector3 InverseTransformPoint(Vector3 worldPoint, Span<TrsX> vertices = default)
         {
-            SharedArray<TrsX> standaloneVertices = null;
+            IVmmPooledArray<TrsX> standaloneVertices = null;
             try
             {
                 if (vertices.IsEmpty)
@@ -297,7 +298,7 @@ namespace EftDmaRadarLite.Unity
         /// <summary>
         /// Read Updated Vertices for this Transform.
         /// </summary>
-        public SharedArray<TrsX> ReadVertices()
+        public IVmmPooledArray<TrsX> ReadVertices()
         {
             return Memory.ReadArray<TrsX>(VerticesAddr, Index + 1, _useCache);
         }
