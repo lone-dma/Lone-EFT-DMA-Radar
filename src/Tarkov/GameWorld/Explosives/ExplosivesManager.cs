@@ -1,5 +1,4 @@
-﻿using EftDmaRadarLite.Misc;
-using EftDmaRadarLite.Unity.Collections;
+﻿using EftDmaRadarLite.Unity.Collections;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 {
@@ -80,7 +79,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
         {
             try
             {
-                var syncObjectsPtr = Memory.ReadPtrChain(_localGameWorld, _toSyncObjects);
+                var syncObjectsPtr = Memory.ReadPtrChain(_localGameWorld, true, _toSyncObjects);
                 using var syncObjects = new UnityList<ulong>(syncObjectsPtr, true);
                 foreach (var syncObject in syncObjects)
                 {

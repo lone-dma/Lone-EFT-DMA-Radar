@@ -239,7 +239,7 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// </summary>
         private ulong GetMovementContext()
         {
-            var movementController = Memory.ReadPtrChain(ObservedPlayerController, Offsets.ObservedPlayerController.MovementController);
+            var movementController = Memory.ReadPtrChain(ObservedPlayerController, true, Offsets.ObservedPlayerController.MovementController);
             return movementController;
         }
 
@@ -285,10 +285,16 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// Get the Transform Internal Chain for this Player.
         /// </summary>
         /// <param name="bone">Bone to lookup.</param>
-        /// <returns>Array of offsets for transform internal chain.</returns>
-        public override uint[] GetTransformInternalChain(Bones bone)
+        /// <param name="offsets">Buffer to receive offsets.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected override void GetTransformInternalChain(Bones bone, Span<uint> offsets)
         {
-            return new uint[] { Offsets.ObservedPlayerView.PlayerBody, Offsets.PlayerBody.SkeletonRootJoint, Offsets.DizSkinningSkeleton._values, UnityList<byte>.ArrOffset, UnityList<byte>.ArrStartOffset + (uint)bone * 0x8, 0x10 };
+            offsets[0] = Offsets.ObservedPlayerView.PlayerBody;
+            offsets[1] = Offsets.PlayerBody.SkeletonRootJoint;
+            offsets[2] = Offsets.DizSkinningSkeleton._values;
+            offsets[3] = UnityList<byte>.ArrOffset;
+            offsets[4] = UnityList<byte>.ArrStartOffset + (uint)bone * 0x8;
+            offsets[5] = 0x10;
         }
     }
 }

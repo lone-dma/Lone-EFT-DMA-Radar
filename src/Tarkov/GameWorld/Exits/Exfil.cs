@@ -25,8 +25,8 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
         {
             _addr = baseAddr;
             _isPMC = isPMC;
-            var transformInternal = Memory.ReadPtrChain(baseAddr, _transformInternalChain, false);
-            var namePtr = Memory.ReadPtrChain(baseAddr, new[] { Offsets.Exfil.Settings, Offsets.ExfilSettings.Name });
+            var transformInternal = Memory.ReadPtrChain(baseAddr, false, _transformInternalChain);
+            var namePtr = Memory.ReadPtrChain(baseAddr, true, Offsets.Exfil.Settings, Offsets.ExfilSettings.Name);
             Name = Memory.ReadUnityString(namePtr)?.Trim();
             if (string.IsNullOrEmpty(Name))
                 Name = "default";

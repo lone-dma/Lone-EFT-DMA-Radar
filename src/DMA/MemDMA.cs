@@ -434,11 +434,13 @@ namespace EftDmaRadarLite.DMA
         /// <summary>
         /// Read a chain of pointers and get the final result.
         /// </summary>
-        public ulong ReadPtrChain(ulong addr, uint[] offsets, bool useCache = true)
+        public ulong ReadPtrChain(ulong addr, bool useCache, params Span<uint> offsets)
         {
-            var pointer = addr; // push ptr to first address value
-            for (var i = 0; i < offsets.Length; i++)
-                pointer = ReadPtr(pointer + offsets[i], useCache);
+            ulong pointer = addr; // push ptr to first address value
+            foreach (var offset in offsets)
+            {
+                pointer = ReadPtr(pointer + offset, useCache);
+            }
 
             return pointer;
         }

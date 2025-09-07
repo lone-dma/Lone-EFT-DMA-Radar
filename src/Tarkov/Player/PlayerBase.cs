@@ -601,11 +601,16 @@ namespace EftDmaRadarLite.Tarkov.Player
         }
 
         /// <summary>
+        /// All implementations are 6 elements long, so this is fine for now. If the chain ever updates we'll need to tweak this.
+        /// </summary>
+        internal const int TransformInternalChainCount = 6;
+        /// <summary>
         /// Get the Transform Internal Chain for this Player.
         /// </summary>
         /// <param name="bone">Bone to lookup.</param>
-        /// <returns>Array of offsets for transform internal chain.</returns>
-        public virtual uint[] GetTransformInternalChain(Bones bone) =>
+        /// <param name="offsets">Buffer to receive offsets.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected virtual void GetTransformInternalChain(Bones bone, scoped Span<uint> offsets) =>
             throw new NotImplementedException();
 
         #endregion

@@ -31,7 +31,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
             {
                 Name = "Transit";
             }
-            var transformInternal = Memory.ReadPtrChain(baseAddr, _transformInternalChain, false);
+            var transformInternal = Memory.ReadPtrChain(baseAddr, false, _transformInternalChain);
             try
             {
                 _position = new UnityTransform(transformInternal).UpdatePosition();
