@@ -4,7 +4,7 @@
     /// Represents a flexible array buffer that uses the Shared Array Pool.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class SharedArray<T> : IReadOnlyList<T>, IEnumerable<T>, IDisposable
+    public class PooledArray<T> : IReadOnlyList<T>, IEnumerable<T>, IDisposable
         where T : unmanaged
     {
         private IMemoryOwner<T> _mem;
@@ -18,7 +18,7 @@
         /// Construct a new SharedArray with a defined length.
         /// </summary>
         /// <param name="count">Number of array elements.</param>
-        public SharedArray(int count) 
+        public PooledArray(int count) 
         {
             Initialize(count);
         }
@@ -28,7 +28,7 @@
         /// This class will become the new owner.
         /// </summary>
         /// <param name="mem">Existing <see cref="IMemoryOwner{T}"/> instance. This class will become the new owner.</param>
-        public SharedArray(IMemoryOwner<T> mem)
+        public PooledArray(IMemoryOwner<T> mem)
         {
             _mem = mem;
             Count = mem.Memory.Length;
@@ -39,7 +39,7 @@
         /// Constructor for derived classes.
         /// Be sure to call <see cref="Initialize(int)"/> in the derived class."/>
         /// </summary>
-        protected SharedArray() { }
+        protected PooledArray() { }
 
         /// <summary>
         /// Initialize the array to a defined length.
