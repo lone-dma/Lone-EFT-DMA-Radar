@@ -75,7 +75,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
             if (_isPMC)
             {
                 var entriesArrPtr = Memory.ReadPtr(_addr + Offsets.Exfil.EligibleEntryPoints);
-                using var entriesArr = new UnityArray<ulong>(entriesArrPtr, true);
+                using var entriesArr = UnityArray<ulong>.Create(entriesArrPtr, true);
                 foreach (var entryNamePtr in entriesArr)
                 {
                     var entryName = Memory.ReadUnityString(entryNamePtr);
@@ -85,7 +85,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
             else // Scav Exfils
             {
                 var eligibleIdsPtr = Memory.ReadPtr(_addr + Offsets.ScavExfil.EligibleIds);
-                using var idsArr = new UnityList<ulong>(eligibleIdsPtr, true);
+                using var idsArr = UnityList<ulong>.Create(eligibleIdsPtr, true);
                 foreach (var idPtr in idsArr)
                 {
                     var idName = Memory.ReadUnityString(idPtr);

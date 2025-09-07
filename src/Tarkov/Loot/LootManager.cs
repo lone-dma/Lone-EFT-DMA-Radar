@@ -101,7 +101,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
         private void GetLoot(CancellationToken ct)
         {
             var lootListAddr = Memory.ReadPtr(_lgw + Offsets.ClientLocalGameWorld.LootList);
-            using var lootList = new UnityList<ulong>(
+            using var lootList = UnityList<ulong>.Create(
                 addr: lootListAddr, 
                 useCache: true);
             // Remove any loot no longer present
@@ -317,7 +317,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
         private static void GetItemsInSlots(ulong slotsPtr, List<LootItem> loot, bool isPMC)
         {
             using var slotDict = new PooledDictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);
-            using var slots = new UnityArray<ulong>(slotsPtr, true);
+            using var slots = UnityArray<ulong>.Create(slotsPtr, true);
 
             foreach (var slot in slots)
             {

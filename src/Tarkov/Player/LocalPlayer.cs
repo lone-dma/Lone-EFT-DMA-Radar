@@ -61,7 +61,7 @@ namespace EftDmaRadarLite.Tarkov.Player
         {
             var wishlistManager = Memory.ReadPtr(Profile + Offsets.Profile.WishlistManager);
             var itemsPtr = Memory.ReadPtr(wishlistManager + Offsets.WishlistManager.Items);
-            using var items = new UnityDictionary<Types.MongoID, int>(itemsPtr, true);
+            using var items = UnityDictionary<Types.MongoID, int>.Create(itemsPtr, true);
             var wishlist = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var item in items)
             {

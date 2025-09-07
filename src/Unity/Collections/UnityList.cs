@@ -14,25 +14,31 @@ namespace EftDmaRadarLite.Unity.Collections
         public const uint ArrOffset = 0x10;
         public const uint ArrStartOffset = 0x20;
 
+        private UnityList(T[] array, int count) : base(array, count) { }
+
         /// <summary>
-        /// Constructor for Unity List.
+        /// Factory method to create a new <see cref="UnityList{T}"/> instance from a memory address.
         /// </summary>
-        /// <param name="addr">Base Address for this collection.</param>
-        /// <param name="useCache">Perform cached reading.</param>
-        public UnityList(ulong addr, bool useCache = true) : base()
+        /// <param name="addr"></param>
+        /// <param name="useCache"></param>
+        /// <returns></returns>
+        public static UnityList<T> Create(ulong addr, bool useCache = true)
         {
+            var count = Memory.ReadValue<int>(addr + CountOffset, useCache);
+            var array = ArrayPool<T>.Shared.Rent(count);
             try
             {
-                var count = Memory.ReadValue<int>(addr + CountOffset, useCache);
-                base.Initialize(count);
                 if (count == 0)
-                    return;
+                {
+                    return new UnityList<T>(array, 0);
+                }
                 var listBase = Memory.ReadPtr(addr + ArrOffset, useCache) + ArrStartOffset;
-                Memory.ReadSpan(listBase, Span, useCache);
+                Memory.ReadSpan(listBase, array.AsSpan(0, count), useCache);
+                return new UnityList<T>(array, count);
             }
             catch
             {
-                Dispose();
+                ArrayPool<T>.Shared.Return(array);
                 throw;
             }
         }

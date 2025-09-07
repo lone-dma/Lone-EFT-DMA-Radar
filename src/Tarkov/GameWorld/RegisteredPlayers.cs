@@ -39,7 +39,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
         {
             try
             {
-                using var playersList = new UnityList<ulong>(this, false); // Realtime Read
+                using var playersList = UnityList<ulong>.Create(this, false); // Realtime Read
                 using var registered = playersList.Where(x => x != 0x0).ToPooledSet();
                 /// Allocate New Players
                 foreach (var playerBase in registered)
