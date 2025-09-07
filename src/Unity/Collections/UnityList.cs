@@ -7,7 +7,7 @@ namespace EftDmaRadarLite.Unity.Collections
     /// Must initialize before use. Must dispose after use.
     /// </summary>
     /// <typeparam name="T">Collection Type</typeparam>
-    public sealed class UnityList<T> : SharedArray<T>
+    public sealed class UnityList<T> : PooledArray<T>
         where T : unmanaged
     {
         public const uint CountOffset = 0x18;

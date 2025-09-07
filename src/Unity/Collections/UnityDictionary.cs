@@ -8,7 +8,7 @@ namespace EftDmaRadarLite.Unity.Collections
     /// </summary>
     /// <typeparam name="TKey">Key Type between 1-8 bytes.</typeparam>
     /// <typeparam name="TValue">Value Type between 1-8 bytes.</typeparam>
-    public sealed class UnityDictionary<TKey, TValue> : SharedArray<UnityDictionary<TKey, TValue>.MemDictEntry>
+    public sealed class UnityDictionary<TKey, TValue> : PooledArray<UnityDictionary<TKey, TValue>.MemDictEntry>
     where TKey : unmanaged
         where TValue : unmanaged
     {
