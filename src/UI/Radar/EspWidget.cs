@@ -157,8 +157,8 @@ namespace EftDmaRadarLite.UI.Radar
                         var scaleX = _espBitmap.Width / (float)CameraManager.Viewport.Width;
                         var scaleY = _espBitmap.Height / (float)CameraManager.Viewport.Height;
                         foreach (var player in allPlayers)
-                            if (player.Skeleton.UpdateESPWidgetBuffer(scaleX, scaleY))
-                                _espCanvas.DrawPoints(SKPointMode.Lines, Skeleton.ESPWidgetBuffer, GetPaint(player));
+                            if (player.Skeleton.UpdateESPWidgetBuffer(scaleX, scaleY, out var buffer))
+                                _espCanvas.DrawPoints(SKPointMode.Lines, buffer, GetPaint(player));
                     }
 
                     var bounds = _espBitmap.Info.Rect;

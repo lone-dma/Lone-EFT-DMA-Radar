@@ -9,11 +9,7 @@ namespace EftDmaRadarLite.Tarkov.Player
     public sealed class Skeleton
     {
         private const int JOINTS_COUNT = 26;
-
-        /// <summary>
-        /// Bones Buffer for ESP Widget.
-        /// </summary>
-        public static readonly SKPoint[] ESPWidgetBuffer = new SKPoint[JOINTS_COUNT];
+        private static readonly SKPoint[] _espWidgetBuffer = new SKPoint[JOINTS_COUNT];
         /// <summary>
         /// All Skeleton Bones.
         /// </summary>
@@ -66,14 +62,15 @@ namespace EftDmaRadarLite.Tarkov.Player
 
         /// <summary>
         /// Updates the static ESP Widget Buffer with the current Skeleton Bone Screen Coordinates.<br />
-        /// See <see cref="Skeleton.ESPWidgetBuffer"/><br />
+        /// See <see cref="Skeleton._espWidgetBuffer"/><br />
         /// NOT THREAD SAFE!
         /// </summary>
         /// <param name="scaleX">X Scale Factor.</param>
         /// <param name="scaleY">Y Scale Factor.</param>
         /// <returns>True if successful, otherwise False.</returns>
-        public bool UpdateESPWidgetBuffer(float scaleX, float scaleY)
+        public bool UpdateESPWidgetBuffer(float scaleX, float scaleY, out SKPoint[] buffer)
         {
+            buffer = default;
             if (!CameraManager.WorldToScreen(ref _bones[Unity.Bones.HumanSpine2].Position, out var midTorsoScreen, true, true))
                 return false;
             if (!CameraManager.WorldToScreen(ref _bones[Unity.Bones.HumanHead].Position, out var headScreen))
@@ -109,35 +106,36 @@ namespace EftDmaRadarLite.Tarkov.Player
             int index = 0;
             var center = CameraManager.ViewportCenter;
             // Head to left foot
-            ScaleAimviewPoint(headScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(neckScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(neckScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(upperTorsoScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(upperTorsoScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(midTorsoScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(midTorsoScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(lowerTorsoScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(lowerTorsoScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(pelvisScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(pelvisScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(leftKneeScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(leftKneeScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(leftFootScreen, ref ESPWidgetBuffer[index++]);
+            ScaleAimviewPoint(headScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(neckScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(neckScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(upperTorsoScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(upperTorsoScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(midTorsoScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(midTorsoScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(lowerTorsoScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(lowerTorsoScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(pelvisScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(pelvisScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(leftKneeScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(leftKneeScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(leftFootScreen, ref _espWidgetBuffer[index++]);
             // Pelvis to right foot
-            ScaleAimviewPoint(pelvisScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(rightKneeScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(rightKneeScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(rightFootScreen, ref ESPWidgetBuffer[index++]);
+            ScaleAimviewPoint(pelvisScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(rightKneeScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(rightKneeScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(rightFootScreen, ref _espWidgetBuffer[index++]);
             // Left collar to left hand
-            ScaleAimviewPoint(leftCollarScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(leftElbowScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(leftElbowScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(leftHandScreen, ref ESPWidgetBuffer[index++]);
+            ScaleAimviewPoint(leftCollarScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(leftElbowScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(leftElbowScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(leftHandScreen, ref _espWidgetBuffer[index++]);
             // Right collar to right hand
-            ScaleAimviewPoint(rightCollarScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(rightElbowScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(rightElbowScreen, ref ESPWidgetBuffer[index++]);
-            ScaleAimviewPoint(rightHandScreen, ref ESPWidgetBuffer[index++]);
+            ScaleAimviewPoint(rightCollarScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(rightElbowScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(rightElbowScreen, ref _espWidgetBuffer[index++]);
+            ScaleAimviewPoint(rightHandScreen, ref _espWidgetBuffer[index++]);
+            buffer = _espWidgetBuffer;
             return true;
 
             void ScaleAimviewPoint(SKPoint original, ref SKPoint result)

@@ -6,7 +6,7 @@ namespace EftDmaRadarLite.WebRadar.MessagePack
 {
     public static class ResolverGenerator
     {
-        public static readonly IFormatterResolver Instance;
+        public static IFormatterResolver Instance { get; }
 
         static ResolverGenerator()
         {
@@ -15,7 +15,7 @@ namespace EftDmaRadarLite.WebRadar.MessagePack
 
         private sealed class CustomResolver : IFormatterResolver
         {
-            public static readonly CustomResolver Instance = new();
+            public static CustomResolver Instance { get; } = new();
 
             private readonly Vector2Formatter _vector2Formatter = new();
             private readonly Vector3Formatter _vector3Formatter = new();
