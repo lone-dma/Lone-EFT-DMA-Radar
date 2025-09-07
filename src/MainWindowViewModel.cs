@@ -87,12 +87,13 @@ namespace EftDmaRadarLite
         {
             if (e.State)
             {
+                var zooms = ViewMatrix.ZoomLevels.Span;
                 // find the current zoom's index (-1 if somehow not found)
-                int idx = Array.IndexOf(ViewMatrix.ZoomLevels, App.Config.EspWidget.Zoom);
+                int idx = zooms.IndexOf(App.Config.EspWidget.Zoom);
                 // step backward one, wrapping to last when we go below 0
                 idx = (idx - 1 + ViewMatrix.ZoomLevels.Length) % ViewMatrix.ZoomLevels.Length;
                 // apply it
-                App.Config.EspWidget.Zoom = ViewMatrix.ZoomLevels[idx];
+                App.Config.EspWidget.Zoom = zooms[idx];
             }
         }
 
@@ -100,12 +101,13 @@ namespace EftDmaRadarLite
         {
             if (e.State)
             {
+                var zooms = ViewMatrix.ZoomLevels.Span;
                 // find the current zoom's index (-1 if somehow not found)
-                int idx = Array.IndexOf(ViewMatrix.ZoomLevels, App.Config.EspWidget.Zoom);
+                int idx = zooms.IndexOf(App.Config.EspWidget.Zoom);
                 // step forward one, wrapping back to 0 when we pass the end
                 idx = (idx + 1) % ViewMatrix.ZoomLevels.Length;
                 // apply it
-                App.Config.EspWidget.Zoom = ViewMatrix.ZoomLevels[idx];
+                App.Config.EspWidget.Zoom = zooms[idx];
             }
         }
 

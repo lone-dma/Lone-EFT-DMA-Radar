@@ -8,7 +8,7 @@
         /// <summary>
         /// Zoom Levels for ESP View Matrix.
         /// </summary>
-        public static float[] ZoomLevels { get; } = new float[]
+        public static ReadOnlyMemory<float> ZoomLevels { get; } = new float[]
         {
             1f, 2f, 5f, 10f
         };
