@@ -431,9 +431,14 @@ namespace EftDmaRadarLite.DMA
             return new SharedArray<T>(arr);
         }
 
+
         /// <summary>
         /// Read a chain of pointers and get the final result.
         /// </summary>
+        /// <param name="addr">Base virtual address to read from.</param>
+        /// <param name="useCache">Use caching for this read (recommended).</param>
+        /// <param name="offsets">Offsets to read in succession.</param>
+        /// <returns>Pointer address after final offset.</returns>
         public ulong ReadPtrChain(ulong addr, bool useCache, params Span<uint> offsets)
         {
             ulong pointer = addr; // push ptr to first address value
