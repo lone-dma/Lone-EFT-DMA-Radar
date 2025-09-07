@@ -7,12 +7,18 @@
     public class PooledArray<T> : IReadOnlyList<T>, IEnumerable<T>, IDisposable
         where T : unmanaged
     {
-        private IMemoryOwner<T> _mem;
+        private T[] _array;
 
         /// <summary>
         /// Returns a Span <typeparamref name="T"/> over this instance.
         /// </summary>
-        public Span<T> Span => _mem.Memory.Span.Slice(0, Count);
+        public Span<T> Span
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _array.AsSpan(0, Count);
+        }
+
+        private PooledArray() { }
 
         /// <summary>
         /// Construct a new SharedArray with a defined length.
@@ -20,72 +26,52 @@
         /// <param name="count">Number of array elements.</param>
         public PooledArray(int count) 
         {
-            Initialize(count);
-        }
-
-        /// <summary>
-        /// Construct a new SharedArray from an existing memory owner.
-        /// This class will become the new owner.
-        /// </summary>
-        /// <param name="mem">Existing <see cref="IMemoryOwner{T}"/> instance. This class will become the new owner.</param>
-        public PooledArray(IMemoryOwner<T> mem)
-        {
-            _mem = mem;
-            Count = mem.Memory.Length;
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(Count, 16384, nameof(Count));
-        }
-
-        /// <summary>
-        /// Constructor for derived classes.
-        /// Be sure to call <see cref="Initialize(int)"/> in the derived class."/>
-        /// </summary>
-        protected PooledArray() { }
-
-        /// <summary>
-        /// Initialize the array to a defined length.
-        /// </summary>
-        /// <param name="count">Number of elements in the array.</param>
-        protected void Initialize(int count)
-        {
             ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
-            _mem = MemoryPool<T>.Shared.Rent(count);
+            _array = ArrayPool<T>.Shared.Rent(count);
             Count = count;
         }
 
+        /// <summary>
+        /// Construct a new SharedArray from an existing rented array.
+        /// This class will become the new array owner.
+        /// </summary>
+        /// <param name="array">Existing <see cref="T[]"/> instance. This class will become the new owner.</param>
+        protected PooledArray(T[] array, int count)
+        {
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
+            _array = array;
+            Count = count;
+        }
 
         #region Interfaces
 
-        public int Count { get; private set; }
+        public int Count { get; }
 
-        public T this[int index] => Span[index];
+        public T this[int index] => Span[index]; // Span enforces bounds
 
         public Span<T>.Enumerator GetEnumerator() => Span.GetEnumerator(); // Use the Span enumerator for better performance.
 
-        [Obsolete("This implementation uses a slower interface enumerator. Use GetEnumerator() for better performance.")]
         IEnumerator<T> IEnumerable<T>.GetEnumerator() // For LINQ and other interface compatibility.
         {
-            var mem = _mem.Memory.Slice(0, Count);
-            for (int i = 0; i < mem.Length; i++)
+            for (int i = 0; i < Count; i++)
             {
-                yield return mem.Span[i];
+                yield return _array[i];
             }
         }
 
-        [Obsolete("This implementation uses a slower interface enumerator. Use GetEnumerator() for better performance.")]
         IEnumerator IEnumerable.GetEnumerator() // For LINQ and other interface compatibility.
         {
-            var mem = _mem.Memory.Slice(0, Count);
-            for (int i = 0; i < mem.Length; i++)
+            for (int i = 0; i < Count; i++)
             {
-                yield return mem.Span[i];
+                yield return _array[i];
             }
         }
 
         public void Dispose()
         {
-            if (Interlocked.Exchange(ref _mem, null) is IMemoryOwner<T> mem)
+            if (Interlocked.Exchange(ref _array, null) is T[] array)
             {
-                mem.Dispose();
+                ArrayPool<T>.Shared.Return(array);
                 GC.SuppressFinalize(this);
             }
         }

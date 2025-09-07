@@ -14,25 +14,31 @@ namespace EftDmaRadarLite.Unity.Collections
         public const uint ArrOffset = 0x18;
         public const uint ArrStartOffset = 0x20;
 
+        private UnityHashSet(MemHashEntry[] array, int count) : base(array, count) { }
+
         /// <summary>
-        /// Constructor for Unity HashSet.
+        /// Factory method to create a new <see cref="UnityHashSet{T}"/> instance from a memory address.
         /// </summary>
-        /// <param name="addr">Base Address for this collection.</param>
-        /// <param name="useCache">Perform cached reading.</param>
-        public UnityHashSet(ulong addr, bool useCache = true) : base()
+        /// <param name="addr"></param>
+        /// <param name="useCache"></param>
+        /// <returns></returns>
+        public static UnityHashSet<T> Create(ulong addr, bool useCache = true)
         {
+            var count = Memory.ReadValue<int>(addr + CountOffset, useCache);
+            var array = ArrayPool<MemHashEntry>.Shared.Rent(count);
             try
             {
-                var count = Memory.ReadValue<int>(addr + CountOffset, useCache);
-                base.Initialize(count);
                 if (count == 0)
-                    return;
+                {
+                    return new UnityHashSet<T>(array, 0);
+                }
                 var hashSetBase = Memory.ReadPtr(addr + ArrOffset, useCache) + ArrStartOffset;
-                Memory.ReadSpan(hashSetBase, Span, useCache);
+                Memory.ReadSpan(hashSetBase, array.AsSpan(0, count), useCache);
+                return new UnityHashSet<T>(array, count);
             }
             catch
             {
-                Dispose();
+                ArrayPool<MemHashEntry>.Shared.Return(array);
                 throw;
             }
         }

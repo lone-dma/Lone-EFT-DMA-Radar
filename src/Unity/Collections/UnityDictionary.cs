@@ -9,32 +9,38 @@ namespace EftDmaRadarLite.Unity.Collections
     /// <typeparam name="TKey">Key Type between 1-8 bytes.</typeparam>
     /// <typeparam name="TValue">Value Type between 1-8 bytes.</typeparam>
     public sealed class UnityDictionary<TKey, TValue> : PooledArray<UnityDictionary<TKey, TValue>.MemDictEntry>
-    where TKey : unmanaged
+        where TKey : unmanaged
         where TValue : unmanaged
     {
         public const uint CountOffset = 0x40;
         public const uint EntriesOffset = 0x18;
         public const uint EntriesStartOffset = 0x20;
 
+        private UnityDictionary(MemDictEntry[] array, int count) : base(array, count) { }
+
         /// <summary>
-        /// Constructor for Unity Dictionary.
+        /// Factory method to create a new <see cref="UnityDictionary{TKey, TValue}"/> instance from a memory address.
         /// </summary>
-        /// <param name="addr">Base Address for this collection.</param>
-        /// <param name="useCache">Perform cached reading.</param>
-        public UnityDictionary(ulong addr, bool useCache = true) : base()
+        /// <param name="addr"></param>
+        /// <param name="useCache"></param>
+        /// <returns></returns>
+        public static UnityDictionary<TKey, TValue> Create(ulong addr, bool useCache = true)
         {
+            var count = Memory.ReadValue<int>(addr + CountOffset, useCache);
+            var array = ArrayPool<MemDictEntry>.Shared.Rent(count);
             try
             {
-                var count = Memory.ReadValue<int>(addr + CountOffset, useCache);
-                base.Initialize(count);
                 if (count == 0)
-                    return;
+                {
+                    return new UnityDictionary<TKey, TValue>(array, 0);
+                }
                 var dictBase = Memory.ReadPtr(addr + EntriesOffset, useCache) + EntriesStartOffset;
-                Memory.ReadSpan(dictBase, Span, useCache); // Single read into mem buffer
+                Memory.ReadSpan(dictBase, array.AsSpan(0, count), useCache); // Single read into mem buffer
+                return new UnityDictionary<TKey, TValue>(array, count);
             }
             catch
             {
-                Dispose();
+                ArrayPool<MemDictEntry>.Shared.Return(array);
                 throw;
             }
         }

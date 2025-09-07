@@ -73,7 +73,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
                 if (OpticCameraActive)
                 {
                     var opticsPtr = Memory.ReadPtr(localPlayer.PWA + Offsets.ProceduralWeaponAnimation._optics);
-                    using var optics = new UnityList<VmmPointer>(opticsPtr, true);
+                    using var optics = UnityList<VmmPointer>.Create(opticsPtr, true);
                     if (optics.Count > 0)
                     {
                         var pSightComponent = Memory.ReadPtr(optics[0] + Offsets.SightNBone.Mod);
@@ -150,7 +150,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
                 using var zoomArray = SightInterface.Zooms;
                 if (SelectedScope >= zoomArray.Count || SelectedScope is < 0 or > 10)
                     return -1.0f;
-                using var selectedScopeModes = new UnityArray<int>(pScopeSelectedModes, false);
+                using var selectedScopeModes = UnityArray<int>.Create(pScopeSelectedModes, false);
                 int selectedScopeMode = SelectedScope >= selectedScopeModes.Count ?
                     0 : selectedScopeModes[SelectedScope];
                 ulong zoomAddr = zoomArray[SelectedScope] + UnityArray<float>.ArrBaseOffset + (uint)selectedScopeMode * 0x4;
@@ -173,7 +173,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
             [FieldOffset((int)Offsets.SightInterface.Zooms)] private readonly ulong pZooms;
 
             public readonly UnityArray<ulong> Zooms =>
-                new UnityArray<ulong>(pZooms, true);
+                UnityArray<ulong>.Create(pZooms, true);
         }
 
         #region Static Interfaces
