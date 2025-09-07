@@ -26,6 +26,7 @@ namespace EftDmaRadarLite.Unity.Collections
         public static UnityHashSet<T> Create(ulong addr, bool useCache = true)
         {
             var count = Memory.ReadValue<int>(addr + CountOffset, useCache);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
             var array = ArrayPool<MemHashEntry>.Shared.Rent(count);
             try
             {

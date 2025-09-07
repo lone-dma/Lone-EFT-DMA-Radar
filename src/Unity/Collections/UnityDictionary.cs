@@ -28,6 +28,7 @@ namespace EftDmaRadarLite.Unity.Collections
         public static UnityDictionary<TKey, TValue> Create(ulong addr, bool useCache = true)
         {
             var count = Memory.ReadValue<int>(addr + CountOffset, useCache);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
             var array = ArrayPool<MemDictEntry>.Shared.Rent(count);
             try
             {

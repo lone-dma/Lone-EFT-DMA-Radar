@@ -26,7 +26,6 @@
         /// <param name="count">Number of array elements.</param>
         public PooledArray(int count) 
         {
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
             _array = ArrayPool<T>.Shared.Rent(count);
             Count = count;
         }
@@ -38,7 +37,6 @@
         /// <param name="array">Existing <see cref="T[]"/> instance. This class will become the new owner.</param>
         protected PooledArray(T[] array, int count)
         {
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
             _array = array;
             Count = count;
         }
