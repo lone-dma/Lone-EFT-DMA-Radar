@@ -14,6 +14,7 @@ namespace EftDmaRadarLite.Unity.Collections
         public const uint ArrOffset = 0x18;
         public const uint ArrStartOffset = 0x20;
 
+        private UnityHashSet() { }
         private UnityHashSet(MemHashEntry[] array, int count) : base(array, count) { }
 
         /// <summary>

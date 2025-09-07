@@ -18,7 +18,7 @@
             get => _array.AsSpan(0, Count);
         }
 
-        private PooledArray() { }
+        protected PooledArray() { }
 
         /// <summary>
         /// Construct a new SharedArray with a defined length.

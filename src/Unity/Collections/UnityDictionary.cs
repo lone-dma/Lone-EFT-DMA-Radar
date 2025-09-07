@@ -16,6 +16,7 @@ namespace EftDmaRadarLite.Unity.Collections
         public const uint EntriesOffset = 0x18;
         public const uint EntriesStartOffset = 0x20;
 
+        private UnityDictionary() { }
         private UnityDictionary(MemDictEntry[] array, int count) : base(array, count) { }
 
         /// <summary>

@@ -13,6 +13,7 @@ namespace EftDmaRadarLite.Unity.Collections
         public const uint CountOffset = 0x18;
         public const uint ArrBaseOffset = 0x20;
 
+        private UnityArray() { }
         private UnityArray(T[] array, int count) : base(array, count) { }
 
         /// <summary>
