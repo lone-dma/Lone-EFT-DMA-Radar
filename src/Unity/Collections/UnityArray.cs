@@ -25,6 +25,7 @@ namespace EftDmaRadarLite.Unity.Collections
         public static UnityArray<T> Create(ulong addr, bool useCache = true)
         {
             var count = Memory.ReadValue<int>(addr + CountOffset, useCache);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
             var array = ArrayPool<T>.Shared.Rent(count);
             try
             {
