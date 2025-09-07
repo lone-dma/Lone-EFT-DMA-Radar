@@ -31,9 +31,9 @@ namespace EftDmaRadarLite.Tarkov.Player
         public Skeleton(PlayerBase player, Action<Bones, Span<uint>> getTransformChainFunc)
         {
             _player = player;
-            Span<uint> offsets = stackalloc uint[PlayerBase.TransformInternalChainCount];
-            getTransformChainFunc(Unity.Bones.HumanBase, offsets);
-            var tiRoot = Memory.ReadPtrChain(player.Base, true, offsets);
+            Span<uint> tiOffsets = stackalloc uint[PlayerBase.TransformInternalChainCount];
+            getTransformChainFunc(Unity.Bones.HumanBase, tiOffsets);
+            var tiRoot = Memory.ReadPtrChain(player.Base, true, tiOffsets);
             Root = new UnityTransform(tiRoot);
             _ = Root.UpdatePosition();
             var bones = new Dictionary<Bones, UnityTransform>(AllSkeletonBones.Length + 1)
@@ -42,8 +42,8 @@ namespace EftDmaRadarLite.Tarkov.Player
             };
             foreach (var bone in AllSkeletonBones.Span)
             {
-                getTransformChainFunc(bone, offsets);
-                var tiBone = Memory.ReadPtrChain(player.Base, true, offsets);
+                getTransformChainFunc(bone, tiOffsets);
+                var tiBone = Memory.ReadPtrChain(player.Base, true, tiOffsets);
                 bones[bone] = new UnityTransform(tiBone);
             }
             _bones = bones;
