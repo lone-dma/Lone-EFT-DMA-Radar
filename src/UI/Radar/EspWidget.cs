@@ -172,8 +172,7 @@ namespace EftDmaRadarLite.UI.Radar
             }
             catch (Exception ex) // Log rendering errors
             {
-                var error = $"CRITICAL ESP WIDGET RENDER ERROR: {ex}";
-                Debug.WriteLine(error);
+                Debug.WriteLine($"CRITICAL ESP WIDGET RENDER ERROR: {ex}");
             }
 
             _espCanvas.Flush();
