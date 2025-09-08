@@ -105,6 +105,7 @@ namespace EftDmaRadarLite.WebRadar
                 while (await timer.WaitForNextTickAsync()) // Wait for specified interval to regulate Tick Rate
                 {
                     try
+
                     {
                         if (Memory.InRaid && Memory.Players is IReadOnlyCollection<PlayerBase> players && players.Count > 0)
                         {
