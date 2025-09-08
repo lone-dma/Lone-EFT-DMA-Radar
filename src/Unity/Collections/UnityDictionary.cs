@@ -1,4 +1,6 @@
-﻿using EftDmaRadarLite.Misc;
+﻿using Collections.Pooled;
+using EftDmaRadarLite.DMA;
+using EftDmaRadarLite.Misc;
 
 namespace EftDmaRadarLite.Unity.Collections
 {
@@ -8,7 +10,7 @@ namespace EftDmaRadarLite.Unity.Collections
     /// </summary>
     /// <typeparam name="TKey">Key Type between 1-8 bytes.</typeparam>
     /// <typeparam name="TValue">Value Type between 1-8 bytes.</typeparam>
-    public sealed class UnityDictionary<TKey, TValue> : PooledArray<UnityDictionary<TKey, TValue>.MemDictEntry>
+    public sealed class UnityDictionary<TKey, TValue> : PooledMemory<UnityDictionary<TKey, TValue>.MemDictEntry>
         where TKey : unmanaged
         where TValue : unmanaged
     {
@@ -16,8 +18,8 @@ namespace EftDmaRadarLite.Unity.Collections
         public const uint EntriesOffset = 0x18;
         public const uint EntriesStartOffset = 0x20;
 
-        private UnityDictionary() { }
-        private UnityDictionary(MemDictEntry[] array, int count) : base(array, count) { }
+        private UnityDictionary() : base(0) { }
+        private UnityDictionary(int count) : base(count) { }
 
         /// <summary>
         /// Factory method to create a new <see cref="UnityDictionary{TKey, TValue}"/> instance from a memory address.
@@ -27,22 +29,22 @@ namespace EftDmaRadarLite.Unity.Collections
         /// <returns></returns>
         public static UnityDictionary<TKey, TValue> Create(ulong addr, bool useCache = true)
         {
-            var count = Memory.ReadValue<int>(addr + CountOffset, useCache);
+            var count = MemoryInterface.Memory.ReadValue<int>(addr + CountOffset, useCache);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
-            var array = ArrayPool<MemDictEntry>.Shared.Rent(count);
+            var dict = new UnityDictionary<TKey, TValue>(count);
             try
             {
                 if (count == 0)
                 {
-                    return new UnityDictionary<TKey, TValue>(array, 0);
+                    return dict;
                 }
-                var dictBase = Memory.ReadPtr(addr + EntriesOffset, useCache) + EntriesStartOffset;
-                Memory.ReadSpan(dictBase, array.AsSpan(0, count), useCache); // Single read into mem buffer
-                return new UnityDictionary<TKey, TValue>(array, count);
+                var dictBase = MemoryInterface.Memory.ReadPtr(addr + EntriesOffset, useCache) + EntriesStartOffset;
+                MemoryInterface.Memory.ReadSpan(dictBase, dict.Span, useCache); // Single read into mem buffer
+                return dict;
             }
             catch
             {
-                ArrayPool<MemDictEntry>.Shared.Return(array);
+                dict.Dispose();
                 throw;
             }
         }

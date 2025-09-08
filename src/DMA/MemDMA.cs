@@ -11,7 +11,7 @@ using EftDmaRadarLite.Tarkov.Quests;
 using VmmSharpEx.Refresh;
 using VmmSharpEx.Options;
 using VmmSharpEx.Scatter;
-using VmmSharpEx.Pools;
+using Collections.Pooled;
 
 namespace EftDmaRadarLite.DMA
 {
@@ -422,8 +422,8 @@ namespace EftDmaRadarLite.DMA
         /// <param name="addr">Address to read from.</param>
         /// <param name="count">Number of array elements to read.</param>
         /// <param name="useCache">Use caching for this read.</param>
-        /// <returns><see cref="IVmmPooledArray{T}"/> value. Be sure to call <see cref="IDisposable.Dispose"/>!</returns>
-        public IVmmPooledArray<T> ReadArray<T>(ulong addr, int count, bool useCache = true)
+        /// <returns><see cref="PooledMemory{T}"/> value. Be sure to call <see cref="IDisposable.Dispose"/>!</returns>
+        public PooledMemory<T> ReadArray<T>(ulong addr, int count, bool useCache = true)
             where T : unmanaged
         {
             var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;

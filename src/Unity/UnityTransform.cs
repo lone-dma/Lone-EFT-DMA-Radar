@@ -1,5 +1,5 @@
-﻿using EftDmaRadarLite.Misc;
-using VmmSharpEx.Pools;
+﻿using Collections.Pooled;
+using EftDmaRadarLite.Misc;
 
 namespace EftDmaRadarLite.Unity
 {
@@ -50,7 +50,7 @@ namespace EftDmaRadarLite.Unity
         /// <returns>Ref to World Position</returns>
         public ref Vector3 UpdatePosition(Span<TrsX> vertices = default)
         {
-            IVmmPooledArray<TrsX> standaloneVertices = null;
+            PooledMemory<TrsX> standaloneVertices = null;
             try
             {
                 if (vertices.IsEmpty)
@@ -90,7 +90,7 @@ namespace EftDmaRadarLite.Unity
         /// <returns>World Rotation</returns>
         public Quaternion GetRotation(Span<TrsX> vertices = default)
         {
-            IVmmPooledArray<TrsX> standaloneVertices = null;
+            PooledMemory<TrsX> standaloneVertices = null;
             try
             {
                 if (vertices.IsEmpty)
@@ -170,7 +170,7 @@ namespace EftDmaRadarLite.Unity
         /// <returns>World Point.</returns>
         public Vector3 TransformPoint(Vector3 localPoint, Span<TrsX> vertices = default)
         {
-            IVmmPooledArray<TrsX> standaloneVertices = null;
+            PooledMemory<TrsX> standaloneVertices = null;
             try
             {
                 if (vertices.IsEmpty)
@@ -210,7 +210,7 @@ namespace EftDmaRadarLite.Unity
         /// <returns>Local Point</returns>
         public Vector3 InverseTransformPoint(Vector3 worldPoint, Span<TrsX> vertices = default)
         {
-            IVmmPooledArray<TrsX> standaloneVertices = null;
+            PooledMemory<TrsX> standaloneVertices = null;
             try
             {
                 if (vertices.IsEmpty)
@@ -298,7 +298,7 @@ namespace EftDmaRadarLite.Unity
         /// <summary>
         /// Read Updated Vertices for this Transform.
         /// </summary>
-        public IVmmPooledArray<TrsX> ReadVertices()
+        public PooledMemory<TrsX> ReadVertices()
         {
             return Memory.ReadArray<TrsX>(VerticesAddr, Index + 1, _useCache);
         }

@@ -1,4 +1,6 @@
-﻿using EftDmaRadarLite.Misc;
+﻿using Collections.Pooled;
+using EftDmaRadarLite.DMA;
+using EftDmaRadarLite.Misc;
 
 namespace EftDmaRadarLite.Unity.Collections
 {
@@ -7,15 +9,15 @@ namespace EftDmaRadarLite.Unity.Collections
     /// Must initialize before use. Must dispose after use.
     /// </summary>
     /// <typeparam name="T">Collection Type</typeparam>
-    public sealed class UnityList<T> : PooledArray<T>
+    public sealed class UnityList<T> : PooledMemory<T>
         where T : unmanaged
     {
         public const uint CountOffset = 0x18;
         public const uint ArrOffset = 0x10;
         public const uint ArrStartOffset = 0x20;
 
-        private UnityList() { }
-        private UnityList(T[] array, int count) : base(array, count) { }
+        private UnityList() : base(0) { }
+        private UnityList(int count) : base(count) { }
 
         /// <summary>
         /// Factory method to create a new <see cref="UnityList{T}"/> instance from a memory address.
@@ -25,22 +27,22 @@ namespace EftDmaRadarLite.Unity.Collections
         /// <returns></returns>
         public static UnityList<T> Create(ulong addr, bool useCache = true)
         {
-            var count = Memory.ReadValue<int>(addr + CountOffset, useCache);
+            var count = MemoryInterface.Memory.ReadValue<int>(addr + CountOffset, useCache);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
-            var array = ArrayPool<T>.Shared.Rent(count);
+            var list = new UnityList<T>(count);
             try
             {
                 if (count == 0)
                 {
-                    return new UnityList<T>(array, 0);
+                    return list;
                 }
-                var listBase = Memory.ReadPtr(addr + ArrOffset, useCache) + ArrStartOffset;
-                Memory.ReadSpan(listBase, array.AsSpan(0, count), useCache);
-                return new UnityList<T>(array, count);
+                var listBase = MemoryInterface.Memory.ReadPtr(addr + ArrOffset, useCache) + ArrStartOffset;
+                MemoryInterface.Memory.ReadSpan(listBase, list.Span, useCache);
+                return list;
             }
             catch
             {
-                ArrayPool<T>.Shared.Return(array);
+                list.Dispose();
                 throw;
             }
         }
