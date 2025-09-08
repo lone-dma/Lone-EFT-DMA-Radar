@@ -1,4 +1,5 @@
-﻿using EftDmaRadarLite.Misc;
+﻿using Collections.Pooled;
+using EftDmaRadarLite.DMA;
 
 namespace EftDmaRadarLite.Unity.Collections
 {
@@ -7,14 +8,14 @@ namespace EftDmaRadarLite.Unity.Collections
     /// Must initialize before use. Must dispose after use.
     /// </summary>
     /// <typeparam name="T">Array Type</typeparam>
-    public sealed class UnityArray<T> : PooledArray<T>
+    public sealed class UnityArray<T> : PooledMemory<T>
         where T : unmanaged
     {
         public const uint CountOffset = 0x18;
         public const uint ArrBaseOffset = 0x20;
 
-        private UnityArray() { }
-        private UnityArray(T[] array, int count) : base(array, count) { }
+        private UnityArray() : base(0) { }
+        private UnityArray(int count) : base(count) { }
 
         /// <summary>
         /// Factory method to create a new <see cref="UnityArray{T}"/> instance from a memory address.
@@ -24,21 +25,21 @@ namespace EftDmaRadarLite.Unity.Collections
         /// <returns></returns>
         public static UnityArray<T> Create(ulong addr, bool useCache = true)
         {
-            var count = Memory.ReadValue<int>(addr + CountOffset, useCache);
+            var count = MemoryInterface.Memory.ReadValue<int>(addr + CountOffset, useCache);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
-            var array = ArrayPool<T>.Shared.Rent(count);
+            var array = new UnityArray<T>(count);
             try
             {
                 if (count == 0)
                 {
-                    return new UnityArray<T>(array, 0);
+                    return array;
                 }
-                Memory.ReadSpan(addr + ArrBaseOffset, array.AsSpan(0, count), useCache);
-                return new UnityArray<T>(array, count);
+                MemoryInterface.Memory.ReadSpan(addr + ArrBaseOffset, array.Span, useCache);
+                return array;
             }
             catch
             {
-                ArrayPool<T>.Shared.Return(array);
+                array.Dispose();
                 throw;
             }
         }

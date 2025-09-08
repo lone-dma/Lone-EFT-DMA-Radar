@@ -1,4 +1,6 @@
-﻿using EftDmaRadarLite.Misc;
+﻿using Collections.Pooled;
+using EftDmaRadarLite.DMA;
+using EftDmaRadarLite.Misc;
 
 namespace EftDmaRadarLite.Unity.Collections
 {
@@ -7,15 +9,15 @@ namespace EftDmaRadarLite.Unity.Collections
     /// Must initialize before use. Must dispose after use.
     /// </summary>
     /// <typeparam name="T">Collection Type</typeparam>
-    public sealed class UnityHashSet<T> : PooledArray<UnityHashSet<T>.MemHashEntry>
+    public sealed class UnityHashSet<T> : PooledMemory<UnityHashSet<T>.MemHashEntry>
         where T : unmanaged
     {
         public const uint CountOffset = 0x3C;
         public const uint ArrOffset = 0x18;
         public const uint ArrStartOffset = 0x20;
 
-        private UnityHashSet() { }
-        private UnityHashSet(MemHashEntry[] array, int count) : base(array, count) { }
+        private UnityHashSet() : base(0) { }
+        private UnityHashSet(int count) : base(count) { }
 
         /// <summary>
         /// Factory method to create a new <see cref="UnityHashSet{T}"/> instance from a memory address.
@@ -25,22 +27,22 @@ namespace EftDmaRadarLite.Unity.Collections
         /// <returns></returns>
         public static UnityHashSet<T> Create(ulong addr, bool useCache = true)
         {
-            var count = Memory.ReadValue<int>(addr + CountOffset, useCache);
+            var count = MemoryInterface.Memory.ReadValue<int>(addr + CountOffset, useCache);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
-            var array = ArrayPool<MemHashEntry>.Shared.Rent(count);
+            var hs = new UnityHashSet<T>(count);
             try
             {
                 if (count == 0)
                 {
-                    return new UnityHashSet<T>(array, 0);
+                    return hs;
                 }
-                var hashSetBase = Memory.ReadPtr(addr + ArrOffset, useCache) + ArrStartOffset;
-                Memory.ReadSpan(hashSetBase, array.AsSpan(0, count), useCache);
-                return new UnityHashSet<T>(array, count);
+                var hashSetBase = MemoryInterface.Memory.ReadPtr(addr + ArrOffset, useCache) + ArrStartOffset;
+                MemoryInterface.Memory.ReadSpan(hashSetBase, hs.Span, useCache);
+                return hs;
             }
             catch
             {
-                ArrayPool<MemHashEntry>.Shared.Return(array);
+                hs.Dispose();
                 throw;
             }
         }
