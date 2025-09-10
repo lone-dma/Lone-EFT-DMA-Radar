@@ -72,8 +72,8 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                     }
                     while (_profiles.TryDequeue(out var profile))
                     {
-                        ct.ThrowIfCancellationRequested();
                         await ProcessProfileAsync(profile, ct);
+                        await Task.Delay(0, ct);
                     }
                 }
                 catch (Exception ex)
@@ -82,7 +82,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                 }
                 finally
                 {
-                    Thread.Sleep(TimeSpan.FromMilliseconds(250));
+                    await Task.Delay(TimeSpan.FromMilliseconds(250));
                 }
             }
         }
@@ -96,21 +96,22 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             if (Cache.TryGetValue(profile.AccountID, out var cachedProfile) && !cachedProfile.IsExpired)
             {
                 profile.Data ??= cachedProfile.Data;
-                return;
+                return; // Success exit early
             }
-            var usableProviders = IProfileApiProvider.AllProviders.Where(CanUseProvider);
-            if (!usableProviders.Any())
-                return;
-            IProfileApiProvider provider = null;
-            while ((provider = usableProviders
+            var validProviders = IProfileApiProvider.AllProviders.Where(IsValidProvider);
+            if (!validProviders.Any())
+                return; // No valid providers, don't ever try again
+            var provider = validProviders
                 .Where(x => x.CanRun)
                 .OrderBy(x => x.Priority)
-                .FirstOrDefault()) is null)
+                .FirstOrDefault();
+            if (provider is null)
             {
-                await Task.Delay(TimeSpan.FromSeconds(1), ct);
+                TryReEnqueueProfile(); // Eligible for retry
+                return;
             }
             var result = await provider.GetProfileAsync(profile.AccountID, ct);
-            if (result is not null)
+            if (result is not null) // Success
             {
                 Cache[profile.AccountID] = new CachedProfileData()
                 {
@@ -118,11 +119,18 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                 };
                 profile.Data ??= result;
             }
-            else if (IProfileApiProvider.AllProviders.Any(CanUseProvider))
+            else // Fail
             {
-                _profiles.Enqueue(profile); // Re-queue for later processing
+                TryReEnqueueProfile(); // Eligible for retry
             }
-            bool CanUseProvider(IProfileApiProvider provider) => provider.IsEnabled && provider.CanLookup(profile.AccountID);
+            bool IsValidProvider(IProfileApiProvider provider) => provider.IsEnabled && provider.CanLookup(profile.AccountID);
+            void TryReEnqueueProfile()
+            {
+                if (IProfileApiProvider.AllProviders.Any(IsValidProvider)) 
+                {
+                    _profiles.Enqueue(profile);
+                }
+            }
         }
 
         #endregion
