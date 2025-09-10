@@ -378,7 +378,7 @@ namespace EftDmaRadarLite.DMA
         public void ReadSpan<T>(ulong addr, Span<T> span, bool useCache = true)
             where T : unmanaged
         {
-            uint cb = (uint)(SizeChecker<T>.Size * span.Length);
+            uint cb = (uint)checked(SizeCache<T>.Size * span.Length);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(cb, MAX_READ_SIZE, nameof(cb));
             var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
 
@@ -395,7 +395,7 @@ namespace EftDmaRadarLite.DMA
         public void ReadSpanEnsure<T>(ulong addr, Span<T> span)
             where T : unmanaged
         {
-            uint cb = (uint)(SizeChecker<T>.Size * span.Length);
+            uint cb = (uint)checked(SizeCache<T>.Size * span.Length);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(cb, MAX_READ_SIZE, nameof(cb));
             var buffer2 = new T[span.Length].AsSpan();
             var buffer3 = new T[span.Length].AsSpan();
@@ -442,12 +442,11 @@ namespace EftDmaRadarLite.DMA
         /// <returns>Pointer address after final offset.</returns>
         public ulong ReadPtrChain(ulong addr, bool useCache, params Span<uint> offsets)
         {
-            ulong pointer = addr; // push ptr to first address value
+            ulong pointer = addr;
             foreach (var offset in offsets)
             {
-                pointer = ReadPtr(pointer + offset, useCache);
+                pointer = ReadPtr(checked(pointer + offset), useCache);
             }
-
             return pointer;
         }
 
@@ -483,7 +482,7 @@ namespace EftDmaRadarLite.DMA
         public unsafe T ReadValueEnsure<T>(ulong addr)
             where T : unmanaged, allows ref struct
         {
-            int cb = sizeof(T);
+            int cb = SizeCache<T>.Size;
             if (!_vmm.MemReadValue<T>(_pid, addr, out var r1, VmmFlags.NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
