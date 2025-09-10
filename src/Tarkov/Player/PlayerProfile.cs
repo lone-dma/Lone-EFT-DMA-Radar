@@ -164,7 +164,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                 _name = value;
                 if (_player.IsHuman)
                 {
-                    _ = RunTwitchLookupAsync(value);
+                    _ = Task.Run(() => RunTwitchLookupAsync(value));
                 }
                 OnPropertyChanged(nameof(Name));
             }
