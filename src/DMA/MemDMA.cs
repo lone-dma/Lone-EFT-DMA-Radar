@@ -600,26 +600,34 @@ namespace EftDmaRadarLite.DMA
         }
 
         /// <summary>
-        /// The PAGE_ALIGN macro takes a virtual address and returns a page-aligned
-        /// virtual address for that page.
+        /// The PAGE_ALIGN macro returns a page-aligned virtual address for a given virtual address.
+        /// https://learn.microsoft.com/windows-hardware/drivers/ddi/wdm/nf-wdm-page_align
         /// </summary>
+        /// <param name="va">Virtual address.</param>
+        /// <returns>Page-aligned virtual address.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong PAGE_ALIGN(ulong va) => va & ~(0x1000ul - 1);
 
         /// <summary>
-        /// The ADDRESS_AND_SIZE_TO_SPAN_PAGES macro takes a virtual address and size and returns the number of pages spanned by
-        /// the size.
+        /// The BYTE_OFFSET macro takes a virtual address and returns the byte offset of that address within the page.
+        /// https://learn.microsoft.com/windows-hardware/drivers/ddi/wdm/nf-wdm-byte_offset
         /// </summary>
+        /// <param name="va">virtual address.</param>
+        /// <returns>Offset portion of the virtual address within the page.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static uint ADDRESS_AND_SIZE_TO_SPAN_PAGES(ulong va, uint size) =>
-            (uint)(BYTE_OFFSET(va) + size + (0x1000ul - 1) >> 12);
+        public static uint BYTE_OFFSET(ulong va) => (uint)(va & (0x1000ul - 1));
 
         /// <summary>
-        /// The BYTE_OFFSET macro takes a virtual address and returns the byte offset
-        /// of that address within the page.
+        /// The ADDRESS_AND_SIZE_TO_SPAN_PAGES macro returns the number of pages that a virtual range spans.
+        /// The virtual range is defined by a virtual address and the size in bytes of a transfer request.
+        /// https://learn.microsoft.com/windows-hardware/drivers/ddi/wdm/nf-wdm-address_and_size_to_span_pages
         /// </summary>
+        /// <param name="va">Virtual address that is the base of the range.</param>
+        /// <param name="size">Specifies the size in bytes.</param>
+        /// <returns>Returns the number of pages spanned by the virtual range starting at Va.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static uint BYTE_OFFSET(ulong va) => (uint)(va & 0x1000ul - 1);
+        public static ulong ADDRESS_AND_SIZE_TO_SPAN_PAGES(ulong va, ulong size) =>
+            (BYTE_OFFSET(va) + size + (0x1000ul - 1)) >> 12;
 
         /// <summary>
         /// Returns a length aligned to 8 bytes.
