@@ -59,7 +59,7 @@
 		<PackageReference Include="Svg.Skia" Version="3.0.6" />
 		<PackageReference Include="Extended.Wpf.Toolkit" Version="5.0.0" />
 		<PackageReference Include="TwitchLib.Api" Version="3.9.0" />
-		<PackageReference Include="VmmSharpEx" Version="2.5.9384.809" />
+		<PackageReference Include="VmmSharpEx" Version="2.5.9384.830" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="9.0.9" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.9" />
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
