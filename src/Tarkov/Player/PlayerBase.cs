@@ -60,9 +60,6 @@ namespace EftDmaRadarLite.Tarkov.Player
         #region Static Interfaces
 
         public static implicit operator ulong(PlayerBase x) => x.Base;
-        private static readonly long _rateLimitTicks = (long)(Stopwatch.Frequency * 0.5d); // 500ms
-        private static readonly ConcurrentDictionary<ulong, long> _rateLimit = new();
-
         protected static readonly GroupManager _groups = new();
         protected static int _playerScavNumber;
 
@@ -72,7 +69,6 @@ namespace EftDmaRadarLite.Tarkov.Player
         public static void Reset()
         {
             _groups.Clear();
-            _rateLimit.Clear();
             _playerScavNumber = 0;
         }
 
@@ -87,13 +83,6 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// <param name="playerBase">Player base memory address.</param>
         public static void Allocate(ConcurrentDictionary<ulong, PlayerBase> playerDict, ulong playerBase)
         {
-            long now = Stopwatch.GetTimestamp();
-
-            if (_rateLimit.TryGetValue(playerBase, out var last) && unchecked(now - last) < _rateLimitTicks)
-            {
-                return;
-            }    
-
             try
             {
                 var player = AllocateInternal(playerBase);
@@ -103,11 +92,6 @@ namespace EftDmaRadarLite.Tarkov.Player
             catch (Exception ex)
             {
                 Debug.WriteLine($"ERROR during Player Allocation for player @ 0x{playerBase.ToString("X")}: {ex}");
-            }
-            finally
-            {
-                // Update last-attempt timestamp even on failure to avoid thrashing.
-                _rateLimit[playerBase] = now;
             }
         }
 
