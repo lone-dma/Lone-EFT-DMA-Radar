@@ -47,7 +47,8 @@
                 new Thread(Worker)
                 {
                     IsBackground = true,
-                    Priority = ThreadPriority
+                    Priority = ThreadPriority,
+                    Name = Name
                 }.Start();
             }
         }
