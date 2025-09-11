@@ -258,8 +258,8 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
                     return;
                 }
 
-                using var scatterMap = Memory.GetScatterMap();
-                var round1 = scatterMap.AddRound(false);
+                using var map = Memory.GetScatterMap();
+                var round1 = map.AddRound(false);
                 if (espRunning && CameraManager is CameraManager cm)
                 {
                     cm.OnRealtimeLoop(round1[-1], localPlayer);
@@ -269,8 +269,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
                 {
                     player.OnRealtimeLoop(round1[i++], espRunning);
                 }
-
-                scatterMap.Execute(); // Execute scatter read
+                map.Execute(); // Execute scatter read
             }
             catch (Exception ex)
             {
@@ -359,16 +358,16 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
                     .Where(x => x.IsActive && x.IsAlive && x is not BtrOperator);
                 if (players.Any()) // at least 1 player
                 {
-                    using var scatterMap = Memory.GetScatterMap();
-                    var round1 = scatterMap.AddRound();
-                    var round2 = scatterMap.AddRound();
+                    using var map = Memory.GetScatterMap();
+                    var round1 = map.AddRound();
+                    var round2 = map.AddRound();
                     int i = 0;
                     foreach (var player in players)
                     {
                         player.OnValidateTransforms(round1[i], round2[i]);
                         i++;
                     }
-                    scatterMap.Execute(); // execute scatter read
+                    map.Execute(); // execute scatter read
                 }
             }
             catch (Exception ex)
