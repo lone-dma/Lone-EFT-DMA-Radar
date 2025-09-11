@@ -85,7 +85,7 @@ namespace EftDmaRadarLite.Tarkov.Player
             CorpseAddr = this + Offsets.Player.Corpse;
 
             AccountID = GetAccountID();
-            GroupID = GetGroupID();
+            GroupID = GetGroupNumber();
             MovementContext = GetMovementContext();
             RotationAddress = ValidateRotationAddr(MovementContext + Offsets.MovementContext._rotation);
             /// Setup Transforms
@@ -136,13 +136,13 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// <summary>
         /// Gets player's Group Number.
         /// </summary>
-        private int GetGroupID()
+        private int GetGroupNumber()
         {
             try
             {
-                var grpIdPtr = Memory.ReadPtr(Info + Offsets.PlayerInfo.GroupId);
-                var grp = Memory.ReadUnityString(grpIdPtr);
-                return _groups.GetGroup(grp);
+                var groupIdPtr = Memory.ReadPtr(Info + Offsets.PlayerInfo.GroupId);
+                string groupId = Memory.ReadUnityString(groupIdPtr);
+                return _groups.GetOrAdd(groupId, Interlocked.Increment(ref _lastGroupNumber));
             }
             catch { return -1; } // will return null if Solo / Don't have a team
         }

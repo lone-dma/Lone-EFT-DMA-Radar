@@ -162,7 +162,7 @@ namespace EftDmaRadarLite.Tarkov.Player
             IsHuman = !isAI;
             Profile = new PlayerProfile(this, GetAccountID());
             // Get Group ID
-            GroupID = GetGroupID();
+            GroupID = GetGroupNumber();
             /// Determine Player Type
             PlayerSide = (Enums.EPlayerSide)Memory.ReadValue<int>(this + Offsets.ObservedPlayerView.Side); // Usec,Bear,Scav,etc.
             if (!Enum.IsDefined(PlayerSide)) // Make sure PlayerSide is valid
@@ -179,7 +179,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                 }
                 else
                 {
-                    int pscavNumber = Interlocked.Increment(ref _playerScavNumber);
+                    int pscavNumber = Interlocked.Increment(ref _lastPscavNumber);
                     Name = $"PScav{pscavNumber}";
                     Type = GroupID != -1 && GroupID == localPlayer.GroupID ?
                         PlayerType.Teammate : PlayerType.PScav;
@@ -223,13 +223,13 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// <summary>
         /// Gets player's Group Number.
         /// </summary>
-        private int GetGroupID()
+        private int GetGroupNumber()
         {
             try
             {
-                var grpIdPtr = Memory.ReadPtr(this + Offsets.ObservedPlayerView.GroupID);
-                var grp = Memory.ReadUnityString(grpIdPtr);
-                return _groups.GetGroup(grp);
+                var groupIdPtr = Memory.ReadPtr(this + Offsets.ObservedPlayerView.GroupID);
+                string groupId = Memory.ReadUnityString(groupIdPtr);
+                return _groups.GetOrAdd(groupId, Interlocked.Increment(ref _lastGroupNumber));
             }
             catch { return -1; } // will return null if Solo / Don't have a team
         }

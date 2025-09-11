@@ -19,49 +19,12 @@ namespace EftDmaRadarLite.Tarkov.Player
     /// </summary>
     public abstract class PlayerBase : IWorldEntity, IMapEntity, IMouseoverEntity
     {
-        #region Group Manager
-
-        /// <summary>
-        /// Wrapper Class to manage group allocations.
-        /// Thread Safe.
-        /// </summary>
-        protected sealed class GroupManager
-        {
-            private readonly Dictionary<string, int> _groups = new(StringComparer.OrdinalIgnoreCase);
-
-            /// <summary>
-            /// Returns the Group Number for a given id.
-            /// </summary>
-            /// <param name="id">Group ID.</param>
-            /// <returns>Group Number (0,1,2,etc.)</returns>
-            public int GetGroup(string id)
-            {
-                lock (_groups)
-                {
-                    _groups.TryAdd(id, _groups.Count);
-                    return _groups[id];
-                }
-            }
-
-            /// <summary>
-            /// Clears the group definitions.
-            /// </summary>
-            public void Clear()
-            {
-                lock (_groups)
-                {
-                    _groups.Clear();
-                }
-            }
-        }
-
-        #endregion
-
         #region Static Interfaces
 
         public static implicit operator ulong(PlayerBase x) => x.Base;
-        protected static readonly GroupManager _groups = new();
-        protected static int _playerScavNumber;
+        protected static readonly ConcurrentDictionary<string, int> _groups = new();
+        protected static int _lastGroupNumber;
+        protected static int _lastPscavNumber;
 
         /// <summary>
         /// Resets/Updates 'static' assets in preparation for a new game/raid instance.
@@ -69,7 +32,8 @@ namespace EftDmaRadarLite.Tarkov.Player
         public static void Reset()
         {
             _groups.Clear();
-            _playerScavNumber = 0;
+            _lastGroupNumber = default;
+            _lastPscavNumber = default;
         }
 
         #endregion
