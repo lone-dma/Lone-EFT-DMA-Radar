@@ -1,4 +1,5 @@
 ﻿using Collections.Pooled;
+using EftDmaRadarLite.DMA;
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Tarkov.Data.TarkovMarket;
 using EftDmaRadarLite.Tarkov.Loot;
@@ -26,10 +27,12 @@ namespace EftDmaRadarLite.Tarkov.Player
         protected static int _lastGroupNumber;
         protected static int _lastPscavNumber;
 
-        /// <summary>
-        /// Resets/Updates 'static' assets in preparation for a new game/raid instance.
-        /// </summary>
-        public static void Reset()
+        static PlayerBase()
+        {
+            MemDMA.RaidStarted += MemDMA_RaidStarted;
+        }
+
+        private static void MemDMA_RaidStarted(object sender, EventArgs e)
         {
             _groups.Clear();
             _lastGroupNumber = default;
