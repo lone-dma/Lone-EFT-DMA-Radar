@@ -44,7 +44,7 @@ namespace EftDmaRadarLite.Tarkov.Player
         #region Allocation
 
         /// <summary>
-        /// Allocates a player and takes into consideration any rate-limits.
+        /// Allocates a player.
         /// </summary>
         /// <param name="playerDict">Player Dictionary collection to add the newly allocated player to.</param>
         /// <param name="playerBase">Player base memory address.</param>
