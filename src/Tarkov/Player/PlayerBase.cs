@@ -22,7 +22,7 @@ namespace EftDmaRadarLite.Tarkov.Player
         #region Static Interfaces
 
         public static implicit operator ulong(PlayerBase x) => x.Base;
-        protected static readonly ConcurrentDictionary<string, int> _groups = new();
+        protected static readonly ConcurrentDictionary<string, int> _groups = new(StringComparer.OrdinalIgnoreCase);
         protected static int _lastGroupNumber;
         protected static int _lastPscavNumber;
 
