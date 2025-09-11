@@ -83,8 +83,6 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
                 SleepDuration = TimeSpan.FromMilliseconds(100)
             };
             _t4.PerformWork += FastWorker_PerformWork;
-            // Reset static assets for a new raid/game.
-            PlayerBase.Reset();
             var rgtPlayersAddr = Memory.ReadPtr(localGameWorld + Offsets.ClientLocalGameWorld.RegisteredPlayers, false);
             _rgtPlayers = new RegisteredPlayers(rgtPlayersAddr, this);
             ArgumentOutOfRangeException.ThrowIfLessThan(_rgtPlayers.GetPlayerCount(), 1, nameof(_rgtPlayers));
