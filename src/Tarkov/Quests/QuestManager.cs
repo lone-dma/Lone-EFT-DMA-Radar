@@ -202,11 +202,11 @@ namespace EftDmaRadarLite.Tarkov.Quests
                         _questZones.TryGetValue(id, out var zones) &&
                         zones.TryGetValue(target, out var loc))
                     {
+                        masterLocations.Add(target);
                         if (!_locations.ContainsKey(target))
                         {
                             _locations[target] = new QuestLocation(questID, target, loc);
                         }
-                        masterLocations.Add(target);
                     }
                 }
                 else if (condName == "ConditionVisitPlace")
@@ -217,11 +217,11 @@ namespace EftDmaRadarLite.Tarkov.Quests
                         _questZones.TryGetValue(id, out var zones) &&
                         zones.TryGetValue(target, out var loc))
                     {
+                        masterLocations.Add(target);
                         if (!_locations.ContainsKey(target))
                         {
                             _locations[target] = new QuestLocation(questID, target, loc);
                         }
-                        masterLocations.Add(target);
                     }
                 }
                 else if (condName == "ConditionCounterCreator") // Check for children
