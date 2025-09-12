@@ -44,9 +44,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
         public IReadOnlyCollection<IExitPoint> Exits => _exfilManager;
         public LocalPlayer LocalPlayer => _rgtPlayers?.LocalPlayer;
         public LootManager Loot { get; }
-
-        public QuestManager QuestManager { get; private set; }
-
+        public QuestManager QuestManager { get; }
         public CameraManager CameraManager { get; private set; }
 
         /// <summary>
@@ -85,6 +83,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
             _t4.PerformWork += FastWorker_PerformWork;
             var rgtPlayersAddr = Memory.ReadPtr(localGameWorld + Offsets.ClientLocalGameWorld.RegisteredPlayers, false);
             _rgtPlayers = new RegisteredPlayers(rgtPlayersAddr, this);
+            QuestManager = new(_rgtPlayers.LocalPlayer.Profile);
             ArgumentOutOfRangeException.ThrowIfLessThan(_rgtPlayers.GetPlayerCount(), 1, nameof(_rgtPlayers));
             Loot = new(localGameWorld);
             _exfilManager = new(localGameWorld, _rgtPlayers.LocalPlayer.IsPmc);
@@ -299,35 +298,10 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
             // Refresh Loot
             Loot.Refresh(ct);
             if (App.Config.Loot.ShowWishlist)
-            {
-                try
-                {
-                    Memory.LocalPlayer?.RefreshWishlist();
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"[Wishlist] ERROR Refreshing: {ex}");
-                }
-            }
+                Memory.LocalPlayer?.RefreshWishlist();
             RefreshGear(); // Update gear periodically
             if (App.Config.QuestHelper.Enabled)
-                try
-                {
-                    if (QuestManager is null)
-                    {
-                        var localPlayer = LocalPlayer;
-                        if (localPlayer is not null)
-                            QuestManager = new QuestManager(localPlayer.Profile);
-                    }
-                    else
-                    {
-                        QuestManager.Refresh();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"[QuestManager] CRITICAL ERROR: {ex}");
-                }
+                QuestManager.Refresh();
         }
 
         /// <summary>
@@ -396,20 +370,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
         /// </summary>
         private void FastWorker_PerformWork(object sender, WorkerThreadArgs e)
         {
-            RefreshCameraManager();
             RefreshFast(e.CancellationToken);
-        }
-
-        private void RefreshCameraManager()
-        {
-            try
-            {
-                CameraManager ??= new();
-            }
-            catch
-            {
-                //Debug.WriteLine($"ERROR Refreshing Cameras! {ex}");
-            }
         }
 
         /// <summary>
@@ -417,16 +378,19 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
         /// </summary>
         private void RefreshFast(CancellationToken ct)
         {
+            try { CameraManager ??= new(); } catch { }
             try
             {
-                var players = _rgtPlayers
-                    .Where(x => x.IsActive && x.IsAlive);
-                if (players is not null && players.Any())
+                if (_rgtPlayers?
+                    .Where(x => x.IsActive && x.IsAlive) is IEnumerable<PlayerBase> players &&
+                    players.Any())
+                {
                     foreach (var player in players)
                     {
                         ct.ThrowIfCancellationRequested();
                         player.RefreshHands();
                     }
+                }
             }
             catch
             {
@@ -464,8 +428,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
 
         public void Dispose()
         {
-            bool disposed = Interlocked.Exchange(ref _disposed, true);
-            if (!disposed)
+            if (Interlocked.Exchange(ref _disposed, true) == false)
             {
                 _t1.Dispose();
                 _t2.Dispose();

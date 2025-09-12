@@ -57,7 +57,6 @@ namespace EftDmaRadarLite.Tarkov.Quests
         public QuestManager(ulong profile)
         {
             _profile = profile;
-            Refresh();
         }
 
         private readonly ConcurrentDictionary<string, QuestEntry> _quests = new(StringComparer.OrdinalIgnoreCase); // Key = Quest ID
@@ -91,79 +90,86 @@ namespace EftDmaRadarLite.Tarkov.Quests
 
         public void Refresh()
         {
-            var now = DateTimeOffset.UtcNow;
-            if (now - _last < TimeSpan.FromSeconds(1))
-                return;
-            using var masterQuests = new PooledSet<string>(StringComparer.OrdinalIgnoreCase);
-            using var masterItems = new PooledSet<string>(StringComparer.OrdinalIgnoreCase);
-            using var masterLocations = new PooledSet<string>(StringComparer.OrdinalIgnoreCase);
-            var questsData = Memory.ReadPtr(_profile + Offsets.Profile.QuestsData);
-            using var questsDataList = UnityList<ulong>.Create(questsData, true);
-            foreach (var qDataEntry in questsDataList) // GCLass1BBF
+            try
             {
-                try
+                var now = DateTimeOffset.UtcNow;
+                if (now - _last < TimeSpan.FromSeconds(1))
+                    return;
+                using var masterQuests = new PooledSet<string>(StringComparer.OrdinalIgnoreCase);
+                using var masterItems = new PooledSet<string>(StringComparer.OrdinalIgnoreCase);
+                using var masterLocations = new PooledSet<string>(StringComparer.OrdinalIgnoreCase);
+                var questsData = Memory.ReadPtr(_profile + Offsets.Profile.QuestsData);
+                using var questsDataList = UnityList<ulong>.Create(questsData, true);
+                foreach (var qDataEntry in questsDataList) // GCLass1BBF
                 {
-                    var qStatus = Memory.ReadValue<int>(qDataEntry + Offsets.QuestData.Status);
-                    if (qStatus != 2) // 2 == Started
-                        continue;
-                    var completedPtr = Memory.ReadPtr(qDataEntry + Offsets.QuestData.CompletedConditions);
-                    using var completedHS = UnityHashSet<Types.MongoID>.Create(completedPtr, true);
-                    using var completedConditions = new PooledSet<string>();
-                    foreach (var c in completedHS)
+                    try
                     {
-                        var completedCond = Memory.ReadUnityString(c.Value.StringID);
-                        completedConditions.Add(completedCond);
-                    }
+                        var qStatus = Memory.ReadValue<int>(qDataEntry + Offsets.QuestData.Status);
+                        if (qStatus != 2) // 2 == Started
+                            continue;
+                        var completedPtr = Memory.ReadPtr(qDataEntry + Offsets.QuestData.CompletedConditions);
+                        using var completedHS = UnityHashSet<Types.MongoID>.Create(completedPtr, true);
+                        using var completedConditions = new PooledSet<string>();
+                        foreach (var c in completedHS)
+                        {
+                            var completedCond = Memory.ReadUnityString(c.Value.StringID);
+                            completedConditions.Add(completedCond);
+                        }
 
-                    var qIDPtr = Memory.ReadPtr(qDataEntry + Offsets.QuestData.Id);
-                    var qID = Memory.ReadUnityString(qIDPtr);
-                    masterQuests.Add(qID);
-                    if (!_quests.ContainsKey(qID))
-                    {
-                        _quests[qID] = new QuestEntry(qID);
+                        var qIDPtr = Memory.ReadPtr(qDataEntry + Offsets.QuestData.Id);
+                        var qID = Memory.ReadUnityString(qIDPtr);
+                        masterQuests.Add(qID);
+                        if (!_quests.ContainsKey(qID))
+                        {
+                            _quests[qID] = new QuestEntry(qID);
+                        }
+                        if (App.Config.QuestHelper.BlacklistedQuests.Contains(qID))
+                            continue;
+                        var qTemplate = Memory.ReadPtr(qDataEntry + Offsets.QuestData.Template); // GClass1BF4
+                        var qConditions =
+                            Memory.ReadPtr(qTemplate + Offsets.QuestTemplate.Conditions); // EFT.Quests.QuestConditionsList
+                        using var qCondDict = UnityDictionary<int, ulong>.Create(qConditions, true);
+                        foreach (var qDicCondEntry in qCondDict)
+                        {
+                            var condListPtr = Memory.ReadPtr(qDicCondEntry.Value + Offsets.QuestConditionsContainer.ConditionsList);
+                            using var condList = UnityList<ulong>.Create(condListPtr, true);
+                            foreach (var condition in condList)
+                                GetQuestConditions(qID, condition, completedConditions, masterItems, masterLocations);
+                        }
                     }
-                    if (App.Config.QuestHelper.BlacklistedQuests.Contains(qID))
-                        continue;
-                    var qTemplate = Memory.ReadPtr(qDataEntry + Offsets.QuestData.Template); // GClass1BF4
-                    var qConditions =
-                        Memory.ReadPtr(qTemplate + Offsets.QuestTemplate.Conditions); // EFT.Quests.QuestConditionsList
-                    using var qCondDict = UnityDictionary<int, ulong>.Create(qConditions, true);
-                    foreach (var qDicCondEntry in qCondDict)
+                    catch (Exception ex)
                     {
-                        var condListPtr = Memory.ReadPtr(qDicCondEntry.Value + Offsets.QuestConditionsContainer.ConditionsList);
-                        using var condList = UnityList<ulong>.Create(condListPtr, true);
-                        foreach (var condition in condList)
-                            GetQuestConditions(qID, condition, completedConditions, masterItems, masterLocations);
+                        Debug.WriteLine($"[QuestManager] ERROR parsing Quest at 0x{qDataEntry.ToString("X")}: {ex}");
                     }
                 }
-                catch (Exception ex)
+                // Remove stale Quests/Items/Locations
+                foreach (var oldQuest in _quests)
                 {
-                    Debug.WriteLine($"[QuestManager] ERROR parsing Quest at 0x{qDataEntry.ToString("X")}: {ex}");
+                    if (!masterQuests.Contains(oldQuest.Key))
+                    {
+                        _quests.TryRemove(oldQuest.Key, out _);
+                    }
                 }
+                foreach (var oldItem in _items)
+                {
+                    if (!masterItems.Contains(oldItem))
+                    {
+                        _items.Remove(oldItem);
+                    }
+                }
+                foreach (var oldLoc in _locations.Keys)
+                {
+                    if (!masterLocations.Contains(oldLoc))
+                    {
+                        _locations.TryRemove(oldLoc, out _);
+                    }
+                }
+                _last = now;
             }
-            // Remove stale Quests/Items/Locations
-            foreach (var oldQuest in _quests)
+            catch (Exception ex)
             {
-                if (!masterQuests.Contains(oldQuest.Key, StringComparer.OrdinalIgnoreCase))
-                {
-                    _quests.TryRemove(oldQuest.Key, out _);
-                }
+                Debug.WriteLine($"[QuestManager] CRITICAL ERROR: {ex}");
             }
-            foreach (var oldItem in _items)
-            {
-                if (!masterItems.Contains(oldItem, StringComparer.OrdinalIgnoreCase))
-                {
-                    _items.Remove(oldItem);
-                }
-            }
-            foreach (var oldLoc in _locations.Keys)
-            {
-                if (!masterLocations.Contains(oldLoc, StringComparer.OrdinalIgnoreCase))
-                {
-                    _locations.TryRemove(oldLoc, out _);
-                }
-            }
-            _last = now;
         }
 
         private void GetQuestConditions(string questID, ulong condition, ISet<string> completedConditions,

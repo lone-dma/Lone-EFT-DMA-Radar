@@ -59,24 +59,31 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// </summary>
         public void RefreshWishlist()
         {
-            var wishlistManager = Memory.ReadPtr(Profile + Offsets.Profile.WishlistManager);
-            var itemsPtr = Memory.ReadPtr(wishlistManager + Offsets.WishlistManager.Items);
-            using var items = UnityDictionary<Types.MongoID, int>.Create(itemsPtr, true);
-            var wishlist = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var item in items)
+            try
             {
-                try
+                var wishlistManager = Memory.ReadPtr(Profile + Offsets.Profile.WishlistManager);
+                var itemsPtr = Memory.ReadPtr(wishlistManager + Offsets.WishlistManager.Items);
+                using var items = UnityDictionary<Types.MongoID, int>.Create(itemsPtr, true);
+                var wishlist = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var item in items)
                 {
-                    if (item.Key.StringID == 0)
-                        continue;
-                    string id = Memory.ReadUnityString(item.Key.StringID);
-                    if (string.IsNullOrWhiteSpace(id))
-                        continue;
-                    wishlist.Add(id);
+                    try
+                    {
+                        if (item.Key.StringID == 0)
+                            continue;
+                        string id = Memory.ReadUnityString(item.Key.StringID);
+                        if (string.IsNullOrWhiteSpace(id))
+                            continue;
+                        wishlist.Add(id);
+                    }
+                    catch { }
                 }
-                catch { }
+                _wishlistItems = wishlist;
             }
-            _wishlistItems = wishlist;
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Wishlist] ERROR Refreshing: {ex}");
+            }
         }
 
         /// <summary>
