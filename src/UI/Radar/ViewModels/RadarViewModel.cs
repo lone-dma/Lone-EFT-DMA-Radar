@@ -103,7 +103,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
                 var loot = Loot ?? Enumerable.Empty<IMouseoverEntity>();
                 var containers = Containers ?? Enumerable.Empty<IMouseoverEntity>();
                 var exits = Exits ?? Enumerable.Empty<IMouseoverEntity>();
-                var questZones = Memory.QuestManager?.LocationConditions ?? Enumerable.Empty<IMouseoverEntity>();
+                var questZones = Memory.QuestManager?.LocationConditions?.Values ?? Enumerable.Empty<IMouseoverEntity>();
 
                 if (FilterIsSet && !(MainWindow.Instance?.Radar?.Overlay?.ViewModel?.HideCorpses ?? false)) // Item Search
                     players = players.Where(x =>
@@ -298,7 +298,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
                                 item.Draw(canvas, mapParams, localPlayer);
                             }
                         }
-                        var questLocations = Memory.QuestManager?.LocationConditions;
+                        var questLocations = Memory.QuestManager?.LocationConditions?.Values;
                         if (questLocations is not null)
                         {
                             foreach (var loc in questLocations)

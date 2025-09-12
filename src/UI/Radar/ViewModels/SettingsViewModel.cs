@@ -38,7 +38,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
         private void Parent_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (e.NewValue is bool visible && visible &&
-                Memory.QuestManager?.CurrentQuests is IReadOnlyDictionary<string, QuestEntry> quests)
+                Memory.QuestManager?.Quests is IReadOnlyDictionary<string, QuestEntry> quests)
             {
                 using var currentQuests = CurrentQuests.ToPooledList(); // snapshot
                 using var currentIds = new PooledSet<string>(currentQuests.Select(q => q.Id), StringComparer.OrdinalIgnoreCase);

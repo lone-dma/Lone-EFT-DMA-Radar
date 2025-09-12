@@ -1,8 +1,9 @@
-﻿using System.Collections.Frozen;
-using Collections.Pooled;
+﻿using Collections.Pooled;
+using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Unity.Collections;
+using System.Collections.Frozen;
 
 namespace EftDmaRadarLite.Tarkov.Quests
 {
@@ -50,8 +51,8 @@ namespace EftDmaRadarLite.Tarkov.Quests
             )
             .ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
-        private readonly Stopwatch _rateLimit = new();
         private readonly ulong _profile;
+        private DateTimeOffset _last = DateTimeOffset.MinValue;
 
         public QuestManager(ulong profile)
         {
@@ -59,21 +60,21 @@ namespace EftDmaRadarLite.Tarkov.Quests
             Refresh();
         }
 
-        private readonly ConcurrentDictionary<string, QuestEntry> _currentQuests = new(StringComparer.OrdinalIgnoreCase);
-
+        private readonly ConcurrentDictionary<string, QuestEntry> _quests = new(StringComparer.OrdinalIgnoreCase); // Key = Quest ID
         /// <summary>
-        /// Currently logged quests.
+        /// All current quests.
         /// </summary>
-        public IReadOnlyDictionary<string, QuestEntry> CurrentQuests => _currentQuests;
+        public IReadOnlyDictionary<string, QuestEntry> Quests => _quests;
+        private readonly ConcurrentHashSet<string> _items = new(StringComparer.OrdinalIgnoreCase); // Key = Item ID
         /// <summary>
-        /// Contains a List of BSG ID's that we need to pickup.
+        /// All item BSG ID's that we need to pickup.
         /// </summary>
-        public IReadOnlySet<string> ItemConditions { get; private set; } = new HashSet<string>();
-
+        public IReadOnlySet<string> ItemConditions => _items;
+        private readonly ConcurrentDictionary<string, QuestLocation> _locations = new(StringComparer.OrdinalIgnoreCase); // Key = Target ID
         /// <summary>
-        /// Contains a List of locations that we need to visit.
+        /// All locations that we need to visit.
         /// </summary>
-        public IReadOnlyList<QuestLocation> LocationConditions { get; private set; } = new List<QuestLocation>();
+        public IReadOnlyDictionary<string, QuestLocation> LocationConditions => _locations;
 
         /// <summary>
         /// Map Identifier of Current Map.
@@ -90,11 +91,12 @@ namespace EftDmaRadarLite.Tarkov.Quests
 
         public void Refresh()
         {
-            if (_rateLimit.IsRunning && _rateLimit.Elapsed.TotalSeconds < 2d)
+            var now = DateTimeOffset.UtcNow;
+            if (now - _last < TimeSpan.FromSeconds(1))
                 return;
-            using var currentQuests = new PooledSet<string>(StringComparer.OrdinalIgnoreCase);
-            var masterItems = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var masterLocations = new List<QuestLocation>();
+            using var masterQuests = new PooledSet<string>(StringComparer.OrdinalIgnoreCase);
+            using var masterItems = new PooledSet<string>(StringComparer.OrdinalIgnoreCase);
+            using var masterLocations = new PooledSet<string>(StringComparer.OrdinalIgnoreCase);
             var questsData = Memory.ReadPtr(_profile + Offsets.Profile.QuestsData);
             using var questsDataList = UnityList<ulong>.Create(questsData, true);
             foreach (var qDataEntry in questsDataList) // GCLass1BBF
@@ -115,7 +117,11 @@ namespace EftDmaRadarLite.Tarkov.Quests
 
                     var qIDPtr = Memory.ReadPtr(qDataEntry + Offsets.QuestData.Id);
                     var qID = Memory.ReadUnityString(qIDPtr);
-                    currentQuests.Add(qID);
+                    masterQuests.Add(qID);
+                    if (!_quests.ContainsKey(qID))
+                    {
+                        _quests[qID] = new QuestEntry(qID);
+                    }
                     if (App.Config.QuestHelper.BlacklistedQuests.Contains(qID))
                         continue;
                     var qTemplate = Memory.ReadPtr(qDataEntry + Offsets.QuestData.Template); // GClass1BF4
@@ -135,26 +141,33 @@ namespace EftDmaRadarLite.Tarkov.Quests
                     Debug.WriteLine($"[QuestManager] ERROR parsing Quest at 0x{qDataEntry.ToString("X")}: {ex}");
                 }
             }
-            // Update Current Quests for Data Binding
-            foreach (var currentQuest in currentQuests)
+            // Remove stale Quests/Items/Locations
+            foreach (var oldQuest in _quests)
             {
-                var entry = new QuestEntry(currentQuest);
-                _currentQuests.TryAdd(currentQuest, entry);
-            }
-            foreach (var currentQuest in _currentQuests)
-            {
-                if (!currentQuests.Contains(currentQuest.Key, StringComparer.OrdinalIgnoreCase))
+                if (!masterQuests.Contains(oldQuest.Key, StringComparer.OrdinalIgnoreCase))
                 {
-                    _currentQuests.TryRemove(currentQuest.Key, out _);
+                    _quests.TryRemove(oldQuest.Key, out _);
                 }
             }
-            ItemConditions = masterItems;
-            LocationConditions = masterLocations;
-            _rateLimit.Restart();
+            foreach (var oldItem in _items)
+            {
+                if (!masterItems.Contains(oldItem, StringComparer.OrdinalIgnoreCase))
+                {
+                    _items.Remove(oldItem);
+                }
+            }
+            foreach (var oldLoc in _locations.Keys)
+            {
+                if (!masterLocations.Contains(oldLoc, StringComparer.OrdinalIgnoreCase))
+                {
+                    _locations.TryRemove(oldLoc, out _);
+                }
+            }
+            _last = now;
         }
 
-        private static void GetQuestConditions(string questID, ulong condition, ISet<string> completedConditions,
-            HashSet<string> items, List<QuestLocation> locations)
+        private void GetQuestConditions(string questID, ulong condition, ISet<string> completedConditions,
+            ISet<string> masterItems, ISet<string> masterLocations)
         {
             try
             {
@@ -171,7 +184,8 @@ namespace EftDmaRadarLite.Tarkov.Quests
                     foreach (var targetPtr in targets)
                     {
                         var target = Memory.ReadUnityString(targetPtr);
-                        items.Add(target);
+                        masterItems.Add(target);
+                        _items.Add(target);
                     }
                 }
                 else if (condName == "ConditionPlaceBeacon" || condName == "ConditionLeaveItemAtLocation")
@@ -182,7 +196,11 @@ namespace EftDmaRadarLite.Tarkov.Quests
                         _questZones.TryGetValue(id, out var zones) &&
                         zones.TryGetValue(target, out var loc))
                     {
-                        locations.Add(new QuestLocation(questID, target, loc));
+                        if (!_locations.ContainsKey(target))
+                        {
+                            _locations[target] = new QuestLocation(questID, target, loc);
+                        }
+                        masterLocations.Add(target);
                     }
                 }
                 else if (condName == "ConditionVisitPlace")
@@ -193,7 +211,11 @@ namespace EftDmaRadarLite.Tarkov.Quests
                         _questZones.TryGetValue(id, out var zones) &&
                         zones.TryGetValue(target, out var loc))
                     {
-                        locations.Add(new QuestLocation(questID, target, loc));
+                        if (!_locations.ContainsKey(target))
+                        {
+                            _locations[target] = new QuestLocation(questID, target, loc);
+                        }
+                        masterLocations.Add(target);
                     }
                 }
                 else if (condName == "ConditionCounterCreator") // Check for children
@@ -202,7 +224,7 @@ namespace EftDmaRadarLite.Tarkov.Quests
                     var conditionsListPtr = Memory.ReadPtr(conditionsPtr + Offsets.QuestConditionsContainer.ConditionsList);
                     using var counterList = UnityList<ulong>.Create(conditionsListPtr, true);
                     foreach (var childCond in counterList)
-                        GetQuestConditions(questID, childCond, completedConditions, items, locations);
+                        GetQuestConditions(questID, childCond, completedConditions, masterItems, masterLocations);
                 }
             }
             catch (Exception ex)
