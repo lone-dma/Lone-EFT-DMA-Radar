@@ -299,26 +299,24 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
             Loot.Refresh(ct);
             if (App.Config.Loot.ShowWishlist)
                 Memory.LocalPlayer?.RefreshWishlist();
-            RefreshGear(); // Update gear periodically
+            RefreshGear(ct); // Update gear periodically
             if (App.Config.QuestHelper.Enabled)
-                QuestManager.Refresh();
+                QuestManager.Refresh(ct);
         }
 
         /// <summary>
         /// Refresh Gear Manager
         /// </summary>
-        private void RefreshGear()
+        private void RefreshGear(CancellationToken ct)
         {
-            try
+            if (_rgtPlayers?
+                .Where(x => x.IsHostileActive) is IEnumerable<PlayerBase> players && players.Any())
             {
-                var players = _rgtPlayers
-                    .Where(x => x.IsHostileActive);
-                if (players is not null && players.Any())
-                    foreach (var player in players)
-                        player.RefreshGear();
-            }
-            catch
-            {
+                foreach (var player in players)
+                {
+                    ct.ThrowIfCancellationRequested();
+                    player.RefreshGear();
+                }
             }
         }
 
