@@ -298,7 +298,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
             // Refresh Loot
             Loot.Refresh(ct);
             if (App.Config.Loot.ShowWishlist)
-                Memory.LocalPlayer?.RefreshWishlist();
+                Memory.LocalPlayer?.RefreshWishlist(ct);
             RefreshGear(ct); // Update gear periodically
             if (App.Config.QuestHelper.Enabled)
                 QuestManager.Refresh(ct);
