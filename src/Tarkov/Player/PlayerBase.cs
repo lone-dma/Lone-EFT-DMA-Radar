@@ -924,7 +924,7 @@ namespace EftDmaRadarLite.Tarkov.Player
             {
                 lines.Add($"{name}{health} {AccountID}".Trim());
                 var gear = Gear;
-                var hands = Hands?.CurrentItem;
+                var hands = Hands?.DisplayString;
                 lines.Add($"Use:{(hands is null ? "--" : hands)}");
                 var faction = PlayerSide.ToString();
                 string g = null;
