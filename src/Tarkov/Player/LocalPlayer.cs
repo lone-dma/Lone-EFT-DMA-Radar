@@ -12,7 +12,7 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// All Items on the Player's WishList.
         /// </summary>
         public static IReadOnlySet<string> WishlistItems => _wishlistItems;
-        private static HashSet<string> _wishlistItems = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly HashSet<string> _wishlistItems = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Spawn Point.
@@ -57,7 +57,7 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// <summary>
         /// Set the Player's WishList.
         /// </summary>
-        public void RefreshWishlist()
+        public void RefreshWishlist(CancellationToken ct)
         {
             try
             {
@@ -67,6 +67,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                 var wishlist = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 foreach (var item in items)
                 {
+                    ct.ThrowIfCancellationRequested();
                     try
                     {
                         if (item.Key.StringID == 0)
@@ -78,8 +79,14 @@ namespace EftDmaRadarLite.Tarkov.Player
                     }
                     catch { }
                 }
-                _wishlistItems = wishlist;
+                foreach (var existing in _wishlistItems)
+                {
+                    ct.ThrowIfCancellationRequested();
+                    if (!wishlist.Contains(existing))
+                        _wishlistItems.Remove(existing);
+                }
             }
+            catch (OperationCanceledException) { throw; }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[Wishlist] ERROR Refreshing: {ex}");
