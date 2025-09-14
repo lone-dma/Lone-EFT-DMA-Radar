@@ -4,13 +4,13 @@ namespace SDK
 	{
 		public readonly partial struct OpticCameraManagerContainer
 		{
-			public const uint ClassName_ClassToken = 0x2002F5F; // MDToken
+			public const uint ClassName_ClassToken = 0x2002F60; // MDToken
 			public const string ClassName = @"\uF124";
 		}
 
 		public readonly partial struct ScreenManager
 		{
-			public const uint ClassName_ClassToken = 0x200369A; // MDToken
+			public const uint ClassName_ClassToken = 0x200369B; // MDToken
 			public const string ClassName = @"\uF1EF";
 		}
 	}
@@ -161,7 +161,7 @@ namespace SDK
 		public readonly partial struct ObservedPlayerController
 		{
 			public const uint Player = 0x10; // EFT.NextObservedPlayer.ObservedPlayerView
-			public static uint[] MovementController { get; } = new uint[] { 0xC8, 0x10 }; // -.\uED66, -.\uED68
+			public static readonly uint[] MovementController = new uint[] { 0xC8, 0x10 }; // -.\uED66, -.\uED68
 			public const uint HandsController = 0xD8; // -.\uED50
 			public const uint InfoContainer = 0xE8; // -.\uED59
 			public const uint HealthController = 0xF0; // -.\uE446
