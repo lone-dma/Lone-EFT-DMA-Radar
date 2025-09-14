@@ -88,7 +88,7 @@ namespace EftDmaRadarLite.Tarkov.Quests
             }
         }
 
-        public void Refresh()
+        public void Refresh(CancellationToken ct)
         {
             try
             {
@@ -102,6 +102,7 @@ namespace EftDmaRadarLite.Tarkov.Quests
                 using var questsDataList = UnityList<ulong>.Create(questsData, true);
                 foreach (var qDataEntry in questsDataList) // GCLass1BBF
                 {
+                    ct.ThrowIfCancellationRequested();
                     try
                     {
                         var qStatus = Memory.ReadValue<int>(qDataEntry + Offsets.QuestData.Status);
@@ -166,6 +167,7 @@ namespace EftDmaRadarLite.Tarkov.Quests
                 }
                 _last = now;
             }
+            catch (OperationCanceledException) { throw; }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[QuestManager] CRITICAL ERROR: {ex}");
