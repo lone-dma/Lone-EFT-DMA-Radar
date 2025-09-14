@@ -40,14 +40,13 @@ namespace EftDmaRadarLite.UI.Radar
                 .AppendFormat("{0,-6}", "S/R%")
                 .AppendFormat("{0,-5}", "Grp")
                 .AppendFormat("{0,-8}", "Value")
-                .AppendFormat("{0,-30}", "In Hands")
-                .AppendFormat("{0,-5}", "Dist")
+                .AppendFormat("{0,-15}", "In Hands")
                 .AppendLine();
             foreach (var player in filteredPlayers)
             {
                 var name = App.Config.UI.HideNames && player.IsHuman ? "<Hidden>" : player.Name;
                 var faction = player.PlayerSide.ToString()[0];
-                var hands = player.Hands?.CurrentItem;
+                var hands = player.Hands?.DisplayString;
                 var inHands = hands is not null ? hands : "--";
                 string edition = "--";
                 string level = "0";
@@ -79,8 +78,7 @@ namespace EftDmaRadarLite.UI.Radar
                     .AppendFormat("{0,-6}", survivePercent)
                     .AppendFormat("{0,-5}", grp)
                     .AppendFormat("{0,-8}", $"{TarkovMarketItem.FormatPrice(player.Gear?.Value ?? 0)}")
-                    .AppendFormat("{0,-30}", $"{inHands}")
-                    .AppendFormat("{0,-5}", $"{(int)Math.Round(Vector3.Distance(localPlayerPos, player.Position))}")
+                    .AppendFormat("{0,-15}", $"{inHands}")
                     .AppendLine();
             }
 
@@ -89,7 +87,7 @@ namespace EftDmaRadarLite.UI.Radar
             var lineSpacing = SKFonts.InfoWidgetFont.Spacing;
             var maxLength = data.Max(x => SKFonts.InfoWidgetFont.MeasureText(x));
             var pad = 2.5f * ScaleFactor;
-            Size = new SKSize(maxLength + pad, data.Length * lineSpacing + pad);
+            Size = new SKSize(maxLength + pad, data.Length * lineSpacing);
             Location = Location; // Bounds check
             Draw(canvas); // Draw backer
             var drawPt = new SKPoint(ClientRectangle.Left + pad, ClientRectangle.Top + lineSpacing / 2 + pad);

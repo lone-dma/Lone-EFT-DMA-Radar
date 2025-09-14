@@ -7,25 +7,21 @@ namespace EftDmaRadarLite.Tarkov.Player
     public sealed class HandsManager
     {
         private readonly PlayerBase _parent;
-
-        private string _ammo;
-        private string _thermal;
         private LootItem _cachedItem;
         private ulong _cached;
+        private string CurrentItem => _cachedItem?.ShortName ?? "--";
+        private string _thermal;
+        private string _ammo;
         /// <summary>
-        /// Item in hands currently (Short Name).
-        /// Also contains ammo/thermal info.
+        /// String for display in UI.
         /// </summary>
-        public string CurrentItem
+        public string DisplayString
         {
             get
             {
-                string at = $"{_ammo} {_thermal}".Trim();
-                var item = _cachedItem?.ShortName;
-                if (item is null) return "--";
-                if (at != string.Empty)
-                    return $"{item} ({at})";
-                return item;
+                string aux = $"{_thermal},{_ammo}".Trim(',');
+                int len = 15 - (aux.Length + 2);
+                return $"{CurrentItem.Substring(0, Math.Min(CurrentItem.Length, len))}({aux})";
             }
         }
 
@@ -48,8 +44,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                 if (itemBase != _cached)
                 {
                     _cachedItem = null;
-                    _ammo = null;
-                    _thermal = null;
+                    string thermal = null;
                     var itemTemplate = Memory.ReadPtr(itemBase + Offsets.LootItem.Template);
                     var itemIDPtr = Memory.ReadValue<Types.MongoID>(itemTemplate + Offsets.ItemTemplate._id);
                     var itemID = Memory.ReadUnityString(itemIDPtr.StringID);
@@ -64,8 +59,8 @@ namespace EftDmaRadarLite.Tarkov.Player
                                 x.ID.Equals("6478641c19d732620e045e17", StringComparison.OrdinalIgnoreCase) || // ECHO
                                 x.ID.Equals("63fc44e2429a8a166c7f61e6", StringComparison.OrdinalIgnoreCase))   // ZEUS
                                 ?? false;
-                            _thermal = hasThermal ?
-                                "Thermal" : null;
+                            thermal = hasThermal ?
+                                "T+" : null;
                         }
                     }
                     else // Item doesn't exist in DB , use name from game memory
@@ -77,9 +72,11 @@ namespace EftDmaRadarLite.Tarkov.Player
                         _cachedItem = new("NULL", itemName);
                     }
                     _cached = itemBase;
+                    _thermal = thermal;
                 }
                 if (_cachedItem?.IsWeapon ?? false)
                 {
+                    string ammo = null;
                     try
                     {
                         var chambers = Memory.ReadPtr(itemBase + Offsets.LootItemWeapon.Chambers);
@@ -88,10 +85,11 @@ namespace EftDmaRadarLite.Tarkov.Player
                         var ammoTemplate = Memory.ReadPtr(slotItem + Offsets.LootItem.Template);
                         var ammoIDPtr = Memory.ReadValue<Types.MongoID>(ammoTemplate + Offsets.ItemTemplate._id);
                         var ammoID = Memory.ReadUnityString(ammoIDPtr.StringID);
-                        if (EftDataManager.AllItems.TryGetValue(ammoID, out var ammo))
-                            _ammo = ammo?.ShortName;
+                        if (EftDataManager.AllItems.TryGetValue(ammoID, out var ammoItem))
+                            ammo = ammoItem?.ShortName;
                     }
                     catch { }
+                    _ammo = ammo;
                 }
             }
             catch
