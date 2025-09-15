@@ -41,7 +41,7 @@ namespace EftDmaRadarLite.UI.Radar
                 .AppendFormat("{0,-6}", "S/R%")
                 .AppendFormat("{0,-4}", "Grp")
                 .AppendFormat("{0,-7}", "Value")
-                .AppendFormat("{0,-15}", "In Hands")
+                .AppendFormat("{0,-16}", "In Hands")
                 .AppendLine();
             foreach (var player in filteredPlayers)
             {
@@ -79,7 +79,7 @@ namespace EftDmaRadarLite.UI.Radar
                     .AppendFormat("{0,-6}", survivePercent)
                     .AppendFormat("{0,-4}", grp)
                     .AppendFormat("{0,-7}", $"{Utilities.FormatNumberKM(player.Gear?.Value ?? 0)}")
-                    .AppendFormat("{0,-15}", $"{inHands}")
+                    .AppendFormat("{0,-16}", $"{inHands}")
                     .AppendLine();
             }
 

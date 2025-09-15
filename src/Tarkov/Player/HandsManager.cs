@@ -20,8 +20,10 @@ namespace EftDmaRadarLite.Tarkov.Player
             get
             {
                 string aux = $"{_thermal},{_ammo}".Trim(',');
-                int len = 15 - (aux.Length + 2);
-                return $"{CurrentItem.Substring(0, Math.Min(CurrentItem.Length, len))}({aux})";
+                if (!string.IsNullOrEmpty(aux))
+                    aux = $" ({aux})";
+                int len = 16 - (aux.Length + 2);
+                return $"{CurrentItem.Substring(0, Math.Min(CurrentItem.Length, len))}{aux}";
             }
         }
 
