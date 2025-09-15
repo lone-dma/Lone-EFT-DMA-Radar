@@ -100,19 +100,5 @@ namespace EftDmaRadarLite.Tarkov.Data.TarkovMarket
         }
 
         public override string ToString() => Name;
-
-        /// <summary>
-        /// Format price numeral as a string.
-        /// </summary>
-        /// <param name="price">Price to convert to string format.</param>
-        public static string FormatPrice(int price)
-        {
-            if (price >= 1000000)
-                return (price / 1000000D).ToString("0.##") + "M";
-            if (price >= 1000)
-                return (price / 1000D).ToString("0") + "K";
-
-            return price.ToString();
-        }
     }
 }

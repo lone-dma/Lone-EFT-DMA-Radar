@@ -934,7 +934,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                 var loot = gear?.Loot;
                 if (loot is not null)
                 {
-                    var playerValue = TarkovMarketItem.FormatPrice(gear?.Value ?? -1);
+                    var playerValue = Utilities.FormatNumberKM(gear?.Value ?? -1);
                     lines.Add($"Value: {playerValue}");
                     var iterations = 0;
                     foreach (var item in loot)
@@ -956,7 +956,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                 if (corpseLoot is not null)
                 {
                     var sumPrice = corpseLoot.Sum(x => x.Price);
-                    var corpseValue = TarkovMarketItem.FormatPrice(sumPrice);
+                    var corpseValue = Utilities.FormatNumberKM(sumPrice);
                     lines.Add($"Value: {corpseValue}"); // Player name, value
                     if (corpseLoot.Any())
                         foreach (var item in corpseLoot)
