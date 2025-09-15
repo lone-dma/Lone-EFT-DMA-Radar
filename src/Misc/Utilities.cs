@@ -21,15 +21,15 @@ namespace EftDmaRadarLite.Misc
         /// <summary>
         /// Format integer as a compact string with K/M suffixes.
         /// </summary>
-        /// <param name="price">Price to convert to string format.</param>
-        public static string FormatNumberKM(int price)
+        /// <param name="num">Integer to convert to string format.</param>
+        public static string FormatNumberKM(int num)
         {
-            if (price >= 1000000)
-                return (price / 1000000D).ToString("0.#") + "M";
-            if (price >= 1000)
-                return (price / 1000D).ToString("0") + "K";
+            if (num >= 1000000)
+                return (num / 1000000D).ToString("0.#") + "M";
+            if (num >= 1000)
+                return (num / 1000D).ToString("0") + "K";
 
-            return price.ToString();
+            return num.ToString();
         }
     }
 }
