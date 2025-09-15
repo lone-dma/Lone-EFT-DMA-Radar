@@ -281,7 +281,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                 {
                     var corpseLoot = corpse.Loot?.OrderLoot();
                     var sumPrice = corpseLoot?.Sum(x => x.Price) ?? 0;
-                    var corpseValue = TarkovMarketItem.FormatPrice(sumPrice);
+                    var corpseValue = Utilities.FormatNumberKM(sumPrice);
                     var playerObj = corpse.PlayerObject;
                     if (playerObj is not null)
                     {
@@ -348,7 +348,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                 if (IsImportant)
                     label += "!!";
                 else if (Price > 0)
-                    label += $"[{TarkovMarketItem.FormatPrice(Price)}] ";
+                    label += $"[{Utilities.FormatNumberKM(Price)}] ";
                 label += ShortName;
                 if (showQuest && IsQuestCondition)
                     label += " (Quest)";

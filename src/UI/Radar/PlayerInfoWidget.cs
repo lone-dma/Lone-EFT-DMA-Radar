@@ -2,6 +2,7 @@
 using EftDmaRadarLite.UI.Skia;
 using EftDmaRadarLite.Tarkov.Data.TarkovMarket;
 using SkiaSharp.Views.WPF;
+using EftDmaRadarLite.Misc;
 
 namespace EftDmaRadarLite.UI.Radar
 {
@@ -34,12 +35,12 @@ namespace EftDmaRadarLite.UI.Radar
             var sb = new StringBuilder();
             sb.AppendFormat("{0,-21}", "Fac / Lvl / Name")
                 .AppendFormat("{0,-5}", "Acct")
-                .AppendFormat("{0,-7}", "K/D")
-                .AppendFormat("{0,-7}", "Hours")
+                .AppendFormat("{0,-5}", "K/D")
+                .AppendFormat("{0,-6}", "Hours")
                 .AppendFormat("{0,-6}", "Raids")
                 .AppendFormat("{0,-6}", "S/R%")
-                .AppendFormat("{0,-5}", "Grp")
-                .AppendFormat("{0,-8}", "Value")
+                .AppendFormat("{0,-4}", "Grp")
+                .AppendFormat("{0,-7}", "Value")
                 .AppendFormat("{0,-15}", "In Hands")
                 .AppendLine();
             foreach (var player in filteredPlayers)
@@ -60,24 +61,24 @@ namespace EftDmaRadarLite.UI.Radar
                     if (observed.Profile?.Level is int levelResult)
                         level = levelResult.ToString();
                     if (observed.Profile?.Overall_KD is float kdResult)
-                        kd = kdResult.ToString("n2");
+                        kd = kdResult.ToString("n1");
                     if (observed.Profile?.RaidCount is int raidCountResult)
-                        raidCount = raidCountResult.ToString();
+                        raidCount = Utilities.FormatNumberKM(raidCountResult);
                     if (observed.Profile?.SurvivedRate is float survivedResult)
                         survivePercent = survivedResult.ToString("n1");
                     if (observed.Profile?.Hours is int hoursResult)
-                        hours = hoursResult.ToString();
+                        hours = Utilities.FormatNumberKM(hoursResult);
                 }
                 var grp = player.GroupID != -1 ? player.GroupID.ToString() : "--";
                 var focused = player.IsFocused ? "*" : null;
                 sb.AppendFormat("{0,-21}", $"{focused}{faction}{level}:{name}");
                 sb.AppendFormat("{0,-5}", edition)
-                    .AppendFormat("{0,-7}", kd)
-                    .AppendFormat("{0,-7}", hours)
+                    .AppendFormat("{0,-5}", kd)
+                    .AppendFormat("{0,-6}", hours)
                     .AppendFormat("{0,-6}", raidCount)
                     .AppendFormat("{0,-6}", survivePercent)
-                    .AppendFormat("{0,-5}", grp)
-                    .AppendFormat("{0,-8}", $"{TarkovMarketItem.FormatPrice(player.Gear?.Value ?? 0)}")
+                    .AppendFormat("{0,-4}", grp)
+                    .AppendFormat("{0,-7}", $"{Utilities.FormatNumberKM(player.Gear?.Value ?? 0)}")
                     .AppendFormat("{0,-15}", $"{inHands}")
                     .AppendLine();
             }
