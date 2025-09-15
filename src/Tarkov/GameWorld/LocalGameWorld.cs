@@ -83,8 +83,8 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
             _t4.PerformWork += FastWorker_PerformWork;
             var rgtPlayersAddr = Memory.ReadPtr(localGameWorld + Offsets.ClientLocalGameWorld.RegisteredPlayers, false);
             _rgtPlayers = new RegisteredPlayers(rgtPlayersAddr, this);
-            QuestManager = new(_rgtPlayers.LocalPlayer.Profile);
             ArgumentOutOfRangeException.ThrowIfLessThan(_rgtPlayers.GetPlayerCount(), 1, nameof(_rgtPlayers));
+            QuestManager = new(_rgtPlayers.LocalPlayer.Profile);
             Loot = new(localGameWorld);
             _exfilManager = new(localGameWorld, _rgtPlayers.LocalPlayer.IsPmc);
             _grenadeManager = new(localGameWorld);
