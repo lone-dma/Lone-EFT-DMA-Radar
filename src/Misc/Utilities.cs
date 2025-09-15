@@ -25,7 +25,7 @@ namespace EftDmaRadarLite.Misc
         public static string FormatNumberKM(int price)
         {
             if (price >= 1000000)
-                return (price / 1000000D).ToString("0.##") + "M";
+                return (price / 1000000D).ToString("0.#") + "M";
             if (price >= 1000)
                 return (price / 1000D).ToString("0") + "K";
 
