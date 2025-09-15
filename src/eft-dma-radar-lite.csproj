@@ -14,6 +14,8 @@
 	<ServerGarbageCollection>true</ServerGarbageCollection>
 	<ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
 	<RetainVMGarbageCollection>true</RetainVMGarbageCollection>
+	<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+	<Deterministic>False</Deterministic>
   </PropertyGroup>
 
 	<ItemGroup>

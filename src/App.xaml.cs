@@ -30,6 +30,7 @@ using System.Runtime.Versioning;
 using System.Security.Authentication;
 
 [assembly: SupportedOSPlatform("Windows")]
+[assembly: AssemblyVersion("1.0.*")]
 
 namespace EftDmaRadarLite
 {
