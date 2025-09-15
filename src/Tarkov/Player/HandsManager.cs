@@ -22,7 +22,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                 string aux = $"{_thermal},{_ammo}".Trim(',');
                 if (!string.IsNullOrEmpty(aux))
                     aux = $" ({aux})";
-                int len = 16 - (aux.Length + 2);
+                int len = 16 - (aux?.Length ?? 0);
                 return $"{CurrentItem.Substring(0, Math.Min(CurrentItem.Length, len))}{aux}";
             }
         }
