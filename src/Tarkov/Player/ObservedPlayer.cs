@@ -31,7 +31,6 @@ using EftDmaRadarLite.UI.Radar.ViewModels;
 using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Unity.Collections;
 using VmmSharpEx.Scatter;
-using static SDK.Offsets;
 
 namespace EftDmaRadarLite.Tarkov.Player
 {
