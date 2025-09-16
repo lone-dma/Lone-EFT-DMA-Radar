@@ -310,7 +310,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                     var corpseLoot = corpse.Loot?.OrderLoot();
                     var sumPrice = corpseLoot?.Sum(x => x.Price) ?? 0;
                     var corpseValue = Utilities.FormatNumberKM(sumPrice);
-                    var playerObj = corpse.PlayerObject;
+                    var playerObj = corpse.Player;
                     if (playerObj is not null)
                     {
                         var name = App.Config.UI.HideNames && playerObj.IsHuman ? "<Hidden>" : playerObj.Name;
