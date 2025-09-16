@@ -26,24 +26,103 @@ SOFTWARE.
  *
 */
 
+using Collections.Pooled;
+using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.Unity.Collections;
+using System.Collections.Frozen;
 
 namespace EftDmaRadarLite.Tarkov.Loot
 {
     public sealed class LootCorpse : LootContainer
     {
-        public override string Name => PlayerObject?.Name ?? "Body";
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="name">Name of corpse (example: Killa).</param>
-        public LootCorpse(IReadOnlyList<LootItem> loot) : base(loot)
+        private static readonly FrozenSet<string> _skipSlots = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-        }
-
+            "SecuredContainer", "Dogtag", "Compass", "Eyewear", "ArmBand"
+        }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
+        private readonly ulong _corpse;
+        private DateTimeOffset _last = DateTimeOffset.MinValue;
         /// <summary>
         /// Corpse container's associated player object (if any).
         /// </summary>
-        public PlayerBase PlayerObject { get; init; }
+        public PlayerBase Player { get; private set; }
+        /// <summary>
+        /// Name of the corpse.
+        /// </summary>
+        public override string Name => Player?.Name ?? "Body";
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public LootCorpse(ulong corpseAddr) : base()
+        {
+            _corpse = corpseAddr;
+        }
+
+        /// <summary>
+        /// Refresh the loot on this corpse. Only slots are shown not bag contents.
+        /// </summary>
+        /// <param name="deadPlayers"></param>
+        public void Refresh(IReadOnlyList<PlayerBase> deadPlayers)
+        {
+            var now = DateTimeOffset.UtcNow;
+            if (now - _last < TimeSpan.FromSeconds(2))
+                return;
+            Player ??= deadPlayers?.FirstOrDefault(x => x.Corpse == _corpse);
+            var loot = new List<LootItem>();
+            GetCorpseLoot(_corpse, loot, Player?.IsPmc ?? true);
+            Player?.LootObject ??= this;
+            Loot = loot;
+            _last = now;
+        }
+
+        /// <summary>
+        /// Gets all loot on a corpse.
+        /// </summary>
+        private static void GetCorpseLoot(ulong lootInteractiveClass, IList<LootItem> loot, bool isPMC)
+        {
+            try
+            {
+                var itemBase = Memory.ReadPtr(lootInteractiveClass + Offsets.InteractiveLootItem.Item);
+                var slots = Memory.ReadPtr(itemBase + Offsets.LootItemMod.Slots);
+                GetItemsInSlots(slots, loot, isPMC);
+            }
+            catch { }
+        }
+
+        /// <summary>
+        /// Recurse slots for gear.
+        /// </summary>
+        private static void GetItemsInSlots(ulong slotsPtr, IList<LootItem> loot, bool isPMC)
+        {
+            using var slotDict = new PooledDictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);
+            using var slots = UnityArray<ulong>.Create(slotsPtr, true);
+
+            foreach (var slot in slots)
+            {
+                var namePtr = Memory.ReadPtr(slot + Offsets.Slot.ID);
+                var name = Memory.ReadUnityString(namePtr);
+                if (!_skipSlots.Contains(name))
+                    slotDict.TryAdd(name, slot);
+            }
+
+            foreach (var slot in slotDict)
+            {
+                try
+                {
+                    if (isPMC && slot.Key == "Scabbard")
+                        continue;
+                    var containedItem = Memory.ReadPtr(slot.Value + Offsets.Slot.ContainedItem);
+                    var inventorytemplate = Memory.ReadPtr(containedItem + Offsets.LootItem.Template);
+                    var idPtr = Memory.ReadValue<Types.MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
+                    var id = Memory.ReadUnityString(idPtr.StringID);
+                    if (EftDataManager.AllItems.TryGetValue(id, out var entry))
+                        loot.Add(new LootItem(entry));
+                }
+                catch
+                {
+                }
+            }
+        }
     }
 }

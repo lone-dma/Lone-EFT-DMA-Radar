@@ -47,6 +47,9 @@ namespace EftDmaRadarLite.Tarkov.Loot
                 return "Loot";
             }
         }
+
+        protected LootContainer() : base(_defaultItem) { }
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -70,7 +73,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
         /// <summary>
         /// All items inside this Container (unfiltered/unordered).
         /// </summary>
-        public IReadOnlyList<LootItem> Loot { get; }
+        public IReadOnlyList<LootItem> Loot { get; protected set; }
 
         /// <summary>
         /// All Items inside this container that pass the current Loot Filter.

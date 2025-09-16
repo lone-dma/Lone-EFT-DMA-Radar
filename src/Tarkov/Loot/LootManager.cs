@@ -223,6 +223,11 @@ namespace EftDmaRadarLite.Tarkov.Loot
                 };
             }
             map.Execute(); // execute scatter read
+            // Post Scatter Read - Refresh Corpses
+            foreach (var corpse in _loot.Values.OfType<LootCorpse>())
+            {
+                corpse.Refresh(deadPlayers);
+            }
         }
 
         /// <summary>
@@ -244,20 +249,11 @@ namespace EftDmaRadarLite.Tarkov.Loot
                 var pos = new UnityTransform(p.TransformInternal, true).UpdatePosition();
                 if (isCorpse)
                 {
-                    var player = p.DeadPlayers?.FirstOrDefault(x => x.Corpse == interactiveClass);
-                    var corpseLoot = new List<LootItem>();
-                    bool isPMC = player?.IsPmc ?? true; // Default to true to omit things like Red Rebel Scabbard if we're not sure
-                    GetCorpseLoot(interactiveClass, corpseLoot, isPMC);
-                    var corpse = new LootCorpse(corpseLoot)
+                    var corpse = new LootCorpse(interactiveClass)
                     {
-                        Position = pos,
-                        PlayerObject = player
+                        Position = pos
                     };
                     _ = _loot.TryAdd(p.ItemBase, corpse);
-                    if (player is not null)
-                    {
-                        player.LootObject = corpse;
-                    }
                 }
                 else if (isContainer)
                 {
@@ -331,62 +327,6 @@ namespace EftDmaRadarLite.Tarkov.Loot
                         }
                     }
                 }
-            }
-        }
-
-        private static readonly FrozenSet<string> _skipSlots = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "SecuredContainer", "Dogtag", "Compass", "Eyewear", "ArmBand"
-        }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
-
-        /// <summary>
-        /// Recurse slots for gear.
-        /// </summary>
-        private static void GetItemsInSlots(ulong slotsPtr, List<LootItem> loot, bool isPMC)
-        {
-            using var slotDict = new PooledDictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);
-            using var slots = UnityArray<ulong>.Create(slotsPtr, true);
-
-            foreach (var slot in slots)
-            {
-                var namePtr = Memory.ReadPtr(slot + Offsets.Slot.ID);
-                var name = Memory.ReadUnityString(namePtr);
-                if (!_skipSlots.Contains(name))
-                    slotDict.TryAdd(name, slot);
-            }
-
-            foreach (var slot in slotDict)
-            {
-                try
-                {
-                    if (isPMC && slot.Key == "Scabbard")
-                        continue;
-                    var containedItem = Memory.ReadPtr(slot.Value + Offsets.Slot.ContainedItem);
-                    var inventorytemplate = Memory.ReadPtr(containedItem + Offsets.LootItem.Template);
-                    var idPtr = Memory.ReadValue<Types.MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
-                    var id = Memory.ReadUnityString(idPtr.StringID);
-                    if (EftDataManager.AllItems.TryGetValue(id, out var entry))
-                        loot.Add(new LootItem(entry));
-                }
-                catch
-                {
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets all loot on a corpse.
-        /// </summary>
-        private static void GetCorpseLoot(ulong lootInteractiveClass, List<LootItem> loot, bool isPMC)
-        {
-            var itemBase = Memory.ReadPtr(lootInteractiveClass + Offsets.InteractiveLootItem.Item);
-            var slots = Memory.ReadPtr(itemBase + Offsets.LootItemMod.Slots);
-            try
-            {
-                GetItemsInSlots(slots, loot, isPMC);
-            }
-            catch
-            {
             }
         }
 

@@ -696,7 +696,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
 
                     case LootCorpse corpseObj:
                         _mouseOverItem = corpseObj;
-                        var corpse = corpseObj.PlayerObject;
+                        var corpse = corpseObj.Player;
                         MouseoverGroup = (corpse?.IsHumanHostile == true && corpse.GroupID != -1)
                             ? corpse.GroupID
                             : (int?)null;
