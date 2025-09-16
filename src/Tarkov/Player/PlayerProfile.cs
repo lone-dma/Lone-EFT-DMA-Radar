@@ -44,17 +44,6 @@ namespace EftDmaRadarLite.Tarkov.Player
         {
             _player = player ?? throw new ArgumentNullException(nameof(player));
             AccountID = accountId ?? throw new ArgumentNullException(nameof(accountId));
-            if (player.IsHuman)
-            {
-                if (App.Config.Cache.ProfileService.TryGetValue(player.AccountID, out var cachedProfile))
-                {
-                    Data = cachedProfile.Data;
-                }
-                else
-                {
-                    EFTProfileService.RegisterProfile(this);
-                }
-            }
         }
 
         /// <summary>

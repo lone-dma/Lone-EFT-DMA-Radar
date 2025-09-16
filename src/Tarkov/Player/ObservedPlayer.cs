@@ -26,10 +26,12 @@ SOFTWARE.
  *
 */
 
+using EftDmaRadarLite.Tarkov.Data.ProfileApi;
 using EftDmaRadarLite.UI.Radar.ViewModels;
 using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Unity.Collections;
 using VmmSharpEx.Scatter;
+using static SDK.Offsets;
 
 namespace EftDmaRadarLite.Tarkov.Player
 {
@@ -224,6 +226,14 @@ namespace EftDmaRadarLite.Tarkov.Player
             if (IsHuman)
             {
                 PlayerHistoryViewModel.Add(this); /// Log To Player History
+                if (App.Config.Cache.ProfileService.TryGetValue(AccountID, out var cachedProfile))
+                {
+                    Profile.Data = cachedProfile.Data;
+                }
+                else
+                {
+                    EFTProfileService.RegisterProfile(Profile);
+                }
             }
             if (IsHumanHostile) /// Special Players Check on Hostiles Only
             {
