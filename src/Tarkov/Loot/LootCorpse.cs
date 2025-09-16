@@ -66,7 +66,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
         public void Refresh(IReadOnlyList<PlayerBase> deadPlayers)
         {
             var now = DateTimeOffset.UtcNow;
-            if (now - _last < TimeSpan.FromSeconds(2))
+            if (now - _last < TimeSpan.FromSeconds(5))
                 return;
             Player ??= deadPlayers?.FirstOrDefault(x => x.Corpse == _corpse);
             var loot = new List<LootItem>();
