@@ -63,7 +63,7 @@ namespace EftDmaRadarLite.UI.Radar
             var sb = new StringBuilder();
             sb.AppendFormat("{0,-21}", "Fac / Lvl / Name")
                 .AppendFormat("{0,-5}", "Acct")
-                .AppendFormat("{0,-5}", "K/D")
+                .AppendFormat("{0,-6}", "K/D")
                 .AppendFormat("{0,-6}", "Hours")
                 .AppendFormat("{0,-6}", "Raids")
                 .AppendFormat("{0,-6}", "S/R%")
@@ -101,7 +101,7 @@ namespace EftDmaRadarLite.UI.Radar
                 var focused = player.IsFocused ? "*" : null;
                 sb.AppendFormat("{0,-21}", $"{focused}{faction}{level}:{name}");
                 sb.AppendFormat("{0,-5}", edition)
-                    .AppendFormat("{0,-5}", kd)
+                    .AppendFormat("{0,-6}", kd)
                     .AppendFormat("{0,-6}", hours)
                     .AppendFormat("{0,-6}", raidCount)
                     .AppendFormat("{0,-6}", survivePercent)
