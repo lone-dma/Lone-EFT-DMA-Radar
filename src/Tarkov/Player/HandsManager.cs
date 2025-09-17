@@ -74,6 +74,8 @@ namespace EftDmaRadarLite.Tarkov.Player
                 if (itemBase != _cached)
                 {
                     _cachedItem = null;
+                    _ammo = null;
+                    _thermal = null;
                     string thermal = null;
                     var itemTemplate = Memory.ReadPtr(itemBase + Offsets.LootItem.Template);
                     var itemIDPtr = Memory.ReadValue<Types.MongoID>(itemTemplate + Offsets.ItemTemplate._id);
@@ -90,7 +92,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                                 x.ID.Equals("63fc44e2429a8a166c7f61e6", StringComparison.OrdinalIgnoreCase))   // ZEUS
                                 ?? false;
                             thermal = hasThermal ?
-                                "T+" : null;
+                                "Th" : null;
                         }
                     }
                     else // Item doesn't exist in DB , use name from game memory
