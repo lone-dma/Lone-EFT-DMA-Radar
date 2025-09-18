@@ -31,38 +31,49 @@ using SkiaSharp.Views.WPF;
 
 namespace EftDmaRadarLite.UI.Skia
 {
+    /// <summary>
+    /// Base class for interactive Skia widgets hosted in an <see cref="SKGLElement"/>.
+    /// Provides dragging, optional resizing, minimizing and basic chrome rendering.
+    /// </summary>
     public abstract class SKWidgetControl : IDisposable
     {
-        #region Fields
         private readonly Lock _sync = new();
         private readonly SKGLElement _parent;
+
         private bool _titleDrag;
         private bool _resizeDrag;
+
         private Vector2 _lastMousePosition;
+
         private SKPoint _location = new(1, 1);
         private SKSize _size = new(200, 200);
         private SKPath _resizeTriangle;
         private float _relativeX;
         private float _relativeY;
-        #endregion
+        private bool _disposed;
 
-        #region Private Properties
-        private float TitleBarHeight => 12.5f * ScaleFactor;
+        protected virtual float TitlePadding => 2.5f * ScaleFactor;
+        protected virtual float BaseFontSize => 9f;
+        protected virtual float TitleBarBaseHeight => 12.5f;
+        protected virtual float ResizeGlyphBaseSize => 10.5f;
+
+        private float TitleBarHeight => TitleBarBaseHeight * ScaleFactor;
         private SKRect TitleBar => new(Rectangle.Left, Rectangle.Top, Rectangle.Right, Rectangle.Top + TitleBarHeight);
-        private SKRect MinimizeButton => new(TitleBar.Right - TitleBarHeight,
-            TitleBar.Top, TitleBar.Right, TitleBar.Bottom);
-        #endregion
+        private SKRect MinimizeButton => new(TitleBar.Right - TitleBarHeight, TitleBar.Top, TitleBar.Right, TitleBar.Bottom);
 
-        #region Protected Properties
         protected string Title { get; }
         protected bool CanResize { get; }
         protected float ScaleFactor { get; private set; }
         protected SKPath ResizeTriangle => _resizeTriangle;
-        #endregion
 
-        #region Public Properties
         public bool Minimized { get; protected set; }
-        public SKRect ClientRectangle => new(Rectangle.Left, Rectangle.Top + TitleBarHeight, Rectangle.Right, Rectangle.Bottom);
+
+        public SKRect ClientRectangle => new(
+            Rectangle.Left,
+            Rectangle.Top + TitleBarHeight,
+            Rectangle.Right,
+            Rectangle.Bottom);
+
         public SKSize Size
         {
             get => _size;
@@ -74,13 +85,33 @@ namespace EftDmaRadarLite.UI.Skia
                         return;
                     if (value.Width < 0f || value.Height < 0f)
                         return;
+
                     value.Width = (int)value.Width;
                     value.Height = (int)value.Height;
-                    _size = value;
+                    var clamped = ClampSize(value);
+                    if (clamped.Equals(_size))
+                        return;
+
+                    _size = clamped;
                     InitializeResizeTriangle();
+
+                    // NEW: ensure widget remains in bounds after size change (removes need for Location = Location hack)
+                    var canvasSize = _parent.CanvasSize;
+                    if (canvasSize.Width > 0 && canvasSize.Height > 0)
+                    {
+                        var canvasRect = new SKRect(
+                            0, 0,
+                            (int)Math.Round(canvasSize.Width),
+                            (int)Math.Round(canvasSize.Height));
+
+                        CorrectLocationBounds(canvasRect);
+                        _relativeX = canvasRect.Width > 0 ? _location.X / canvasRect.Width : 0f;
+                        _relativeY = canvasRect.Height > 0 ? _location.Y / canvasRect.Height : 0f;
+                    }
                 }
             }
         }
+
         public SKPoint Location
         {
             get => _location;
@@ -91,58 +122,79 @@ namespace EftDmaRadarLite.UI.Skia
                     if ((value.X != 0f && !value.X.IsNormalOrZero()) ||
                         (value.Y != 0f && !value.Y.IsNormalOrZero()))
                         return;
-                    var size = _parent.CanvasSize;
-                    var cr = new SKRect(0, 0, (int)Math.Round(size.Width), (int)Math.Round(size.Height));
-                    if (cr.Width == 0 ||
-                        cr.Height == 0)
+
+                    var canvasSize = _parent.CanvasSize;
+                    if (canvasSize.Width <= 0 || canvasSize.Height <= 0)
                         return;
+
+                    var canvasRect = new SKRect(
+                        0, 0,
+                        (int)Math.Round(canvasSize.Width),
+                        (int)Math.Round(canvasSize.Height));
+
                     _location = value;
-                    CorrectLocationBounds(cr);
-                    _relativeX = value.X / cr.Width;
-                    _relativeY = value.Y / cr.Height;
+                    CorrectLocationBounds(canvasRect);
+                    _relativeX = canvasRect.Width > 0 ? _location.X / canvasRect.Width : 0f;
+                    _relativeY = canvasRect.Height > 0 ? _location.Y / canvasRect.Height : 0f;
+
                     InitializeResizeTriangle();
                 }
             }
         }
-        public SKRect Rectangle => new SKRect(Location.X,
+
+        public SKRect Rectangle => new(
+            Location.X,
             Location.Y,
             Location.X + Size.Width,
             Location.Y + Size.Height + TitleBarHeight);
-        #endregion
 
-        #region Constructor
-        protected SKWidgetControl(SKGLElement parent, string title, SKPoint location, SKSize clientSize, float scaleFactor, bool canResize = true)
+        protected SKWidgetControl(
+            SKGLElement parent,
+            string title,
+            SKPoint location,
+            SKSize clientSize,
+            float scaleFactor,
+            bool canResize = true)
         {
             _parent = parent;
-            CanResize = canResize;
             Title = title;
+            CanResize = canResize;
             ScaleFactor = scaleFactor;
             Size = clientSize;
             Location = location;
+            HookParentEvents(parent);
+            InitializeResizeTriangle();
+        }
+
+        private void HookParentEvents(SKGLElement parent)
+        {
             parent.MouseLeave += Parent_MouseLeave;
             parent.MouseMove += Parent_MouseMove;
             parent.MouseDown += Parent_MouseDown;
             parent.MouseUp += Parent_MouseUp;
             parent.SizeChanged += Parent_SizeChanged;
-            InitializeResizeTriangle();
-            CanResize = canResize;
         }
 
-        #endregion
-
-        #region Hooked Parent Events
+        private void UnhookParentEvents(SKGLElement parent)
+        {
+            parent.MouseLeave -= Parent_MouseLeave;
+            parent.MouseDown -= Parent_MouseDown;
+            parent.MouseUp -= Parent_MouseUp;
+            parent.MouseMove -= Parent_MouseMove;
+            parent.SizeChanged -= Parent_SizeChanged;
+        }
 
         private void Parent_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             var element = (IInputElement)sender;
-            Point pos = e.GetPosition(element);
+            var pos = e.GetPosition(element);
             _lastMousePosition = new((float)pos.X, (float)pos.Y);
-            var test = HitTest(new SKPoint((float)pos.X, (float)pos.Y));
-            switch (test)
+
+            var pt = new SKPoint(_lastMousePosition.X, _lastMousePosition.Y);
+            switch (HitTest(pt))
             {
                 case SKWidgetClickEvent.ClickedMinimize:
-                    Minimized = !Minimized;
-                    Location = Location;
+                    ToggleMinimized();
                     break;
                 case SKWidgetClickEvent.ClickedTitleBar:
                     _titleDrag = true;
@@ -153,86 +205,129 @@ namespace EftDmaRadarLite.UI.Skia
             }
         }
 
-        private void Parent_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            _titleDrag = false;
-            _resizeDrag = false;
-        }
-
-        private void Parent_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            _titleDrag = false;
-            _resizeDrag = false;
-        }
+        private void Parent_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e) => CancelInteractions();
+        private void Parent_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e) => CancelInteractions();
 
         private void Parent_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
             var element = (IInputElement)sender;
-            Point pos = e.GetPosition(element);
+            var pos = e.GetPosition(element);
+            var posF = new SKPoint((float)pos.X, (float)pos.Y);
+
             if (_resizeDrag && CanResize)
             {
-                if (pos.X < Rectangle.Left || pos.Y < Rectangle.Top)
-                    return;
-                var newSize = new SKSize(Math.Abs(Rectangle.Left - (float)pos.X), Math.Abs(Rectangle.Top - (float)pos.Y));
-                Size = newSize;
+                if (posF.X >= Rectangle.Left && posF.Y >= Rectangle.Top)
+                {
+                    var newSize = new SKSize(
+                        Math.Abs(posF.X - Rectangle.Left),
+                        Math.Abs(posF.Y - Rectangle.Top));
+                    Size = newSize;
+                }
             }
             else if (_titleDrag)
             {
-                int deltaX = (int)Math.Round(pos.X - _lastMousePosition.X);
-                int deltaY = (int)Math.Round(pos.Y - _lastMousePosition.Y);
-                var newLoc = new SKPoint(Location.X + deltaX, Location.Y + deltaY);
-                // Set the new location
-                Location = newLoc;
+                var dx = (int)Math.Round(posF.X - _lastMousePosition.X);
+                var dy = (int)Math.Round(posF.Y - _lastMousePosition.Y);
+                if (dx != 0 || dy != 0)
+                    Location = new SKPoint(Location.X + dx, Location.Y + dy);
             }
-            _lastMousePosition = new((float)pos.X, (float)pos.Y);
+
+            _lastMousePosition = new Vector2(posF.X, posF.Y);
         }
 
         private void Parent_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            var size = _parent.CanvasSize;
-            var cr = new SKRect(0, 0, (int)Math.Round(size.Width), (int)Math.Round(size.Height));
-
-            // Calculate the new location based on relative position
+            var canvasSize = _parent.CanvasSize;
+            var cr = new SKRect(
+                0, 0,
+                (int)Math.Round(canvasSize.Width),
+                (int)Math.Round(canvasSize.Height));
+            if (cr.Width <= 0 || cr.Height <= 0)
+                return;
             Location = new SKPoint(
                 cr.Width * _relativeX,
                 cr.Height * _relativeY);
         }
-        #endregion
 
-        #region Public Methods
         public virtual void Draw(SKCanvas canvas)
         {
             if (!Minimized)
                 canvas.DrawRect(Rectangle, WidgetBackgroundPaint);
-            canvas.DrawRect(TitleBar, TitleBarPaint);
-            float titleCenterY = TitleBar.Top + (TitleBar.Height / 2);
 
-            float titleYOffset = (Font.Metrics.Ascent + Font.Metrics.Descent) / 2;
+            canvas.DrawRect(TitleBar, TitleBarPaint);
+
+            float titleCenterY = TitleBar.MidY;
+            float titleYOffset = (Font.Metrics.Ascent + Font.Metrics.Descent) / 2f;
             canvas.DrawText(
                 Title,
-                new(TitleBar.Left + 2.5f * ScaleFactor, titleCenterY - titleYOffset),
+                new(TitleBar.Left + TitlePadding, titleCenterY - titleYOffset),
                 SKTextAlign.Left,
                 Font,
                 TitleBarText);
 
             canvas.DrawRect(MinimizeButton, ButtonBackgroundPaint);
-            // Draw Rest of stuff...
             DrawMinimizeButton(canvas);
+
             if (!Minimized && CanResize)
                 DrawResizeCorner(canvas);
         }
 
         public virtual void SetScaleFactor(float newScale)
         {
+            if (newScale <= 0 || !newScale.IsNormalOrZero())
+                return;
             ScaleFactor = newScale;
+            Font.Size = BaseFontSize * newScale;
             InitializeResizeTriangle();
-        }
-        #endregion
 
-        #region Private Methods
+            // After scale change, size/title bar changes may push widget off screen.
+            var canvasSize = _parent.CanvasSize;
+            if (canvasSize.Width > 0 && canvasSize.Height > 0)
+            {
+                var canvasRect = new SKRect(0, 0,
+                    (int)Math.Round(canvasSize.Width),
+                    (int)Math.Round(canvasSize.Height));
+                CorrectLocationBounds(canvasRect);
+                _relativeX = canvasRect.Width > 0 ? _location.X / canvasRect.Width : 0f;
+                _relativeY = canvasRect.Height > 0 ? _location.Y / canvasRect.Height : 0f;
+            }
+        }
+
+        protected virtual SKSize ClampSize(SKSize requested)
+        {
+            const float min = 16f;
+            return new SKSize(Math.Max(min, requested.Width), Math.Max(min, requested.Height));
+        }
+
+        private void ToggleMinimized()
+        {
+            Minimized = !Minimized;
+            // Re-run bounds to keep title visible
+            var canvasSize = _parent.CanvasSize;
+            if (canvasSize.Width > 0 && canvasSize.Height > 0)
+            {
+                var canvasRect = new SKRect(0, 0,
+                    (int)Math.Round(canvasSize.Width),
+                    (int)Math.Round(canvasSize.Height));
+                CorrectLocationBounds(canvasRect);
+                _relativeX = canvasRect.Width > 0 ? _location.X / canvasRect.Width : 0f;
+                _relativeY = canvasRect.Height > 0 ? _location.Y / canvasRect.Height : 0f;
+            }
+        }
+
+        private void CancelInteractions()
+        {
+            _titleDrag = false;
+            _resizeDrag = false;
+        }
+
         private void CorrectLocationBounds(SKRect clientRectangle)
         {
-            var rect = Minimized ? TitleBar : Rectangle;
+            var rect = Minimized
+                ? new SKRect(_location.X, _location.Y,
+                    _location.X + Size.Width,
+                    _location.Y + TitleBarHeight)
+                : Rectangle;
 
             if (rect.Left < clientRectangle.Left)
                 _location = new SKPoint(clientRectangle.Left, _location.Y);
@@ -244,42 +339,58 @@ namespace EftDmaRadarLite.UI.Skia
             else if (rect.Bottom > clientRectangle.Bottom)
                 _location = new SKPoint(_location.X, clientRectangle.Bottom - rect.Height);
         }
+
+        private SKWidgetClickEvent HitTest(SKPoint point)
+        {
+            if (!Rectangle.Contains(point.X, point.Y))
+                return SKWidgetClickEvent.None;
+            if (MinimizeButton.Contains(point.X, point.Y))
+                return SKWidgetClickEvent.ClickedMinimize;
+            if (TitleBar.Contains(point.X, point.Y))
+                return SKWidgetClickEvent.ClickedTitleBar;
+            if (!Minimized &&
+                CanResize &&
+                _resizeTriangle is not null &&
+                _resizeTriangle.Contains(point.X, point.Y))
+                return SKWidgetClickEvent.ClickedResize;
+            if (!Minimized && ClientRectangle.Contains(point.X, point.Y))
+                return SKWidgetClickEvent.ClickedClientArea;
+            return SKWidgetClickEvent.Clicked;
+        }
+
         private void DrawMinimizeButton(SKCanvas canvas)
         {
-            float minHalfLength = MinimizeButton.Width / 4;
+            float halfLength = MinimizeButton.Width / 4f;
+            canvas.DrawLine(
+                MinimizeButton.MidX - halfLength,
+                MinimizeButton.MidY,
+                MinimizeButton.MidX + halfLength,
+                MinimizeButton.MidY,
+                SymbolPaint);
             if (Minimized)
             {
-                canvas.DrawLine(MinimizeButton.MidX - minHalfLength,
-                    MinimizeButton.MidY,
-                    MinimizeButton.MidX + minHalfLength,
-                    MinimizeButton.MidY,
-                    SymbolPaint);
-                canvas.DrawLine(MinimizeButton.MidX,
-                    MinimizeButton.MidY - minHalfLength,
+                canvas.DrawLine(
                     MinimizeButton.MidX,
-                    MinimizeButton.MidY + minHalfLength,
+                    MinimizeButton.MidY - halfLength,
+                    MinimizeButton.MidX,
+                    MinimizeButton.MidY + halfLength,
                     SymbolPaint);
             }
-            else
-                canvas.DrawLine(MinimizeButton.MidX - minHalfLength,
-                    MinimizeButton.MidY,
-                    MinimizeButton.MidX + minHalfLength,
-                    MinimizeButton.MidY,
-                    SymbolPaint);
         }
 
         private void InitializeResizeTriangle()
         {
-            float triangleSize = 10.5f * ScaleFactor;
+            float triSize = ResizeGlyphBaseSize * ScaleFactor;
             var bottomRight = new SKPoint(Rectangle.Right, Rectangle.Bottom);
-            var topOfTriangle = new SKPoint(bottomRight.X, bottomRight.Y - triangleSize);
-            var leftOfTriangle = new SKPoint(bottomRight.X - triangleSize, bottomRight.Y);
+            var top = new SKPoint(bottomRight.X, bottomRight.Y - triSize);
+            var left = new SKPoint(bottomRight.X - triSize, bottomRight.Y);
 
             var path = new SKPath();
             path.MoveTo(bottomRight);
-            path.LineTo(topOfTriangle);
-            path.LineTo(leftOfTriangle);
+            path.LineTo(top);
+            path.LineTo(left);
             path.Close();
+
             var old = Interlocked.Exchange(ref _resizeTriangle, path);
             old?.Dispose();
         }
@@ -290,52 +401,29 @@ namespace EftDmaRadarLite.UI.Skia
             if (path is not null)
                 canvas.DrawPath(path, TitleBarPaint);
         }
-        private SKWidgetClickEvent HitTest(SKPoint point)
-        {
-            var result = SKWidgetClickEvent.None;
-            bool clicked = point.X >= Rectangle.Left && point.X <= Rectangle.Right && point.Y >= Rectangle.Top && point.Y <= Rectangle.Bottom;
-            if (!clicked)
-                return result;
-            result = SKWidgetClickEvent.Clicked;
-            bool titleClicked = point.X >= TitleBar.Left && point.X <= TitleBar.Right && point.Y >= TitleBar.Top && point.Y <= TitleBar.Bottom;
-            if (titleClicked)
-                result = SKWidgetClickEvent.ClickedTitleBar;
-            bool clientClicked = point.X >= ClientRectangle.Left && point.X <= ClientRectangle.Right && point.Y >= ClientRectangle.Top && point.Y <= ClientRectangle.Bottom;
-            if (!Minimized && clientClicked)
-                result = SKWidgetClickEvent.ClickedClientArea;
-            bool minClicked = point.X >= MinimizeButton.Left && point.X <= MinimizeButton.Right && point.Y >= MinimizeButton.Top && point.Y <= MinimizeButton.Bottom;
-            if (minClicked)
-                result = SKWidgetClickEvent.ClickedMinimize;
-            var resizePath = _resizeTriangle;
-            if (!Minimized && resizePath is not null && resizePath.Contains(point.X, point.Y))
-                result = SKWidgetClickEvent.ClickedResize;
-            return result;
-        }
-        #endregion
 
-        #region Paints
-        private static SKPaint WidgetBackgroundPaint { get; } = new SKPaint
+        private static SKPaint WidgetBackgroundPaint { get; } = new()
         {
             Color = SKColors.Black.WithAlpha(0xBE),
             StrokeWidth = 1,
-            Style = SKPaintStyle.Fill,
+            Style = SKPaintStyle.Fill
         };
 
-        private static SKPaint TitleBarPaint { get; } = new SKPaint
+        private static SKPaint TitleBarPaint { get; } = new()
         {
             Color = SKColors.Gray,
             StrokeWidth = 0.5f,
-            Style = SKPaintStyle.Fill,
+            Style = SKPaintStyle.Fill
         };
 
-        private static SKPaint ButtonBackgroundPaint { get; } = new SKPaint
+        private static SKPaint ButtonBackgroundPaint { get; } = new()
         {
             Color = SKColors.LightGray,
             StrokeWidth = 0.1f,
-            Style = SKPaintStyle.Fill,
+            Style = SKPaintStyle.Fill
         };
 
-        private static SKPaint SymbolPaint { get; } = new SKPaint
+        private static SKPaint SymbolPaint { get; } = new()
         {
             Color = SKColors.Black,
             StrokeWidth = 2f,
@@ -343,39 +431,31 @@ namespace EftDmaRadarLite.UI.Skia
             IsAntialias = true
         };
 
-        private static SKPaint TitleBarText { get; } = new SKPaint
+        private static SKPaint TitleBarText { get; } = new()
         {
             Color = SKColors.White,
             IsStroke = false,
             IsAntialias = true
         };
 
-        private static SKFont Font { get; } = new SKFont(CustomFonts.NeoSansStdRegular, 9f)
+        private static SKFont Font { get; } = new(CustomFonts.NeoSansStdRegular, 9f)
         {
             Subpixel = true
         };
 
         internal static void SetScaleFactorInternal(float scale)
         {
-            Font.Size = 9f * scale;
+            if (scale > 0 && scale.IsNormalOrZero())
+                Font.Size = 9f * scale;
         }
-        #endregion
 
-        #region IDisposable
-        private bool _disposed;
         public virtual void Dispose()
         {
-            bool disposed = Interlocked.Exchange(ref _disposed, true);
-            if (!disposed)
-            {
-                _parent.MouseLeave -= Parent_MouseLeave;
-                _parent.MouseDown -= Parent_MouseDown;
-                _parent.MouseUp -= Parent_MouseUp;
-                _parent.MouseMove -= Parent_MouseMove;
-                _parent.SizeChanged -= Parent_SizeChanged;
-                ResizeTriangle?.Dispose();
-            }
+            if (Interlocked.Exchange(ref _disposed, true))
+                return;
+            UnhookParentEvents(_parent);
+            ResizeTriangle?.Dispose();
+            GC.SuppressFinalize(this);
         }
-        #endregion
     }
 }

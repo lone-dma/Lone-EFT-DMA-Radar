@@ -162,7 +162,7 @@ namespace EftDmaRadarLite.UI.Radar
 
             // Split lines (trim empty last line if any)
             var lines = sb.ToString()
-                          .Split(Environment.NewLine)
+                          .Split(Environment.NewLine, StringSplitOptions.None)
                           .Where(l => !string.IsNullOrWhiteSpace(l))
                           .ToArray();
 
@@ -178,8 +178,7 @@ namespace EftDmaRadarLite.UI.Radar
             }
 
             Size = new SKSize(maxLength + pad, lines.Length * lineSpacing);
-            Location = Location; // Bounds check via property setter logic.
-            Draw(canvas); // Background / frame.
+            Draw(canvas); // Background/fram
 
             var drawPt = new SKPoint(
                 ClientRectangle.Left + pad,
