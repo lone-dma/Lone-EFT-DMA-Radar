@@ -30,6 +30,7 @@ using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.UI.Skia;
 using SkiaSharp.Views.WPF;
 using EftDmaRadarLite.Misc;
+using Collections.Pooled;
 
 namespace EftDmaRadarLite.UI.Radar
 {
@@ -55,52 +56,58 @@ namespace EftDmaRadarLite.UI.Radar
                 return;
             }
 
-            const int W_FAC_LVL_NAME = -21;
-            const int W_ACCT = -5;
-            const int W_KD = -6;
-            const int W_HOURS = -6;
-            const int W_RAIDS = -6;
-            const int W_SURVIVE = -7;
-            const int W_GROUP = -4;
-            const int W_VALUE = -7;
-            const int W_HANDS = -16;
-
-            static void AppendRow(StringBuilder sb,
-                (int w, string v) c1,
-                (int w, string v) c2,
-                (int w, string v) c3,
-                (int w, string v) c4,
-                (int w, string v) c5,
-                (int w, string v) c6,
-                (int w, string v) c7,
-                (int w, string v) c8,
-                (int w, string v) c9)
+            static string MakeRow(string c1, string c2, string c3, string c4,
+                                  string c5, string c6, string c7, string c8, string c9)
             {
-                sb.AppendFormat($"{{0,{c1.w}}}", c1.v)
-                  .AppendFormat($"{{0,{c2.w}}}", c2.v)
-                  .AppendFormat($"{{0,{c3.w}}}", c3.v)
-                  .AppendFormat($"{{0,{c4.w}}}", c4.v)
-                  .AppendFormat($"{{0,{c5.w}}}", c5.v)
-                  .AppendFormat($"{{0,{c6.w}}}", c6.v)
-                  .AppendFormat($"{{0,{c7.w}}}", c7.v)
-                  .AppendFormat($"{{0,{c8.w}}}", c8.v)
-                  .AppendFormat($"{{0,{c9.w}}}", c9.v)
-                  .AppendLine();
+                // known widths
+                const int W1 = 21, W2 = 5, W3 = 6, W4 = 6, W5 = 6,
+                          W6 = 7, W7 = 4, W8 = 7, W9 = 16;
+
+                const int len = W1 + W2 + W3 + W4 + W5 + W6 + W7 + W8 + W9;
+
+                return string.Create(len, (c1, c2, c3, c4, c5, c6, c7, c8, c9), static (span, cols) =>
+                {
+                    int pos = 0;
+                    WriteAligned(span, ref pos, cols.c1, 21);
+                    WriteAligned(span, ref pos, cols.c2, 5);
+                    WriteAligned(span, ref pos, cols.c3, 6);
+                    WriteAligned(span, ref pos, cols.c4, 6);
+                    WriteAligned(span, ref pos, cols.c5, 6);
+                    WriteAligned(span, ref pos, cols.c6, 7);
+                    WriteAligned(span, ref pos, cols.c7, 4);
+                    WriteAligned(span, ref pos, cols.c8, 7);
+                    WriteAligned(span, ref pos, cols.c9, 16);
+                });
             }
 
-            var sb = new StringBuilder(2048);
+            static void WriteAligned(Span<char> span, ref int pos, string value, int width)
+            {
+                int padding = width - value.Length;
+                if (padding < 0) padding = 0;
+
+                // write the value left-aligned
+                value.AsSpan(0, Math.Min(value.Length, width))
+                     .CopyTo(span.Slice(pos));
+
+                // pad the rest with spaces
+                span.Slice(pos + value.Length, padding).Fill(' ');
+
+                pos += width;
+            }
+
+            using var lines = new PooledList<string>(capacity: 32);
 
             // Header
-            AppendRow(sb,
-                (W_FAC_LVL_NAME, "Fac / Lvl / Name"),
-                (W_ACCT, "Acct"),
-                (W_KD, "K/D"),
-                (W_HOURS, "Hours"),
-                (W_RAIDS, "Raids"),
-                (W_SURVIVE, "S/R%"),
-                (W_GROUP, "Grp"),
-                (W_VALUE, "Value"),
-                (W_HANDS, "In Hands"));
+            lines.Add(MakeRow(
+                "Fac / Lvl / Name", // c1
+                "Acct",             // c2
+                "K/D",              // c3
+                "Hours",            // c4
+                "Raids",            // c5
+                "S/R%",             // c6
+                "Grp",              // c7
+                "Value",            // c8
+                "In Hands"));       // c9
 
             // Sort & filter
             var localPos = localPlayer.Position;
@@ -148,23 +155,17 @@ namespace EftDmaRadarLite.UI.Radar
                 string facLvlName = $"{focused}{faction}{level}:{name}";
                 string value = Utilities.FormatNumberKM(player.Gear?.Value ?? 0);
 
-                AppendRow(sb,
-                    (W_FAC_LVL_NAME, facLvlName),
-                    (W_ACCT, edition),
-                    (W_KD, kd),
-                    (W_HOURS, hours),
-                    (W_RAIDS, raidCount),
-                    (W_SURVIVE, survivePercent),
-                    (W_GROUP, grp),
-                    (W_VALUE, value),
-                    (W_HANDS, inHands));
+                lines.Add(MakeRow(
+                    facLvlName + "ZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+                    edition,
+                    kd,
+                    hours,
+                    raidCount,
+                    survivePercent,
+                    grp,
+                    value,
+                    inHands));
             }
-
-            // Split lines (trim empty last line if any)
-            var lines = sb.ToString()
-                          .Split(Environment.NewLine, StringSplitOptions.None)
-                          .Where(l => !string.IsNullOrWhiteSpace(l))
-                          .ToArray();
 
             var font = SKFonts.InfoWidgetFont;
             float lineSpacing = font.Spacing;
@@ -177,8 +178,8 @@ namespace EftDmaRadarLite.UI.Radar
                 if (len > maxLength) maxLength = len;
             }
 
-            Size = new SKSize(maxLength + pad, lines.Length * lineSpacing);
-            Draw(canvas); // Background/fram
+            Size = new SKSize(maxLength + pad, lines.Count * lineSpacing);
+            Draw(canvas); // Background/frame
 
             var drawPt = new SKPoint(
                 ClientRectangle.Left + pad,
@@ -194,6 +195,7 @@ namespace EftDmaRadarLite.UI.Radar
                 drawPt.Y += lineSpacing;
             }
         }
+
 
         public override void SetScaleFactor(float newScale)
         {
