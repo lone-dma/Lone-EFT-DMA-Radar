@@ -69,23 +69,27 @@ namespace EftDmaRadarLite.Tarkov.Loot
             if (now - _last < TimeSpan.FromSeconds(5))
                 return;
             Player ??= deadPlayers?.FirstOrDefault(x => x.Corpse == _corpse);
-            var loot = new List<LootItem>();
-            GetCorpseLoot(_corpse, loot, Player?.IsPmc ?? true);
+            using var scannedItems = new PooledSet<ulong>(capacity: 12);
+            GetCorpseLoot(_corpse, scannedItems, Loot, Player?.IsPmc ?? true);
+            foreach (var existingItem in Loot.Keys) // Remove old loot
+            {
+                if (!scannedItems.Contains(existingItem))
+                    Loot.TryRemove(existingItem, out _);
+            }
             Player?.LootObject ??= this;
-            Loot = loot;
             _last = now;
         }
 
         /// <summary>
         /// Gets all loot on a corpse.
         /// </summary>
-        private static void GetCorpseLoot(ulong lootInteractiveClass, IList<LootItem> loot, bool isPMC)
+        private static void GetCorpseLoot(ulong lootInteractiveClass, ISet<ulong> scannedItems, IDictionary<ulong, LootItem> containerLoot, bool isPMC)
         {
             try
             {
                 var itemBase = Memory.ReadPtr(lootInteractiveClass + Offsets.InteractiveLootItem.Item);
                 var slots = Memory.ReadPtr(itemBase + Offsets.LootItemMod.Slots);
-                GetItemsInSlots(slots, loot, isPMC);
+                GetItemsInSlots(slots, scannedItems, containerLoot, isPMC);
             }
             catch { }
         }
@@ -93,7 +97,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
         /// <summary>
         /// Recurse slots for gear.
         /// </summary>
-        private static void GetItemsInSlots(ulong slotsPtr, IList<LootItem> loot, bool isPMC)
+        private static void GetItemsInSlots(ulong slotsPtr, ISet<ulong> scannedItems, IDictionary<ulong, LootItem> containerLoot, bool isPMC)
         {
             using var slotDict = new PooledDictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);
             using var slots = UnityArray<ulong>.Create(slotsPtr, true);
@@ -113,11 +117,14 @@ namespace EftDmaRadarLite.Tarkov.Loot
                     if (isPMC && slot.Key == "Scabbard")
                         continue;
                     var containedItem = Memory.ReadPtr(slot.Value + Offsets.Slot.ContainedItem);
+                    scannedItems.Add(containedItem);
                     var inventorytemplate = Memory.ReadPtr(containedItem + Offsets.LootItem.Template);
                     var idPtr = Memory.ReadValue<Types.MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
                     var id = Memory.ReadUnityString(idPtr.StringID);
-                    if (EftDataManager.AllItems.TryGetValue(id, out var entry))
-                        loot.Add(new LootItem(entry));
+                    if (EftDataManager.AllItems.TryGetValue(id, out var entry) && !containerLoot.ContainsKey(containedItem))
+                    {
+                        containerLoot[containedItem] = new LootItem(entry);
+                    }
                 }
                 catch
                 {

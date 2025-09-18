@@ -37,7 +37,6 @@ namespace EftDmaRadarLite.Tarkov.Loot
 {
     public sealed class StaticLootContainer : LootContainer
     {
-        private static readonly IReadOnlyList<LootItem> _defaultLoot = new List<LootItem>(1);
         private readonly ulong _interactiveClass;
         public override string Name { get; } = "Container";
         public override string ID { get; }
@@ -47,7 +46,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
         /// </summary>
         public bool Searched { get; private set; }
 
-        public StaticLootContainer(string containerId, ulong interactiveClass) : base(_defaultLoot)
+        public StaticLootContainer(string containerId, ulong interactiveClass) : base()
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(containerId, nameof(containerId));
             ID = containerId;

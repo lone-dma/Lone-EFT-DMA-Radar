@@ -51,16 +51,6 @@ namespace EftDmaRadarLite.Tarkov.Loot
         protected LootContainer() : base(_defaultItem) { }
 
         /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="name">Name of container (example: AIRDROP).</param>
-        public LootContainer(IReadOnlyList<LootItem> loot) : base(_defaultItem)
-        {
-            ArgumentNullException.ThrowIfNull(loot, nameof(loot));
-            Loot = loot;
-        }
-
-        /// <summary>
         /// Update the filter for this container.
         /// </summary>
         /// <param name="filter">New filter to be set.</param>
@@ -73,13 +63,13 @@ namespace EftDmaRadarLite.Tarkov.Loot
         /// <summary>
         /// All items inside this Container (unfiltered/unordered).
         /// </summary>
-        public IReadOnlyList<LootItem> Loot { get; protected set; }
+        public ConcurrentDictionary<ulong, LootItem> Loot { get; } = new();
 
         /// <summary>
         /// All Items inside this container that pass the current Loot Filter.
         /// Ordered by Important/Price Value.
         /// </summary>
-        public IEnumerable<LootItem> FilteredLoot => Loot
+        public IEnumerable<LootItem> FilteredLoot => Loot.Values
             .Where(x => _filter(x))
             .OrderLoot();
     }
