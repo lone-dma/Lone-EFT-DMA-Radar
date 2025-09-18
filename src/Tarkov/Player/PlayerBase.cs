@@ -980,7 +980,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                 if (GroupID != -1)
                     g = $"G:{GroupID} ";
                 if (g is not null) lines.Add(g);
-                var corpseLoot = LootObject?.Loot?.OrderLoot();
+                var corpseLoot = LootObject?.Loot?.Values?.OrderLoot();
                 if (corpseLoot is not null)
                 {
                     var sumPrice = corpseLoot.Sum(x => x.Price);

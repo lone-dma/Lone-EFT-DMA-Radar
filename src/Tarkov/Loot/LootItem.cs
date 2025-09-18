@@ -137,7 +137,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
             {
                 if (this is LootContainer container)
                 {
-                    return container.Loot.Any(x => x.IsMeds);
+                    return container.Loot.Values.Any(x => x.IsMeds);
                 }
                 return _item.IsMed;
             }
@@ -148,7 +148,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
             {
                 if (this is LootContainer container)
                 {
-                    return container.Loot.Any(x => x.IsFood);
+                    return container.Loot.Values.Any(x => x.IsFood);
                 }
                 return _item.IsFood;
             }
@@ -159,7 +159,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
             {
                 if (this is LootContainer container)
                 {
-                    return container.Loot.Any(x => x.IsBackpack);
+                    return container.Loot.Values.Any(x => x.IsBackpack);
                 }
                 return _item.IsBackpack;
             }
@@ -178,7 +178,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                     return false;
                 if (this is LootContainer container)
                 {
-                    return container.Loot.Any(x => x.IsRegularLoot);
+                    return container.Loot.Values.Any(x => x.IsRegularLoot);
                 }
                 return Price >= App.Config.Loot.MinValue;
             }
@@ -195,7 +195,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                     return false;
                 if (this is LootContainer container)
                 {
-                    return container.Loot.Any(x => x.IsValuableLoot);
+                    return container.Loot.Values.Any(x => x.IsValuableLoot);
                 }
                 return Price >= App.Config.Loot.MinValueValuable;
             }
@@ -212,7 +212,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                     return false;
                 if (this is LootContainer container)
                 {
-                    return container.Loot.Any(x => x.IsImportant);
+                    return container.Loot.Values.Any(x => x.IsImportant);
                 }
                 return _item.Important || IsWishlisted;
             }
@@ -231,7 +231,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                     return false;
                 if (this is LootContainer container)
                 {
-                    return container.Loot.Any(x => x.IsQuestCondition);
+                    return container.Loot.Values.Any(x => x.IsQuestCondition);
                 }
                 return Memory.QuestManager?.ItemConditions?.Contains(ID) ?? false;
             }
@@ -246,7 +246,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
         {
             if (this is LootContainer container)
             {
-                return container.Loot.Any(x => x.ContainsSearchPredicate(predicate));
+                return container.Loot.Values.Any(x => x.ContainsSearchPredicate(predicate));
             }
             return predicate(this);
         }
@@ -307,7 +307,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                 var loot = container.FilteredLoot;
                 if (container is LootCorpse corpse) // Draw corpse loot
                 {
-                    var corpseLoot = corpse.Loot?.OrderLoot();
+                    var corpseLoot = corpse.Loot?.Values?.OrderLoot();
                     var sumPrice = corpseLoot?.Sum(x => x.Price) ?? 0;
                     var corpseValue = Utilities.FormatNumberKM(sumPrice);
                     var playerObj = corpse.Player;
@@ -356,7 +356,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
             var label = "";
             if (this is LootContainer container)
             {
-                var important = container.Loot.Any(x => x.IsImportant);
+                var important = container.Loot.Values.Any(x => x.IsImportant);
                 var loot = container.FilteredLoot;
                 if (this is not LootCorpse && loot.Count() == 1)
                 {
@@ -404,7 +404,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
             string filterColor = null;
             if (this is LootContainer ctr)
             {
-                filterColor = ctr.Loot?.FirstOrDefault(x => x.Important)?.CustomFilter?.Color;
+                filterColor = ctr.Loot?.Values?.FirstOrDefault(x => x.Important)?.CustomFilter?.Color;
                 if (filterColor is null && this is LootCorpse)
                     return new (SKPaints.PaintCorpse, SKPaints.TextCorpse);
             }
