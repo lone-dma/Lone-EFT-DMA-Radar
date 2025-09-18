@@ -61,22 +61,22 @@ namespace EftDmaRadarLite.UI.Radar
             {
                 // known widths
                 const int W1 = 21, W2 = 5, W3 = 6, W4 = 6, W5 = 6,
-                          W6 = 7, W7 = 4, W8 = 7, W9 = 16;
+                          W6 = 6, W7 = 4, W8 = 7, W9 = 16;
 
                 const int len = W1 + W2 + W3 + W4 + W5 + W6 + W7 + W8 + W9;
 
                 return string.Create(len, (c1, c2, c3, c4, c5, c6, c7, c8, c9), static (span, cols) =>
                 {
                     int pos = 0;
-                    WriteAligned(span, ref pos, cols.c1, 21);
-                    WriteAligned(span, ref pos, cols.c2, 5);
-                    WriteAligned(span, ref pos, cols.c3, 6);
-                    WriteAligned(span, ref pos, cols.c4, 6);
-                    WriteAligned(span, ref pos, cols.c5, 6);
-                    WriteAligned(span, ref pos, cols.c6, 7);
-                    WriteAligned(span, ref pos, cols.c7, 4);
-                    WriteAligned(span, ref pos, cols.c8, 7);
-                    WriteAligned(span, ref pos, cols.c9, 16);
+                    WriteAligned(span, ref pos, cols.c1, W1);
+                    WriteAligned(span, ref pos, cols.c2, W2);
+                    WriteAligned(span, ref pos, cols.c3, W3);
+                    WriteAligned(span, ref pos, cols.c4, W4);
+                    WriteAligned(span, ref pos, cols.c5, W5);
+                    WriteAligned(span, ref pos, cols.c6, W6);
+                    WriteAligned(span, ref pos, cols.c7, W7);
+                    WriteAligned(span, ref pos, cols.c8, W8);
+                    WriteAligned(span, ref pos, cols.c9, W9);
                 });
             }
 
