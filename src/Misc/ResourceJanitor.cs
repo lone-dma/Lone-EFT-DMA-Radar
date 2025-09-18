@@ -39,11 +39,7 @@ namespace EftDmaRadarLite.Common
         {
             MemDMA.RaidStarted += MemDMA_RaidStarted;
             MemDMA.RaidStopped += MemDMA_RaidStopped;
-            new Thread(Worker)
-            {
-                Priority = ThreadPriority.Lowest,
-                IsBackground = true
-            }.Start();
+            _ = Task.Run(WorkerRoutineAsync);
         }
 
         private static void MemDMA_RaidStarted(object sender, EventArgs e)
@@ -56,7 +52,7 @@ namespace EftDmaRadarLite.Common
             GCSettings.LatencyMode = GCLatencyMode.Interactive;
         }
 
-        private static void Worker()
+        private static async Task WorkerRoutineAsync()
         {
             while (true)
             {
@@ -70,7 +66,7 @@ namespace EftDmaRadarLite.Common
                     }
                 }
                 catch { }
-                finally { Thread.Sleep(TimeSpan.FromSeconds(5)); }
+                finally { await Task.Delay(TimeSpan.FromSeconds(5)); }
             }
         }
 
