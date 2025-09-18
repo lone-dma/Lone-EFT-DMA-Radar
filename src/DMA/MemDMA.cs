@@ -306,9 +306,9 @@ namespace EftDmaRadarLite.DMA
         private void LoadModules()
         {
             var unityBase = _vmm.ProcessGetModuleBase(_pid, "UnityPlayer.dll");
-            ArgumentOutOfRangeException.ThrowIfZero(unityBase, nameof(unityBase));
+            unityBase.ThrowIfInvalidVirtualAddress(nameof(unityBase));
             var monoBase = _vmm.ProcessGetModuleBase(_pid, "mono-2.0-bdwgc.dll");
-            ArgumentOutOfRangeException.ThrowIfZero(monoBase, nameof(monoBase));
+            monoBase.ThrowIfInvalidVirtualAddress(nameof(monoBase));
             UnityBase = unityBase;
             MonoBase = monoBase;
         }
