@@ -318,7 +318,7 @@ namespace EftDmaRadarLite.DMA
         #region Events
 
         /// <summary>
-        /// Raised when the game process is starting up.
+        /// Raised when the game process is starting up (after getting PID/Module Base).
         /// Outside Subscribers should handle exceptions!
         /// </summary>
         public static event EventHandler<EventArgs> ProcessStarting;
