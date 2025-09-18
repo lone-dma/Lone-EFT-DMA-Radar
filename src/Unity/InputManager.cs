@@ -29,67 +29,49 @@ SOFTWARE.
 using EftDmaRadarLite.UI.Hotkeys;
 using EftDmaRadarLite.DMA;
 using VmmSharpEx.Scatter;
+using EftDmaRadarLite.Misc;
+using EftDmaRadarLite.Misc.Workers;
 
 namespace EftDmaRadarLite.Unity
 {
     internal static class InputManager
     {
+        private static readonly WorkerThread _thread;
         private static ulong _inputManager;
 
         static InputManager()
         {
-            new Thread(Worker)
+            MemDMA.ProcessStarting += MemDMA_ProcessStarting;
+            MemDMA.ProcessStopped += MemDMA_ProcessStopped;
+            _thread = new()
             {
-                IsBackground = true
-            }.Start();
+                Name = "InputManager",
+                SleepDuration = TimeSpan.FromMilliseconds(10)
+            };
+            _thread.PerformWork += Thread_PerformWork;
+            _thread.Start();
         }
 
-        /// <summary>
-        /// Attempts to load Input Manager.
-        /// </summary>
-        /// <param name="unityBase">UnityPlayer.dll Base Addr</param>
-        public static void Initialize(ulong unityBase)
+        private static void MemDMA_ProcessStarting(object sender, EventArgs e)
         {
-            try
-            {
-                _inputManager = Memory.ReadPtr(unityBase + UnityOffsets.ModuleBase.InputManager, false);
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException("ERROR Initializing Input Manager", ex);
-            }
+            ulong unityBase = Memory.UnityBase;
+            unityBase.ThrowIfInvalidVirtualAddress();
+            _inputManager = Memory.ReadPtr(unityBase + UnityOffsets.ModuleBase.InputManager, false);
         }
 
-        /// <summary>
-        /// Reset InputManager (usually after game closure).
-        /// </summary>
-        public static void Reset()
+        private static void MemDMA_ProcessStopped(object sender, EventArgs e)
         {
             _inputManager = 0x0;
         }
 
-        /// <summary>
-        /// InputManager Managed thread.
-        /// </summary>
-        private static void Worker()
+        private static void Thread_PerformWork(object sender, WorkerThreadArgs e)
         {
-            Debug.WriteLine("InputManager thread starting...");
-            while (true)
+            if (MemDMA.WaitForProcess())
             {
-                try
-                {
-                    if (MemDMA.WaitForProcess())
-                    {
-                        ProcessAllHotkeys();
-                    }
-                }
-                catch { }
-                finally
-                {
-                    Thread.Sleep(10);
-                }
+                ProcessAllHotkeys();
             }
         }
+
         /// <summary>
         /// Check all hotkeys, and execute delegates.
         /// </summary>

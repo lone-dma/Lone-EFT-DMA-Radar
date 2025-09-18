@@ -86,6 +86,13 @@ namespace EftDmaRadarLite.DMA
         public QuestManager QuestManager => Game?.QuestManager;
         public LocalGameWorld Game { get; private set; }
 
+        static MemDMA()
+        {
+            RuntimeHelpers.RunClassConstructor(typeof(MonoLib).TypeHandle);
+            RuntimeHelpers.RunClassConstructor(typeof(CameraManager).TypeHandle);
+            RuntimeHelpers.RunClassConstructor(typeof(InputManager).TypeHandle);
+        }
+
         internal MemDMA()
         {
             FpgaAlgo fpgaAlgo = App.Config.DMA.FpgaAlgo;
@@ -202,9 +209,7 @@ namespace EftDmaRadarLite.DMA
                     LoadProcess();
                     LoadModules();
                     this.Starting = true;
-                    MonoLib.InitializeEFT();
-                    InputManager.Initialize(UnityBase);
-                    CameraManager.Initialize();
+                    OnProcessStarting();
                     this.Ready = true;
                     Debug.WriteLine("Game Startup [OK]");
                     break;
@@ -276,8 +281,6 @@ namespace EftDmaRadarLite.DMA
             UnityBase = default;
             MonoBase = default;
             _pid = default;
-            MonoLib.Reset();
-            InputManager.Reset();
         }
 
 
@@ -315,6 +318,11 @@ namespace EftDmaRadarLite.DMA
         #region Events
 
         /// <summary>
+        /// Raised when the game process is starting up.
+        /// Outside Subscribers should handle exceptions!
+        /// </summary>
+        public static event EventHandler<EventArgs> ProcessStarting;
+        /// <summary>
         /// Raised when the game process is successfully started.
         /// Outside Subscribers should handle exceptions!
         /// </summary>
@@ -334,6 +342,14 @@ namespace EftDmaRadarLite.DMA
         /// Outside Subscribers should handle exceptions!
         /// </summary>
         public static event EventHandler<EventArgs> RaidStopped;
+
+        /// <summary>
+        /// Raises the ProcessStarting Event.
+        /// </summary>
+        private static void OnProcessStarting()
+        {
+            ProcessStarting?.Invoke(null, EventArgs.Empty);
+        }
 
         /// <summary>
         /// Raises the ProcessStarted Event.

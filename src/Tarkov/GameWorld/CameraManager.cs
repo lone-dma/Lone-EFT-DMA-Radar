@@ -71,13 +71,11 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
 
         static CameraManager()
         {
+            MemDMA.ProcessStarting += MemDMA_ProcessStarting;
             MemDMA.ProcessStopped += MemDMA_ProcessStopped;
         }
 
-        /// <summary>
-        /// Initialize the Camera Manager static assets on game startup.
-        /// </summary>
-        public static void Initialize()
+        private static void MemDMA_ProcessStarting(object sender, EventArgs e)
         {
             _opticCameraManagerField = MonoLib.MonoClass.Find("Assembly-CSharp", ClassNames.OpticCameraManagerContainer.ClassName, out _).GetStaticFieldData();
             _opticCameraManagerField.ThrowIfInvalidVirtualAddress();

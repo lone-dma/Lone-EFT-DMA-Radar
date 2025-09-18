@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using EftDmaRadarLite.DMA;
 using EftDmaRadarLite.Misc;
 using VmmSharpEx;
 
@@ -38,35 +39,25 @@ namespace EftDmaRadarLite.Unity
         /// </summary>
         public static ulong GameWorldField { get; private set; }
 
-        /// <summary>
-        /// Initialize Mono at Game Startup.
-        /// </summary>
-        public static void InitializeEFT()
+        static MonoLib()
         {
-            try
-            {
-                Debug.WriteLine("Initializing Mono...");
-                var gameWorldField = Singleton.FindOne("GameWorld");
-                gameWorldField.ThrowIfInvalidVirtualAddress("Failed to get GameWorld");
-                GameWorldField = gameWorldField;
-                Debug.WriteLine("Mono Init [OK]");
-            }
-            catch (Exception ex)
-            {
-                Reset();
-                throw new InvalidOperationException("Mono Init [FAIL]", ex);
-            }
+            MemDMA.ProcessStarting += MemDMA_ProcessStarting;
+            MemDMA.ProcessStopped += MemDMA_ProcessStopped;
         }
 
+        private static void MemDMA_ProcessStarting(object sender, EventArgs e)
+        {
+            Debug.WriteLine("Initializing Mono...");
+            var gameWorldField = Singleton.FindOne("GameWorld");
+            gameWorldField.ThrowIfInvalidVirtualAddress("Failed to get GameWorld");
+            GameWorldField = gameWorldField;
+            Debug.WriteLine("Mono Init [OK]");
+        }
 
-        /// <summary>
-        /// Reset MonoLib (usually after game closure/reopening).
-        /// </summary>
-        public static void Reset()
+        private static void MemDMA_ProcessStopped(object sender, EventArgs e)
         {
             GameWorldField = default;
         }
-
 
         #region Internal Functions
 
