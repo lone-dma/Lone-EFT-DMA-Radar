@@ -156,7 +156,7 @@ namespace EftDmaRadarLite.UI.Radar
                 string value = Utilities.FormatNumberKM(player.Gear?.Value ?? 0);
 
                 lines.Add(MakeRow(
-                    facLvlName + "ZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+                    facLvlName,
                     edition,
                     kd,
                     hours,
