@@ -28,7 +28,6 @@ SOFTWARE.
 
 using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.UI.Skia;
-using EftDmaRadarLite.Tarkov.Data.TarkovMarket;
 using SkiaSharp.Views.WPF;
 using EftDmaRadarLite.Misc;
 
@@ -56,88 +55,143 @@ namespace EftDmaRadarLite.UI.Radar
                 return;
             }
 
-            var localPlayerPos = localPlayer.Position;
-            var hostileCount = players.Count(x => x.IsHostileActive);
-            var filteredPlayers = players.Where(x => x.IsHumanHostileActive)
-                .OrderBy(x => Vector3.Distance(localPlayerPos, x.Position));
-            var sb = new StringBuilder();
-            sb.AppendFormat("{0,-21}", "Fac / Lvl / Name")
-                .AppendFormat("{0,-5}", "Acct")
-                .AppendFormat("{0,-6}", "K/D")
-                .AppendFormat("{0,-6}", "Hours")
-                .AppendFormat("{0,-6}", "Raids")
-                .AppendFormat("{0,-6}", "S/R%")
-                .AppendFormat("{0,-4}", "Grp")
-                .AppendFormat("{0,-7}", "Value")
-                .AppendFormat("{0,-16}", "In Hands")
-                .AppendLine();
+            const int W_FAC_LVL_NAME = -21;
+            const int W_ACCT = -5;
+            const int W_KD = -6;
+            const int W_HOURS = -6;
+            const int W_RAIDS = -6;
+            const int W_SURVIVE = -7;
+            const int W_GROUP = -4;
+            const int W_VALUE = -7;
+            const int W_HANDS = -16;
+
+            static void AppendRow(StringBuilder sb,
+                (int w, string v) c1,
+                (int w, string v) c2,
+                (int w, string v) c3,
+                (int w, string v) c4,
+                (int w, string v) c5,
+                (int w, string v) c6,
+                (int w, string v) c7,
+                (int w, string v) c8,
+                (int w, string v) c9)
+            {
+                sb.AppendFormat($"{{0,{c1.w}}}", c1.v)
+                  .AppendFormat($"{{0,{c2.w}}}", c2.v)
+                  .AppendFormat($"{{0,{c3.w}}}", c3.v)
+                  .AppendFormat($"{{0,{c4.w}}}", c4.v)
+                  .AppendFormat($"{{0,{c5.w}}}", c5.v)
+                  .AppendFormat($"{{0,{c6.w}}}", c6.v)
+                  .AppendFormat($"{{0,{c7.w}}}", c7.v)
+                  .AppendFormat($"{{0,{c8.w}}}", c8.v)
+                  .AppendFormat($"{{0,{c9.w}}}", c9.v)
+                  .AppendLine();
+            }
+
+            var sb = new StringBuilder(2048);
+
+            // Header
+            AppendRow(sb,
+                (W_FAC_LVL_NAME, "Fac / Lvl / Name"),
+                (W_ACCT, "Acct"),
+                (W_KD, "K/D"),
+                (W_HOURS, "Hours"),
+                (W_RAIDS, "Raids"),
+                (W_SURVIVE, "S/R%"),
+                (W_GROUP, "Grp"),
+                (W_VALUE, "Value"),
+                (W_HANDS, "In Hands"));
+
+            // Sort & filter
+            var localPos = localPlayer.Position;
+            var filteredPlayers = players
+                .Where(p => p.IsHumanHostileActive)
+                .OrderBy(p => Vector3.Distance(localPos, p.Position));
+
             foreach (var player in filteredPlayers)
             {
-                var name = App.Config.UI.HideNames && player.IsHuman ? "<Hidden>" : player.Name;
-                var faction = player.PlayerSide.ToString()[0];
-                var hands = player.Hands?.DisplayString;
-                var inHands = hands is not null ? hands : "--";
+                string name = (App.Config.UI.HideNames && player.IsHuman) ? "<Hidden>" : player.Name;
+                char faction = player.PlayerSide.ToString()[0];
+                string inHands = player.Hands?.DisplayString ?? "--";
+
+                // Defaults
                 string edition = "--";
                 string level = "0";
                 string kd = "--";
                 string raidCount = "--";
                 string survivePercent = "--";
                 string hours = "--";
-                if (player is ObservedPlayer observed)
+
+                if (player is ObservedPlayer { Profile: { } profile })
                 {
-                    edition = observed.Profile?.Acct;
-                    if (observed.Profile?.Level is int levelResult)
-                        level = levelResult.ToString();
-                    if (observed.Profile?.Overall_KD is float kdResult)
-                        kd = kdResult.ToString("n1");
-                    if (observed.Profile?.RaidCount is int raidCountResult)
-                        raidCount = Utilities.FormatNumberKM(raidCountResult);
-                    if (observed.Profile?.SurvivedRate is float survivedResult)
-                        survivePercent = survivedResult.ToString("n1");
-                    if (observed.Profile?.Hours is int hoursResult)
-                        hours = Utilities.FormatNumberKM(hoursResult);
+                    if (!string.IsNullOrEmpty(profile.Acct))
+                        edition = profile.Acct;
+
+                    if (profile.Level is int lvl)
+                        level = lvl.ToString();
+
+                    if (profile.Overall_KD is float kdVal)
+                        kd = kdVal.ToString("n1");
+
+                    if (profile.RaidCount is int rc)
+                        raidCount = Utilities.FormatNumberKM(rc);
+
+                    if (profile.SurvivedRate is float sr)
+                        survivePercent = sr.ToString("n1");
+
+                    if (profile.Hours is int hrs)
+                        hours = Utilities.FormatNumberKM(hrs);
                 }
-                var grp = player.GroupID != -1 ? player.GroupID.ToString() : "--";
-                var focused = player.IsFocused ? "*" : null;
-                sb.AppendFormat("{0,-21}", $"{focused}{faction}{level}:{name}");
-                sb.AppendFormat("{0,-5}", edition)
-                    .AppendFormat("{0,-6}", kd)
-                    .AppendFormat("{0,-6}", hours)
-                    .AppendFormat("{0,-6}", raidCount)
-                    .AppendFormat("{0,-6}", survivePercent)
-                    .AppendFormat("{0,-4}", grp)
-                    .AppendFormat("{0,-7}", $"{Utilities.FormatNumberKM(player.Gear?.Value ?? 0)}")
-                    .AppendFormat("{0,-16}", $"{inHands}")
-                    .AppendLine();
+
+                string grp = player.GroupID != -1 ? player.GroupID.ToString() : "--";
+                string focused = player.IsFocused ? "*" : string.Empty;
+                string facLvlName = $"{focused}{faction}{level}:{name}";
+                string value = Utilities.FormatNumberKM(player.Gear?.Value ?? 0);
+
+                AppendRow(sb,
+                    (W_FAC_LVL_NAME, facLvlName),
+                    (W_ACCT, edition),
+                    (W_KD, kd),
+                    (W_HOURS, hours),
+                    (W_RAIDS, raidCount),
+                    (W_SURVIVE, survivePercent),
+                    (W_GROUP, grp),
+                    (W_VALUE, value),
+                    (W_HANDS, inHands));
             }
 
-            var data = sb.ToString().Split(Environment.NewLine);
+            // Split lines (trim empty last line if any)
+            var lines = sb.ToString()
+                          .Split(Environment.NewLine)
+                          .Where(l => !string.IsNullOrWhiteSpace(l))
+                          .ToArray();
 
-            var lineSpacing = SKFonts.InfoWidgetFont.Spacing;
-            var maxLength = data.Max(x => SKFonts.InfoWidgetFont.MeasureText(x));
-            var pad = 2.5f * ScaleFactor;
-            Size = new SKSize(maxLength + pad, data.Length * lineSpacing);
-            Location = Location; // Bounds check
-            Draw(canvas); // Draw backer
-            var drawPt = new SKPoint(ClientRectangle.Left + pad, ClientRectangle.Top + lineSpacing / 2 + pad);
-            canvas.DrawText(
-                $"Hostile Count: {hostileCount}",
-                drawPt,
-                SKTextAlign.Left,
-                SKFonts.InfoWidgetFont,
-                SKPaints.TextPlayersOverlay); // draw line text
-            drawPt.Y += lineSpacing;
-            foreach (var line in data) // Draw tooltip text
+            var font = SKFonts.InfoWidgetFont;
+            float lineSpacing = font.Spacing;
+            float pad = 2.5f * ScaleFactor;
+            float maxLength = 0f;
+
+            foreach (var line in lines)
             {
-                if (string.IsNullOrEmpty(line?.Trim()))
-                    continue;
-                canvas.DrawText(
-                    line,
-                    drawPt,
-                    SKTextAlign.Left,
-                    SKFonts.InfoWidgetFont,
-                    SKPaints.TextPlayersOverlay); // draw line text
+                var len = font.MeasureText(line);
+                if (len > maxLength) maxLength = len;
+            }
 
+            Size = new SKSize(maxLength + pad, lines.Length * lineSpacing);
+            Location = Location; // Bounds check via property setter logic.
+            Draw(canvas); // Background / frame.
+
+            var drawPt = new SKPoint(
+                ClientRectangle.Left + pad,
+                ClientRectangle.Top + lineSpacing / 2 + pad);
+
+            foreach (var line in lines)
+            {
+                canvas.DrawText(line,
+                                drawPt,
+                                SKTextAlign.Left,
+                                font,
+                                SKPaints.TextPlayersOverlay);
                 drawPt.Y += lineSpacing;
             }
         }
