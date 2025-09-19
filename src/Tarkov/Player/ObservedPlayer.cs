@@ -229,6 +229,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                 long acctIdLong = long.Parse(AccountID);
                 var cache = LocalCache.GetProfileCollection();
                 if (cache.FindById(acctIdLong) is CachedPlayerProfile cachedProfile &&
+                    cachedProfile.IsCachedRecent &&
                     cachedProfile.Data is string json)
                 {
                     try
