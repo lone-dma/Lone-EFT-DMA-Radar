@@ -26,8 +26,6 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
-
 namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
 {
     public interface IProfileApiProvider
