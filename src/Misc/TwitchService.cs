@@ -26,12 +26,14 @@ SOFTWARE.
  *
 */
 
+using EftDmaRadarLite.Misc.Cache;
+using LiteDB;
 using System.Text.RegularExpressions;
 using TwitchLib.Api;
 using TwitchLib.Api.Core;
 using TwitchLib.Api.Core.Exceptions;
 
-namespace EftDmaRadarLite.Twitch
+namespace EftDmaRadarLite.Misc
 {
     internal static class TwitchService
     {
@@ -47,11 +49,6 @@ namespace EftDmaRadarLite.Twitch
         };
         private static readonly TwitchAPI _api;
 
-        /// <summary>
-        /// Persistent Cache Access.
-        /// </summary>
-        private static ConcurrentDictionary<string, CachedTwitchEntry> Cache { get; } = App.Config.Cache.TwitchService;
-
         static TwitchService()
         {
             if (App.Config.TwitchApi.ClientId is not string clientId ||
@@ -64,9 +61,12 @@ namespace EftDmaRadarLite.Twitch
             };
             _api = new TwitchAPI(settings: settings);
             // Cleanup Cache
-            var expiredLookups = Cache.Where(x => x.Value.Expired);
-            foreach (var expired in expiredLookups)
-                Cache.TryRemove(expired.Key, out _);
+            var cache = LocalCache.GetTwitchCollection();
+            foreach (var expired in cache.Find(cached => cached.IsExpired))
+            {
+                _ = cache.Delete(expired.Username);
+            }
+
         }
 
         /// <summary>
@@ -80,12 +80,16 @@ namespace EftDmaRadarLite.Twitch
             {
                 if (_api is null) // Twitch API is not configured
                     return null;
-                if (Cache.TryGetValue(username, out var cachedEntry) &&
-                    !cachedEntry.Expired &&
-                    cachedEntry.TwitchLogin is string cachedTwitchLogin)
+                username = username.ToLower(); // Cache is case-sensitive
+                var cache = LocalCache.GetTwitchCollection();
+
+                var cachedEntry = cache.FindById(username);
+                if (cachedEntry is not null &&
+                    !cachedEntry.IsExpired &&
+                    cachedEntry.Channel is string channel)
                 {
                     Debug.WriteLine($"[Twitch] {username} is LIVE! (Cached)");
-                    return cachedTwitchLogin;
+                    return channel;
                 }
 
                 var replacedName = GetTTVName(username)?.ToLower();
@@ -97,12 +101,17 @@ namespace EftDmaRadarLite.Twitch
                 Debug.WriteLine($"[Twitch] Checking {username}..."); // replacedName
                 string result = await LookupTwitchApiAsync(replacedName);
                 if (result is not null)
-                    Debug.WriteLine($"[Twitch] {username} is LIVE!");
-
-                Cache[username] = new CachedTwitchEntry()
                 {
-                    TwitchLogin = result
-                };
+                    cachedEntry ??= new CachedTwitchEntry()
+                    {
+                        Username = username,
+                    };
+                    cachedEntry.Channel = result;
+                    cachedEntry.Timestamp = DateTimeOffset.UtcNow;
+                    _ = cache.Upsert(cachedEntry);
+                    Debug.WriteLine($"[Twitch] {username} is LIVE!");
+                }
+
                 return result;
             }
             catch
@@ -182,20 +191,8 @@ namespace EftDmaRadarLite.Twitch
                 var response = await _api.Helix.Streams.GetStreamsAsync(
                     first: 1,
                     userLogins: logins);
-                if (response.Streams.Length == 0)
-                {
-                    Cache[username] = new CachedTwitchEntry()
-                    {
-                        TwitchLogin = null
-                    };
-                    return null;
-                }
-                string twitchLogin = response.Streams.First().UserLogin;
-                Cache[username] = new CachedTwitchEntry()
-                {
-                    TwitchLogin = twitchLogin
-                };
-                return twitchLogin;
+                string channel = response.Streams.First().UserLogin;
+                return channel;
             }
             catch (BadRequestException) // Fake TTVer
             {

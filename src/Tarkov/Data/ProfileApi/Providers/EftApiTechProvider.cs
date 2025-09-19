@@ -27,7 +27,6 @@ SOFTWARE.
 */
 
 using EftDmaRadarLite.Misc;
-using EftDmaRadarLite.Tarkov.Data.ProfileApi;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
 using System.Net.Http;
 
@@ -55,7 +54,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 
         public bool CanLookup(string accountId) => !_skip.Contains(accountId);
 
-        public async Task<ProfileData> GetProfileAsync(string accountId, CancellationToken ct)
+        public async Task<EFTProfileResponse> GetProfileAsync(string accountId, CancellationToken ct)
         {
             try
             {
@@ -77,15 +76,23 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                     _rateLimit = response.Headers.RetryAfter.GetRetryAfter();
                 }
                 response.EnsureSuccessStatusCode(); // Handles 429 TooManyRequests
-                using var stream = await response.Content.ReadAsStreamAsync(ct);
-                var result = await JsonSerializer.DeserializeAsync<EftApiTechResponse>(
-                    utf8Json: stream,
-                    cancellationToken: ct);
-                ArgumentNullException.ThrowIfNull(result, nameof(result));
-                if (!result.Success)
+                string json = await response.Content.ReadAsStringAsync(ct);
+                using var jsonDoc = JsonDocument.Parse(json);
+                bool success = jsonDoc.RootElement.GetProperty("success").GetBoolean();
+                if (!success)
                     throw new InvalidOperationException("Profile request was not successful.");
+                var epoch = jsonDoc.RootElement.GetProperty("lastUpdated").GetProperty("epoch").GetInt64();
+                var data = jsonDoc.RootElement.GetProperty("data");
+                string raw = data.GetRawText();
+                var result = JsonSerializer.Deserialize<ProfileData>(raw) ??
+                    throw new InvalidOperationException("Failed to deserialize response");
                 Debug.WriteLine($"[EftApiTechProvider] Got Profile '{accountId}'!");
-                return result.Data;
+                return new()
+                {
+                    Data = result,
+                    Raw = raw,
+                    LastUpdated = DateTimeOffset.FromUnixTimeMilliseconds(epoch)
+                };
             }
             catch (Exception ex)
             {
