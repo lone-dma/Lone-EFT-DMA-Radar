@@ -89,16 +89,16 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             {
                 try
                 {
+                    // Wait until we are actually in-raid before starting to read/process.
+                    while (!Memory.InRaid)
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(1));
+                    }
+
                     CancellationToken ct;
                     lock (_syncRoot)
                     {
                         ct = _cts.Token;
-                    }
-
-                    // Wait until we are actually in-raid before starting to read/process.
-                    while (!Memory.InRaid)
-                    {
-                        await Task.Delay(TimeSpan.FromSeconds(1), ct);
                     }
 
                     var cache = LocalCache.GetProfileCollection();
