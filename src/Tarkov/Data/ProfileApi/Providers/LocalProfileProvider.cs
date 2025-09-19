@@ -67,8 +67,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                 }
                 try
                 {
-                    var data = JsonSerializer.Deserialize<ProfileData>(cachedProfile.Data) ??
-                        throw new InvalidOperationException("Failed to deserialize cached data");
+                    var data = cachedProfile.ToProfileData();
                     Debug.WriteLine($"[LocalProfileProvider] Got Profile '{accountId}'!");
                     var result = new EFTProfileResponse()
                     {

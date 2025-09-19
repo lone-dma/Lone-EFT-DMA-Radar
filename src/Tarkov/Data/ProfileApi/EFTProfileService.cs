@@ -132,10 +132,16 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             var result = await provider.GetProfileAsync(profile.AccountID, ct);
             if (result is not null) // Success
             {
-                profile.Data ??= result.Data; // Set result on profile
                 var cachedProfile = cache.FindById(acctIdLong);
-                if (cachedProfile is not null && result.LastUpdated <= cachedProfile.Updated)
-                    return; // Don't cache if we already have newer data (oh well lol)
+                if (cachedProfile is not null && result.LastUpdated < cachedProfile.Updated)
+                {
+                    profile.Data ??= cachedProfile.ToProfileData(); // Huh odd the cached data is newer, lets use that instead
+                    return; // Don't re-cache
+                }
+                else
+                {
+                    profile.Data ??= result.Data; // Use the newly fetched data
+                }
                 if (result.Raw is null)
                     return; // Don't cache if we don't have raw data (shouldn't happen)
                 cachedProfile ??= new CachedPlayerProfile

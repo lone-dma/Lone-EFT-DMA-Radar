@@ -70,6 +70,19 @@ namespace EftDmaRadarLite.Misc.Cache
         [BsonIgnore]
         public bool IsCachedRecent => DateTimeOffset.UtcNow - CachedAt < TimeSpan.FromDays(1);
 
+        /// <summary>
+        /// Attempt to deserialize the cached data into a <see cref="ProfileData"/> instance.
+        /// </summary>
+        /// <returns><see cref="ProfileData"/> instance.</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="JsonException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
+        public ProfileData ToProfileData()
+        {
+            return System.Text.Json.JsonSerializer.Deserialize<ProfileData>(this.Data) ??
+                throw new InvalidOperationException("Failed to deserialize ProfileData from cached data.");
+        }
+
         private static byte[] Compress(string text)
         {
             if (text is null)
