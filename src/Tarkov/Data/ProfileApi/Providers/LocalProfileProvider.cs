@@ -72,8 +72,8 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                     var result = new EFTProfileResponse()
                     {
                         Data = data,
-                        Raw = null, // Won't be re-cached so w/e
-                        LastUpdated = DateTimeOffset.MinValue // Don't re-cache
+                        Raw = null, // Don't cache this response
+                        LastUpdated = DateTimeOffset.MinValue // Don't care
                     };
                     return Task.FromResult(result);
                 }
