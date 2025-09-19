@@ -29,7 +29,6 @@ SOFTWARE.
 using EftDmaRadarLite.DMA;
 using EftDmaRadarLite.Misc.Cache;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers;
-using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
 using EftDmaRadarLite.Tarkov.Player;
 using LiteDB;
 
@@ -136,9 +135,9 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                 profile.Data ??= result.Data; // Set result on profile
                 var cachedProfile = cache.FindById(acctIdLong);
                 if (cachedProfile is not null && result.LastUpdated <= cachedProfile.Updated)
-                    return;
+                    return; // Don't cache if we already have newer data (oh well lol)
                 if (result.Raw is null)
-                    return; // Don't cache if we don't have raw data
+                    return; // Don't cache if we don't have raw data (shouldn't happen)
                 cachedProfile ??= new CachedPlayerProfile
                 {
                     Id = acctIdLong,
