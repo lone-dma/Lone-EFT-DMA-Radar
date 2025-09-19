@@ -761,11 +761,6 @@ namespace EftDmaRadarLite
         /// </summary>
         [JsonPropertyName("enabled")]
         public bool Enabled { get; set; } = true;
-        /// <summary>
-        /// Number of requests per minute to this provider.
-        /// </summary>
-        [JsonPropertyName("requestsPerMinute")]
-        public int RequestsPerMinute { get; set; } = 40;
     }
 
     public sealed class EftApiTechConfig
