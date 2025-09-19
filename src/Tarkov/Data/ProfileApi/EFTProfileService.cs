@@ -84,7 +84,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             {
                 try
                 {
-                    while (!Memory.InRaid)
+                    while (!Memory.InRaid || _profiles.IsEmpty)
                         await Task.Delay(TimeSpan.FromSeconds(1));
                     CancellationToken ct;
                     lock (_syncRoot)
