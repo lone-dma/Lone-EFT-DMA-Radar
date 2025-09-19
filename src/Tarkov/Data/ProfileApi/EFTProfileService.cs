@@ -136,7 +136,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                 if (cachedProfile is not null && result.LastUpdated < cachedProfile.Updated)
                 {
                     profile.Data ??= cachedProfile.ToProfileData(); // Huh odd the cached data is newer, lets use that instead
-                    return; // Don't re-cache
+                    return; // Don't cache old data
                 }
                 else
                 {
