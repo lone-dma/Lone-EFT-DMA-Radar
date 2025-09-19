@@ -26,7 +26,9 @@ SOFTWARE.
  *
 */
 
+using EftDmaRadarLite.Misc.Cache;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi;
+using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
 using EftDmaRadarLite.UI.Radar.ViewModels;
 using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Unity.Collections;
@@ -224,15 +226,29 @@ namespace EftDmaRadarLite.Tarkov.Player
                 throw new NotImplementedException(nameof(PlayerSide));
             if (IsHuman)
             {
-                PlayerHistoryViewModel.Add(this); /// Log To Player History
-                if (App.Config.Cache.ProfileService.TryGetValue(AccountID, out var cachedProfile))
+                long acctIdLong = long.Parse(AccountID);
+                var cache = LocalCache.GetProfileCollection();
+                if (cache.FindById(acctIdLong) is CachedPlayerProfile cachedProfile &&
+                    cachedProfile.Data is string json)
                 {
-                    Profile.Data = cachedProfile.Data;
+                    try
+                    {
+                        var profileData = System.Text.Json.JsonSerializer.Deserialize<ProfileData>(json) ??
+                            throw new InvalidOperationException("Failed to deserialize cached data");
+                        Profile.Data = profileData;
+                        Debug.WriteLine($"[ObservedPlayer] Loaded Cached Profile '{AccountID}'!");
+                    }
+                    catch
+                    {
+                        _ = cache.Delete(acctIdLong); // Corrupted cache data, remove it
+                        EFTProfileService.RegisterProfile(Profile); // Re-register for lookup
+                    }
                 }
                 else
                 {
                     EFTProfileService.RegisterProfile(Profile);
                 }
+                PlayerHistoryViewModel.Add(this); /// Log To Player History
             }
             if (IsHumanHostile) /// Special Players Check on Hostiles Only
             {

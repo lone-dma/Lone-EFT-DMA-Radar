@@ -53,7 +53,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 
         public bool CanLookup(string accountId) => !_skip.Contains(accountId);
 
-        public async Task<ProfileData> GetProfileAsync(string accountId, CancellationToken ct)
+        public async Task<EFTProfileResponse> GetProfileAsync(string accountId, CancellationToken ct)
         {
             if (_skip.Contains(accountId))
             {
@@ -73,13 +73,16 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                     _rateLimit = response.Headers.RetryAfter.GetRetryAfter();
                 }
                 response.EnsureSuccessStatusCode(); // Handles 429 TooManyRequests
-                using var stream = await response.Content.ReadAsStreamAsync(ct);
-                var result = await JsonSerializer.DeserializeAsync<ProfileData>(
-                    utf8Json: stream,
-                    cancellationToken: ct);
-                ArgumentNullException.ThrowIfNull(result, nameof(result));
+                string json = await response.Content.ReadAsStringAsync(ct);
+                var result = JsonSerializer.Deserialize<ProfileData>(json) ??
+                    throw new InvalidOperationException("Failed to deserialize response");
                 Debug.WriteLine($"[TarkovDevProvider] Got Profile '{accountId}'!");
-                return result;
+                return new()
+                {
+                    Data = result,
+                    Raw = json,
+                    LastUpdated = DateTimeOffset.FromUnixTimeMilliseconds(result.Epoch)
+                };
             }
             catch (Exception ex)
             {

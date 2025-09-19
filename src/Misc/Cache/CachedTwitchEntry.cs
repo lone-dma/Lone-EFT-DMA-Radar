@@ -26,20 +26,31 @@ SOFTWARE.
  *
 */
 
-namespace EftDmaRadarLite.Twitch
-{
-    public sealed class CachedTwitchEntry
-    {
-        [JsonPropertyName("timestamp")]
-        [JsonInclude]
-        public DateTime Timestamp { get; init; } = DateTime.Now;
-        [JsonPropertyName("twitchLogin")]
-        [JsonInclude]
-        public string TwitchLogin { get; init; }
+using LiteDB;
 
-        [JsonIgnore]
-        public TimeSpan Age => DateTime.Now - Timestamp;
-        [JsonIgnore]
-        public bool Expired => Age > TimeSpan.FromMinutes(15);
+namespace EftDmaRadarLite.Misc.Cache
+{
+    public class CachedTwitchEntry
+    {
+        /// <summary>
+        /// User's in-game name.
+        /// </summary>
+        [BsonId]
+        public string Username { get; init; }
+        /// <summary>
+        /// User's Twitch Channel Name.
+        /// </summary>
+        [BsonField("Channel")]
+        public string Channel { get; set; }
+        /// <summary>
+        /// Gets the date and time when the object was last updated.
+        /// </summary>
+        [BsonField("Timestamp")]
+        public DateTimeOffset Timestamp { get; set; }
+
+        [BsonIgnore]
+        public TimeSpan Age => DateTimeOffset.UtcNow - Timestamp;
+        [BsonIgnore]
+        public bool IsExpired => Age > TimeSpan.FromHours(1);
     }
 }

@@ -27,8 +27,11 @@ SOFTWARE.
 */
 
 using EftDmaRadarLite.DMA;
+using EftDmaRadarLite.Misc.Cache;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers;
+using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
 using EftDmaRadarLite.Tarkov.Player;
+using LiteDB;
 
 namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
 {
@@ -39,20 +42,11 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
         private static readonly ConcurrentQueue<PlayerProfile> _profiles = new();
         private static CancellationTokenSource _cts = new();
 
-        /// <summary>
-        /// Persistent Cache Access.
-        /// </summary>
-        private static ConcurrentDictionary<string, CachedProfileData> Cache { get; } = App.Config.Cache.ProfileService;
-
         static EFTProfileService()
         {
             RuntimeHelpers.RunClassConstructor(typeof(EftApiTechProvider).TypeHandle);
             RuntimeHelpers.RunClassConstructor(typeof(TarkovDevProvider).TypeHandle);
             MemDMA.ProcessStopped += MemDMA_ProcessStopped;
-            // Cleanup Cache
-            var expiredProfiles = Cache.Where(x => x.Value.IsExpired);
-            foreach (var expired in expiredProfiles)
-                Cache.TryRemove(expired.Key, out _);
             _ = Task.Run(WorkerRoutineAsync);
         }
 
@@ -98,9 +92,10 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                     {
                         ct = _cts.Token;
                     }
+                    var cache = LocalCache.GetProfileCollection();
                     while (_profiles.TryDequeue(out var profile))
                     {
-                        await ProcessProfileAsync(profile, ct);
+                        await ProcessProfileAsync(profile, cache, ct);
                         await Task.Delay(0, ct);
                     }
                 }
@@ -119,13 +114,10 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
         /// Get profile data for a particular Account ID.
         /// </summary>
         /// <param name="profile">Profile to lookup.</param>
-        private static async Task ProcessProfileAsync(PlayerProfile profile, CancellationToken ct)
+        private static async Task ProcessProfileAsync(PlayerProfile profile, ILiteCollection<CachedPlayerProfile> cache, CancellationToken ct)
         {
-            if (Cache.TryGetValue(profile.AccountID, out var cachedProfile) && !cachedProfile.IsExpired)
-            {
-                profile.Data ??= cachedProfile.Data;
-                return; // Success exit early
-            }
+            if (!long.TryParse(profile.AccountID, out var acctIdLong))
+                return; // Skip invalid Account IDs
             var validProviders = IProfileApiProvider.AllProviders.Where(IsValidProvider);
             if (!validProviders.Any())
                 return; // No valid providers, don't ever try again
@@ -141,11 +133,20 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             var result = await provider.GetProfileAsync(profile.AccountID, ct);
             if (result is not null) // Success
             {
-                Cache[profile.AccountID] = new CachedProfileData()
+                profile.Data ??= result.Data; // Set result on profile
+                var cachedProfile = cache.FindById(acctIdLong);
+                if (cachedProfile is not null && result.LastUpdated <= cachedProfile.Updated)
+                    return;
+                if (result.Raw is null)
+                    return; // Don't cache if we don't have raw data
+                cachedProfile ??= new CachedPlayerProfile
                 {
-                    Data = result
+                    Id = acctIdLong,
                 };
-                profile.Data ??= result;
+                cachedProfile.Data = result.Raw;
+                cachedProfile.Updated = result.LastUpdated;
+                cachedProfile.CachedAt = DateTimeOffset.UtcNow;
+                _ = cache.Upsert(cachedProfile);
             }
             else // Fail
             {

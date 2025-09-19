@@ -47,6 +47,7 @@ global using System.Text.Json;
 global using System.Text.Json.Serialization;
 global using System.Windows;
 using EftDmaRadarLite.DMA;
+using EftDmaRadarLite.Misc.Cache;
 using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.UI.ColorPicker;
 using EftDmaRadarLite.UI.Misc;
@@ -153,6 +154,7 @@ namespace EftDmaRadarLite
             await loadingWindow.ViewModel.UpdateProgressAsync(50, "Starting DMA Connection...");
             MemoryInterface.ModuleInit();
             await loadingWindow.ViewModel.UpdateProgressAsync(75, "Loading Remaining Modules...");
+            RuntimeHelpers.RunClassConstructor(typeof(LocalCache).TypeHandle);
             RuntimeHelpers.RunClassConstructor(typeof(ColorPickerViewModel).TypeHandle);
             await loadingWindow.ViewModel.UpdateProgressAsync(100, "Loading Completed!");
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;

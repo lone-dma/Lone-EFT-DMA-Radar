@@ -31,8 +31,6 @@ using EftDmaRadarLite.DMA;
 using EftDmaRadarLite.UI.ColorPicker;
 using EftDmaRadarLite.UI.Data;
 using System.Collections.ObjectModel;
-using EftDmaRadarLite.Tarkov.Data.ProfileApi;
-using EftDmaRadarLite.Twitch;
 using EftDmaRadarLite.Misc.JSON;
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Unity;
@@ -317,13 +315,6 @@ namespace EftDmaRadarLite
         [JsonInclude]
         [JsonPropertyName("lootFilters")]
         public LootFilterConfig LootFilters { get; private set; } = new();
-
-        /// <summary>
-        /// Contains cache data between program sessions.
-        /// </summary>
-        [JsonInclude]
-        [JsonPropertyName("cache")]
-        public PersistentCache Cache { get; private set; } = new();
 
         #region Config Interface
 
@@ -745,6 +736,9 @@ namespace EftDmaRadarLite
         [JsonPropertyName("eftApiTech")]
         [JsonInclude]
         public EftApiTechConfig EftApiTech { get; private set; } = new();
+        [JsonPropertyName("localProfiles")]
+        [JsonInclude]
+        public LocalProfileConfig LocalProfile { get; private set; } = new();
     }
 
     public sealed class TwitchApiConfig
@@ -760,8 +754,8 @@ namespace EftDmaRadarLite
         /// <summary>
         /// Priority of this provider.
         /// </summary>
-        [JsonPropertyName("priority")]
-        public uint Priority { get; set; } = uint.MaxValue;
+        [JsonPropertyName("priority_v2")]
+        public uint Priority { get; set; } = 1000;
         /// <summary>
         /// True if this provider is enabled, otherwise False.
         /// </summary>
@@ -798,6 +792,20 @@ namespace EftDmaRadarLite
         public string ApiKey { get; set; } = null;
     }
 
+    public sealed class LocalProfileConfig
+    {
+        /// <summary>
+        /// Priority of this provider.
+        /// </summary>
+        [JsonPropertyName("priority")]
+        public uint Priority { get; set; } = uint.MaxValue;
+        /// <summary>
+        /// True if this provider is enabled, otherwise False.
+        /// </summary>
+        [JsonPropertyName("enabled")]
+        public bool Enabled { get; set; } = false;
+    }
+
     /// <summary>
     /// Configuration for Web Radar.
     /// </summary>
@@ -823,22 +831,5 @@ namespace EftDmaRadarLite
         /// </summary>
         [JsonPropertyName("tickRate")]
         public string TickRate { get; set; } = "60";
-    }
-
-    /// <summary>
-    /// Caches runtime data between sessions.
-    /// </summary>
-    public sealed class PersistentCache
-    {
-        [JsonPropertyName("profileService")]
-        [JsonInclude]
-        [JsonConverter(typeof(CaseInsensitiveConcurrentDictionaryConverter<CachedProfileData>))]
-
-        public ConcurrentDictionary<string, CachedProfileData> ProfileService { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
-
-        [JsonPropertyName("twitchService")]
-        [JsonInclude]
-        [JsonConverter(typeof(CaseInsensitiveConcurrentDictionaryConverter<CachedTwitchEntry>))]
-        public ConcurrentDictionary<string, CachedTwitchEntry> TwitchService { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
     }
 }
