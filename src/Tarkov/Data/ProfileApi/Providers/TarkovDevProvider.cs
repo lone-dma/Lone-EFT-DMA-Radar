@@ -39,7 +39,6 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
         }
 
         private readonly HashSet<string> _skip = new(StringComparer.OrdinalIgnoreCase);
-        private readonly TimeSpan _rate = TimeSpan.FromMinutes(1) / App.Config.ProfileApi.TarkovDev.RequestsPerMinute;
         private DateTimeOffset _nextRun = DateTimeOffset.MinValue;
         private TimeSpan _rateLimit;
 
@@ -91,8 +90,12 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
             }
             finally
             {
-                _nextRun = DateTimeOffset.UtcNow + _rate + _rateLimit;
-                _rateLimit = TimeSpan.Zero; // Reset rate limit after use
+                if (_rateLimit > TimeSpan.Zero)
+                {
+                    // Rate limited we should respect that
+                    _nextRun = DateTimeOffset.UtcNow + _rateLimit;
+                    _rateLimit = TimeSpan.Zero; // Reset rate limit after use
+                }
             }
         }
     }

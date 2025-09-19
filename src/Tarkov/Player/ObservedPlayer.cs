@@ -234,7 +234,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                     {
                         var profileData = cachedProfile.ToProfileData();
                         Profile.Data = profileData;
-                        Debug.WriteLine($"[ObservedPlayer] Loaded Cached Profile '{AccountID}'!");
+                        Debug.WriteLine($"[ObservedPlayer] Got Profile (Cached) '{acctIdLong}'!");
                     }
                     catch
                     {

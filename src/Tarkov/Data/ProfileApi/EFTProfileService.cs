@@ -31,6 +31,7 @@ using EftDmaRadarLite.Misc.Cache;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers;
 using EftDmaRadarLite.Tarkov.Player;
 using LiteDB;
+using System.Threading.Channels;
 
 namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
 {
@@ -38,7 +39,13 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
     {
         #region Fields / Constructor
         private static readonly Lock _syncRoot = new();
-        private static readonly ConcurrentQueue<PlayerProfile> _profiles = new();
+        private static readonly Channel<PlayerProfile> _channel = Channel.CreateUnbounded<PlayerProfile>(
+            new UnboundedChannelOptions
+            {
+                SingleReader = true,
+                SingleWriter = false,
+                AllowSynchronousContinuations = false
+            });
         private static CancellationTokenSource _cts = new();
 
         static EFTProfileService()
@@ -66,12 +73,12 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
         /// <summary>
         /// Attempt to register a Profile for lookup.
         /// </summary>
-        /// <param name="accountId">Profile's Account ID.</param>
         public static void RegisterProfile(PlayerProfile profile)
         {
             if (!ulong.TryParse(profile.AccountID, out _))
                 return; // Skip invalid Account IDs
-            _profiles.Enqueue(profile);
+            // Non-blocking write; if channel ever closed, ignore.
+            _channel.Writer.TryWrite(profile);
         }
 
         #endregion
@@ -84,19 +91,33 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             {
                 try
                 {
-                    while (!Memory.InRaid || _profiles.IsEmpty)
-                        await Task.Delay(TimeSpan.FromSeconds(1));
                     CancellationToken ct;
                     lock (_syncRoot)
                     {
                         ct = _cts.Token;
                     }
-                    var cache = LocalCache.GetProfileCollection();
-                    while (_profiles.TryDequeue(out var profile))
+
+                    // Wait until we are actually in-raid before starting to read/process.
+                    while (!Memory.InRaid)
                     {
-                        await ProcessProfileAsync(profile, cache, ct);
-                        await Task.Delay(0, ct);
+                        await Task.Delay(TimeSpan.FromSeconds(1), ct);
                     }
+
+                    var cache = LocalCache.GetProfileCollection();
+
+                    while (await _channel.Reader.WaitToReadAsync(ct))
+                    {
+                        // Drain available items.
+                        while (_channel.Reader.TryRead(out var profile))
+                        {
+                            await ProcessProfileAsync(profile, cache, ct);
+                            await Task.Yield();
+                        }
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    // Cancellation expected when ProcessStopped triggers; loop will restart with new token.
                 }
                 catch (Exception ex)
                 {
@@ -112,58 +133,75 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
         /// <summary>
         /// Get profile data for a particular Account ID.
         /// </summary>
-        /// <param name="profile">Profile to lookup.</param>
         private static async Task ProcessProfileAsync(PlayerProfile profile, ILiteCollection<CachedPlayerProfile> cache, CancellationToken ct)
         {
-            if (!long.TryParse(profile.AccountID, out var acctIdLong))
-                return; // Skip invalid Account IDs
-            var validProviders = IProfileApiProvider.AllProviders.Where(IsValidProvider);
-            if (!validProviders.Any())
-                return; // No valid providers, don't ever try again
-            var provider = validProviders
-                .Where(x => x.CanRun)
-                .OrderBy(x => x.Priority)
-                .FirstOrDefault();
-            if (provider is null)
+            try
             {
-                TryReEnqueueProfile(); // Eligible for retry
-                return;
-            }
-            var result = await provider.GetProfileAsync(profile.AccountID, ct);
-            if (result is not null) // Success
-            {
-                var cachedProfile = cache.FindById(acctIdLong);
-                if (cachedProfile is not null && result.LastUpdated < cachedProfile.Updated)
+                if (!long.TryParse(profile.AccountID, out var acctIdLong))
+                    return; // Skip invalid Account IDs
+
+                var validProviders = IProfileApiProvider.AllProviders.Where(IsValidProvider);
+                if (!validProviders.Any())
+                    return; // No valid providers, don't ever try again
+
+                var provider = validProviders
+                    .Where(x => x.CanRun)
+                    .OrderBy(x => x.Priority)
+                    .FirstOrDefault();
+
+                if (provider is null) // None available right now
                 {
-                    try
-                    {
-                        profile.Data ??= cachedProfile.ToProfileData(); // Huh odd the cached data is newer, lets use that instead
-                        return; // Don't cache old data
-                    }
-                    catch { } // Don't throw here, just continue and overwrite the corrupted cache data
+                    await RetryProfileAsync(); // Eligible for retry
+                    return;
                 }
-                profile.Data ??= result.Data; // Use the newly fetched data
-                if (result.Raw is null)
-                    return; // Don't cache if we don't have raw data (shouldn't happen)
-                cachedProfile ??= new CachedPlayerProfile
+
+                var result = await provider.GetProfileAsync(profile.AccountID, ct);
+                if (result is not null) // Success
                 {
-                    Id = acctIdLong,
-                };
-                cachedProfile.Data = result.Raw;
-                cachedProfile.Updated = result.LastUpdated;
-                cachedProfile.CachedAt = DateTimeOffset.UtcNow;
-                _ = cache.Upsert(cachedProfile);
-            }
-            else // Fail
-            {
-                TryReEnqueueProfile(); // Eligible for retry
-            }
-            bool IsValidProvider(IProfileApiProvider provider) => provider.IsEnabled && provider.CanLookup(profile.AccountID);
-            void TryReEnqueueProfile()
-            {
-                if (IProfileApiProvider.AllProviders.Any(IsValidProvider)) 
+                    var cachedProfile = cache.FindById(acctIdLong);
+                    if (cachedProfile is not null && result.LastUpdated < cachedProfile.Updated)
+                    {
+                        try
+                        {
+                            profile.Data ??= cachedProfile.ToProfileData(); // Use newer cached data
+                            return; // Don't overwrite with older data
+                        }
+                        catch
+                        {
+                            // Corrupted cache, proceed to overwrite
+                        }
+                    }
+
+                    profile.Data ??= result.Data;
+                    if (result.Raw is null)
+                        return; // Cannot cache without raw data
+                    
+                    cachedProfile ??= new CachedPlayerProfile
+                    {
+                        Id = acctIdLong,
+                    };
+                    cachedProfile.Data = result.Raw;
+                    cachedProfile.Updated = result.LastUpdated;
+                    cachedProfile.CachedAt = DateTimeOffset.UtcNow;
+                    _ = cache.Upsert(cachedProfile);
+                }
+                else
                 {
-                    _profiles.Enqueue(profile);
+                    await RetryProfileAsync(); // Retry later
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                await RetryProfileAsync(); // Put back for retry
+                throw;
+            }
+
+            bool IsValidProvider(IProfileApiProvider p) => p.IsEnabled && p.CanLookup(profile.AccountID);
+            async Task RetryProfileAsync()
+            {
+                if (IProfileApiProvider.AllProviders.Any(IsValidProvider))
+                {
+                    await _channel.Writer.WriteAsync(profile, CancellationToken.None); // Put back for retry, don't cancel
                 }
             }
         }
