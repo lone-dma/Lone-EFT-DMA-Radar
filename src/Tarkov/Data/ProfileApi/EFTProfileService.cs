@@ -135,13 +135,14 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                 var cachedProfile = cache.FindById(acctIdLong);
                 if (cachedProfile is not null && result.LastUpdated < cachedProfile.Updated)
                 {
-                    profile.Data ??= cachedProfile.ToProfileData(); // Huh odd the cached data is newer, lets use that instead
-                    return; // Don't cache old data
+                    try
+                    {
+                        profile.Data ??= cachedProfile.ToProfileData(); // Huh odd the cached data is newer, lets use that instead
+                        return; // Don't cache old data
+                    }
+                    catch { } // Don't throw here, just continue and overwrite the corrupted cache data
                 }
-                else
-                {
-                    profile.Data ??= result.Data; // Use the newly fetched data
-                }
+                profile.Data ??= result.Data; // Use the newly fetched data
                 if (result.Raw is null)
                     return; // Don't cache if we don't have raw data (shouldn't happen)
                 cachedProfile ??= new CachedPlayerProfile
