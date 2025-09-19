@@ -75,9 +75,6 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
         /// </summary>
         public static void RegisterProfile(PlayerProfile profile)
         {
-            if (!ulong.TryParse(profile.AccountID, out _))
-                return; // Skip invalid Account IDs
-            // Non-blocking write; if channel ever closed, ignore.
             _channel.Writer.TryWrite(profile);
         }
 
