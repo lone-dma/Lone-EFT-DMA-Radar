@@ -186,7 +186,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             {
                 if (IProfileApiProvider.AllProviders.Any(IsValidProvider))
                 {
-                    await _channel.Writer.WriteAsync(profile, CancellationToken.None); // Put back for retry, don't cancel
+                    await _channel.Writer.WriteAsync(profile, ct); // Put back for retry
                 }
             }
         }
