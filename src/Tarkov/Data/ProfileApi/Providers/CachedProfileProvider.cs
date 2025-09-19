@@ -30,11 +30,11 @@ using EftDmaRadarLite.Misc.Cache;
 
 namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 {
-    public sealed class LocalProfileProvider : IProfileApiProvider
+    public sealed class CachedProfileProvider : IProfileApiProvider
     {
-        static LocalProfileProvider()
+        static CachedProfileProvider()
         {
-            IProfileApiProvider.Register(new LocalProfileProvider());
+            IProfileApiProvider.Register(new CachedProfileProvider());
         }
 
         private readonly HashSet<string> _skip = new(StringComparer.OrdinalIgnoreCase);
@@ -45,7 +45,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 
         public bool CanRun => true;
 
-        private LocalProfileProvider() { }
+        private CachedProfileProvider() { }
 
         public bool CanLookup(string accountId) => !_skip.Contains(accountId);
 

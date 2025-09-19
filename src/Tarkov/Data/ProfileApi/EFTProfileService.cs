@@ -52,6 +52,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
         {
             RuntimeHelpers.RunClassConstructor(typeof(EftApiTechProvider).TypeHandle);
             RuntimeHelpers.RunClassConstructor(typeof(TarkovDevProvider).TypeHandle);
+            RuntimeHelpers.RunClassConstructor(typeof(CachedProfileProvider).TypeHandle);
             MemDMA.ProcessStopped += MemDMA_ProcessStopped;
             _ = Task.Run(WorkerRoutineAsync);
         }
