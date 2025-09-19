@@ -40,9 +40,9 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 
         private readonly HashSet<string> _skip = new(StringComparer.OrdinalIgnoreCase);
 
-        public uint Priority { get; } = App.Config.ProfileApi.LocalProfile.Priority;
+        public uint Priority { get; } = App.Config.ProfileApi.CachedProfiles.Priority;
 
-        public bool IsEnabled { get; } = App.Config.ProfileApi.LocalProfile.Enabled;
+        public bool IsEnabled { get; } = App.Config.ProfileApi.CachedProfiles.Enabled;
 
         public bool CanRun => true;
 
