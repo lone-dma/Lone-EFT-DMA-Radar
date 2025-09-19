@@ -105,14 +105,10 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
 
                     var cache = LocalCache.GetProfileCollection();
 
-                    while (await _channel.Reader.WaitToReadAsync(ct))
+                    await foreach (var profile in _channel.Reader.ReadAllAsync(ct))
                     {
-                        // Drain available items.
-                        while (_channel.Reader.TryRead(out var profile))
-                        {
-                            await ProcessProfileAsync(profile, cache, ct);
-                            await Task.Yield();
-                        }
+                        await ProcessProfileAsync(profile, cache, ct);
+                        await Task.Yield();
                     }
                 }
                 catch (OperationCanceledException)
