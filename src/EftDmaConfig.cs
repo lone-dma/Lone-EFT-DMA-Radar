@@ -803,7 +803,7 @@ namespace EftDmaRadarLite
         /// True if this provider is enabled, otherwise False.
         /// </summary>
         [JsonPropertyName("enabled")]
-        public bool Enabled { get; set; } = false;
+        public bool Enabled { get; set; } = true;
     }
 
     /// <summary>
