@@ -27,7 +27,6 @@ SOFTWARE.
 */
 
 using EftDmaRadarLite.Misc.Cache;
-using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
 
 namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 {

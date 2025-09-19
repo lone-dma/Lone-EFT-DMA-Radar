@@ -1,4 +1,6 @@
-﻿namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema
+﻿using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
+
+namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
 {
     public sealed class EFTProfileResponse
     {
