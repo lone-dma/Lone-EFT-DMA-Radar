@@ -135,65 +135,57 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
         /// </summary>
         private static async Task ProcessProfileAsync(PlayerProfile profile, ILiteCollection<CachedPlayerProfile> cache, CancellationToken ct)
         {
-            try
+            if (!long.TryParse(profile.AccountID, out var acctIdLong))
+                return; // Skip invalid Account IDs
+
+            var validProviders = IProfileApiProvider.AllProviders.Where(IsValidProvider);
+            if (!validProviders.Any())
+                return; // No valid providers, don't ever try again
+
+            var provider = validProviders
+                .Where(x => x.CanRun)
+                .OrderBy(x => x.Priority)
+                .FirstOrDefault();
+
+            if (provider is null) // None available right now
             {
-                if (!long.TryParse(profile.AccountID, out var acctIdLong))
-                    return; // Skip invalid Account IDs
-
-                var validProviders = IProfileApiProvider.AllProviders.Where(IsValidProvider);
-                if (!validProviders.Any())
-                    return; // No valid providers, don't ever try again
-
-                var provider = validProviders
-                    .Where(x => x.CanRun)
-                    .OrderBy(x => x.Priority)
-                    .FirstOrDefault();
-
-                if (provider is null) // None available right now
-                {
-                    await RetryProfileAsync(); // Eligible for retry
-                    return;
-                }
-
-                var result = await provider.GetProfileAsync(profile.AccountID, ct);
-                if (result is not null) // Success
-                {
-                    var cachedProfile = cache.FindById(acctIdLong);
-                    if (cachedProfile is not null && result.LastUpdated < cachedProfile.Updated)
-                    {
-                        try
-                        {
-                            profile.Data ??= cachedProfile.ToProfileData(); // Use newer cached data
-                            return; // Don't overwrite with older data
-                        }
-                        catch
-                        {
-                            // Corrupted cache, proceed to overwrite
-                        }
-                    }
-
-                    profile.Data ??= result.Data;
-                    if (result.Raw is null)
-                        return; // Cannot cache without raw data
-                    
-                    cachedProfile ??= new CachedPlayerProfile
-                    {
-                        Id = acctIdLong,
-                    };
-                    cachedProfile.Data = result.Raw;
-                    cachedProfile.Updated = result.LastUpdated;
-                    cachedProfile.CachedAt = DateTimeOffset.UtcNow;
-                    _ = cache.Upsert(cachedProfile);
-                }
-                else
-                {
-                    await RetryProfileAsync(); // Retry later
-                }
+                await RetryProfileAsync(); // Eligible for retry
+                return;
             }
-            catch (OperationCanceledException)
+
+            var result = await provider.GetProfileAsync(profile.AccountID, ct);
+            if (result is not null) // Success
             {
-                await RetryProfileAsync(); // Put back for retry
-                throw;
+                var cachedProfile = cache.FindById(acctIdLong);
+                if (cachedProfile is not null && result.LastUpdated < cachedProfile.Updated)
+                {
+                    try
+                    {
+                        profile.Data ??= cachedProfile.ToProfileData(); // Use newer cached data
+                        return; // Don't overwrite with older data
+                    }
+                    catch
+                    {
+                        // Corrupted cache, proceed to overwrite
+                    }
+                }
+
+                profile.Data ??= result.Data;
+                if (result.Raw is null)
+                    return; // Cannot cache without raw data
+
+                cachedProfile ??= new CachedPlayerProfile
+                {
+                    Id = acctIdLong,
+                };
+                cachedProfile.Data = result.Raw;
+                cachedProfile.Updated = result.LastUpdated;
+                cachedProfile.CachedAt = DateTimeOffset.UtcNow;
+                _ = cache.Upsert(cachedProfile);
+            }
+            else
+            {
+                await RetryProfileAsync(); // Retry later
             }
 
             bool IsValidProvider(IProfileApiProvider p) => p.IsEnabled && p.CanLookup(profile.AccountID);
