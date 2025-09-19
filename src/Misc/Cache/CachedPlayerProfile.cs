@@ -40,18 +40,15 @@ namespace EftDmaRadarLite.Misc.Cache
         [BsonId]
         public long Id { get; init; }
         [BsonField("Data")]
-        [Obsolete("Use Data property instead.")]
-        public byte[] _data { get; set; }
+        private byte[] _data;
         /// <summary>
         /// Raw JSON Data for <see cref="ProfileData"/>.
         /// </summary>
         [BsonIgnore]
         public string Data
         {
-#pragma warning disable CS0618 // Type or member is obsolete
             get => Decompress(_data);
             set => _data = Compress(value);
-#pragma warning restore CS0618 // Type or member is obsolete
         }
         /// <summary>
         /// Date/Time of the profile data. This may be older than the time it was cached at.
