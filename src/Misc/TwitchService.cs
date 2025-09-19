@@ -62,11 +62,7 @@ namespace EftDmaRadarLite.Misc
             _api = new TwitchAPI(settings: settings);
             // Cleanup Cache
             var cache = LocalCache.GetTwitchCollection();
-            foreach (var expired in cache.Find(cached => cached.IsExpired))
-            {
-                _ = cache.Delete(expired.Username);
-            }
-
+            _ = cache.DeleteMany(x => x.IsExpired);
         }
 
         /// <summary>

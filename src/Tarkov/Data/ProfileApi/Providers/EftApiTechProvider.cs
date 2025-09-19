@@ -58,7 +58,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
         {
             try
             {
-                string uri = $"https://eft-api.tech/api/profile/{accountId}?includeOnlyPmcStats=true";
+                string uri = $"https://eft-api.tech/api/profile/{accountId}";
                 using var request = new HttpRequestMessage(HttpMethod.Get, uri);
                 request.Headers.Add("Authorization", $"Bearer {App.Config.ProfileApi.EftApiTech.ApiKey}");
                 var client = App.HttpClientFactory.CreateClient("default");
