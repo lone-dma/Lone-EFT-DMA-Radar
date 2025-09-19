@@ -28,7 +28,6 @@ SOFTWARE.
 
 using EftDmaRadarLite.Misc.Cache;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi;
-using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
 using EftDmaRadarLite.UI.Radar.ViewModels;
 using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Unity.Collections;
@@ -229,13 +228,11 @@ namespace EftDmaRadarLite.Tarkov.Player
                 long acctIdLong = long.Parse(AccountID);
                 var cache = LocalCache.GetProfileCollection();
                 if (cache.FindById(acctIdLong) is CachedPlayerProfile cachedProfile &&
-                    cachedProfile.IsCachedRecent &&
-                    cachedProfile.Data is string json)
+                    cachedProfile.IsCachedRecent)
                 {
                     try
                     {
-                        var profileData = System.Text.Json.JsonSerializer.Deserialize<ProfileData>(json) ??
-                            throw new InvalidOperationException("Failed to deserialize cached data");
+                        var profileData = cachedProfile.ToProfileData();
                         Profile.Data = profileData;
                         Debug.WriteLine($"[ObservedPlayer] Loaded Cached Profile '{AccountID}'!");
                     }
