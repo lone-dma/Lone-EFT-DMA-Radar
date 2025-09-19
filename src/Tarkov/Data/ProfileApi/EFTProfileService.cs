@@ -75,7 +75,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
         /// </summary>
         public static void RegisterProfile(PlayerProfile profile)
         {
-            _channel.Writer.TryWrite(profile);
+            _ = _channel.Writer.TryWrite(profile);
         }
 
         #endregion
