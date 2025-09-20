@@ -69,7 +69,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                         Raw = default,
                         LastUpdated = default
                     };
-                    Debug.WriteLine($"[LocalProfileProvider] Got Profile '{accountId}'!");
+                    Debug.WriteLine($"[CachedProfileProvider] Got Profile '{accountId}'!");
                     return Task.FromResult(result);
                 }
                 catch
@@ -80,7 +80,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[LocalProfileProvider] Failed to get profile: {ex}");
+                Debug.WriteLine($"[CachedProfileProvider] Failed to get profile: {ex}");
                 return Task.FromResult<EFTProfileResponse>(null);
             }
         }
