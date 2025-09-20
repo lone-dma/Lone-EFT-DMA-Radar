@@ -27,6 +27,10 @@ SOFTWARE.
 */
 
 using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
+using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Security.Authentication;
 
 namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 {
@@ -36,6 +40,37 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
         /// Singleton instance.
         /// </summary>
         internal static readonly TarkovDevProvider Instance = new();
+
+        internal static void Configure(IServiceCollection services)
+        {
+            services.AddHttpClient(nameof(TarkovDevProvider), client =>
+            {
+                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("br"));
+                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
+                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("identity"));
+                client.BaseAddress = new Uri("https://players.tarkov.dev/");
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler()
+            {
+                SslOptions = new()
+                {
+                    EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13
+                },
+                AutomaticDecompression = DecompressionMethods.Brotli | DecompressionMethods.GZip | DecompressionMethods.Deflate
+            })
+            .AddStandardResilienceHandler(options =>
+            {
+                options.Retry.MaxRetryAttempts = 3;
+                options.Retry.ShouldRetryAfterHeader = true;
+                options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(60);
+                options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(20);
+                options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
+                options.CircuitBreaker.FailureRatio = 1.0;
+                options.CircuitBreaker.MinimumThroughput = 2;
+                options.CircuitBreaker.BreakDuration = TimeSpan.FromMinutes(1);
+            });
+        }
 
         private readonly HashSet<string> _skip = new(StringComparer.OrdinalIgnoreCase);
 
@@ -57,9 +92,8 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
             }
             try
             {
-                string uri = $"https://players.tarkov.dev/profile/{accountId}.json";
-                var client = App.HttpClientFactory.CreateClient("default");
-                using var response = await client.GetAsync(uri, ct);
+                var client = App.HttpClientFactory.CreateClient(nameof(TarkovDevProvider));
+                using var response = await client.GetAsync($"profile/{accountId}.json", ct);
                 if (response.StatusCode is HttpStatusCode.NotFound)
                 {
                     _skip.Add(accountId);
