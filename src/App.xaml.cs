@@ -205,7 +205,7 @@ namespace EftDmaRadarLite
                 options.Retry.ShouldRetryAfterHeader = true;
                 options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(60);
                 options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(20);
-                options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
+                options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 3;
                 options.CircuitBreaker.FailureRatio = 1.0;
             });
             /// eft-api.tech

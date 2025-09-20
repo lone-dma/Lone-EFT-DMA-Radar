@@ -75,7 +75,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                 {
                     _skip.Add(accountId);
                 }
-                response.EnsureSuccessStatusCode(); // Handles 429 TooManyRequests
+                response.EnsureSuccessStatusCode();
                 string json = await response.Content.ReadAsStringAsync(ct);
                 using var jsonDoc = JsonDocument.Parse(json);
                 bool success = jsonDoc.RootElement.GetProperty("success").GetBoolean();
