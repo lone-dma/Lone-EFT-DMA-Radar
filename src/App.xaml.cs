@@ -184,7 +184,6 @@ namespace EftDmaRadarLite
         /// <param name="services"></param>
         private static void ConfigureHttpClientFactory(IServiceCollection services)
         {
-            /// default clients
             services.AddHttpClient("default", client =>
             {
                 client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("br"));
