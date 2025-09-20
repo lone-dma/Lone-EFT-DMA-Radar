@@ -75,9 +75,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
 
         public override void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
-            var dist = Vector3.Distance(localPlayer.Position, Position);
-
-            if (dist > App.Config.Containers.DrawDistance)
+            if (!Position.WithinDistance(localPlayer.Position, App.Config.Containers.DrawDistance))
                 return;
             var heightDiff = Position.Y - localPlayer.Position.Y;
             var point = Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);

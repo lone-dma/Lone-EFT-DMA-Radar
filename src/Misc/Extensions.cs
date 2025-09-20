@@ -39,6 +39,17 @@ namespace EftDmaRadarLite.Misc
     /// </summary>
     public static class GeneralExtensions
     {
+        /// <summary>
+        /// Checks if point A is within maxDist of point B.
+        /// </summary>
+        /// <param name="a">Point A.</param>
+        /// <param name="b">Point B.</param>
+        /// <param name="maxDist">Maximum distance between points.</param>
+        /// <returns>TRUE if the squared distance between point A/B is within the squared distance of maxDist, otherwise FALSE.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool WithinDistance(this Vector3 a, Vector3 b, float maxDist)
+            => Vector3.DistanceSquared(a, b) < maxDist * maxDist;
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int FindUtf16NullTerminatorIndex(this ReadOnlySpan<byte> span)
         {

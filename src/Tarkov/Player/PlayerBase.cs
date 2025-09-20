@@ -801,16 +801,16 @@ namespace EftDmaRadarLite.Tarkov.Player
                         {
                             health = observed.HealthStatus is Enums.ETagStatus.Healthy
                                 ? null
-                                : $" ({observed.HealthStatus.ToString()})"; // Only display abnormal health status
+                                : $" ({observed.HealthStatus})"; // Only display abnormal health status
                             if (observed.Profile?.Level is int levelResult)
                                 level = $"L{levelResult}:";
                         }
                         lines.Add($"{level}{name}{health}");
-                        lines.Add($"H: {(int)Math.Round(height)} D: {(int)Math.Round(dist)}");
+                        lines.Add($"H: {height:n0} D: {dist:n0}");
                     }
                     else // just height, distance
                     {
-                        lines.Add($"{(int)Math.Round(height)},{(int)Math.Round(dist)}");
+                        lines.Add($"{height:n0},{dist:n0}");
                         if (IsError)
                             lines[0] = "ERROR"; // In case POS stops updating, let us know!
                     }
