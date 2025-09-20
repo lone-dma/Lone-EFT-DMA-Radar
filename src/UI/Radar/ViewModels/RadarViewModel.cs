@@ -230,7 +230,6 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
             var isStarting = Starting;
             var isReady = Ready;
             var inRaid = InRaid;
-            var localPlayer = LocalPlayer;
             var canvas = e.Surface.Canvas;
             // Begin draw
             try
@@ -244,7 +243,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
                     EftMapManager.LoadMap(mapID);
                 }
                 canvas.Clear(); // Clear canvas
-                if (inRaid && localPlayer is not null) // LocalPlayer is in a raid -> Begin Drawing...
+                if (inRaid && LocalPlayer is LocalPlayer localPlayer) // LocalPlayer is in a raid -> Begin Drawing...
                 {
                     var map = EftMapManager.Map; // Cache ref
                     ArgumentNullException.ThrowIfNull(map, nameof(map));
@@ -288,8 +287,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
                         .Where(x => !x.HasExfild); // Skip exfil'd players
                     if (App.Config.Loot.Enabled) // Draw loot (if enabled)
                     {
-                        var loot = Loot?.Reverse(); // Draw important loot last (on top)
-                        if (loot is not null)
+                        if (Loot?.Reverse() is IEnumerable<LootItem> loot) // Draw important loot last (on top)
                         {
                             foreach (var item in loot)
                             {
@@ -300,8 +298,8 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
                         }
                         if (App.Config.Containers.Enabled) // Draw Containers
                         {
-                            var containers = Containers;
-                            if (containers is not null && MainWindow.Instance?.Settings?.ViewModel is SettingsViewModel vm)
+                            if (Containers is IEnumerable<StaticLootContainer> containers && 
+                                MainWindow.Instance?.Settings?.ViewModel is SettingsViewModel vm)
                             {
                                 foreach (var container in containers)
                                 {
@@ -318,16 +316,14 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
 
                     if (App.Config.QuestHelper.Enabled)
                     {
-                        var questItems = Loot?.Where(x => x is QuestItem);
-                        if (questItems is not null)
+                        if (Loot?.OfType<QuestItem>() is IEnumerable<QuestItem> questItems)
                         {
                             foreach (var item in questItems)
                             {
                                 item.Draw(canvas, mapParams, localPlayer);
                             }
                         }
-                        var questLocations = Memory.QuestManager?.LocationConditions?.Values;
-                        if (questLocations is not null)
+                        if (Memory.QuestManager?.LocationConditions?.Values is IEnumerable<QuestLocation> questLocations)
                         {
                             foreach (var loc in questLocations)
                             {
@@ -346,8 +342,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
                         }
                     }
 
-                    var explosives = Explosives;
-                    if (explosives is not null) // Draw grenades
+                    if (Explosives is IReadOnlyCollection<IExplosiveItem> explosives) // Draw grenades
                     {
                         foreach (var explosive in explosives)
                         {
@@ -355,8 +350,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
                         }
                     }
 
-                    var exits = Exits;
-                    if (exits is not null)
+                    if (Exits is IReadOnlyCollection<IExitPoint> exits)
                     {
                         foreach (var exit in exits)
                         {
