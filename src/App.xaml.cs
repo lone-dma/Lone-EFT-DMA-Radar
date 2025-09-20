@@ -206,6 +206,8 @@ namespace EftDmaRadarLite
                 options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(20);
                 options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 3;
                 options.CircuitBreaker.FailureRatio = 1.0;
+                options.CircuitBreaker.MinimumThroughput = 5;
+                options.CircuitBreaker.BreakDuration = TimeSpan.FromMinutes(1);
             });
             /// eft-api.tech
             services.AddHttpClient("eft-api", client =>
