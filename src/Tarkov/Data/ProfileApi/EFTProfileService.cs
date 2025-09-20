@@ -46,7 +46,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                 SingleWriter = false,
                 AllowSynchronousContinuations = false
             });
-        private static readonly ReadOnlyMemory<IProfileApiProvider> _providers;
+        private static readonly IProfileApiProvider[] _providers;
         private static CancellationTokenSource _cts = new();
 
         static EFTProfileService()
@@ -62,7 +62,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             if (TarkovDevProvider.Instance.IsEnabled)
                 providers.Add(TarkovDevProvider.Instance);
             _providers = providers.OrderBy(x => x.Priority).ToArray();
-            if (_providers.IsEmpty)
+            if (_providers.Length == 0)
                 return; // No providers, don't start worker
             // Start worker
             MemDMA.ProcessStopped += MemDMA_ProcessStopped;
@@ -88,7 +88,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
         /// </summary>
         public static void RegisterProfile(PlayerProfile profile)
         {
-            if (_providers.IsEmpty)
+            if (_providers.Length == 0)
                 return; // No providers, skip
             _ = _channel.Writer.TryWrite(profile);
         }
@@ -147,8 +147,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             if (!long.TryParse(profile.AccountID, out var acctIdLong))
                 return; // Skip invalid Account IDs
 
-            var providers = _providers.Span; // Fast stack-based enumeration
-            foreach (var provider in providers)
+            foreach (var provider in _providers)
             {
                 if (provider.CanRun && provider.CanLookup(profile.AccountID))
                 {
@@ -189,7 +188,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             // No providers were successful. Providers may be on cooldown, or none can lookup this Account ID, but we are not sure which at this point.
             // Before we use the cache we should make sure that no providers are actually capable of looking this up, otherwise it's just best to wait and retry later.
             bool anyValidProviders = false;
-            foreach (var provider in providers)
+            foreach (var provider in _providers)
             {
                 if (provider.CanLookup(profile.AccountID))
                 {
