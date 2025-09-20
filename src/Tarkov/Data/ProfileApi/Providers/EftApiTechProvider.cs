@@ -27,7 +27,10 @@ SOFTWARE.
 */
 
 using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
-using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Security.Authentication;
 using System.Threading.RateLimiting;
 
 namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
@@ -38,6 +41,38 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
         /// Singleton instance.
         /// </summary>
         internal static readonly EftApiTechProvider Instance = new();
+
+        internal static void Configure(IServiceCollection services)
+        {
+            services.AddHttpClient(nameof(EftApiTechProvider), client =>
+            {
+                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("br"));
+                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
+                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("identity"));
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Config.ProfileApi.EftApiTech.ApiKey);
+                client.BaseAddress = new Uri("https://eft-api.tech/");
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler()
+            {
+                SslOptions = new()
+                {
+                    EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13
+                },
+                AutomaticDecompression = DecompressionMethods.Brotli | DecompressionMethods.GZip | DecompressionMethods.Deflate
+            })
+            .AddStandardResilienceHandler(options =>
+            {
+                options.Retry.MaxRetryAttempts = 3;
+                options.Retry.ShouldRetryAfterHeader = true;
+                options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(60);
+                options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(20);
+                options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
+                options.CircuitBreaker.FailureRatio = 1.0;
+                options.CircuitBreaker.MinimumThroughput = 2;
+                options.CircuitBreaker.BreakDuration = TimeSpan.FromMinutes(1);
+            });
+        }
 
         private readonly HashSet<string> _skip = new(StringComparer.OrdinalIgnoreCase);
         private readonly TokenBucketRateLimiter _limiter = new(
@@ -66,7 +101,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                 using var lease = await _limiter.AcquireAsync(1, ct);
                 if (!lease.IsAcquired)
                     return null; // Rate limit hit
-                var client = App.HttpClientFactory.CreateClient("eft-api");
+                var client = App.HttpClientFactory.CreateClient(nameof(EftApiTechProvider));
                 using var response = await client.GetAsync($"api/profile/{accountId}", ct);
                 if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
                 {

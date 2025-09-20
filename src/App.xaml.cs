@@ -49,10 +49,12 @@ global using System.Windows;
 using EftDmaRadarLite.DMA;
 using EftDmaRadarLite.Misc.Cache;
 using EftDmaRadarLite.Tarkov.Data;
+using EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers;
 using EftDmaRadarLite.UI.ColorPicker;
 using EftDmaRadarLite.UI.Misc;
 using EftDmaRadarLite.UI.Skia.Maps;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.Versioning;
@@ -196,48 +198,17 @@ namespace EftDmaRadarLite
                 {
                     EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13
                 },
+                AllowAutoRedirect = true,
                 AutomaticDecompression = DecompressionMethods.Brotli | DecompressionMethods.GZip | DecompressionMethods.Deflate
             })
             .AddStandardResilienceHandler(options =>
             {
-                options.Retry.MaxRetryAttempts = 3;
-                options.Retry.ShouldRetryAfterHeader = true;
-                options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(60);
-                options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(20);
-                options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 3;
-                options.CircuitBreaker.FailureRatio = 1.0;
-                options.CircuitBreaker.MinimumThroughput = 5;
-                options.CircuitBreaker.BreakDuration = TimeSpan.FromMinutes(1);
-            });
-            /// eft-api.tech
-            services.AddHttpClient("eft-api", client =>
-            {
-                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("br"));
-                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
-                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
-                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("identity"));
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Config.ProfileApi.EftApiTech.ApiKey);
-                client.BaseAddress = new Uri("https://eft-api.tech/");
-            })
-            .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler()
-            {
-                SslOptions = new()
-                {
-                    EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13
-                },
-                AutomaticDecompression = DecompressionMethods.Brotli | DecompressionMethods.GZip | DecompressionMethods.Deflate
-            })
-            .AddStandardResilienceHandler(options =>
-            {
-                options.Retry.MaxRetryAttempts = 3;
-                options.Retry.ShouldRetryAfterHeader = true;
-                options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(60);
-                options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(20);
+                options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(100);
+                options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(30);
                 options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
-                options.CircuitBreaker.FailureRatio = 1.0;
-                options.CircuitBreaker.MinimumThroughput = 2;
-                options.CircuitBreaker.BreakDuration = TimeSpan.FromMinutes(1);
             });
+            TarkovDevProvider.Configure(services);
+            EftApiTechProvider.Configure(services);
         }
 
         /// <summary>
