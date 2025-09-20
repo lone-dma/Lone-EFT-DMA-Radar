@@ -64,7 +64,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                 {
                     _skip.Add(accountId);
                 }
-                response.EnsureSuccessStatusCode(); // Handles 429 TooManyRequests
+                response.EnsureSuccessStatusCode();
                 string json = await response.Content.ReadAsStringAsync(ct);
                 var result = JsonSerializer.Deserialize<ProfileData>(json) ??
                     throw new InvalidOperationException("Failed to deserialize response");
