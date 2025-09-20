@@ -181,15 +181,12 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                         cachedProfile.Updated = result.LastUpdated;
                         cachedProfile.CachedAt = DateTimeOffset.UtcNow;
                         _ = cache.Upsert(cachedProfile);
+                        return; // Processed, don't continue
                     }
-                    else
-                    {
-                        await RetryProfileAsync(profile, ct); // Retry later
-                    }
-                    return; // Processed, don't continue
+                    // Failed to get profile, try next provider
                 } // end if
             } // end foreach
-            // No suitable providers found. Providers may be on cooldown, or none can lookup this Account ID, but we are not sure which at this point.
+            // No providers were successful. Providers may be on cooldown, or none can lookup this Account ID, but we are not sure which at this point.
             // Before we use the cache we should make sure that no providers are actually capable of looking this up, otherwise it's just best to wait and retry later.
             bool anyValidProviders = false;
             foreach (var provider in providers)
@@ -213,18 +210,6 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             else // Still have providers to try, retry later
             {
                 await _channel.Writer.WriteAsync(profile, ct); // Put back for retry
-            }
-            static async Task RetryProfileAsync(PlayerProfile profile, CancellationToken ct)
-            {
-                var providers = _providers.Span;
-                foreach (var provider in providers)
-                {
-                    if (provider.CanLookup(profile.AccountID))
-                    {
-                        await _channel.Writer.WriteAsync(profile, ct); // Put back for retry
-                        break;
-                    }
-                }
             }
         }
 
