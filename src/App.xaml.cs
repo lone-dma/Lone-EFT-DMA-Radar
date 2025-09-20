@@ -234,6 +234,7 @@ namespace EftDmaRadarLite
                 options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
                 options.CircuitBreaker.FailureRatio = 1.0;
                 options.CircuitBreaker.MinimumThroughput = 2;
+                options.CircuitBreaker.BreakDuration = TimeSpan.FromMinutes(1);
             });
         }
 
