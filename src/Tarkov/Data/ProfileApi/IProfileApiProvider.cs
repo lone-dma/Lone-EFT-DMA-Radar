@@ -30,12 +30,6 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
 {
     public interface IProfileApiProvider
     {
-        private static readonly ConcurrentBag<IProfileApiProvider> _providers = new();
-        /// <summary>
-        /// All Profile API providers.
-        /// </summary>
-        public static IEnumerable<IProfileApiProvider> AllProviders => _providers;
-
         /// <summary>
         /// True if the provider is enabled.
         /// </summary>
@@ -64,11 +58,5 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
         /// <param name="ct">Cancellation token.</param>
         /// <returns>Player profile result. NULL if not found or an error occurred.</returns>
         Task<EFTProfileResponse> GetProfileAsync(string accountId, CancellationToken ct);
-
-        /// <summary>
-        /// Add a provider to the collection.
-        /// </summary>
-        /// <param name="provider">Provider to add.</param>
-        protected static void Register(IProfileApiProvider provider) => _providers.Add(provider);
     }
 }

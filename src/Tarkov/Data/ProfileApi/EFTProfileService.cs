@@ -46,13 +46,25 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                 SingleWriter = false,
                 AllowSynchronousContinuations = false
             });
+        private static readonly ReadOnlyMemory<IProfileApiProvider> _providers;
         private static CancellationTokenSource _cts = new();
 
         static EFTProfileService()
         {
+            // Ensure static ctors run
             RuntimeHelpers.RunClassConstructor(typeof(EftApiTechProvider).TypeHandle);
             RuntimeHelpers.RunClassConstructor(typeof(TarkovDevProvider).TypeHandle);
             RuntimeHelpers.RunClassConstructor(typeof(CachedProfileProvider).TypeHandle);
+            // Get providers
+            var providers = new List<IProfileApiProvider>();
+            if (EftApiTechProvider.Instance.IsEnabled)
+                providers.Add(EftApiTechProvider.Instance);
+            if (TarkovDevProvider.Instance.IsEnabled)
+                providers.Add(TarkovDevProvider.Instance);
+            _providers = providers.OrderBy(x => x.Priority).ToArray();
+            if (_providers.IsEmpty)
+                return; // No providers, don't start worker
+            // Start worker
             MemDMA.ProcessStopped += MemDMA_ProcessStopped;
             _ = Task.Run(WorkerRoutineAsync);
         }
@@ -76,6 +88,8 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
         /// </summary>
         public static void RegisterProfile(PlayerProfile profile)
         {
+            if (_providers.IsEmpty)
+                return; // No providers, skip
             _ = _channel.Writer.TryWrite(profile);
         }
 
@@ -95,6 +109,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                         await Task.Delay(TimeSpan.FromSeconds(1));
                     }
 
+                    // Make sure we don't try get the token while it's being reset
                     CancellationToken ct;
                     lock (_syncRoot)
                     {
@@ -132,62 +147,83 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             if (!long.TryParse(profile.AccountID, out var acctIdLong))
                 return; // Skip invalid Account IDs
 
-            var validProviders = IProfileApiProvider.AllProviders.Where(IsValidProvider);
-            if (!validProviders.Any())
-                return; // No valid providers, don't ever try again
-
-            var provider = validProviders
-                .Where(x => x.CanRun)
-                .OrderBy(x => x.Priority)
-                .FirstOrDefault();
-
-            if (provider is null) // None available right now
+            var providers = _providers.Span; // Fast stack-based enumeration
+            foreach (var provider in providers)
             {
-                await RetryProfileAsync(); // Eligible for retry
-                return;
-            }
-
-            var result = await provider.GetProfileAsync(profile.AccountID, ct);
-            if (result is not null) // Success
-            {
-                var cachedProfile = cache.FindById(acctIdLong);
-                if (cachedProfile is not null && result.LastUpdated < cachedProfile.Updated)
+                if (provider.CanRun && provider.CanLookup(profile.AccountID))
                 {
-                    try
+                    var result = await provider.GetProfileAsync(profile.AccountID, ct);
+                    if (result is not null) // Success
                     {
-                        profile.Data ??= cachedProfile.ToProfileData(); // Use newer cached data
-                        return; // Don't overwrite with older data
+                        var cachedProfile = cache.FindById(acctIdLong);
+                        if (cachedProfile is not null && result.LastUpdated < cachedProfile.Updated)
+                        {
+                            try
+                            {
+                                profile.Data ??= cachedProfile.ToProfileData(); // Use newer cached data
+                                return; // Don't overwrite with older data
+                            }
+                            catch
+                            {
+                                // Corrupted cache, proceed to overwrite
+                            }
+                        }
+
+                        profile.Data ??= result.Data;
+                        if (result.Raw is null)
+                            return; // Cannot cache without raw data
+
+                        cachedProfile ??= new CachedPlayerProfile
+                        {
+                            Id = acctIdLong,
+                        };
+                        cachedProfile.Data = result.Raw;
+                        cachedProfile.Updated = result.LastUpdated;
+                        cachedProfile.CachedAt = DateTimeOffset.UtcNow;
+                        _ = cache.Upsert(cachedProfile);
                     }
-                    catch
+                    else
                     {
-                        // Corrupted cache, proceed to overwrite
+                        await RetryProfileAsync(profile, ct); // Retry later
                     }
+                    return; // Processed, don't continue
+                } // end if
+            } // end foreach
+            // No suitable providers found. Providers may be on cooldown, or none can lookup this Account ID, but we are not sure which at this point.
+            // Before we use the cache we should make sure that no providers are actually capable of looking this up, otherwise it's just best to wait and retry later.
+            bool anyValidProviders = false;
+            foreach (var provider in providers)
+            {
+                if (provider.CanLookup(profile.AccountID))
+                {
+                    anyValidProviders = true;
+                    break;
                 }
-
-                profile.Data ??= result.Data;
-                if (result.Raw is null)
-                    return; // Cannot cache without raw data
-
-                cachedProfile ??= new CachedPlayerProfile
-                {
-                    Id = acctIdLong,
-                };
-                cachedProfile.Data = result.Raw;
-                cachedProfile.Updated = result.LastUpdated;
-                cachedProfile.CachedAt = DateTimeOffset.UtcNow;
-                _ = cache.Upsert(cachedProfile);
             }
-            else
+            if (!anyValidProviders) // No providers left to try -> check cache as a last ditch effort
             {
-                await RetryProfileAsync(); // Retry later
-            }
-
-            bool IsValidProvider(IProfileApiProvider p) => p.IsEnabled && p.CanLookup(profile.AccountID);
-            async Task RetryProfileAsync()
-            {
-                if (IProfileApiProvider.AllProviders.Any(IsValidProvider))
+                var result = await CachedProfileProvider.Instance.GetProfileAsync(profile.AccountID, ct);
+                if (result is not null)
                 {
-                    await _channel.Writer.WriteAsync(profile, ct); // Put back for retry
+                    profile.Data ??= result.Data;
+                    // Don't care about caching, already cached
+                }
+                // Can't find it but we have no options left ¯\_(ツ)_/¯
+            }
+            else // Still have providers to try, retry later
+            {
+                await _channel.Writer.WriteAsync(profile, ct); // Put back for retry
+            }
+            static async Task RetryProfileAsync(PlayerProfile profile, CancellationToken ct)
+            {
+                var providers = _providers.Span;
+                foreach (var provider in providers)
+                {
+                    if (provider.CanLookup(profile.AccountID))
+                    {
+                        await _channel.Writer.WriteAsync(profile, ct); // Put back for retry
+                        break;
+                    }
                 }
             }
         }
