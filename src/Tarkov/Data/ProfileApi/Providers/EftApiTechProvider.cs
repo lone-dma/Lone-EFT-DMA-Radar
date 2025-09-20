@@ -50,7 +50,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                 client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
                 client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
                 client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("identity"));
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Config.ProfileApi.EftApiTech.ApiKey);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", App.Config.ProfileApi.EftApiTech.ApiKey);
                 client.BaseAddress = new Uri("https://eft-api.tech/");
             })
             .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler()
