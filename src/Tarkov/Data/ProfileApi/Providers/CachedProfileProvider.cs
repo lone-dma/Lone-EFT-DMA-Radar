@@ -30,27 +30,23 @@ using EftDmaRadarLite.Misc.Cache;
 
 namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 {
-    public sealed class CachedProfileProvider : IProfileApiProvider
+    /// <summary>
+    /// Cached Profile Provider. Provides profiles from local cache.
+    /// Since this is a special provider, it does not implement the <see cref="IProfileApiProvider"/> interface.
+    /// </summary>
+    public sealed class CachedProfileProvider
     {
-        static CachedProfileProvider()
-        {
-            IProfileApiProvider.Register(new CachedProfileProvider());
-        }
-
+        /// <summary>
+        /// Singleton instance.
+        /// </summary>
+        internal static CachedProfileProvider Instance { get; } = new();
         private readonly HashSet<string> _skip = new(StringComparer.OrdinalIgnoreCase);
-
-        public uint Priority { get; } = App.Config.ProfileApi.CachedProfiles.Priority;
-
-        public bool IsEnabled { get; } = App.Config.ProfileApi.CachedProfiles.Enabled;
-
-        public bool CanRun => true;
 
         private CachedProfileProvider() { }
 
-        public bool CanLookup(string accountId) => !_skip.Contains(accountId);
-
         public Task<EFTProfileResponse> GetProfileAsync(string accountId, CancellationToken ct)
         {
+            ct.ThrowIfCancellationRequested();
             if (_skip.Contains(accountId))
             {
                 return Task.FromResult<EFTProfileResponse>(null);
@@ -67,13 +63,13 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                 try
                 {
                     var data = cachedProfile.ToProfileData();
-                    Debug.WriteLine($"[LocalProfileProvider] Got Profile '{accountId}'!");
                     var result = new EFTProfileResponse()
                     {
                         Data = data,
-                        Raw = null, // Don't cache this response
-                        LastUpdated = DateTimeOffset.MinValue // Don't care
+                        Raw = default,
+                        LastUpdated = default
                     };
+                    Debug.WriteLine($"[LocalProfileProvider] Got Profile '{accountId}'!");
                     return Task.FromResult(result);
                 }
                 catch

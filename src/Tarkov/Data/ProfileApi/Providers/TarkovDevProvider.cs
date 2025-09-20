@@ -33,10 +33,10 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 {
     public sealed class TarkovDevProvider : IProfileApiProvider
     {
-        static TarkovDevProvider()
-        {
-            IProfileApiProvider.Register(new TarkovDevProvider());
-        }
+        /// <summary>
+        /// Singleton instance.
+        /// </summary>
+        internal static readonly TarkovDevProvider Instance = new();
 
         private readonly HashSet<string> _skip = new(StringComparer.OrdinalIgnoreCase);
         private DateTimeOffset _nextRun = DateTimeOffset.MinValue;

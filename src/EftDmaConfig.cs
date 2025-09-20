@@ -736,9 +736,6 @@ namespace EftDmaRadarLite
         [JsonPropertyName("eftApiTech")]
         [JsonInclude]
         public EftApiTechConfig EftApiTech { get; private set; } = new();
-        [JsonPropertyName("cachedProfiles")]
-        [JsonInclude]
-        public CachedProfilesConfig CachedProfiles { get; private set; } = new();
     }
 
     public sealed class TwitchApiConfig
@@ -785,20 +782,6 @@ namespace EftDmaRadarLite
         /// </summary>
         [JsonPropertyName("apiKey")]
         public string ApiKey { get; set; } = null;
-    }
-
-    public sealed class CachedProfilesConfig
-    {
-        /// <summary>
-        /// Priority of this provider.
-        /// </summary>
-        [JsonPropertyName("priority")]
-        public uint Priority { get; set; } = uint.MaxValue;
-        /// <summary>
-        /// True if this provider is enabled, otherwise False.
-        /// </summary>
-        [JsonPropertyName("enabled")]
-        public bool Enabled { get; set; } = true;
     }
 
     /// <summary>

@@ -34,10 +34,10 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 {
     public sealed class EftApiTechProvider : IProfileApiProvider
     {
-        static EftApiTechProvider()
-        {
-            IProfileApiProvider.Register(new EftApiTechProvider());
-        }
+        /// <summary>
+        /// Singleton instance.
+        /// </summary>
+        internal static readonly EftApiTechProvider Instance = new();
 
         private readonly HashSet<string> _skip = new(StringComparer.OrdinalIgnoreCase);
         private readonly TimeSpan _rate = TimeSpan.FromMinutes(1) / App.Config.ProfileApi.EftApiTech.RequestsPerMinute;
