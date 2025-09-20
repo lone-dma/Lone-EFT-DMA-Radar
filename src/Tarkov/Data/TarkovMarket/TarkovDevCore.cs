@@ -222,7 +222,7 @@ namespace EftDmaRadarLite.Tarkov.Data.TarkovMarket
                 """
                 }
             };
-            var client = App.HttpClientFactory.CreateClient("resilient");
+            var client = App.HttpClientFactory.CreateClient("default");
             using var response = await client.PostAsJsonAsync(
                 requestUri: "https://api.tarkov.dev/graphql", 
                 value: query);

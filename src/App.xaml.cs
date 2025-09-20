@@ -182,10 +182,10 @@ namespace EftDmaRadarLite
         /// <param name="services"></param>
         private static void ConfigureHttpClientFactory(IServiceCollection services)
         {
+            /// default clients
             services.AddHttpClient();
             services.AddHttpClient("default", client =>
             {
-                client.Timeout = TimeSpan.FromSeconds(30);
                 client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("br"));
                 client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
                 client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
@@ -197,30 +197,44 @@ namespace EftDmaRadarLite
                 {
                     EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13
                 },
-                AllowAutoRedirect = true,
-                AutomaticDecompression = DecompressionMethods.Brotli | DecompressionMethods.GZip | DecompressionMethods.Deflate
-            });
-            services.AddHttpClient("resilient", client =>
-            {
-                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("br"));
-                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
-                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
-                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("identity"));
-            })
-            .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler()
-            {
-                SslOptions = new()
-                {
-                    EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13
-                },
-                AllowAutoRedirect = true,
                 AutomaticDecompression = DecompressionMethods.Brotli | DecompressionMethods.GZip | DecompressionMethods.Deflate
             })
             .AddStandardResilienceHandler(options =>
             {
-                options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(100);
-                options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(30);
+                options.Retry.MaxRetryAttempts = 3;
+                options.Retry.ShouldRetryAfterHeader = true;
+                options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(60);
+                options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(20);
                 options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
+                options.CircuitBreaker.FailureRatio = 1.0;
+            });
+            /// eft-api.tech
+            services.AddHttpClient("eft-api", client =>
+            {
+                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("br"));
+                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
+                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("identity"));
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Config.ProfileApi.EftApiTech.ApiKey);
+                client.BaseAddress = new Uri("https://eft-api.tech/");
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler()
+            {
+                SslOptions = new()
+                {
+                    EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13
+                },
+                AutomaticDecompression = DecompressionMethods.Brotli | DecompressionMethods.GZip | DecompressionMethods.Deflate
+            })
+            .AddStandardResilienceHandler(options =>
+            {
+                options.Retry.MaxRetryAttempts = 3;
+                options.Retry.ShouldRetryAfterHeader = true;
+                options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(60);
+                options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(20);
+                options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
+                options.CircuitBreaker.FailureRatio = 1.0;
+                options.CircuitBreaker.MinimumThroughput = 2;
             });
         }
 

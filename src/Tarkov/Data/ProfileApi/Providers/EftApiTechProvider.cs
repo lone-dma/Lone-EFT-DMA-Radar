@@ -26,9 +26,8 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
-using System.Net.Http;
+using System.Threading.RateLimiting;
 
 namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 {
@@ -40,15 +39,20 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
         internal static readonly EftApiTechProvider Instance = new();
 
         private readonly HashSet<string> _skip = new(StringComparer.OrdinalIgnoreCase);
-        private readonly TimeSpan _rate = TimeSpan.FromMinutes(1) / App.Config.ProfileApi.EftApiTech.RequestsPerMinute;
-        private DateTimeOffset _nextRun = DateTimeOffset.MinValue;
-        private TimeSpan _rateLimit;
+        private readonly TokenBucketRateLimiter _limiter = new(
+            new TokenBucketRateLimiterOptions
+            {
+                TokenLimit = 1,
+                TokensPerPeriod = 1,
+                ReplenishmentPeriod = TimeSpan.FromMinutes(1) / App.Config.ProfileApi.EftApiTech.RequestsPerMinute,
+                QueueLimit = 0
+            });
 
         public uint Priority { get; } = App.Config.ProfileApi.EftApiTech.Priority;
 
         public bool IsEnabled { get; } = App.Config.ProfileApi.EftApiTech.Enabled;
 
-        public bool CanRun => DateTimeOffset.UtcNow > _nextRun;
+        public bool CanRun => (_limiter.GetStatistics()?.CurrentAvailablePermits ?? 0) > 0;
 
         private EftApiTechProvider() { }
 
@@ -58,11 +62,11 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
         {
             try
             {
-                string uri = $"https://eft-api.tech/api/profile/{accountId}";
-                using var request = new HttpRequestMessage(HttpMethod.Get, uri);
-                request.Headers.Add("Authorization", $"Bearer {App.Config.ProfileApi.EftApiTech.ApiKey}");
-                var client = App.HttpClientFactory.CreateClient("default");
-                using var response = await client.SendAsync(request, ct);
+                using var lease = await _limiter.AcquireAsync(1, ct);
+                if (!lease.IsAcquired)
+                    return null; // Rate limit hit
+                var client = App.HttpClientFactory.CreateClient("eft-api");
+                using var response = await client.GetAsync($"api/profile/{accountId}", ct);
                 if (response.StatusCode is HttpStatusCode.Unauthorized)
                 {
                     MessageBox.Show(MainWindow.Instance, "eft-api.tech returned 401 UNAUTHORIZED. Please make sure your Api Key and IP Address are set correctly.", nameof(EftApiTechProvider), MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -70,10 +74,6 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                 else if (response.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.NotFound)
                 {
                     _skip.Add(accountId);
-                }
-                else if (response.StatusCode is HttpStatusCode.TooManyRequests)
-                {
-                    _rateLimit = response.Headers.RetryAfter.GetRetryAfter();
                 }
                 response.EnsureSuccessStatusCode(); // Handles 429 TooManyRequests
                 string json = await response.Content.ReadAsStringAsync(ct);
@@ -98,11 +98,6 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
             {
                 Debug.WriteLine($"[EftApiTechProvider] Failed to get profile: {ex}");
                 return null;
-            }
-            finally
-            {
-                _nextRun = DateTimeOffset.UtcNow + _rate + _rateLimit;
-                _rateLimit = TimeSpan.Zero; // Reset rate limit after use
             }
         }
     }
