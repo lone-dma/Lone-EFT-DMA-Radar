@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
 
 namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
@@ -39,14 +38,12 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
         internal static readonly TarkovDevProvider Instance = new();
 
         private readonly HashSet<string> _skip = new(StringComparer.OrdinalIgnoreCase);
-        private DateTimeOffset _nextRun = DateTimeOffset.MinValue;
-        private TimeSpan _rateLimit;
 
         public uint Priority { get; } = App.Config.ProfileApi.TarkovDev.Priority;
 
         public bool IsEnabled { get; } = App.Config.ProfileApi.TarkovDev.Enabled;
 
-        public bool CanRun => DateTimeOffset.UtcNow > _nextRun;
+        public bool CanRun { get; } = true;
 
         private TarkovDevProvider() { }
 
@@ -67,10 +64,6 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                 {
                     _skip.Add(accountId);
                 }
-                else if (response.StatusCode is HttpStatusCode.TooManyRequests)
-                {
-                    _rateLimit = response.Headers.RetryAfter.GetRetryAfter();
-                }
                 response.EnsureSuccessStatusCode(); // Handles 429 TooManyRequests
                 string json = await response.Content.ReadAsStringAsync(ct);
                 var result = JsonSerializer.Deserialize<ProfileData>(json) ??
@@ -87,15 +80,6 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
             {
                 Debug.WriteLine($"[TarkovDevProvider] Failed to get profile: {ex}");
                 return null;
-            }
-            finally
-            {
-                if (_rateLimit > TimeSpan.Zero)
-                {
-                    // Rate limited we should respect that
-                    _nextRun = DateTimeOffset.UtcNow + _rateLimit;
-                    _rateLimit = TimeSpan.Zero; // Reset rate limit after use
-                }
             }
         }
     }
