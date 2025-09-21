@@ -103,10 +103,6 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                         await Task.Yield();
                     }
                 }
-                catch (OperationCanceledException)
-                {
-                    // Cancellation expected when ProcessStopped triggers; loop will restart with new token.
-                }
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"[EFTProfileService] Unhandled Exception: {ex}");
