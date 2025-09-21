@@ -36,7 +36,6 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
 {
     internal static class EFTProfileService
     {
-        #region Fields / Constructor
         private static readonly Channel<PlayerProfile> _channel = Channel.CreateUnbounded<PlayerProfile>(
             new UnboundedChannelOptions
             {
@@ -65,10 +64,6 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             _ = Task.Run(WorkerRoutineAsync);
         }
 
-        #endregion
-
-        #region Public API
-
         /// <summary>
         /// Attempt to register a Profile for lookup.
         /// </summary>
@@ -78,10 +73,6 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                 return; // No providers, skip
             _ = _channel.Writer.TryWrite(profile);
         }
-
-        #endregion
-
-        #region Internal API
 
         private static async Task WorkerRoutineAsync()
         {
@@ -186,7 +177,5 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                 await _channel.Writer.WriteAsync(profile); // Put back for retry
             }
         }
-
-        #endregion
     }
 }
