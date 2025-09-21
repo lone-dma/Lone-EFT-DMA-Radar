@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.DMA;
 using EftDmaRadarLite.Misc.Cache;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers;
 using EftDmaRadarLite.Tarkov.Player;
@@ -38,7 +37,6 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
     internal static class EFTProfileService
     {
         #region Fields / Constructor
-        private static readonly Lock _syncRoot = new();
         private static readonly Channel<PlayerProfile> _channel = Channel.CreateUnbounded<PlayerProfile>(
             new UnboundedChannelOptions
             {
@@ -47,7 +45,6 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                 AllowSynchronousContinuations = false
             });
         private static readonly IProfileApiProvider[] _providers;
-        private static CancellationTokenSource _cts = new();
 
         static EFTProfileService()
         {
@@ -65,18 +62,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             if (_providers.Length == 0)
                 return; // No providers, don't start worker
             // Start worker
-            MemDMA.ProcessStopped += MemDMA_ProcessStopped;
             _ = Task.Run(WorkerRoutineAsync);
-        }
-
-        private static void MemDMA_ProcessStopped(object sender, EventArgs e)
-        {
-            lock (_syncRoot)
-            {
-                _cts.Cancel();
-                _cts.Dispose();
-                _cts = new();
-            }
         }
 
         #endregion
@@ -109,18 +95,11 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                         await Task.Delay(TimeSpan.FromSeconds(1));
                     }
 
-                    // Make sure we don't try get the token while it's being reset
-                    CancellationToken ct;
-                    lock (_syncRoot)
-                    {
-                        ct = _cts.Token;
-                    }
-
                     var cache = LocalCache.GetProfileCollection();
 
-                    await foreach (var profile in _channel.Reader.ReadAllAsync(ct))
+                    await foreach (var profile in _channel.Reader.ReadAllAsync())
                     {
-                        await ProcessProfileAsync(profile, cache, ct);
+                        await ProcessProfileAsync(profile, cache);
                         await Task.Yield();
                     }
                 }
@@ -142,7 +121,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
         /// <summary>
         /// Get profile data for a particular Account ID.
         /// </summary>
-        private static async Task ProcessProfileAsync(PlayerProfile profile, ILiteCollection<CachedPlayerProfile> cache, CancellationToken ct)
+        private static async Task ProcessProfileAsync(PlayerProfile profile, ILiteCollection<CachedPlayerProfile> cache)
         {
             if (!long.TryParse(profile.AccountID, out var acctIdLong))
                 return; // Skip invalid Account IDs
@@ -151,7 +130,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             {
                 if (provider.CanRun && provider.CanLookup(profile.AccountID))
                 {
-                    var result = await provider.GetProfileAsync(profile.AccountID, ct);
+                    var result = await provider.GetProfileAsync(profile.AccountID);
                     if (result is not null) // Success
                     {
                         var cachedProfile = cache.FindById(acctIdLong);
@@ -198,7 +177,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             }
             if (!anyValidProviders) // No providers left to try -> check cache as a last ditch effort
             {
-                var result = await CachedProfileProvider.Instance.GetProfileAsync(profile.AccountID, ct);
+                var result = await CachedProfileProvider.Instance.GetProfileAsync(profile.AccountID);
                 if (result is not null)
                 {
                     profile.Data ??= result.Data;
@@ -208,7 +187,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             }
             else // Still have providers to try, retry later
             {
-                await _channel.Writer.WriteAsync(profile, ct); // Put back for retry
+                await _channel.Writer.WriteAsync(profile); // Put back for retry
             }
         }
 
