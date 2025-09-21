@@ -175,6 +175,8 @@ namespace EftDmaRadarLite
         {
             var services = new ServiceCollection();
             ConfigureHttpClientFactory(services);
+            TarkovDevProvider.Configure(services);
+            EftApiTechProvider.Configure(services);
             return services.BuildServiceProvider();
         }
 
@@ -206,8 +208,6 @@ namespace EftDmaRadarLite
                 options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(30);
                 options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
             });
-            TarkovDevProvider.Configure(services);
-            EftApiTechProvider.Configure(services);
         }
 
         /// <summary>
