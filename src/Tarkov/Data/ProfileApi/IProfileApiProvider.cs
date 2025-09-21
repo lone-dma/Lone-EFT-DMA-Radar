@@ -55,8 +55,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
         /// Must not throw exceptions.
         /// </summary>
         /// <param name="accountId">Account id of player profile to lookup.</param>
-        /// <param name="ct">Cancellation token.</param>
         /// <returns>Player profile result. NULL if not found or an error occurred.</returns>
-        Task<EFTProfileResponse> GetProfileAsync(string accountId, CancellationToken ct);
+        Task<EFTProfileResponse> GetProfileAsync(string accountId);
     }
 }

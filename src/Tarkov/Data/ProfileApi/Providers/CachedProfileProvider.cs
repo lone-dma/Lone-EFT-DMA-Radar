@@ -44,9 +44,8 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 
         private CachedProfileProvider() { }
 
-        public Task<EFTProfileResponse> GetProfileAsync(string accountId, CancellationToken ct)
+        public Task<EFTProfileResponse> GetProfileAsync(string accountId)
         {
-            ct.ThrowIfCancellationRequested();
             if (_skip.Contains(accountId))
             {
                 return Task.FromResult<EFTProfileResponse>(null);
