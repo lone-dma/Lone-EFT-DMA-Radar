@@ -50,7 +50,6 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             // Ensure static ctors run
             RuntimeHelpers.RunClassConstructor(typeof(EftApiTechProvider).TypeHandle);
             RuntimeHelpers.RunClassConstructor(typeof(TarkovDevProvider).TypeHandle);
-            RuntimeHelpers.RunClassConstructor(typeof(CachedProfileProvider).TypeHandle);
             // Get providers
             var providers = new List<IProfileApiProvider>();
             if (EftApiTechProvider.Instance.IsEnabled)
@@ -164,12 +163,12 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             }
             if (!anyValidProviders) // No providers left to try -> check cache as a last ditch effort
             {
-                var result = await CachedProfileProvider.Instance.GetProfileAsync(profile.AccountID);
-                if (result is not null)
+                var cachedProfile = cache.FindById(acctIdLong);
+                try
                 {
-                    profile.Data ??= result.Data;
-                    // Don't care about caching, already cached
+                    profile.Data ??= cachedProfile?.ToProfileData();
                 }
+                catch { } // This may throw, ignore
                 // Can't find it but we have no options left ¯\_(ツ)_/¯
             }
             else // Still have providers to try, retry later
