@@ -105,7 +105,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                 using var response = await client.GetAsync($"api/profile/{accountId}");
                 if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
                 {
-                    MessageBox.Show(MainWindow.Instance, $"eft-api.tech returned {response.StatusCode}. Please make sure your Api Key and IP Address are set correctly.", nameof(EftApiTechProvider), MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(MainWindow.Instance, $"eft-api.tech returned '{response.StatusCode}'. Please make sure your Api Key and IP Address are set correctly.", nameof(EftApiTechProvider), MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 else if (response.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.NotFound)
                 {
