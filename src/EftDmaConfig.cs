@@ -42,6 +42,10 @@ namespace EftDmaRadarLite
     /// </summary>
     public sealed class EftDmaConfig
     {
+        private static readonly JsonSerializerOptions _jsonOptions = new() 
+        { 
+            WriteIndented = true
+        };
         /// <summary>
         /// Public Constructor required for deserialization.
         /// DO NOT CALL - USE LOAD().
@@ -385,7 +389,7 @@ namespace EftDmaRadarLite
                 if (!file.Exists) 
                     return null;
                 string json = File.ReadAllText(file.FullName);
-                return JsonSerializer.Deserialize<EftDmaConfig>(json);
+                return JsonSerializer.Deserialize<EftDmaConfig>(json, _jsonOptions);
             }
             catch
             {
@@ -420,8 +424,7 @@ namespace EftDmaRadarLite
 
         private static void SaveInternal(EftDmaConfig config)
         {
-            // 1) Write JSON to .tmp with WriteThrough so data hits disk
-            var json = JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = false });
+            var json = JsonSerializer.Serialize(config, _jsonOptions);
             using (var fs = new FileStream(
                 _tempFile.FullName,
                 FileMode.Create,
@@ -435,8 +438,6 @@ namespace EftDmaRadarLite
                 sw.Flush();
                 fs.Flush(flushToDisk: true);
             }
-
-            // 2) Atomic replace: .tmp → config, backing up old config to .bak
             if (_configFile.Exists)
             {
                 File.Replace(
@@ -454,10 +455,6 @@ namespace EftDmaRadarLite
                     sourceFileName: _tempFile.FullName, 
                     destFileName: _configFile.FullName);
             }
-
-            // 3) Clean up stale backup if you want
-            //if (_backupFile.Exists)
-            //    _backupFile.Delete();
         }
 
         #endregion
