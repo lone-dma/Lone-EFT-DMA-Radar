@@ -11,16 +11,22 @@
 	<Platforms>x64</Platforms>
 	<Configurations>Debug;Release</Configurations>
 	<ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
-	<ServerGarbageCollection>true</ServerGarbageCollection>
-	<ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
-	<RetainVMGarbageCollection>true</RetainVMGarbageCollection>
 	<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
 	<Deterministic>False</Deterministic>
   </PropertyGroup>
 
+	<PropertyGroup>
+		<!-- GC Tuning for optimal performance -->
+		<ServerGarbageCollection>true</ServerGarbageCollection>
+		<ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+		<RetainVMGarbageCollection>true</RetainVMGarbageCollection>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<!-- enable RDP GPU acceleration in .NET 8 and later -->
 		<RuntimeHostConfigurationOption Include="Switch.System.Windows.Media.EnableHardwareAccelerationInRdp" Value="true" />
+		<!-- Disable DATAS GC Mode -->
+		<RuntimeHostConfigurationOption Include="System.GC.DynamicAdaptationMode" Value="0" />
 	</ItemGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
