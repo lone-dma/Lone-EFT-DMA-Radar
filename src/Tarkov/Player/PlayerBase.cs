@@ -57,10 +57,10 @@ namespace EftDmaRadarLite.Tarkov.Player
 
         static PlayerBase()
         {
-            MemDMA.RaidStarted += MemDMA_RaidStarted;
+            MemDMA.RaidStopped += MemDMA_RaidStopped;
         }
 
-        private static void MemDMA_RaidStarted(object sender, EventArgs e)
+        private static void MemDMA_RaidStopped(object sender, EventArgs e)
         {
             _groups.Clear();
             _lastGroupNumber = default;
