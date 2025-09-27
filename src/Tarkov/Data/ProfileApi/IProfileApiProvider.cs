@@ -28,6 +28,10 @@ SOFTWARE.
 
 namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
 {
+    /// <summary>
+    /// Defines an interface for a Profile API provider.
+    /// Providers should be implemented in a thread-safe manner.
+    /// </summary>
     public interface IProfileApiProvider
     {
         private static readonly ConcurrentBag<IProfileApiProvider> _providers = new();

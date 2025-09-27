@@ -36,6 +36,10 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
 {
     internal static class EFTProfileService
     {
+        private static readonly ParallelOptions _parallelOptions = new()
+        {
+            MaxDegreeOfParallelism = Math.Min(5, Environment.ProcessorCount)
+        };
         private static readonly Channel<PlayerProfile> _channel = Channel.CreateUnbounded<PlayerProfile>(
             new UnboundedChannelOptions
             {
@@ -77,15 +81,17 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             {
                 try
                 {
-                    if (!Memory.InRaid || !_providers.Any(x => x.CanRun))
-                        continue; // Wait
+                    while (!Memory.InRaid)
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(1));
+                    }
 
                     var cache = LocalCache.GetProfileCollection();
 
-                    await foreach (var profile in _channel.Reader.ReadAllAsync())
-                    {
-                        await ProcessProfileAsync(profile, cache);
-                    }
+                    await Parallel.ForEachAsync(
+                        _channel.Reader.ReadAllAsync(),
+                        _parallelOptions,
+                        async (profile, _) => await ProcessProfileAsync(profile, cache));
                 }
                 catch (Exception ex)
                 {
