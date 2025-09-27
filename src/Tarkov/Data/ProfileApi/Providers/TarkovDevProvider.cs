@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
@@ -72,7 +73,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
             });
         }
 
-        private readonly HashSet<string> _skip = new(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentHashSet<string> _skip = new(StringComparer.OrdinalIgnoreCase);
 
         public uint Priority { get; } = App.Config.ProfileApi.TarkovDev.Priority;
 
