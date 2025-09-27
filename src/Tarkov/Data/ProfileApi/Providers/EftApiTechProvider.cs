@@ -37,10 +37,10 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 {
     public sealed class EftApiTechProvider : IProfileApiProvider
     {
-        /// <summary>
-        /// Singleton instance.
-        /// </summary>
-        internal static readonly EftApiTechProvider Instance = new();
+        static EftApiTechProvider()
+        {
+            IProfileApiProvider.Register(new EftApiTechProvider());
+        }
 
         internal static void Configure(IServiceCollection services)
         {
@@ -75,14 +75,14 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
         }
 
         private readonly HashSet<string> _skip = new(StringComparer.OrdinalIgnoreCase);
-        private readonly TokenBucketRateLimiter _limiter = new(
-            new TokenBucketRateLimiterOptions
-            {
-                TokenLimit = 1,
-                TokensPerPeriod = 1,
-                ReplenishmentPeriod = TimeSpan.FromMinutes(1) / App.Config.ProfileApi.EftApiTech.RequestsPerMinute,
-                QueueLimit = 0
-            });
+        private readonly SlidingWindowRateLimiter _limiter = new(new SlidingWindowRateLimiterOptions()
+        {
+            AutoReplenishment = true,
+            PermitLimit = App.Config.ProfileApi.EftApiTech.RequestsPerMinute,
+            QueueLimit = 0,
+            Window = TimeSpan.FromMinutes(1),
+            SegmentsPerWindow = 12
+        });
 
         public uint Priority { get; } = App.Config.ProfileApi.EftApiTech.Priority;
 

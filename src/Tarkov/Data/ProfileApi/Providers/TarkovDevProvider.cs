@@ -36,10 +36,10 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 {
     public sealed class TarkovDevProvider : IProfileApiProvider
     {
-        /// <summary>
-        /// Singleton instance.
-        /// </summary>
-        internal static readonly TarkovDevProvider Instance = new();
+        static TarkovDevProvider()
+        {
+            IProfileApiProvider.Register(new TarkovDevProvider());
+        }
 
         internal static void Configure(IServiceCollection services)
         {

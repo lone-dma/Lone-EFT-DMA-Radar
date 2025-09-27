@@ -51,12 +51,10 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             RuntimeHelpers.RunClassConstructor(typeof(EftApiTechProvider).TypeHandle);
             RuntimeHelpers.RunClassConstructor(typeof(TarkovDevProvider).TypeHandle);
             // Get providers
-            var providers = new List<IProfileApiProvider>();
-            if (EftApiTechProvider.Instance.IsEnabled)
-                providers.Add(EftApiTechProvider.Instance);
-            if (TarkovDevProvider.Instance.IsEnabled)
-                providers.Add(TarkovDevProvider.Instance);
-            _providers = providers.OrderBy(x => x.Priority).ToArray();
+            _providers = IProfileApiProvider.AllProviders
+                .Where(x => x.IsEnabled)
+                .OrderBy(x => x.Priority)
+                .ToArray();
             if (_providers.Length == 0)
                 return; // No providers, don't start worker
             // Start worker
@@ -79,18 +77,14 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             {
                 try
                 {
-                    // Wait until we are actually in-raid before starting to read/process.
-                    while (!Memory.InRaid)
-                    {
-                        await Task.Delay(TimeSpan.FromSeconds(1));
-                    }
+                    if (!Memory.InRaid || !_providers.Any(x => x.CanRun))
+                        continue; // Wait
 
                     var cache = LocalCache.GetProfileCollection();
 
                     await foreach (var profile in _channel.Reader.ReadAllAsync())
                     {
                         await ProcessProfileAsync(profile, cache);
-                        await Task.Yield();
                     }
                 }
                 catch (Exception ex)
