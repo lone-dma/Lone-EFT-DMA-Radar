@@ -227,12 +227,12 @@ namespace EftDmaRadarLite.Tarkov.Player
             {
                 long acctIdLong = long.Parse(AccountID);
                 var cache = LocalCache.GetProfileCollection();
-                if (cache.FindById(acctIdLong) is EftProfileDto cachedProfile &&
-                    cachedProfile.IsCachedRecent)
+                if (cache.FindById(acctIdLong) is EftProfileDto dto &&
+                    dto.IsCachedRecent)
                 {
                     try
                     {
-                        var profileData = cachedProfile.ToProfileData();
+                        var profileData = dto.ToProfileData();
                         Profile.Data = profileData;
                         Debug.WriteLine($"[ObservedPlayer] Got Profile (Cached) '{acctIdLong}'!");
                     }
