@@ -54,12 +54,10 @@ namespace EftDmaRadarLite.Misc.Cache
         /// <summary>
         /// Date/Time of the profile data. This may be older than the time it was cached at.
         /// </summary>
-        [BsonField("Updated")]
         public DateTimeOffset Updated { get; set; }
         /// <summary>
         /// Date/Time the data was cached locally.
         /// </summary>
-        [BsonField("Cached")]
         public DateTimeOffset Cached { get; set; }
 
         /// <summary>
