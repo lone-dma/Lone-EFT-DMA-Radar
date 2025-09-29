@@ -123,6 +123,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                         ArgumentOutOfRangeException.ThrowIfEqual(result.Updated, default, nameof(result.Updated));
                         if (result is not null) // Success
                         {
+                            // Check Cache
                             var dto = cache.FindById(acctIdLong);
                             if (dto is not null && dto.Updated > result.Updated)
                             {
@@ -136,7 +137,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                                     // Corrupted cache, proceed to overwrite
                                 }
                             }
-
+                            // Set result and update cache
                             profile.Data ??= result.Data;
                             dto ??= new EftProfileDto
                             {
@@ -151,8 +152,8 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                         // Failed to get profile, try next provider
                     } // end if
                 } // end foreach
-                  // No providers were successful. Providers may be on cooldown, or none can lookup this Account ID, but we are not sure which at this point.
-                  // Before we use the cache we should make sure that no providers are actually capable of looking this up, otherwise it's just best to wait and retry later.
+                // No providers were successful. Providers may be on cooldown, or none can lookup this Account ID, but we are not sure which at this point.
+                // Before we use the cache we should make sure that no providers are actually capable of looking this up, otherwise it's just best to wait and retry later.
                 bool anyValidProviders = false;
                 foreach (var provider in _providers)
                 {
