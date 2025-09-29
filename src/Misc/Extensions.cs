@@ -39,6 +39,23 @@ namespace EftDmaRadarLite.Misc
     /// </summary>
     public static class GeneralExtensions
     {
+        private static readonly JsonSerializerOptions _noIndents = new()
+        {
+            WriteIndented = false
+        };
+
+        /// <summary>
+        /// Removes all unnecessary whitespace from a JSON string, producing a compact, minified representation.
+        /// </summary>
+        /// <param name="json">The JSON string to be minified. Must be a valid JSON document.</param>
+        /// <returns>A minified JSON string with all insignificant whitespace removed.</returns>
+        /// <exception cref="JsonException"></exception>
+        public static string MinifyJson(this string json)
+        {
+            using var doc = System.Text.Json.JsonDocument.Parse(json);
+            return System.Text.Json.JsonSerializer.Serialize(doc, _noIndents);
+        }
+
         /// <summary>
         /// Checks if point A is within maxDist of point B.
         /// </summary>
