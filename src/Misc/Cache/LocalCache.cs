@@ -56,9 +56,9 @@ namespace EftDmaRadarLite.Misc.Cache
         /// Returns the Local DB collection for Player Profiles.
         /// </summary>
         /// <returns></returns>
-        public static ILiteCollection<CachedPlayerProfile> GetProfileCollection()
+        public static ILiteCollection<EftProfileDto> GetProfileCollection()
         {
-            var profiles = _db.GetCollection<CachedPlayerProfile>("profiles");
+            var profiles = _db.GetCollection<EftProfileDto>("profiles");
             profiles.EnsureIndex(x => x.Id, unique: true);
             return profiles;
         }
