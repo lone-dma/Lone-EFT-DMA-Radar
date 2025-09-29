@@ -123,12 +123,12 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                         ArgumentOutOfRangeException.ThrowIfEqual(result.Updated, default, nameof(result.Updated));
                         if (result is not null) // Success
                         {
-                            var cachedProfile = cache.FindById(acctIdLong);
-                            if (cachedProfile is not null && cachedProfile.Updated > result.Updated)
+                            var dto = cache.FindById(acctIdLong);
+                            if (dto is not null && dto.Updated > result.Updated)
                             {
                                 try
                                 {
-                                    profile.Data ??= cachedProfile.ToProfileData(); // Use newer cached data
+                                    profile.Data ??= dto.ToProfileData(); // Use newer cached data
                                     return; // Don't overwrite with older data
                                 }
                                 catch
@@ -138,14 +138,14 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                             }
 
                             profile.Data ??= result.Data;
-                            cachedProfile ??= new EftProfileDto
+                            dto ??= new EftProfileDto
                             {
                                 Id = acctIdLong,
                             };
-                            cachedProfile.Data = result.Raw.MinifyJson();
-                            cachedProfile.Updated = result.Updated;
-                            cachedProfile.Cached = DateTimeOffset.UtcNow;
-                            _ = cache.Upsert(cachedProfile);
+                            dto.Data = result.Raw.MinifyJson();
+                            dto.Updated = result.Updated;
+                            dto.Cached = DateTimeOffset.UtcNow;
+                            _ = cache.Upsert(dto);
                             return; // Processed, don't continue
                         }
                         // Failed to get profile, try next provider

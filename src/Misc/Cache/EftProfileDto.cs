@@ -56,7 +56,7 @@ namespace EftDmaRadarLite.Misc.Cache
         /// </summary>
         public DateTimeOffset Updated { get; set; }
         /// <summary>
-        /// Date/Time the data was cached locally.
+        /// Date/Time the data was cached.
         /// </summary>
         public DateTimeOffset Cached { get; set; }
 
