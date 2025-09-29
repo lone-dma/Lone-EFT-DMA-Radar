@@ -37,6 +37,7 @@ namespace EftDmaRadarLite.Misc
 {
     internal static class TwitchService
     {
+        private static readonly ConcurrentDictionary<string, CachedTwitchEntry> _cache = new(StringComparer.OrdinalIgnoreCase);
         private static readonly SemaphoreSlim _lock = new(1, 1);
         private static readonly IReadOnlyList<string> _ttvAppends = new List<string>()
         {
@@ -60,9 +61,6 @@ namespace EftDmaRadarLite.Misc
                 Secret = clientSecret
             };
             _api = new TwitchAPI(settings: settings);
-            // Cleanup Cache
-            var cache = LocalCache.GetTwitchCollection();
-            _ = cache.DeleteMany(x => x.IsExpired);
         }
 
         /// <summary>
@@ -72,20 +70,20 @@ namespace EftDmaRadarLite.Misc
         /// <returns>Twitch Channel URL. Null if not streaming.</returns>
         public static async Task<string> LookupAsync(string username)
         {
+            string channel = null;
             try
             {
                 if (_api is null) // Twitch API is not configured
                     return null;
                 username = username.ToLower(); // Cache is case-sensitive
-                var cache = LocalCache.GetTwitchCollection();
 
-                var cachedEntry = cache.FindById(username);
-                if (cachedEntry is not null &&
-                    !cachedEntry.IsExpired &&
-                    cachedEntry.Channel is string channel)
+                if (_cache.TryGetValue(username, out var cached) && !cached.IsExpired)
                 {
-                    Debug.WriteLine($"[Twitch] {username} is LIVE! (Cached)");
-                    return channel;
+                    if ((channel = cached.Channel) is not null)
+                    {
+                        return channel;
+                    }
+                    return null;
                 }
 
                 var replacedName = GetTTVName(username)?.ToLower();
@@ -95,28 +93,25 @@ namespace EftDmaRadarLite.Misc
                     return null;
 
                 Debug.WriteLine($"[Twitch] Checking {username}..."); // replacedName
-                string result = await LookupTwitchApiAsync(replacedName);
-                if (result is not null)
+                channel = await LookupTwitchApiAsync(replacedName);
+                _cache[username] = new CachedTwitchEntry()
                 {
-                    cachedEntry ??= new CachedTwitchEntry()
-                    {
-                        Username = username,
-                    };
-                    cachedEntry.Channel = result;
-                    cachedEntry.Timestamp = DateTimeOffset.UtcNow;
-                    _ = cache.Upsert(cachedEntry);
-                    Debug.WriteLine($"[Twitch] {username} is LIVE!");
-                }
+                    Channel = channel,
+                    Timestamp = DateTimeOffset.UtcNow
+                };
 
-                return result;
+                return channel;
             }
             catch
             {
                 return null;
             }
+            finally
+            {
+                if (channel is not null)
+                    Debug.WriteLine($"[Twitch] {username} is LIVE!");
+            }
         }
-
-        #region Internal API
 
         /// <summary>
         /// Takes an input username and attempts to normalize the username by removing the TV/TTV portions.
@@ -200,6 +195,12 @@ namespace EftDmaRadarLite.Misc
             }
         }
 
-        #endregion
+        private sealed class CachedTwitchEntry()
+        {
+            public string Channel { get; init; }
+            public DateTimeOffset Timestamp { get; init; }
+
+            public bool IsExpired => (DateTimeOffset.UtcNow - Timestamp) > TimeSpan.FromMinutes(10);
+        }
     }
 }

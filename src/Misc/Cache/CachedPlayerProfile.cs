@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using EftDmaRadarLite.Tarkov.Data.ProfileApi;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
 using LiteDB;
 using System.IO.Compression;
@@ -58,14 +59,14 @@ namespace EftDmaRadarLite.Misc.Cache
         /// <summary>
         /// Date/Time the data was cached locally.
         /// </summary>
-        [BsonField("CachedAt")]
-        public DateTimeOffset CachedAt { get; set; }
+        [BsonField("Cached")]
+        public DateTimeOffset Cached { get; set; }
 
         /// <summary>
         /// TRUE if the data was recently cached, otherwise FALSE.
         /// </summary>
         [BsonIgnore]
-        public bool IsCachedRecent => DateTimeOffset.UtcNow - CachedAt < TimeSpan.FromDays(1);
+        public bool IsCachedRecent => DateTimeOffset.UtcNow - Cached < TimeSpan.FromDays(1);
 
         /// <summary>
         /// Attempt to deserialize the cached data into a <see cref="ProfileData"/> instance.
@@ -76,8 +77,8 @@ namespace EftDmaRadarLite.Misc.Cache
         /// <exception cref="InvalidOperationException"></exception>
         public ProfileData ToProfileData()
         {
-            return System.Text.Json.JsonSerializer.Deserialize<ProfileData>(this.Data) ??
-                throw new InvalidOperationException("Failed to deserialize ProfileData from cached data.");
+            return System.Text.Json.JsonSerializer.Deserialize<ProfileData>(this.Data, IProfileApiProvider.JsonOptions) ??
+                throw new InvalidOperationException($"Failed to deserialize ProfileData from {nameof(CachedPlayerProfile)}.");
         }
 
         private static byte[] Compress(string text)
