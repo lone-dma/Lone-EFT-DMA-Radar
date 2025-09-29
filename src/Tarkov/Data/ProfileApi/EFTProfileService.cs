@@ -82,17 +82,15 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             {
                 try
                 {
-                    while (!Memory.InRaid)
+                    if (Memory.InRaid)
                     {
-                        await Task.Delay(TimeSpan.FromSeconds(1));
+                        var cache = LocalCache.GetProfileCollection();
+
+                        await Parallel.ForEachAsync(
+                            _channel.Reader.ReadAllAsync(),
+                            _parallelOptions,
+                            async (profile, _) => await ProcessProfileAsync(profile, cache));
                     }
-
-                    var cache = LocalCache.GetProfileCollection();
-
-                    await Parallel.ForEachAsync(
-                        _channel.Reader.ReadAllAsync(),
-                        _parallelOptions,
-                        async (profile, _) => await ProcessProfileAsync(profile, cache));
                 }
                 catch (Exception ex)
                 {
@@ -100,7 +98,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                 }
                 finally
                 {
-                    await Task.Delay(TimeSpan.FromMilliseconds(250));
+                    await Task.Delay(TimeSpan.FromMilliseconds(333));
                 }
             }
         }
@@ -108,76 +106,80 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
         /// <summary>
         /// Get profile data for a particular Account ID.
         /// </summary>
-        private static async Task ProcessProfileAsync(PlayerProfile profile, ILiteCollection<CachedPlayerProfile> cache)
+        private static async Task ProcessProfileAsync(PlayerProfile profile, ILiteCollection<EftProfileDto> cache)
         {
-            if (!long.TryParse(profile.AccountID, out var acctIdLong))
-                return; // Skip invalid Account IDs
-
-            foreach (var provider in _providers)
+            try
             {
-                if (provider.CanRun && provider.CanLookup(profile.AccountID))
+                if (!long.TryParse(profile.AccountID, out var acctIdLong))
+                    return; // Skip invalid Account IDs
+
+                foreach (var provider in _providers)
                 {
-                    var result = await provider.GetProfileAsync(profile.AccountID);
-                    ArgumentNullException.ThrowIfNull(result.Data, nameof(result.Data));
-                    ArgumentException.ThrowIfNullOrWhiteSpace(result.Raw, nameof(result.Raw));
-                    ArgumentOutOfRangeException.ThrowIfEqual(result.LastUpdated, default, nameof(result.LastUpdated));
-                    if (result is not null) // Success
+                    if (provider.CanRun && provider.CanLookup(profile.AccountID))
                     {
-                        var cachedProfile = cache.FindById(acctIdLong);
-                        if (cachedProfile is not null && result.LastUpdated < cachedProfile.Updated)
+                        var result = await provider.GetProfileAsync(profile.AccountID);
+                        ArgumentNullException.ThrowIfNull(result.Data, nameof(result.Data));
+                        ArgumentException.ThrowIfNullOrWhiteSpace(result.Raw, nameof(result.Raw));
+                        ArgumentOutOfRangeException.ThrowIfEqual(result.Updated, default, nameof(result.Updated));
+                        if (result is not null) // Success
                         {
-                            try
+                            var cachedProfile = cache.FindById(acctIdLong);
+                            if (cachedProfile is not null && cachedProfile.Updated > result.Updated)
                             {
-                                profile.Data ??= cachedProfile.ToProfileData(); // Use newer cached data
-                                return; // Don't overwrite with older data
+                                try
+                                {
+                                    profile.Data ??= cachedProfile.ToProfileData(); // Use newer cached data
+                                    return; // Don't overwrite with older data
+                                }
+                                catch
+                                {
+                                    // Corrupted cache, proceed to overwrite
+                                }
                             }
-                            catch
+
+                            profile.Data ??= result.Data;
+                            cachedProfile ??= new EftProfileDto
                             {
-                                // Corrupted cache, proceed to overwrite
-                            }
+                                Id = acctIdLong,
+                            };
+                            cachedProfile.Data = result.Raw.MinifyJson();
+                            cachedProfile.Updated = result.Updated;
+                            cachedProfile.Cached = DateTimeOffset.UtcNow;
+                            _ = cache.Upsert(cachedProfile);
+                            return; // Processed, don't continue
                         }
-
-                        profile.Data ??= result.Data;
-                        if (result.Raw is null)
-                            return; // Cannot cache without raw data
-
-                        cachedProfile ??= new CachedPlayerProfile
-                        {
-                            Id = acctIdLong,
-                        };
-                        cachedProfile.Data = result.Raw.MinifyJson();
-                        cachedProfile.Updated = result.LastUpdated;
-                        cachedProfile.Cached = DateTimeOffset.UtcNow;
-                        _ = cache.Upsert(cachedProfile);
-                        return; // Processed, don't continue
+                        // Failed to get profile, try next provider
+                    } // end if
+                } // end foreach
+                  // No providers were successful. Providers may be on cooldown, or none can lookup this Account ID, but we are not sure which at this point.
+                  // Before we use the cache we should make sure that no providers are actually capable of looking this up, otherwise it's just best to wait and retry later.
+                bool anyValidProviders = false;
+                foreach (var provider in _providers)
+                {
+                    if (provider.CanLookup(profile.AccountID))
+                    {
+                        anyValidProviders = true;
+                        break;
                     }
-                    // Failed to get profile, try next provider
-                } // end if
-            } // end foreach
-            // No providers were successful. Providers may be on cooldown, or none can lookup this Account ID, but we are not sure which at this point.
-            // Before we use the cache we should make sure that no providers are actually capable of looking this up, otherwise it's just best to wait and retry later.
-            bool anyValidProviders = false;
-            foreach (var provider in _providers)
-            {
-                if (provider.CanLookup(profile.AccountID))
+                }
+                if (!anyValidProviders) // No providers left to try -> check cache as a last ditch effort
                 {
-                    anyValidProviders = true;
-                    break;
+                    var cachedProfile = cache.FindById(acctIdLong);
+                    try
+                    {
+                        profile.Data ??= cachedProfile?.ToProfileData();
+                    }
+                    catch { } // This may throw, ignore
+                              // Can't find it but we have no options left ¯\_(ツ)_/¯
+                }
+                else // Still have providers to try, retry later
+                {
+                    await _channel.Writer.WriteAsync(profile); // Put back for retry
                 }
             }
-            if (!anyValidProviders) // No providers left to try -> check cache as a last ditch effort
+            catch (Exception ex) // Keep exceptions from bubbling up to our ForEachAsync caller (it does not defer them like Task.WhenAll)
             {
-                var cachedProfile = cache.FindById(acctIdLong);
-                try
-                {
-                    profile.Data ??= cachedProfile?.ToProfileData();
-                }
-                catch { } // This may throw, ignore
-                // Can't find it but we have no options left ¯\_(ツ)_/¯
-            }
-            else // Still have providers to try, retry later
-            {
-                await _channel.Writer.WriteAsync(profile); // Put back for retry
+                Debug.WriteLine($"[EFTProfileService] ProcessProfileAsync() Unhandled Exception: {ex}");
             }
         }
     }

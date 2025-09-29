@@ -15,6 +15,6 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
         /// <summary>
         /// Date and time when the profile was originally looked up by the provider.
         /// </summary>
-        public DateTimeOffset LastUpdated { get; init; }
+        public DateTimeOffset Updated { get; init; }
     }
 }

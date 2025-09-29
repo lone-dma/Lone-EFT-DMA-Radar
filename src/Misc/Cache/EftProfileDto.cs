@@ -33,7 +33,7 @@ using System.IO.Compression;
 
 namespace EftDmaRadarLite.Misc.Cache
 {
-    public class CachedPlayerProfile
+    public class EftProfileDto
     {
         /// <summary>
         /// Player Account ID.
@@ -78,7 +78,7 @@ namespace EftDmaRadarLite.Misc.Cache
         public ProfileData ToProfileData()
         {
             return System.Text.Json.JsonSerializer.Deserialize<ProfileData>(this.Data, IProfileApiProvider.JsonOptions) ??
-                throw new InvalidOperationException($"Failed to deserialize ProfileData from {nameof(CachedPlayerProfile)}.");
+                throw new InvalidOperationException($"Failed to deserialize ProfileData from {nameof(EftProfileDto)}.");
         }
 
         private static byte[] Compress(string text)

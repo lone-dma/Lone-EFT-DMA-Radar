@@ -101,6 +101,8 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                 }
                 response.EnsureSuccessStatusCode();
                 string json = await response.Content.ReadAsStringAsync();
+                using var jsonDoc = JsonDocument.Parse(json);
+                long epoch = jsonDoc.RootElement.GetProperty("updated").GetInt64();
                 var result = JsonSerializer.Deserialize<ProfileData>(json, IProfileApiProvider.JsonOptions) ??
                     throw new InvalidOperationException("Failed to deserialize response");
                 Debug.WriteLine($"[TarkovDevProvider] Got Profile '{accountId}'!");
@@ -108,7 +110,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                 {
                     Data = result,
                     Raw = json,
-                    LastUpdated = DateTimeOffset.FromUnixTimeMilliseconds(result.Epoch)
+                    Updated = DateTimeOffset.FromUnixTimeMilliseconds(epoch)
                 };
             }
             catch (Exception ex)

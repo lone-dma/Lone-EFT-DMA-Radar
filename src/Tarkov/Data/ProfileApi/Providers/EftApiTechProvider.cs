@@ -128,7 +128,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                 {
                     Data = result,
                     Raw = raw,
-                    LastUpdated = DateTimeOffset.FromUnixTimeMilliseconds(epoch)
+                    Updated = DateTimeOffset.FromUnixTimeMilliseconds(epoch)
                 };
             }
             catch (Exception ex)

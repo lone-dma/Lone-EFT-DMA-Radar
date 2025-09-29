@@ -227,7 +227,7 @@ namespace EftDmaRadarLite.Tarkov.Player
             {
                 long acctIdLong = long.Parse(AccountID);
                 var cache = LocalCache.GetProfileCollection();
-                if (cache.FindById(acctIdLong) is CachedPlayerProfile cachedProfile &&
+                if (cache.FindById(acctIdLong) is EftProfileDto cachedProfile &&
                     cachedProfile.IsCachedRecent)
                 {
                     try
