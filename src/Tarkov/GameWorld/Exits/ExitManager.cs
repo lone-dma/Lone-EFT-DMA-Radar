@@ -99,7 +99,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
                 if (_exits is null) // Initialize
                     Init();
                 ArgumentNullException.ThrowIfNull(_exits, nameof(_exits));
-                using var map = Memory.GetScatterMap();
+                using var map = Memory.CreateScatterMap();
                 var round1 = map.AddRound();
                 for (int ix = 0; ix < _exits.Count; ix++)
                 {

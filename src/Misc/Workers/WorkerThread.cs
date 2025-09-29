@@ -54,6 +54,8 @@ namespace EftDmaRadarLite.Misc.Workers
         /// </summary>
         public string Name { get; init; } = Guid.NewGuid().ToString();
 
+        public WorkerThread() : this(null, null, null) { }
+
         public WorkerThread(TimeSpan? sleepDuration = null, ThreadPriority? threadPriority = null, string workerName = null)
         {
             if (sleepDuration is TimeSpan sleepDurationParam)

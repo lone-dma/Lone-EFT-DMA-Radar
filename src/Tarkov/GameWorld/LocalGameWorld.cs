@@ -282,7 +282,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
                     return;
                 }
 
-                using var map = Memory.GetScatterMap();
+                using var map = Memory.CreateScatterMap();
                 var round1 = map.AddRound(false);
                 if (espRunning && CameraManager is CameraManager cm)
                 {
@@ -355,7 +355,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
                     .Where(x => x.IsActive && x.IsAlive && x is not BtrOperator);
                 if (players.Any()) // at least 1 player
                 {
-                    using var map = Memory.GetScatterMap();
+                    using var map = Memory.CreateScatterMap();
                     var round1 = map.AddRound();
                     var round2 = map.AddRound();
                     int i = 0;

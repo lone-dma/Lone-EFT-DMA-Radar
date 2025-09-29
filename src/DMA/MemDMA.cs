@@ -578,7 +578,7 @@ namespace EftDmaRadarLite.DMA
         /// Get a new ScatterReadMap instance for performing batched reads.
         /// </summary>
         /// <returns></returns>
-        public ScatterReadMap GetScatterMap() => new(_vmm, _pid);
+        public ScatterReadMap CreateScatterMap() => new(_vmm, _pid);
 
         /// <summary>
         /// Throws a special exception if no longer in game.

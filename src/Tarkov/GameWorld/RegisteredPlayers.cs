@@ -109,7 +109,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
             var allPlayers = _players.Values;
             if (allPlayers.Count == 0)
                 return;
-            using var map = Memory.GetScatterMap();
+            using var map = Memory.CreateScatterMap();
             var round1 = map.AddRound(false);
             int i = 0;
             foreach (var player in allPlayers)

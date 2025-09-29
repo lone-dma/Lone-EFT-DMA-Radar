@@ -217,7 +217,7 @@ namespace EftDmaRadarLite.Unity
                 ulong monoImageSetPtrBase = Memory.MonoBase + 0x751980; // img_set_cache (MonoImageSet)
 
                 using var monoImageSetPtrArray = Memory.ReadArray<ulong>(monoImageSetPtrBase, 1103, true);
-                using var mapOuter = Memory.GetScatterMap();
+                using var mapOuter = Memory.CreateScatterMap();
                 var r1 = mapOuter.AddRound();
                 var r2 = mapOuter.AddRound();
                 var r3 = mapOuter.AddRound();
@@ -249,7 +249,7 @@ namespace EftDmaRadarLite.Unity
                                             if (tableData.TableSize > 100000 || tableData.KVS == 0x0)
                                                 return;
                                             using var genericClassPtrArray = Memory.ReadArray<GenericClassPtrEntry>(tableData.KVS, tableData.TableSize, true);
-                                            using var mapInner = Memory.GetScatterMap();
+                                            using var mapInner = Memory.CreateScatterMap();
                                             var r11 = mapInner.AddRound();
                                             var r22 = mapInner.AddRound();
                                             for (int iix = 0; iix < genericClassPtrArray.Count; iix++)
