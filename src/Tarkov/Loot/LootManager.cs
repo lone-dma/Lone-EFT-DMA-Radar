@@ -144,7 +144,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
             // Proceed to get new loot
             using var deadPlayers = Memory.Players?
                 .Where(x => x.Corpse is not null)?.ToPooledList();
-            using var map = Memory.GetScatterMap();
+            using var map = Memory.CreateScatterMap();
             var round1 = map.AddRound();
             var round2 = map.AddRound();
             var round3 = map.AddRound();

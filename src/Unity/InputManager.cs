@@ -77,16 +77,16 @@ namespace EftDmaRadarLite.Unity
         /// </summary>
         private static void ProcessAllHotkeys()
         {
-            if (HotkeyManagerViewModel.Hotkeys.Count > 0)
+            var hotkeys = HotkeyManagerViewModel.Hotkeys.AsEnumerable();
+            if (hotkeys.Any())
             {
-                using var map = Memory.GetScatterMap();
+                var currentKeyState = Memory.ReadPtr(_inputManager + UnityOffsets.UnityInputManager.CurrentKeyState);
+                using var map = Memory.CreateScatterMap();
                 var round1 = map.AddRound(false);
                 int i = 0;
-                var currentKeyState = Memory.ReadPtr(_inputManager + UnityOffsets.UnityInputManager.CurrentKeyState);
-                foreach (var kvp in HotkeyManagerViewModel.Hotkeys)
+                foreach (var kvp in hotkeys)
                 {
-                    ProcessHotkey(kvp.Key, kvp.Value, currentKeyState, round1[i]);
-                    i++;
+                    ProcessHotkey(kvp.Key, kvp.Value, currentKeyState, round1[i++]);
                 }
                 map.Execute();
             }
