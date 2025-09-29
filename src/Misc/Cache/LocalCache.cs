@@ -62,16 +62,5 @@ namespace EftDmaRadarLite.Misc.Cache
             profiles.EnsureIndex(x => x.Id, unique: true);
             return profiles;
         }
-
-        /// <summary>
-        /// Returns the Local DB collection for Twitch lookups.
-        /// </summary>
-        /// <returns></returns>
-        public static ILiteCollection<CachedTwitchEntry> GetTwitchCollection()
-        {
-            var twitch = _db.GetCollection<CachedTwitchEntry>("twitch");
-            twitch.EnsureIndex(x => x.Username, unique: true);
-            return twitch;
-        }
     }
 }

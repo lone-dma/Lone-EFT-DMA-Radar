@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Misc.Cache;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers;
 using EftDmaRadarLite.Tarkov.Player;
@@ -117,6 +118,9 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                 if (provider.CanRun && provider.CanLookup(profile.AccountID))
                 {
                     var result = await provider.GetProfileAsync(profile.AccountID);
+                    ArgumentNullException.ThrowIfNull(result.Data, nameof(result.Data));
+                    ArgumentException.ThrowIfNullOrWhiteSpace(result.Raw, nameof(result.Raw));
+                    ArgumentOutOfRangeException.ThrowIfEqual(result.LastUpdated, default, nameof(result.LastUpdated));
                     if (result is not null) // Success
                     {
                         var cachedProfile = cache.FindById(acctIdLong);
@@ -141,9 +145,9 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                         {
                             Id = acctIdLong,
                         };
-                        cachedProfile.Data = result.Raw;
+                        cachedProfile.Data = result.Raw.MinifyJson();
                         cachedProfile.Updated = result.LastUpdated;
-                        cachedProfile.CachedAt = DateTimeOffset.UtcNow;
+                        cachedProfile.Cached = DateTimeOffset.UtcNow;
                         _ = cache.Upsert(cachedProfile);
                         return; // Processed, don't continue
                     }
