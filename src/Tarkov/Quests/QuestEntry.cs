@@ -51,11 +51,11 @@ namespace EftDmaRadarLite.Tarkov.Quests
                 _isEnabled = value;
                 if (value) // Enabled
                 {
-                    App.Config.QuestHelper.BlacklistedQuests.Remove(Id);
+                    App.Config.QuestHelper.BlacklistedQuests.TryRemove(Id, out _);
                 }
                 else
                 {
-                    App.Config.QuestHelper.BlacklistedQuests.Add(Id);
+                    App.Config.QuestHelper.BlacklistedQuests.TryAdd(Id, 0);
                 }
                 OnPropertyChanged(nameof(IsEnabled));
             }
@@ -71,7 +71,7 @@ namespace EftDmaRadarLite.Tarkov.Quests
             {
                 Name = id;
             }
-            _isEnabled = !App.Config.QuestHelper.BlacklistedQuests.Contains(id);
+            _isEnabled = !App.Config.QuestHelper.BlacklistedQuests.ContainsKey(id);
         }
 
         public override string ToString() => Name;

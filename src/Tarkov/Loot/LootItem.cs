@@ -233,7 +233,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                 {
                     return container.Loot.Values.Any(x => x.IsQuestCondition);
                 }
-                return Memory.QuestManager?.ItemConditions?.Contains(ID) ?? false;
+                return Memory.QuestManager?.ItemConditions?.ContainsKey(ID) ?? false;
             }
         }
 
