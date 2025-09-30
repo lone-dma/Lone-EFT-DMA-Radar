@@ -37,17 +37,10 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
         private static readonly uint[] _toSyncObjects = new[] { Offsets.ClientLocalGameWorld.SynchronizableObjectLogicProcessor, Offsets.SynchronizableObjectLogicProcessor.SynchronizableObjects };
         private readonly ulong _localGameWorld;
         private readonly ConcurrentDictionary<ulong, IExplosiveItem> _explosives = new();
-        private ulong? _grenadesList;
 
         public ExplosivesManager(ulong localGameWorld)
         {
             _localGameWorld = localGameWorld;
-        }
-
-        private ulong GetGrenadesList()
-        {
-            var grenadesPtr = Memory.ReadPtr(_localGameWorld + Offsets.ClientLocalGameWorld.Grenades, false);
-            return Memory.ReadPtr(grenadesPtr + 0x18, false);
         }
 
         /// <summary>
@@ -85,31 +78,27 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
         {
             try
             {
-                _grenadesList ??= GetGrenadesList();
-                if (_grenadesList is ulong grenadesList)
+                var grenades = Memory.ReadPtr(_localGameWorld + Offsets.ClientLocalGameWorld.Grenades);
+                var grenadesListPtr = Memory.ReadPtr(grenades + 0x18);
+                using var grenadesList = UnityList<ulong>.Create(grenadesListPtr, false);
+                foreach (var grenade in grenadesList)
                 {
-                    using var allGrenades = UnityList<ulong>.Create(grenadesList, false);
-                    foreach (var grenadeAddr in allGrenades)
+                    ct.ThrowIfCancellationRequested();
+                    try
                     {
-                        ct.ThrowIfCancellationRequested();
-                        try
+                        if (!_explosives.ContainsKey(grenade))
                         {
-                            if (!_explosives.ContainsKey(grenadeAddr))
-                            {
-                                var grenade = new Grenade(grenadeAddr, _explosives);
-                                _explosives[grenade] = grenade;
-                            }
+                            _explosives[grenade] = new Grenade(grenade, _explosives);
                         }
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine($"Error Processing Grenade @ 0x{grenadeAddr.ToString("X")}: {ex}");
-                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Error Processing Grenade @ 0x{grenade.ToString("X")}: {ex}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                _grenadesList = null;
                 Debug.WriteLine($"Grenades Error: {ex}");
             }
         }
@@ -162,7 +151,6 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
                             ct.ThrowIfCancellationRequested();
                             try
                             {
-                                activeProjectile.Value.ThrowIfInvalidVirtualAddress(nameof(activeProjectile));
                                 if (!_explosives.ContainsKey(activeProjectile.Value))
                                 {
                                     var mortarProjectile = new MortarProjectile(activeProjectile.Value, _explosives);
