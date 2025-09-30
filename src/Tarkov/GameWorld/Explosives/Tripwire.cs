@@ -31,6 +31,7 @@ using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.UI.Skia;
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.UI.Skia.Maps;
+using VmmSharpEx.Scatter;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 {
@@ -40,44 +41,40 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
     public sealed class Tripwire : IExplosiveItem, IWorldEntity, IMapEntity
     {
         public static implicit operator ulong(Tripwire x) => x.Addr;
+        private bool _isActive;
+        private bool _destroyed;
 
         /// <summary>
         /// Base Address of Grenade Object.
         /// </summary>
         public ulong Addr { get; }
 
-        /// <summary>
-        /// True if the Tripwire is in an active state.
-        /// </summary>
-        public bool IsActive { get; private set; }
-
         public Tripwire(ulong baseAddr)
         {
             Addr = baseAddr;
-            IsActive = GetIsTripwireActive(false);
-            if (IsActive)
-            {
-                _position = GetPosition(false);
-            }
         }
 
-        public void Refresh()
+        public void OnRefresh(ScatterReadIndex index)
         {
-            IsActive = GetIsTripwireActive();
-            if (IsActive)
+            if (_destroyed)
             {
-                Position = GetPosition();
+                return;
             }
-        }
-
-        private bool GetIsTripwireActive(bool useCache = true)
-        {
-            var status = (Enums.ETripwireState)Memory.ReadValue<int>(this + Offsets.TripwireSynchronizableObject._tripwireState, useCache);
-            return status is Enums.ETripwireState.Wait || status is Enums.ETripwireState.Active;
-        }
-        private Vector3 GetPosition(bool useCache = true)
-        {
-            return Memory.ReadValue<Vector3>(this + Offsets.TripwireSynchronizableObject.ToPosition, useCache);
+            index.AddValueEntry<int>(0, this + Offsets.TripwireSynchronizableObject._tripwireState);
+            index.AddValueEntry<Vector3>(1, this + Offsets.TripwireSynchronizableObject.ToPosition);
+            index.Completed += (sender, x1) =>
+            {
+                if (x1.TryGetValue<int>(0, out var nState))
+                {
+                    var state = (Enums.ETripwireState)nState;
+                    _destroyed = state is Enums.ETripwireState.Exploded or Enums.ETripwireState.Inert;
+                    _isActive = state is Enums.ETripwireState.Wait or Enums.ETripwireState.Active;
+                }
+                if (x1.TryGetValue<Vector3>(1, out var pos))
+                {
+                    _position = pos;
+                }
+            };
         }
 
         #region Interfaces
@@ -87,7 +84,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 
         public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
-            if (!IsActive)
+            if (!_isActive)
                 return;
             var circlePosition = Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);
             var size = 5f * App.Config.UI.UIScale;

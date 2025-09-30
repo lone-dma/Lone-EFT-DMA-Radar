@@ -99,7 +99,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
             _t3 = new WorkerThread()
             {
                 Name = "Grenades Worker",
-                SleepDuration = TimeSpan.FromMilliseconds(10)
+                SleepDuration = TimeSpan.FromMilliseconds(25)
             };
             _t3.PerformWork += GrenadesWorker_PerformWork;
             _t4 = new WorkerThread()
