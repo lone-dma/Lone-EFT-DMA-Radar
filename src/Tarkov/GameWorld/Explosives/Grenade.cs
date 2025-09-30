@@ -81,7 +81,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
             {
                 if (x1.TryGetValue(0, out Vector3 pos))
                 {
-                    Position = pos;
+                    _position = pos;
                 }
                 if (x1.TryGetValue(1, out bool isDestroyed) && isDestroyed)
                 {

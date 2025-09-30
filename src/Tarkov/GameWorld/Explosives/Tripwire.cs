@@ -64,7 +64,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
             index.AddValueEntry<Vector3>(1, this + Offsets.TripwireSynchronizableObject.ToPosition);
             index.Completed += (sender, x1) =>
             {
-                if (x1.TryGetValue<int>(0, out var nState))
+                if (x1.TryGetValue(0, out int nState))
                 {
                     var state = (Enums.ETripwireState)nState;
                     _destroyed = state is Enums.ETripwireState.Exploded or Enums.ETripwireState.Inert;
