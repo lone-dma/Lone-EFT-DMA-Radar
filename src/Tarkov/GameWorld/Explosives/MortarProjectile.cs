@@ -65,7 +65,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
             index.AddValueEntry<ArtilleryProjectile>(0, this);
             index.Completed += (sender, x1) =>
             {
-                if (x1.TryGetValue<ArtilleryProjectile>(0, out var artilleryProjectile))
+                if (x1.TryGetValue(0, out ArtilleryProjectile artilleryProjectile))
                 {
                     _position = artilleryProjectile.Position;
                     if (!artilleryProjectile.IsActive)
