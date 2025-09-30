@@ -133,6 +133,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
             catch (Exception ex)
             {
                 MessageBox.Show(
+                    MainWindow.Instance,
                     $"ERROR Adding Filter: {ex.Message}",
                     "Loot Filter",
                     MessageBoxButton.OK,
@@ -170,6 +171,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
             catch (Exception ex)
             {
                 MessageBox.Show(
+                    MainWindow.Instance,
                     $"ERROR Renaming Filter: {ex.Message}",
                     "Loot Filter",
                     MessageBoxButton.OK,
@@ -184,6 +186,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
             if (string.IsNullOrEmpty(name))
             {
                 MessageBox.Show(
+                    MainWindow.Instance,
                     "No loot filter selected!",
                     "Loot Filter",
                     MessageBoxButton.OK,
@@ -192,6 +195,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
             }
 
             var result = MessageBox.Show(
+                MainWindow.Instance,
                 $"Are you sure you want to delete '{name}'?",
                 "Loot Filter",
                 MessageBoxButton.YesNo,
@@ -221,6 +225,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
             catch (Exception ex)
             {
                 MessageBox.Show(
+                    MainWindow.Instance,
                     $"ERROR Deleting Filter: {ex.Message}",
                     "Loot Filter",
                     MessageBoxButton.OK,

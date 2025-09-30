@@ -65,7 +65,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"ERROR Starting Web Radar Server: {ex.Message}", "Web Radar", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(MainWindow.Instance, $"ERROR Starting Web Radar Server: {ex.Message}", "Web Radar", MessageBoxButton.OK, MessageBoxImage.Error);
                 StartButtonText = "Start";
                 UiEnabled = true;
             }
@@ -79,12 +79,12 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
                 if (!string.IsNullOrWhiteSpace(url))
                 {
                     Clipboard.SetText(url);
-                    MessageBox.Show("Web Radar URL copied to clipboard.", "Web Radar", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(MainWindow.Instance, "Web Radar URL copied to clipboard.", "Web Radar", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to copy URL: {ex.Message}", "Web Radar", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(MainWindow.Instance, $"Failed to copy URL: {ex.Message}", "Web Radar", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

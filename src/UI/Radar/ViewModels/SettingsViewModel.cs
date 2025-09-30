@@ -162,15 +162,15 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
             {
                 var backupFile = EftDmaConfig.Filename + ".bak";
                 if (File.Exists(backupFile) &&
-                    MessageBox.Show("Overwrite backup?", "Backup Config", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                    MessageBox.Show(MainWindow.Instance, "Overwrite backup?", "Backup Config", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                     return;
 
                 await File.WriteAllTextAsync(backupFile, JsonSerializer.Serialize(App.Config, new JsonSerializerOptions { WriteIndented = true }));
-                MessageBox.Show($"Backed up to {backupFile}", "Backup Config");
+                MessageBox.Show(MainWindow.Instance, $"Backed up to {backupFile}", "Backup Config");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}", "Backup Config", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(MainWindow.Instance, $"Error: {ex.Message}", "Backup Config", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -180,11 +180,11 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
             try
             {
                 await App.Config.SaveAsync();
-                MessageBox.Show($"Config saved to {App.ConfigPath.FullName}", "Save Config");
+                MessageBox.Show(MainWindow.Instance, $"Config saved to {App.ConfigPath.FullName}", "Save Config");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}", "Save Config", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(MainWindow.Instance, $"Error: {ex.Message}", "Save Config", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -558,18 +558,18 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
             {
                 if (!Memory.Ready)
                 {
-                    MessageBox.Show("Game not running!", "Detect Res", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(MainWindow.Instance, "Game not running!", "Detect Res", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 var res = await Task.Run(() => Memory.GetMonitorRes());
                 MonitorWidth = res.Width.ToString();
                 MonitorHeight = res.Height.ToString();
-                MessageBox.Show($"Detected {res.Width}×{res.Height}", "Detect Res");
+                MessageBox.Show(MainWindow.Instance, $"Detected {res.Width}×{res.Height}", "Detect Res");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}", "Detect Res", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(MainWindow.Instance, $"Error: {ex.Message}", "Detect Res", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
