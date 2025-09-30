@@ -26,7 +26,9 @@ SOFTWARE.
  *
 */
 
+using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Unity.Collections;
+using VmmSharpEx.Scatter;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 {
@@ -35,17 +37,17 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
         private static readonly uint[] _toSyncObjects = new[] { Offsets.ClientLocalGameWorld.SynchronizableObjectLogicProcessor, Offsets.SynchronizableObjectLogicProcessor.SynchronizableObjects };
         private readonly ulong _localGameWorld;
         private readonly ConcurrentDictionary<ulong, IExplosiveItem> _explosives = new();
-        private ulong _grenadesBase;
+        private ulong? _grenadesList;
 
         public ExplosivesManager(ulong localGameWorld)
         {
             _localGameWorld = localGameWorld;
         }
 
-        private void Init()
+        private ulong GetGrenadesList()
         {
             var grenadesPtr = Memory.ReadPtr(_localGameWorld + Offsets.ClientLocalGameWorld.Grenades, false);
-            _grenadesBase = Memory.ReadPtr(grenadesPtr + 0x18, false);
+            return Memory.ReadPtr(grenadesPtr + 0x18, false);
         }
 
         /// <summary>
@@ -53,52 +55,61 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
         /// </summary>
         public void Refresh(CancellationToken ct)
         {
-            foreach (var explosive in _explosives.Values)
+            GetGrenades(ct);
+            GetTripwires(ct);
+            GetMortarProjectiles(ct);
+            var explosives = _explosives.Values;
+            if (explosives.Count == 0)
+            {
+                return;
+            }
+            using var map = Memory.CreateScatterMap();  
+            var rd1 = map.AddRound(useCache: false);
+            int i = 0;
+            foreach (var explosive in explosives)
             {
                 ct.ThrowIfCancellationRequested();
                 try
                 {
-                    explosive.Refresh();
+                    explosive.OnRefresh(rd1[i++]);
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"Error Refreshing Explosive @ 0x{explosive.Addr.ToString("X")}: {ex}");
                 }
             }
-            GetGrenades(ct);
-            GetTripwires(ct);
-            GetMortarProjectiles(ct);
+            map.Execute();
         }
 
         private void GetGrenades(CancellationToken ct)
         {
             try
             {
-                if (_grenadesBase == 0x0)
+                _grenadesList ??= GetGrenadesList();
+                if (_grenadesList is ulong grenadesList)
                 {
-                    Init();
-                }
-                using var allGrenades = UnityList<ulong>.Create(_grenadesBase, false);
-                foreach (var grenadeAddr in allGrenades)
-                {
-                    ct.ThrowIfCancellationRequested();
-                    try
+                    using var allGrenades = UnityList<ulong>.Create(grenadesList, false);
+                    foreach (var grenadeAddr in allGrenades)
                     {
-                        if (!_explosives.ContainsKey(grenadeAddr))
+                        ct.ThrowIfCancellationRequested();
+                        try
                         {
-                            var grenade = new Grenade(grenadeAddr, _explosives);
-                            _explosives[grenade] = grenade;
+                            if (!_explosives.ContainsKey(grenadeAddr))
+                            {
+                                var grenade = new Grenade(grenadeAddr, _explosives);
+                                _explosives[grenade] = grenade;
+                            }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"Error Processing Grenade @ 0x{grenadeAddr.ToString("X")}: {ex}");
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Error Processing Grenade @ 0x{grenadeAddr.ToString("X")}: {ex}");
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                _grenadesBase = 0x0;
+                _grenadesList = null;
                 Debug.WriteLine($"Grenades Error: {ex}");
             }
         }
@@ -139,20 +150,19 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
         {
             try
             {
-                var clientShellingController = Memory.ReadValue<ulong>(_localGameWorld + Offsets.ClientLocalGameWorld.ClientShellingController);
+                var clientShellingController = Memory.ReadPtr(_localGameWorld + Offsets.ClientLocalGameWorld.ClientShellingController);
                 if (clientShellingController != 0x0)
                 {
-                    var activeProjectilesPtr = Memory.ReadValue<ulong>(clientShellingController + Offsets.ClientShellingController.ActiveClientProjectiles);
+                    var activeProjectilesPtr = Memory.ReadPtr(clientShellingController + Offsets.ClientShellingController.ActiveClientProjectiles);
                     if (activeProjectilesPtr != 0x0)
                     {
                         using var activeProjectiles = UnityDictionary<int, ulong>.Create(activeProjectilesPtr, true);
                         foreach (var activeProjectile in activeProjectiles)
                         {
                             ct.ThrowIfCancellationRequested();
-                            if (activeProjectile.Value == 0x0)
-                                continue;
                             try
                             {
+                                activeProjectile.Value.ThrowIfInvalidVirtualAddress(nameof(activeProjectile));
                                 if (!_explosives.ContainsKey(activeProjectile.Value))
                                 {
                                     var mortarProjectile = new MortarProjectile(activeProjectile.Value, _explosives);

@@ -31,6 +31,7 @@ using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.UI.Skia;
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.UI.Skia.Maps;
+using VmmSharpEx.Scatter;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 {
@@ -42,62 +43,51 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
         public static implicit operator ulong(Grenade x) => x.Addr;
         private static readonly uint[] _toPosChain =
             ObjectClass.To_GameObject.Concat(new uint[] { GameObject.ComponentsOffset, 0x8, 0x38 }).ToArray();
-        private readonly Stopwatch _sw = Stopwatch.StartNew();
         private readonly ConcurrentDictionary<ulong, IExplosiveItem> _parent;
+        private readonly bool _isSmoke;
+        private readonly ulong _posAddr;
 
         /// <summary>
         /// Base Address of Grenade Object.
         /// </summary>
         public ulong Addr { get; }
 
-        /// <summary>
-        /// Position Pointer for the Vector3 location of this object.
-        /// </summary>
-        private ulong PosAddr { get; }
-
-        /// <summary>
-        /// True if grenade is currently active.
-        /// </summary>
-        public bool IsActive => _sw.Elapsed.TotalSeconds < 12f;
-
-        /// <summary>
-        /// True if the grenade has detonated.
-        /// Doesn't work on smoke grenades.
-        /// </summary>
-        private bool IsDetonated
-        {
-            get
-            {
-                return Memory.ReadValue<bool>(this + Offsets.Grenade.IsDestroyed, false);
-            }
-        }
-
         public Grenade(ulong baseAddr, ConcurrentDictionary<ulong, IExplosiveItem> parent)
         {
             Addr = baseAddr;
             _parent = parent;
-            if (IsDetonated)
-                throw new InvalidOperationException("Grenade is already detonated.");
-            PosAddr = Memory.ReadPtrChain(baseAddr, false, _toPosChain);
-            Refresh();
+            var type = ObjectClass.ReadName(baseAddr, 64, false);
+            if (type == "SmokeGrenade")
+            {
+                _isSmoke = true;
+                return;
+            }
+            _posAddr = Memory.ReadPtrChain(baseAddr, false, _toPosChain) + 0x90;
         }
 
         /// <summary>
         /// Get the updated Position of this Grenade.
         /// </summary>
-        public void Refresh()
+        public void OnRefresh(ScatterReadIndex index)
         {
-            if (!IsActive)
+            if (_isSmoke)
             {
+                // Smokes never leave the list, don't remove
                 return;
             }
-
-            if (IsDetonated)
+            index.AddValueEntry<Vector3>(0, _posAddr);
+            index.AddValueEntry<bool>(1, this + Offsets.Grenade.IsDestroyed);
+            index.Completed += (sender, x1) =>
             {
-                _parent.TryRemove(this, out _);
-                return;
-            }
-            Position = Memory.ReadValue<Vector3>(PosAddr + 0x90, false);
+                if (x1.TryGetValue(0, out Vector3 pos))
+                {
+                    Position = pos;
+                }
+                if (x1.TryGetValue(1, out bool isDestroyed) && isDestroyed)
+                {
+                    _parent.TryRemove(this, out _);
+                }
+            };
         }
 
         #region Interfaces
@@ -107,7 +97,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 
         public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
-            if (!IsActive)
+            if (_isSmoke)
                 return;
             var circlePosition = Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);
             var size = 5f * App.Config.UI.UIScale;

@@ -28,6 +28,7 @@ SOFTWARE.
 
 using EftDmaRadarLite.UI.Skia.Maps;
 using EftDmaRadarLite.Unity;
+using VmmSharpEx.Scatter;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 {
@@ -38,12 +39,8 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
         /// </summary>
         ulong Addr { get; }
         /// <summary>
-        /// True if the explosive is in an active state, otherwise False.
-        /// </summary>
-        bool IsActive { get; }
-        /// <summary>
         /// Refresh the state of the explosive item.
         /// </summary>
-        void Refresh();
+        void OnRefresh(ScatterReadIndex index);
     }
 }

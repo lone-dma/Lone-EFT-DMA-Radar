@@ -30,6 +30,7 @@ using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.UI.Skia;
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.UI.Skia.Maps;
+using VmmSharpEx.Scatter;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 {
@@ -42,24 +43,16 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
         {
             _parent = parent;
             Addr = baseAddr;
-            Refresh();
-            if (!IsActive)
-            {
-                throw new InvalidOperationException("Already exploded!");
-            }
         }
 
         public ulong Addr { get; }
-
-        public bool IsActive { get; private set; }
 
         private Vector3 _position;
         public ref Vector3 Position => ref _position;
 
         public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
-            if (!IsActive)
-                return;
+            // removed isActive check
             var circlePosition = Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);
             var size = 5f * App.Config.UI.UIScale;
             SKPaints.ShapeOutline.StrokeWidth = SKPaints.PaintExplosives.StrokeWidth + 2f * App.Config.UI.UIScale;
@@ -67,18 +60,20 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
             canvas.DrawCircle(circlePosition, size, SKPaints.PaintExplosives); // draw LocalPlayer marker
         }
 
-        public void Refresh()
+        public void OnRefresh(ScatterReadIndex index)
         {
-            var artilleryProjectile = Memory.ReadValue<ArtilleryProjectile>(this, false);
-            IsActive = artilleryProjectile.IsActive;
-            if (IsActive)
+            index.AddValueEntry<ArtilleryProjectile>(0, this);
+            index.Completed += (sender, x1) =>
             {
-                _position = artilleryProjectile.Position;
-            }
-            else
-            {
-                _parent.TryRemove(this, out _);
-            }
+                if (x1.TryGetValue<ArtilleryProjectile>(0, out var artilleryProjectile))
+                {
+                    _position = artilleryProjectile.Position;
+                    if (!artilleryProjectile.IsActive)
+                    {
+                        _parent.TryRemove(this, out _);
+                    }
+                }
+            };
         }
 
         [StructLayout(LayoutKind.Explicit, Pack = 1)]
