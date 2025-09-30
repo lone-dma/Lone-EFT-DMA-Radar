@@ -601,10 +601,10 @@ namespace EftDmaRadarLite
         /// <summary>
         /// Quests that are overridden/disabled.
         /// </summary>
-        [JsonPropertyName("blacklistedQuests_v3")]
+        [JsonPropertyName("blacklistedQuests_v4")]
         [JsonInclude]
-        [JsonConverter(typeof(CaseInsensitiveConcurrentHashSetConverter))]
-        public ConcurrentHashSet<string> BlacklistedQuests { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
+        [JsonConverter(typeof(CaseInsensitiveConcurrentDictionaryConverter<byte>))]
+        public ConcurrentDictionary<string, byte> BlacklistedQuests { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
     }
 
     public sealed class ContainersConfig
@@ -636,10 +636,10 @@ namespace EftDmaRadarLite
         /// <summary>
         /// Selected containers to display.
         /// </summary>
-        [JsonPropertyName("selected_v3")]
+        [JsonPropertyName("selected_v4")]
         [JsonInclude]
-        [JsonConverter(typeof(CaseInsensitiveConcurrentHashSetConverter))]
-        public ConcurrentHashSet<string> Selected { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
+        [JsonConverter(typeof(CaseInsensitiveConcurrentDictionaryConverter<byte>))]
+        public ConcurrentDictionary<string, byte> Selected { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
     }
 
     /// <summary>

@@ -75,7 +75,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
             });
         }
 
-        private readonly ConcurrentHashSet<string> _skip = new(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<string, byte> _skip = new(StringComparer.OrdinalIgnoreCase);
         private readonly SlidingWindowRateLimiter _limiter = new(new SlidingWindowRateLimiterOptions()
         {
             AutoReplenishment = true,
@@ -93,7 +93,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 
         private EftApiTechProvider() { }
 
-        public bool CanLookup(string accountId) => !_skip.Contains(accountId);
+        public bool CanLookup(string accountId) => !_skip.ContainsKey(accountId);
 
         public async Task<EFTProfileResponse> GetProfileAsync(string accountId)
         {
@@ -110,7 +110,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                 }
                 else if (response.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.NotFound)
                 {
-                    _skip.Add(accountId);
+                    _skip.TryAdd(accountId, 0);
                 }
                 response.EnsureSuccessStatusCode();
                 string json = await response.Content.ReadAsStringAsync();

@@ -42,7 +42,7 @@ namespace EftDmaRadarLite.UI.Data
         {
             Name = container.ShortName;
             Id = container.BsgId;
-            _isTracked = App.Config.Containers.Selected.Contains(container.BsgId);
+            _isTracked = App.Config.Containers.Selected.ContainsKey(container.BsgId);
         }
 
 
@@ -60,11 +60,11 @@ namespace EftDmaRadarLite.UI.Data
                     _isTracked = value;
                     if (_isTracked)
                     {
-                        App.Config.Containers.Selected.Add(Id);
+                        App.Config.Containers.Selected.TryAdd(Id, 0);
                     }
                     else
                     {
-                        App.Config.Containers.Selected.Remove(Id);
+                        App.Config.Containers.Selected.TryRemove(Id, out _);
                     }
                     OnPropertyChanged(nameof(IsTracked));
                 }

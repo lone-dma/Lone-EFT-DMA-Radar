@@ -92,11 +92,11 @@ namespace EftDmaRadarLite.Tarkov.Quests
         /// All current quests.
         /// </summary>
         public IReadOnlyDictionary<string, QuestEntry> Quests => _quests;
-        private readonly ConcurrentHashSet<string> _items = new(StringComparer.OrdinalIgnoreCase); // Key = Item ID
+        private readonly ConcurrentDictionary<string, byte> _items = new(StringComparer.OrdinalIgnoreCase); // Key = Item ID
         /// <summary>
         /// All item BSG ID's that we need to pickup.
         /// </summary>
-        public IReadOnlySet<string> ItemConditions => _items;
+        public IReadOnlyDictionary<string, byte> ItemConditions => _items;
         private readonly ConcurrentDictionary<string, QuestLocation> _locations = new(StringComparer.OrdinalIgnoreCase); // Key = Target ID
         /// <summary>
         /// All locations that we need to visit.
@@ -152,7 +152,7 @@ namespace EftDmaRadarLite.Tarkov.Quests
                         {
                             _quests[qID] = new QuestEntry(qID);
                         }
-                        if (App.Config.QuestHelper.BlacklistedQuests.Contains(qID))
+                        if (App.Config.QuestHelper.BlacklistedQuests.ContainsKey(qID))
                             continue;
                         var qTemplate = Memory.ReadPtr(qDataEntry + Offsets.QuestData.Template); // GClass1BF4
                         var qConditions =
@@ -181,9 +181,9 @@ namespace EftDmaRadarLite.Tarkov.Quests
                 }
                 foreach (var oldItem in _items)
                 {
-                    if (!masterItems.Contains(oldItem))
+                    if (!masterItems.Contains(oldItem.Key))
                     {
-                        _items.Remove(oldItem);
+                        _items.TryRemove(oldItem.Key, out _);
                     }
                 }
                 foreach (var oldLoc in _locations.Keys)
@@ -221,7 +221,7 @@ namespace EftDmaRadarLite.Tarkov.Quests
                     {
                         var target = Memory.ReadUnityString(targetPtr);
                         masterItems.Add(target);
-                        _items.Add(target);
+                        _items.TryAdd(target, 0);
                     }
                 }
                 else if (condName == "ConditionPlaceBeacon" || condName == "ConditionLeaveItemAtLocation")
