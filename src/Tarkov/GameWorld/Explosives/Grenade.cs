@@ -54,6 +54,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 
         public Grenade(ulong baseAddr, ConcurrentDictionary<ulong, IExplosiveItem> parent)
         {
+            baseAddr.ThrowIfInvalidVirtualAddress(nameof(baseAddr));
             Addr = baseAddr;
             _parent = parent;
             var type = ObjectClass.ReadName(baseAddr, 64, false);
