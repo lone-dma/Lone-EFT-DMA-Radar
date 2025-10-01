@@ -52,7 +52,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
         public Tripwire(ulong baseAddr)
         {
             Addr = baseAddr;
-            _position = Memory.ReadValue<Vector3>(this + Offsets.TripwireSynchronizableObject.ToPosition, false);
+            _position = Memory.ReadValue<Vector3>(baseAddr + Offsets.TripwireSynchronizableObject.ToPosition, false);
             _position.ThrowIfAbnormal("Tripwire Position");
         }
 
