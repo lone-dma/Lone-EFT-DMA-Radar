@@ -102,7 +102,7 @@ namespace EftDmaRadarLite.Unity
                     index = Indices[index];
                 }
 
-                worldPos.ThrowIfAbnormal();
+                worldPos.ThrowIfAbnormal(nameof(worldPos));
                 _position = worldPos;
                 return ref _position;
             }
@@ -140,7 +140,7 @@ namespace EftDmaRadarLite.Unity
                     index = Indices[index];
                 }
 
-                worldRot.ThrowIfAbnormal();
+                worldRot.ThrowIfAbnormal(nameof(worldRot));
                 return worldRot;
             }
             finally
@@ -157,7 +157,7 @@ namespace EftDmaRadarLite.Unity
         public Vector3 GetRootPosition()
         {
             Vector3 rootPos = Memory.ReadValue<TrsX>(HierarchyAddr + TransformHierarchy.RootPositionOffset, _useCache).t;
-            rootPos.ThrowIfAbnormal();
+            rootPos.ThrowIfAbnormal(nameof(rootPos));
             return rootPos;
         }
 
@@ -222,7 +222,7 @@ namespace EftDmaRadarLite.Unity
                     index = Indices[index];
                 }
 
-                worldPos.ThrowIfAbnormal();
+                worldPos.ThrowIfAbnormal(nameof(worldPos));
                 return worldPos;
             }
             finally

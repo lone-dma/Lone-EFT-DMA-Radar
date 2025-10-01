@@ -49,7 +49,7 @@ namespace EftDmaRadarLite.Unity
         {
             Debug.WriteLine("Initializing Mono...");
             var gameWorldField = Singleton.FindOne("GameWorld");
-            gameWorldField.ThrowIfInvalidVirtualAddress("Failed to get GameWorld");
+            gameWorldField.ThrowIfInvalidVirtualAddress(nameof(gameWorldField));
             GameWorldField = gameWorldField;
             Debug.WriteLine("Mono Init [OK]");
         }

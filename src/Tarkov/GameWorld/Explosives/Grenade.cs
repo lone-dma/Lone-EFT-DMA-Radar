@@ -79,7 +79,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
             index.AddValueEntry<bool>(1, this + Offsets.Grenade.IsDestroyed);
             index.Completed += (sender, x1) =>
             {
-                if (x1.TryGetValue(0, out Vector3 pos))
+                if (x1.TryGetValue(0, out Vector3 pos) && pos.IsNormal())
                 {
                     _position = pos;
                 }
