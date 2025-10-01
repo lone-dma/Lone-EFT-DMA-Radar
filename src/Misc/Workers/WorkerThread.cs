@@ -96,7 +96,8 @@ namespace EftDmaRadarLite.Misc.Workers
             bool shouldSmartSleep = shouldSleep && SleepMode == WorkerThreadSleepMode.DynamicSleep;
             while (!_disposed)
             {
-                long start = Stopwatch.GetTimestamp();
+                long start = shouldSmartSleep ?
+                    Stopwatch.GetTimestamp() : default;
                 try
                 {
                     OnPerformWork();
