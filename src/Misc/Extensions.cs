@@ -255,10 +255,10 @@ namespace EftDmaRadarLite.Misc
         /// <param name="q">Input Float.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ThrowIfAbnormal(this float f)
+        public static void ThrowIfAbnormal(this float f, string paramName = null)
         {
             if (!float.IsNormal(f))
-                throw new ArgumentOutOfRangeException(nameof(f));
+                throw new ArgumentOutOfRangeException(paramName);
         }
 
         /// <summary>
@@ -267,10 +267,10 @@ namespace EftDmaRadarLite.Misc
         /// <param name="q">Input Quaternion.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ThrowIfAbnormal(this Quaternion q)
+        public static void ThrowIfAbnormal(this Quaternion q, string paramName = null)
         {
             if (!q.IsNormal())
-                throw new ArgumentOutOfRangeException(nameof(q));
+                throw new ArgumentOutOfRangeException(paramName);
         }
         /// <summary>
         /// Validates a Vector3 for invalid values.
@@ -278,10 +278,10 @@ namespace EftDmaRadarLite.Misc
         /// <param name="v">Input Vector3.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ThrowIfAbnormal(this Vector3 v)
+        public static void ThrowIfAbnormal(this Vector3 v, string paramName = null)
         {
             if (!v.IsNormal())
-                throw new ArgumentOutOfRangeException(nameof(v));
+                throw new ArgumentOutOfRangeException(paramName);
         }
         /// <summary>
         /// Validates a Vector2 for invalid values.
@@ -289,10 +289,10 @@ namespace EftDmaRadarLite.Misc
         /// <param name="v">Input Vector2.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ThrowIfAbnormal(this Vector2 v)
+        public static void ThrowIfAbnormal(this Vector2 v, string paramName = null)
         {
             if (!v.IsNormal())
-                throw new ArgumentOutOfRangeException(nameof(v));
+                throw new ArgumentOutOfRangeException(paramName);
         }
 
         /// <summary>
@@ -301,10 +301,10 @@ namespace EftDmaRadarLite.Misc
         /// <param name="q">Input Float.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ThrowIfAbnormalAndNotZero(this float f)
+        public static void ThrowIfAbnormalAndNotZero(this float f, string paramName = null)
         {
             if (!f.IsNormalOrZero())
-                throw new ArgumentOutOfRangeException(nameof(f));
+                throw new ArgumentOutOfRangeException(paramName);
         }
 
         /// <summary>
@@ -313,10 +313,10 @@ namespace EftDmaRadarLite.Misc
         /// <param name="q">Input Quaternion.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ThrowIfAbnormalAndNotZero(this Quaternion q)
+        public static void ThrowIfAbnormalAndNotZero(this Quaternion q, string paramName = null)
         {
             if (!q.IsNormalOrZero())
-                throw new ArgumentOutOfRangeException(nameof(q));
+                throw new ArgumentOutOfRangeException(paramName);
         }
         /// <summary>
         /// Validates a Vector3 for invalid values.
@@ -324,10 +324,10 @@ namespace EftDmaRadarLite.Misc
         /// <param name="v">Input Vector3.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ThrowIfAbnormalAndNotZero(this Vector3 v)
+        public static void ThrowIfAbnormalAndNotZero(this Vector3 v, string paramName = null)
         {
             if (!v.IsNormalOrZero())
-                throw new ArgumentOutOfRangeException(nameof(v));
+                throw new ArgumentOutOfRangeException(paramName);
         }
         /// <summary>
         /// Validates a Vector2 for invalid values.
@@ -335,10 +335,10 @@ namespace EftDmaRadarLite.Misc
         /// <param name="v">Input Vector2.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ThrowIfAbnormalAndNotZero(this Vector2 v)
+        public static void ThrowIfAbnormalAndNotZero(this Vector2 v, string paramName = null)
         {
             if (!v.IsNormalOrZero())
-                throw new ArgumentOutOfRangeException(nameof(v));
+                throw new ArgumentOutOfRangeException(paramName);
         }
         /// <summary>
         /// Calculate a normalized direction towards a destination position.
@@ -468,24 +468,21 @@ namespace EftDmaRadarLite.Misc
         /// Throws an exception if the Virtual Address is invalid.
         /// </summary>
         /// <param name="va">Virtual address to validate.</param>
+        /// <param name="paramName">Parameter name to pass in exception message.</param>
         /// <exception cref="InvalidOperationException"></exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ThrowIfInvalidVirtualAddress(this ulong va)
+        public static void ThrowIfInvalidVirtualAddress(this ulong va, string paramName = null)
         {
+            string errorMsg;
+            if (paramName is not null)
+            {
+                errorMsg = $"Invalid Virtual Address 0x{va:X} [{paramName}]";
+            }
+            else
+            {
+                errorMsg = $"Invalid Virtual Address 0x{va:X}";
+            }
             if (!MemDMA.IsValidVirtualAddress(va))
-                throw new InvalidOperationException($"Invalid Virtual Address 0x{va:X}");
-        }
-
-        /// <summary>
-        /// Throws an exception if the Virtual Address is invalid.
-        /// </summary>
-        /// <param name="va">Virtual address to validate.</param>
-        /// <exception cref="InvalidOperationException"></exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ThrowIfInvalidVirtualAddress(this ulong va, string message)
-        {
-            if (!MemDMA.IsValidVirtualAddress(va))
-                throw new InvalidOperationException($"Invalid Virtual Address 0x{va:X} [{message}]");
+                throw new InvalidOperationException(errorMsg);
         }
     }
 

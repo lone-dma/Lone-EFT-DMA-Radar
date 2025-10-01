@@ -55,7 +55,7 @@ namespace EftDmaRadarLite.Unity
         private static void MemDMA_ProcessStarting(object sender, EventArgs e)
         {
             ulong unityBase = Memory.UnityBase;
-            unityBase.ThrowIfInvalidVirtualAddress();
+            unityBase.ThrowIfInvalidVirtualAddress(nameof(unityBase));
             _inputManager = Memory.ReadPtr(unityBase + UnityOffsets.ModuleBase.InputManager, false);
         }
 

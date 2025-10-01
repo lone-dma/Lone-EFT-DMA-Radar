@@ -530,7 +530,7 @@ namespace EftDmaRadarLite.Tarkov.Player
         {
             try
             {
-                rotation.ThrowIfAbnormalAndNotZero();
+                rotation.ThrowIfAbnormalAndNotZero(nameof(rotation));
                 rotation.X = rotation.X.NormalizeAngle();
                 ArgumentOutOfRangeException.ThrowIfLessThan(rotation.X, 0f);
                 ArgumentOutOfRangeException.ThrowIfGreaterThan(rotation.X, 360f);

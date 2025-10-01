@@ -78,7 +78,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
         private static void MemDMA_ProcessStarting(object sender, EventArgs e)
         {
             _opticCameraManagerField = MonoLib.MonoClass.Find("Assembly-CSharp", ClassNames.OpticCameraManagerContainer.ClassName, out _).GetStaticFieldData();
-            _opticCameraManagerField.ThrowIfInvalidVirtualAddress();
+            _opticCameraManagerField.ThrowIfInvalidVirtualAddress(nameof(_opticCameraManagerField));
         }
 
         private static void MemDMA_ProcessStopped(object sender, EventArgs e)

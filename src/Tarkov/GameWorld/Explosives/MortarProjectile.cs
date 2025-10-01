@@ -67,7 +67,10 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
             {
                 if (x1.TryGetValue(0, out ArtilleryProjectile artilleryProjectile))
                 {
-                    _position = artilleryProjectile.Position;
+                    if (artilleryProjectile.Position.IsNormal())
+                    {
+                        _position = artilleryProjectile.Position;
+                    }
                     if (!artilleryProjectile.IsActive)
                     {
                         _parent.TryRemove(this, out _);

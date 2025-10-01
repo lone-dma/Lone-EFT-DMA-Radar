@@ -52,6 +52,8 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
         public Tripwire(ulong baseAddr)
         {
             Addr = baseAddr;
+            _position = Memory.ReadValue<Vector3>(this + Offsets.TripwireSynchronizableObject.ToPosition, false);
+            _position.ThrowIfAbnormal("Tripwire Position");
         }
 
         public void OnRefresh(ScatterReadIndex index)
@@ -61,7 +63,6 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
                 return;
             }
             index.AddValueEntry<int>(0, this + Offsets.TripwireSynchronizableObject._tripwireState);
-            index.AddValueEntry<Vector3>(1, this + Offsets.TripwireSynchronizableObject.ToPosition);
             index.Completed += (sender, x1) =>
             {
                 if (x1.TryGetValue(0, out int nState))
@@ -69,10 +70,6 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
                     var state = (Enums.ETripwireState)nState;
                     _destroyed = state is Enums.ETripwireState.Exploded or Enums.ETripwireState.Inert;
                     _isActive = state is Enums.ETripwireState.Wait or Enums.ETripwireState.Active;
-                }
-                if (x1.TryGetValue<Vector3>(1, out var pos))
-                {
-                    _position = pos;
                 }
             };
         }
