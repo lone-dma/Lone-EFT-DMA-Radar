@@ -86,7 +86,8 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
             {
                 Name = "Realtime Worker",
                 ThreadPriority = ThreadPriority.AboveNormal,
-                SleepDuration = TimeSpan.FromMilliseconds(5)
+                SleepDuration = TimeSpan.FromMilliseconds(8),
+                SleepMode = WorkerThreadSleepMode.DynamicSleep
             };
             _t1.PerformWork += RealtimeWorker_PerformWork;
             _t2 = new WorkerThread()
@@ -99,7 +100,8 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
             _t3 = new WorkerThread()
             {
                 Name = "Grenades Worker",
-                SleepDuration = TimeSpan.FromMilliseconds(25)
+                SleepDuration = TimeSpan.FromMilliseconds(35),
+                SleepMode = WorkerThreadSleepMode.DynamicSleep
             };
             _t3.PerformWork += GrenadesWorker_PerformWork;
             _t4 = new WorkerThread()

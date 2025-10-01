@@ -46,7 +46,8 @@ namespace EftDmaRadarLite.Unity
             _thread = new()
             {
                 Name = "InputManager",
-                SleepDuration = TimeSpan.FromMilliseconds(10)
+                SleepDuration = TimeSpan.FromMilliseconds(12),
+                SleepMode = WorkerThreadSleepMode.DynamicSleep
             };
             _thread.PerformWork += Thread_PerformWork;
             _thread.Start();

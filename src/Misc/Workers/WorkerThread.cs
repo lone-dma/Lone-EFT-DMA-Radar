@@ -53,10 +53,14 @@ namespace EftDmaRadarLite.Misc.Workers
         /// Worker Name/Label.
         /// </summary>
         public string Name { get; init; } = Guid.NewGuid().ToString();
+        /// <summary>
+        /// Defines how the worker thread should sleep between work cycles.
+        /// </summary>
+        public WorkerThreadSleepMode SleepMode { get; init; } = WorkerThreadSleepMode.Default;
 
-        public WorkerThread() : this(null, null, null) { }
+        public WorkerThread() : this(null, null, null, null) { }
 
-        public WorkerThread(TimeSpan? sleepDuration = null, ThreadPriority? threadPriority = null, string workerName = null)
+        public WorkerThread(TimeSpan? sleepDuration = null, ThreadPriority? threadPriority = null, string workerName = null, WorkerThreadSleepMode? sleepMode = null)
         {
             if (sleepDuration is TimeSpan sleepDurationParam)
                 SleepDuration = sleepDurationParam;
@@ -64,6 +68,8 @@ namespace EftDmaRadarLite.Misc.Workers
                 ThreadPriority = threadPriorityParam;
             if (workerName is string workerNameParam)
                 Name = workerNameParam;
+            if (sleepMode is WorkerThreadSleepMode sleepModeParam)
+                SleepMode = sleepModeParam;
             _args = new(_cts.Token);
         }
 
@@ -87,8 +93,10 @@ namespace EftDmaRadarLite.Misc.Workers
         {
             Debug.WriteLine($"[WorkerThread] '{Name}' thread starting...");
             bool shouldSleep = SleepDuration > TimeSpan.Zero;
+            bool shouldSmartSleep = shouldSleep && SleepMode == WorkerThreadSleepMode.DynamicSleep;
             while (!_disposed)
             {
+                long start = Stopwatch.GetTimestamp();
                 try
                 {
                     OnPerformWork();
@@ -99,8 +107,19 @@ namespace EftDmaRadarLite.Misc.Workers
                 }
                 finally
                 {
-                    if (shouldSleep)
+                    if (shouldSmartSleep)
+                    {
+                        long end = Stopwatch.GetTimestamp();
+                        var duration = SleepDuration - TimeSpan.FromTicks(end - start);
+                        if (duration > TimeSpan.Zero)
+                        {
+                            Thread.Sleep(duration);
+                        }
+                    }
+                    else if (shouldSleep)
+                    {
                         Thread.Sleep(SleepDuration);
+                    }    
                 }
             }
             Debug.WriteLine($"[WorkerThread] '{Name}' thread stopping...");
