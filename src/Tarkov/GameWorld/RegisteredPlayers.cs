@@ -74,10 +74,8 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
                 {
                     if (playerBase == LocalPlayer) // Skip LocalPlayer, already allocated
                         continue;
-                    if (!_players.ContainsKey(playerBase)) // Add New Player
-                    {
-                        PlayerBase.Allocate(_players, playerBase);
-                    }
+                    // Add new player
+                    PlayerBase.Allocate(_players, playerBase);
                 }
                 /// Update Existing Players incl LocalPlayer
                 UpdateExistingPlayers(registered);

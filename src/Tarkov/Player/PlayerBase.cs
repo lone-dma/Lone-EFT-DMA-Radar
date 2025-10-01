@@ -39,6 +39,7 @@ using EftDmaRadarLite.Unity;
 using VmmSharpEx;
 using VmmSharpEx.Scatter;
 using static EftDmaRadarLite.Unity.UnityTransform;
+using static SDK.Offsets;
 
 namespace EftDmaRadarLite.Tarkov.Player
 {
@@ -74,15 +75,15 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// <summary>
         /// Allocates a player.
         /// </summary>
-        /// <param name="playerDict">Player Dictionary collection to add the newly allocated player to.</param>
+        /// <param name="regPlayers">Player Dictionary collection to add the newly allocated player to.</param>
         /// <param name="playerBase">Player base memory address.</param>
-        public static void Allocate(ConcurrentDictionary<ulong, PlayerBase> playerDict, ulong playerBase)
+        public static void Allocate(ConcurrentDictionary<ulong, PlayerBase> regPlayers, ulong playerBase)
         {
             try
             {
-                var player = AllocateInternal(playerBase);
-                playerDict[player] = player; // Insert or swap
-                Debug.WriteLine($"Player '{player.Name}' allocated.");
+                _ = regPlayers.GetOrAdd(
+                    playerBase,
+                    _ => AllocateInternal(playerBase));
             }
             catch (Exception ex)
             {
@@ -92,12 +93,16 @@ namespace EftDmaRadarLite.Tarkov.Player
 
         private static PlayerBase AllocateInternal(ulong playerBase)
         {
+            PlayerBase player;
             var className = ObjectClass.ReadName(playerBase, 64);
             var isClientPlayer = className == "ClientPlayer" || className == "LocalPlayer";
 
             if (isClientPlayer)
-                return new ClientPlayer(playerBase);
-            return new ObservedPlayer(playerBase);
+                player = new ClientPlayer(playerBase);
+            else
+                player = new ObservedPlayer(playerBase);
+            Debug.WriteLine($"Player '{player.Name}' allocated.");
+            return player;
         }
 
         /// <summary>

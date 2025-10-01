@@ -84,10 +84,9 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
                     ct.ThrowIfCancellationRequested();
                     try
                     {
-                        if (!_explosives.ContainsKey(grenade))
-                        {
-                            _explosives[grenade] = new Grenade(grenade, _explosives);
-                        }
+                        _ = _explosives.GetOrAdd(
+                            grenade,
+                            addr => new Grenade(addr, _explosives));
                     }
                     catch (Exception ex)
                     {
@@ -115,11 +114,9 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
                         var type = (Enums.SynchronizableObjectType)Memory.ReadValue<int>(syncObject + Offsets.SynchronizableObject.Type);
                         if (type is not Enums.SynchronizableObjectType.Tripwire)
                             continue;
-                        if (!_explosives.ContainsKey(syncObject))
-                        {
-                            var tripwire = new Tripwire(syncObject);
-                            _explosives[tripwire] = tripwire;
-                        }
+                        _ = _explosives.GetOrAdd(
+                            syncObject,
+                            addr => new Tripwire(addr));
                     }
                     catch (Exception ex)
                     {
@@ -145,11 +142,9 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
                     ct.ThrowIfCancellationRequested();
                     try
                     {
-                        if (!_explosives.ContainsKey(activeProjectile.Value))
-                        {
-                            var mortarProjectile = new MortarProjectile(activeProjectile.Value, _explosives);
-                            _explosives[mortarProjectile] = mortarProjectile;
-                        }
+                        _ = _explosives.GetOrAdd(
+                            activeProjectile.Value,
+                            addr => new MortarProjectile(addr, _explosives));
                     }
                     catch (Exception ex)
                     {
