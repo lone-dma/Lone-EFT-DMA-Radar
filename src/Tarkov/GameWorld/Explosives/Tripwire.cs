@@ -51,6 +51,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 
         public Tripwire(ulong baseAddr)
         {
+            baseAddr.ThrowIfInvalidVirtualAddress(nameof(baseAddr));
             Addr = baseAddr;
             _position = Memory.ReadValue<Vector3>(baseAddr + Offsets.TripwireSynchronizableObject.ToPosition, false);
             _position.ThrowIfAbnormal("Tripwire Position");

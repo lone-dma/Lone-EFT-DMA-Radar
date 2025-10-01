@@ -41,6 +41,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 
         public MortarProjectile(ulong baseAddr, ConcurrentDictionary<ulong, IExplosiveItem> parent)
         {
+            baseAddr.ThrowIfInvalidVirtualAddress(nameof(baseAddr));
             _parent = parent;
             Addr = baseAddr;
         }
