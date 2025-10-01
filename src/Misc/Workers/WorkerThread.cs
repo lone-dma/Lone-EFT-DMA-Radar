@@ -93,10 +93,10 @@ namespace EftDmaRadarLite.Misc.Workers
         {
             Debug.WriteLine($"[WorkerThread] '{Name}' thread starting...");
             bool shouldSleep = SleepDuration > TimeSpan.Zero;
-            bool shouldSmartSleep = shouldSleep && SleepMode == WorkerThreadSleepMode.DynamicSleep;
+            bool shouldDynamicSleep = shouldSleep && SleepMode == WorkerThreadSleepMode.DynamicSleep;
             while (!_disposed)
             {
-                long start = shouldSmartSleep ?
+                long start = shouldDynamicSleep ?
                     Stopwatch.GetTimestamp() : default;
                 try
                 {
@@ -108,7 +108,7 @@ namespace EftDmaRadarLite.Misc.Workers
                 }
                 finally
                 {
-                    if (shouldSmartSleep)
+                    if (shouldDynamicSleep)
                     {
                         long end = Stopwatch.GetTimestamp();
                         var duration = SleepDuration - TimeSpan.FromTicks(end - start);
