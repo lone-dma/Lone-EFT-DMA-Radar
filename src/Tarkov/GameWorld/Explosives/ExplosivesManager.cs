@@ -138,28 +138,22 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
             try
             {
                 var clientShellingController = Memory.ReadPtr(_localGameWorld + Offsets.ClientLocalGameWorld.ClientShellingController);
-                if (clientShellingController != 0x0)
+                var activeProjectilesPtr = Memory.ReadPtr(clientShellingController + Offsets.ClientShellingController.ActiveClientProjectiles);
+                using var activeProjectiles = UnityDictionary<int, ulong>.Create(activeProjectilesPtr, true);
+                foreach (var activeProjectile in activeProjectiles)
                 {
-                    var activeProjectilesPtr = Memory.ReadPtr(clientShellingController + Offsets.ClientShellingController.ActiveClientProjectiles);
-                    if (activeProjectilesPtr != 0x0)
+                    ct.ThrowIfCancellationRequested();
+                    try
                     {
-                        using var activeProjectiles = UnityDictionary<int, ulong>.Create(activeProjectilesPtr, true);
-                        foreach (var activeProjectile in activeProjectiles)
+                        if (!_explosives.ContainsKey(activeProjectile.Value))
                         {
-                            ct.ThrowIfCancellationRequested();
-                            try
-                            {
-                                if (!_explosives.ContainsKey(activeProjectile.Value))
-                                {
-                                    var mortarProjectile = new MortarProjectile(activeProjectile.Value, _explosives);
-                                    _explosives[mortarProjectile] = mortarProjectile;
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine($"Error Processing Mortar Projectile @ 0x{activeProjectile.Value.ToString("X")}: {ex}");
-                            }
+                            var mortarProjectile = new MortarProjectile(activeProjectile.Value, _explosives);
+                            _explosives[mortarProjectile] = mortarProjectile;
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Error Processing Mortar Projectile @ 0x{activeProjectile.Value.ToString("X")}: {ex}");
                     }
                 }
             }
