@@ -83,7 +83,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
         /// <summary>
         /// Gets all loot on a corpse.
         /// </summary>
-        private static void GetCorpseLoot(ulong lootInteractiveClass, ISet<ulong> scannedItems, IDictionary<ulong, LootItem> containerLoot, bool isPMC)
+        private static void GetCorpseLoot(ulong lootInteractiveClass, ISet<ulong> scannedItems, ConcurrentDictionary<ulong, LootItem> containerLoot, bool isPMC)
         {
             try
             {
@@ -97,7 +97,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
         /// <summary>
         /// Recurse slots for gear.
         /// </summary>
-        private static void GetItemsInSlots(ulong slotsPtr, ISet<ulong> scannedItems, IDictionary<ulong, LootItem> containerLoot, bool isPMC)
+        private static void GetItemsInSlots(ulong slotsPtr, ISet<ulong> scannedItems, ConcurrentDictionary<ulong, LootItem> containerLoot, bool isPMC)
         {
             using var slotDict = new PooledDictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);
             using var slots = UnityArray<ulong>.Create(slotsPtr, true);
@@ -121,9 +121,11 @@ namespace EftDmaRadarLite.Tarkov.Loot
                     var inventorytemplate = Memory.ReadPtr(containedItem + Offsets.LootItem.Template);
                     var idPtr = Memory.ReadValue<Types.MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
                     var id = Memory.ReadUnityString(idPtr.StringID);
-                    if (EftDataManager.AllItems.TryGetValue(id, out var entry) && !containerLoot.ContainsKey(containedItem))
+                    if (EftDataManager.AllItems.TryGetValue(id, out var entry))
                     {
-                        containerLoot[containedItem] = new LootItem(entry);
+                        _ = containerLoot.GetOrAdd(
+                            containedItem, 
+                            _ => new LootItem(entry));
                     }
                 }
                 catch

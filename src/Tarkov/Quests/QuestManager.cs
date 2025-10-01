@@ -148,10 +148,9 @@ namespace EftDmaRadarLite.Tarkov.Quests
                         var qIDPtr = Memory.ReadPtr(qDataEntry + Offsets.QuestData.Id);
                         var qID = Memory.ReadUnityString(qIDPtr);
                         masterQuests.Add(qID);
-                        if (!_quests.ContainsKey(qID))
-                        {
-                            _quests[qID] = new QuestEntry(qID);
-                        }
+                        _ = _quests.GetOrAdd(
+                            qID, 
+                            id => new QuestEntry(id));
                         if (App.Config.QuestHelper.BlacklistedQuests.ContainsKey(qID))
                             continue;
                         var qTemplate = Memory.ReadPtr(qDataEntry + Offsets.QuestData.Template); // GClass1BF4
@@ -233,10 +232,9 @@ namespace EftDmaRadarLite.Tarkov.Quests
                         zones.TryGetValue(target, out var loc))
                     {
                         masterLocations.Add(target);
-                        if (!_locations.ContainsKey(target))
-                        {
-                            _locations[target] = new QuestLocation(questID, target, loc);
-                        }
+                        _ = _locations.GetOrAdd(
+                            target,
+                            t => new QuestLocation(questID, t, loc));
                     }
                 }
                 else if (condName == "ConditionVisitPlace")
@@ -248,10 +246,9 @@ namespace EftDmaRadarLite.Tarkov.Quests
                         zones.TryGetValue(target, out var loc))
                     {
                         masterLocations.Add(target);
-                        if (!_locations.ContainsKey(target))
-                        {
-                            _locations[target] = new QuestLocation(questID, target, loc);
-                        }
+                        _ = _locations.GetOrAdd(
+                            target,
+                            t => new QuestLocation(questID, t, loc));
                     }
                 }
                 else if (condName == "ConditionCounterCreator") // Check for children
