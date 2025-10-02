@@ -137,7 +137,7 @@ namespace EftDmaRadarLite.Tarkov.Quests
                         if (qStatus != 2) // 2 == Started
                             continue;
                         var completedPtr = Memory.ReadPtr(qDataEntry + Offsets.QuestData.CompletedConditions);
-                        using var completedHS = UnityHashSet<Types.MongoID>.Create(completedPtr, true);
+                        using var completedHS = UnityHashSet<MongoID>.Create(completedPtr, true);
                         using var completedConditions = new PooledSet<string>();
                         foreach (var c in completedHS)
                         {
@@ -206,7 +206,7 @@ namespace EftDmaRadarLite.Tarkov.Quests
         {
             try
             {
-                var condIDPtr = Memory.ReadValue<Types.MongoID>(condition + Offsets.QuestCondition.id);
+                var condIDPtr = Memory.ReadValue<MongoID>(condition + Offsets.QuestCondition.id);
                 var condID = Memory.ReadUnityString(condIDPtr.StringID);
                 if (completedConditions.Contains(condID))
                     return;

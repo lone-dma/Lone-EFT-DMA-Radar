@@ -271,7 +271,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                             var itemOwner = Memory.ReadPtr(interactiveClass + Offsets.LootableContainer.ItemOwner);
                             var ownerItemBase = Memory.ReadPtr(itemOwner + Offsets.LootableContainerItemOwner.RootItem);
                             var ownerItemTemplate = Memory.ReadPtr(ownerItemBase + Offsets.LootItem.Template);
-                            var ownerItemBsgIdPtr = Memory.ReadValue<Types.MongoID>(ownerItemTemplate + Offsets.ItemTemplate._id);
+                            var ownerItemBsgIdPtr = Memory.ReadValue<MongoID>(ownerItemTemplate + Offsets.ItemTemplate._id);
                             var ownerItemBsgId = Memory.ReadUnityString(ownerItemBsgIdPtr.StringID);
                             _ = _loot.TryAdd(p.ItemBase, new StaticLootContainer(ownerItemBsgId, interactiveClass)
                             {
@@ -291,7 +291,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                     var isQuestItem = Memory.ReadValue<bool>(itemTemplate + Offsets.ItemTemplate.QuestItem);
 
                     //If NOT a quest item. Quest items are like the quest related things you need to find like the pocket watch or Jaeger's Letter etc. We want to ignore these quest items.
-                    var BSGIdPtr = Memory.ReadValue<Types.MongoID>(itemTemplate + Offsets.ItemTemplate._id);
+                    var BSGIdPtr = Memory.ReadValue<MongoID>(itemTemplate + Offsets.ItemTemplate._id);
                     var id = Memory.ReadUnityString(BSGIdPtr.StringID);
                     if (isQuestItem)
                     {

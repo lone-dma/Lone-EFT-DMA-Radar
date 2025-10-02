@@ -78,7 +78,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                     _thermal = null;
                     string thermal = null;
                     var itemTemplate = Memory.ReadPtr(itemBase + Offsets.LootItem.Template);
-                    var itemIDPtr = Memory.ReadValue<Types.MongoID>(itemTemplate + Offsets.ItemTemplate._id);
+                    var itemIDPtr = Memory.ReadValue<MongoID>(itemTemplate + Offsets.ItemTemplate._id);
                     var itemID = Memory.ReadUnityString(itemIDPtr.StringID);
                     if (EftDataManager.AllItems.TryGetValue(itemID, out var heldItem)) // Item exists in DB
                     {
@@ -115,7 +115,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                         var slotPtr = Memory.ReadPtr(chambers + UnityList<byte>.ArrStartOffset + 0 * 0x8); // One in the chamber ;)
                         var slotItem = Memory.ReadPtr(slotPtr + Offsets.Slot.ContainedItem);
                         var ammoTemplate = Memory.ReadPtr(slotItem + Offsets.LootItem.Template);
-                        var ammoIDPtr = Memory.ReadValue<Types.MongoID>(ammoTemplate + Offsets.ItemTemplate._id);
+                        var ammoIDPtr = Memory.ReadValue<MongoID>(ammoTemplate + Offsets.ItemTemplate._id);
                         var ammoID = Memory.ReadUnityString(ammoIDPtr.StringID);
                         if (EftDataManager.AllItems.TryGetValue(ammoID, out var ammoItem))
                             ammo = ammoItem?.ShortName;
