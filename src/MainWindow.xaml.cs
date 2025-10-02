@@ -28,6 +28,7 @@ SOFTWARE.
 
 using EftDmaRadarLite.UI.Radar;
 using EftDmaRadarLite.UI.Radar.ViewModels;
+using EftDmaRadarLite.UI.Skia;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
 

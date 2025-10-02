@@ -52,9 +52,9 @@ using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers;
 using EftDmaRadarLite.UI.ColorPicker;
 using EftDmaRadarLite.UI.Misc;
+using EftDmaRadarLite.UI.Skia;
 using EftDmaRadarLite.UI.Skia.Maps;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.Versioning;
@@ -92,6 +92,10 @@ namespace EftDmaRadarLite
         /// HttpClientFactory for creating HttpClients.
         /// </summary>
         public static IHttpClientFactory HttpClientFactory { get; }
+        /// <summary>
+        /// TRUE if the application is currently using Dark Mode resources, otherwise FALSE for Light Mode.
+        /// </summary>
+        public static bool IsDarkMode { get; private set; }
 
         static App()
         {
@@ -156,6 +160,12 @@ namespace EftDmaRadarLite
             await loadingWindow.ViewModel.UpdateProgressAsync(50, "Starting DMA Connection...");
             MemoryInterface.ModuleInit();
             await loadingWindow.ViewModel.UpdateProgressAsync(75, "Loading Remaining Modules...");
+            IsDarkMode = GetIsDarkMode();
+            if (IsDarkMode)
+            {
+                SKPaints.PaintBitmap.ColorFilter = SKPaints.GetDarkModeColorFilter(0.7f);
+                SKPaints.PaintBitmapAlpha.ColorFilter = SKPaints.GetDarkModeColorFilter(0.7f);
+            }
             RuntimeHelpers.RunClassConstructor(typeof(LocalCache).TypeHandle);
             RuntimeHelpers.RunClassConstructor(typeof(ColorPickerViewModel).TypeHandle);
             await loadingWindow.ViewModel.UpdateProgressAsync(100, "Loading Completed!");
@@ -225,6 +235,32 @@ namespace EftDmaRadarLite
             const uint timerResolutionMs = 5;
             if (TimeBeginPeriod(timerResolutionMs) != 0)
                 Debug.WriteLine($"WARNING: Unable to set timer resolution to {timerResolutionMs}ms. This may cause performance issues.");
+        }
+
+        /// <summary>
+        /// Checks the current ResourceDictionaries to determine if Dark Mode or Light Mode is active.
+        /// </summary>
+        private static bool GetIsDarkMode()
+        {
+            try
+            {
+                foreach (var dict in Application.Current.Resources.MergedDictionaries)
+                {
+                    foreach (var inner in dict.MergedDictionaries)
+                    {
+                        if (inner.Source?.ToString() is string src)
+                        {
+                            if (src.Contains("/Theme/Dark.xaml", StringComparison.OrdinalIgnoreCase))
+                                return true;
+                            if (src.Contains("/Theme/Light.xaml", StringComparison.OrdinalIgnoreCase))
+                                return false;
+                        }
+                    }
+                }
+            }
+            catch { }
+            // fallback: assume light if nothing matched
+            return false;
         }
 
         [LibraryImport("kernel32.dll")]
