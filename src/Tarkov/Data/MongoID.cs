@@ -3,7 +3,7 @@
     /// <summary>
     /// EFT.MongoID Struct
     /// </summary>
-    [StructLayout(LayoutKind.Explicit, Pack = 8)]
+    [StructLayout(LayoutKind.Explicit)]
     public readonly struct MongoID
     {
         [FieldOffset(0x0)]
