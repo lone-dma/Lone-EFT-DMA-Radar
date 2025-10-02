@@ -27,56 +27,59 @@ SOFTWARE.
 */
 
 using EftDmaRadarLite.UI.Hotkeys;
-using EftDmaRadarLite.DMA;
 using VmmSharpEx.Scatter;
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Misc.Workers;
+using EftDmaRadarLite.DMA;
 
 namespace EftDmaRadarLite.Unity
 {
-    internal static class InputManager
+    public sealed class InputManager : IDisposable
     {
-        private static readonly WorkerThread _thread;
-        private static ulong _inputManager;
+        private static readonly Lock _lock = new();
+        private static InputManager _instance;
+        private readonly WorkerThread _thread;
+        private readonly ulong _inputManager;
 
         static InputManager()
         {
             MemDMA.ProcessStarting += MemDMA_ProcessStarting;
             MemDMA.ProcessStopped += MemDMA_ProcessStopped;
-            _thread = new()
-            {
-                Name = "InputManager",
-                SleepDuration = TimeSpan.FromMilliseconds(12),
-                SleepMode = WorkerThreadSleepMode.DynamicSleep
-            };
-            _thread.PerformWork += Thread_PerformWork;
-            _thread.Start();
         }
 
         private static void MemDMA_ProcessStarting(object sender, EventArgs e)
         {
-            ulong unityBase = Memory.UnityBase;
-            unityBase.ThrowIfInvalidVirtualAddress(nameof(unityBase));
-            _inputManager = Memory.ReadPtr(unityBase + UnityOffsets.ModuleBase.InputManager, false);
+            lock (_lock)
+            {
+                _instance?.Dispose();
+                _instance = new(Memory.UnityBase);
+            }
         }
 
         private static void MemDMA_ProcessStopped(object sender, EventArgs e)
         {
-            _inputManager = 0x0;
-        }
-
-        private static void Thread_PerformWork(object sender, WorkerThreadArgs e)
-        {
-            if (MemDMA.WaitForProcess())
+            lock (_lock)
             {
-                ProcessAllHotkeys();
+                _instance?.Dispose();
+                _instance = null;
             }
         }
 
-        /// <summary>
-        /// Check all hotkeys, and execute delegates.
-        /// </summary>
-        private static void ProcessAllHotkeys()
+        public InputManager(ulong unityBase)
+        {
+            unityBase.ThrowIfInvalidVirtualAddress(nameof(unityBase));
+            _inputManager = Memory.ReadPtr(unityBase + UnityOffsets.ModuleBase.InputManager, false);
+            _thread = new()
+            {
+                Name = nameof(InputManager),
+                SleepDuration = TimeSpan.FromMilliseconds(12),
+                SleepMode = WorkerThreadSleepMode.DynamicSleep
+            };
+            _thread.PerformWork += InputManager_PerformWork;
+            _thread.Start();
+        }
+
+        private void InputManager_PerformWork(object sender, WorkerThreadArgs e)
         {
             var hotkeys = HotkeyManagerViewModel.Hotkeys.AsEnumerable();
             if (hotkeys.Any())
@@ -116,6 +119,11 @@ namespace EftDmaRadarLite.Unity
                     action.Execute(isKeyDown);
                 }
             };
+        }
+
+        public void Dispose()
+        {
+            _thread.Dispose();
         }
     }
 

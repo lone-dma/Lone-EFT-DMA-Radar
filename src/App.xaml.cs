@@ -59,6 +59,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.Versioning;
 using System.Security.Authentication;
+using System.Windows.Input;
 
 [assembly: SupportedOSPlatform("Windows")]
 [assembly: AssemblyVersion("1.0.*")]
