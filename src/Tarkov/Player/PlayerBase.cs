@@ -83,7 +83,7 @@ namespace EftDmaRadarLite.Tarkov.Player
             {
                 _ = regPlayers.GetOrAdd(
                     playerBase,
-                    _ => AllocateInternal(playerBase));
+                    addr => AllocateInternal(addr));
             }
             catch (Exception ex)
             {

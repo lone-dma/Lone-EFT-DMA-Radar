@@ -280,7 +280,9 @@ namespace EftDmaRadarLite.Tarkov.Player
             {
                 var groupIdPtr = Memory.ReadPtr(this + Offsets.ObservedPlayerView.GroupID);
                 string groupId = Memory.ReadUnityString(groupIdPtr);
-                return _groups.GetOrAdd(groupId, _ => Interlocked.Increment(ref _lastGroupNumber));
+                return _groups.GetOrAdd(
+                    groupId, 
+                    _ => Interlocked.Increment(ref _lastGroupNumber));
             }
             catch { return -1; } // will return null if Solo / Don't have a team
         }
