@@ -53,8 +53,6 @@ namespace EftDmaRadarLite.DMA
         private const string MEMORY_MAP_FILE = "mmap.txt";
         private const string GAME_PROCESS_NAME = "EscapeFromTarkov.exe";
         internal const uint MAX_READ_SIZE = 0x1000u * 1500u;
-        private static readonly ManualResetEvent _syncProcessRunning = new(false);
-        private static readonly ManualResetEvent _syncInRaid = new(false);
         private readonly Vmm _vmm;
         private uint _pid;
         private bool _restartRadar;
@@ -357,7 +355,6 @@ namespace EftDmaRadarLite.DMA
         private static void OnProcessStarted()
         {
             ProcessStarted?.Invoke(null, EventArgs.Empty);
-            _syncProcessRunning.Set();
         }
 
         /// <summary>
@@ -366,7 +363,6 @@ namespace EftDmaRadarLite.DMA
         private static void OnProcessStopped()
         {
             ProcessStopped?.Invoke(null, EventArgs.Empty);
-            _syncProcessRunning.Reset();
         }
 
         /// <summary>
@@ -375,7 +371,6 @@ namespace EftDmaRadarLite.DMA
         private static void OnRaidStarted()
         {
             RaidStarted?.Invoke(null, EventArgs.Empty);
-            _syncInRaid.Set();
         }
 
         /// <summary>
@@ -384,20 +379,7 @@ namespace EftDmaRadarLite.DMA
         private static void OnRaidStopped()
         {
             RaidStopped?.Invoke(null, EventArgs.Empty);
-            _syncInRaid.Reset();
         }
-
-        /// <summary>
-        /// Blocks indefinitely until the Game Process is Running, otherwise returns immediately.
-        /// </summary>
-        /// <returns>True if the Process is running, otherwise this method never returns.</returns>
-        public static bool WaitForProcess() => _syncProcessRunning.WaitOne();
-
-        /// <summary>
-        /// Blocks indefinitely until In Raid/Match, otherwise returns immediately.
-        /// </summary>
-        /// <returns>True if In Raid/Match, otherwise this method never returns.</returns>
-        public static bool WaitForRaid() => _syncInRaid.WaitOne();
 
         #endregion
 
