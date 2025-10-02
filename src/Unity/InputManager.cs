@@ -36,7 +36,6 @@ namespace EftDmaRadarLite.Unity
 {
     public sealed class InputManager : IDisposable
     {
-        private static readonly Lock _lock = new();
         private static InputManager _instance;
         private readonly WorkerThread _thread;
         private readonly ulong _inputManager;
@@ -49,20 +48,15 @@ namespace EftDmaRadarLite.Unity
 
         private static void MemDMA_ProcessStarting(object sender, EventArgs e)
         {
-            lock (_lock)
-            {
-                _instance?.Dispose();
-                _instance = new(Memory.UnityBase);
-            }
+            _instance?.Dispose();
+            _instance = new(Memory.UnityBase);
+            Debug.WriteLine("InputManager initialized.");
         }
 
         private static void MemDMA_ProcessStopped(object sender, EventArgs e)
         {
-            lock (_lock)
-            {
-                _instance?.Dispose();
-                _instance = null;
-            }
+            _instance?.Dispose();
+            _instance = null;
         }
 
         public InputManager(ulong unityBase)
