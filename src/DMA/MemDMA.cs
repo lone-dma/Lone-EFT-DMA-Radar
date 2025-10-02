@@ -197,7 +197,7 @@ namespace EftDmaRadarLite.DMA
         /// </summary>
         private void RunStartupLoop()
         {
-            Debug.WriteLine("New Game Startup");
+            Debug.WriteLine("New Process Startup");
             while (true) // Startup loop
             {
                 try
@@ -209,12 +209,12 @@ namespace EftDmaRadarLite.DMA
                     this.Starting = true;
                     OnProcessStarting();
                     this.Ready = true;
-                    Debug.WriteLine("Game Startup [OK]");
+                    Debug.WriteLine("Process Startup [OK]");
                     break;
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Game Startup [FAIL]: {ex}");
+                    Debug.WriteLine($"Process Startup [FAIL]: {ex}");
                     OnProcessStopped();
                     Thread.Sleep(1000);
                 }
