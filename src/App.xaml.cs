@@ -239,6 +239,7 @@ namespace EftDmaRadarLite
 
         /// <summary>
         /// Checks the current ResourceDictionaries to determine if Dark Mode or Light Mode is active.
+        /// NOTE: Only works after App is initialized and resources are loaded.
         /// </summary>
         private static bool GetIsDarkMode()
         {
