@@ -54,7 +54,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
 
         private readonly RegisteredPlayers _rgtPlayers;
         private readonly ExitManager _exfilManager;
-        private readonly ExplosivesManager _grenadeManager;
+        private readonly ExplosivesManager _explosivesManager;
         private readonly WorkerThread _t1;
         private readonly WorkerThread _t2;
         private readonly WorkerThread _t3;
@@ -67,7 +67,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
 
         public bool InRaid => !_disposed;
         public IReadOnlyCollection<PlayerBase> Players => _rgtPlayers;
-        public IReadOnlyCollection<IExplosiveItem> Explosives => _grenadeManager;
+        public IReadOnlyCollection<IExplosiveItem> Explosives => _explosivesManager;
         public IReadOnlyCollection<IExitPoint> Exits => _exfilManager;
         public LocalPlayer LocalPlayer => _rgtPlayers?.LocalPlayer;
         public LootManager Loot { get; }
@@ -99,11 +99,11 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
             _t2.PerformWork += SlowWorker_PerformWork;
             _t3 = new WorkerThread()
             {
-                Name = "Grenades Worker",
+                Name = "Explosives Worker",
                 SleepDuration = TimeSpan.FromMilliseconds(30),
                 SleepMode = WorkerThreadSleepMode.DynamicSleep
             };
-            _t3.PerformWork += GrenadesWorker_PerformWork;
+            _t3.PerformWork += ExplosivesWorker_PerformWork;
             _t4 = new WorkerThread()
             {
                 Name = "Fast Worker",
@@ -116,7 +116,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
             QuestManager = new(_rgtPlayers.LocalPlayer.Profile);
             Loot = new(localGameWorld);
             _exfilManager = new(localGameWorld, _rgtPlayers.LocalPlayer.IsPmc);
-            _grenadeManager = new(localGameWorld);
+            _explosivesManager = new(localGameWorld);
         }
 
         /// <summary>
@@ -377,14 +377,14 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
 
         #endregion
 
-        #region Grenades Thread T3
+        #region Explosives Thread T3
 
         /// <summary>
-        /// Managed Worker Thread that does Grenade/Throwable updates.
+        /// Managed Worker Thread that does Explosives (grenades,etc.) updates.
         /// </summary>
-        private void GrenadesWorker_PerformWork(object sender, WorkerThreadArgs e)
+        private void ExplosivesWorker_PerformWork(object sender, WorkerThreadArgs e)
         {
-            _grenadeManager.Refresh(e.CancellationToken);
+            _explosivesManager.Refresh(e.CancellationToken);
         }
 
         #endregion
