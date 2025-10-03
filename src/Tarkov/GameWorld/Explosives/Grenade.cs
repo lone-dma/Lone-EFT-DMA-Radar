@@ -59,7 +59,8 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
             Addr = baseAddr;
             _parent = parent;
             var type = ObjectClass.ReadName(baseAddr, 64, false);
-            if (type == "SmokeGrenade")
+            Debug.WriteLine($"[Grenade] Detected Type: {type}");
+            if (type == "SmokeGrenade" || type == "ObservedSmokeGrenade")
             {
                 _isSmoke = true;
                 return;
