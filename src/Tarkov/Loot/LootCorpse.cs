@@ -120,7 +120,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                     scannedItems.Add(containedItem);
                     var inventorytemplate = Memory.ReadPtr(containedItem + Offsets.LootItem.Template);
                     var mongoId = Memory.ReadValue<MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
-                    var id = mongoId.ReadID();
+                    var id = mongoId.ReadString();
                     if (EftDataManager.AllItems.TryGetValue(id, out var entry))
                     {
                         _ = containerLoot.GetOrAdd(
