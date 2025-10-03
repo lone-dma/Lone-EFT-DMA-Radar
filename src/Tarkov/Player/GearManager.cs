@@ -57,7 +57,7 @@ namespace EftDmaRadarLite.Tarkov.Player
             foreach (var slotPtr in slotsArray)
             {
                 var namePtr = Memory.ReadPtr(slotPtr + Offsets.Slot.ID);
-                var name = Memory.ReadUnityString(namePtr);
+                var name = Memory.ReadUnicodeString(namePtr);
                 if (_skipSlots.Contains(name))
                     continue;
                 slotDict.TryAdd(name, slotPtr);
@@ -98,7 +98,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                     var containedItem = Memory.ReadPtr(slot.Value + Offsets.Slot.ContainedItem);
                     var inventorytemplate = Memory.ReadPtr(containedItem + Offsets.LootItem.Template);
                     var idPtr = Memory.ReadValue<MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
-                    var id = Memory.ReadUnityString(idPtr.StringID);
+                    var id = Memory.ReadUnicodeString(idPtr.StringID);
                     if (EftDataManager.AllItems.TryGetValue(id, out var entry1))
                         loot.Add(new LootItem(entry1));
 
@@ -130,7 +130,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                 foreach (var slotPtr in slotsArray)
                 {
                     var namePtr = Memory.ReadPtr(slotPtr + Offsets.Slot.ID);
-                    var name = Memory.ReadUnityString(namePtr);
+                    var name = Memory.ReadUnicodeString(namePtr);
                     slotDict.TryAdd(name, slotPtr);
                 }
 
@@ -143,7 +143,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                             var containedItem = Memory.ReadPtr(slot + Offsets.Slot.ContainedItem);
                             var inventorytemplate = Memory.ReadPtr(containedItem + Offsets.LootItem.Template);
                             var idPtr = Memory.ReadValue<MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
-                            var id = Memory.ReadUnityString(idPtr.StringID);
+                            var id = Memory.ReadUnicodeString(idPtr.StringID);
                             if (EftDataManager.AllItems.TryGetValue(id, out var entry))
                                 loot.Add(new LootItem(entry)); // Add to loot, get weapon attachment values
                             RecursePlayerGearSlots(containedItem, loot);

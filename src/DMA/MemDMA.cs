@@ -529,28 +529,24 @@ namespace EftDmaRadarLite.DMA
         }
 
         /// <summary>
-        /// Read null terminated string (utf-8/default).
+        /// Read null terminated UTF8 string.
         /// </summary>
-        /// <param name="length">Number of bytes to read.</param>
-        /// <exception cref="Exception"></exception>
-        public string ReadString(ulong addr, int length, bool useCache = true) // read n bytes (string)
+        public string ReadUtf8String(ulong addr, int cb, bool useCache = true) // read n bytes (string)
         {
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(length, 0x1000, nameof(length));
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(cb, 0x1000, nameof(cb));
             var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
-            return _vmm.MemReadString(_pid, addr, length, Encoding.UTF8, flags) ??
+            return _vmm.MemReadString(_pid, addr, cb, Encoding.UTF8, flags) ??
                 throw new VmmException("Memory Read Failed!");
         }
 
         /// <summary>
-        /// Read UnityEngineString structure
+        /// Read null terminated Unicode string.
         /// </summary>
-        public string ReadUnityString(ulong addr, int length = 128, bool useCache = true)
+        public string ReadUnicodeString(ulong addr, int cb = 128, bool useCache = true)
         {
-            if (length % 2 != 0)
-                length++;
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(length, 0x1000, nameof(length));
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(cb, 0x1000, nameof(cb));
             var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
-            return _vmm.MemReadString(_pid, addr + 0x14, length, Encoding.Unicode, flags) ??
+            return _vmm.MemReadString(_pid, addr + 0x14, cb, Encoding.Unicode, flags) ??
                 throw new VmmException("Memory Read Failed!");
         }
 

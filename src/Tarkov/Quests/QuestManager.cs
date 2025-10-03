@@ -142,12 +142,12 @@ namespace EftDmaRadarLite.Tarkov.Quests
                         using var completedConditions = new PooledSet<string>();
                         foreach (var c in completedHS)
                         {
-                            var completedCond = Memory.ReadUnityString(c.Value.StringID);
+                            var completedCond = Memory.ReadUnicodeString(c.Value.StringID);
                             completedConditions.Add(completedCond);
                         }
 
                         var qIDPtr = Memory.ReadPtr(qDataEntry + Offsets.QuestData.Id);
-                        var qID = Memory.ReadUnityString(qIDPtr);
+                        var qID = Memory.ReadUnicodeString(qIDPtr);
                         masterQuests.Add(qID);
                         _ = _quests.GetOrAdd(
                             qID, 
@@ -208,7 +208,7 @@ namespace EftDmaRadarLite.Tarkov.Quests
             try
             {
                 var condIDPtr = Memory.ReadValue<MongoID>(condition + Offsets.QuestCondition.id);
-                var condID = Memory.ReadUnityString(condIDPtr.StringID);
+                var condID = Memory.ReadUnicodeString(condIDPtr.StringID);
                 if (completedConditions.Contains(condID))
                     return;
                 var condName = ObjectClass.ReadName(condition);
@@ -219,7 +219,7 @@ namespace EftDmaRadarLite.Tarkov.Quests
                     using var targets = MonoArray<ulong>.Create(targetArray, true);
                     foreach (var targetPtr in targets)
                     {
-                        var target = Memory.ReadUnityString(targetPtr);
+                        var target = Memory.ReadUnicodeString(targetPtr);
                         masterItems.Add(target);
                         _items.TryAdd(target, 0);
                     }
@@ -227,7 +227,7 @@ namespace EftDmaRadarLite.Tarkov.Quests
                 else if (condName == "ConditionPlaceBeacon" || condName == "ConditionLeaveItemAtLocation")
                 {
                     var zoneIDPtr = Memory.ReadPtr(condition + Offsets.QuestConditionPlaceBeacon.zoneId);
-                    var target = Memory.ReadUnityString(zoneIDPtr); // Zone ID
+                    var target = Memory.ReadUnicodeString(zoneIDPtr); // Zone ID
                     if (_mapToId.TryGetValue(MapID, out var id) &&
                         _questZones.TryGetValue(id, out var zones) &&
                         zones.TryGetValue(target, out var loc))
@@ -241,7 +241,7 @@ namespace EftDmaRadarLite.Tarkov.Quests
                 else if (condName == "ConditionVisitPlace")
                 {
                     var targetPtr = Memory.ReadPtr(condition + Offsets.QuestConditionVisitPlace.target);
-                    var target = Memory.ReadUnityString(targetPtr);
+                    var target = Memory.ReadUnicodeString(targetPtr);
                     if (_mapToId.TryGetValue(MapID, out var id) &&
                         _questZones.TryGetValue(id, out var zones) &&
                         zones.TryGetValue(target, out var loc))

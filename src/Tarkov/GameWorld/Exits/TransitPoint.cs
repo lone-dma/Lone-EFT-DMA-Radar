@@ -51,7 +51,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
 
             var parameters = Memory.ReadPtr(baseAddr + Offsets.TransitPoint.parameters, false);
             var locationPtr = Memory.ReadPtr(parameters + Offsets.TransitParameters.location, false);
-            var location = Memory.ReadUnityString(locationPtr, 128, false);
+            var location = Memory.ReadUnicodeString(locationPtr, 128, false);
             if (StaticGameData.MapNames.TryGetValue(location, out string destinationMapName))
             {
                 Name = $"Transit to {destinationMapName}";

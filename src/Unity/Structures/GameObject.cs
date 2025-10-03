@@ -23,7 +23,7 @@
         /// </summary>
         /// <returns>Name string.</returns>
         public readonly string GetName() =>
-            Memory.ReadString(Name, 128);
+            Memory.ReadUtf8String(Name, 128);
 
         /// <summary>
         /// Gets a component class from a Game Object.

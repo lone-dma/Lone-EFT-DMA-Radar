@@ -19,7 +19,7 @@
         public static string ReadName(ulong objectClass, int length = 128, bool useCache = true)
         {
             var namePtr = Memory.ReadPtrChain(objectClass, useCache, To_NamePtr);
-            return Memory.ReadString(namePtr, length, useCache);
+            return Memory.ReadUtf8String(namePtr, length, useCache);
         }
     }
 }

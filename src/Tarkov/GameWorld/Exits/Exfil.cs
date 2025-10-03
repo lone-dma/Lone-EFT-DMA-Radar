@@ -56,7 +56,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
             _isPMC = isPMC;
             var transformInternal = Memory.ReadPtrChain(baseAddr, false, _transformInternalChain);
             var namePtr = Memory.ReadPtrChain(baseAddr, true, Offsets.Exfil.Settings, Offsets.ExfilSettings.Name);
-            Name = Memory.ReadUnityString(namePtr)?.Trim();
+            Name = Memory.ReadUnicodeString(namePtr)?.Trim();
             if (string.IsNullOrEmpty(Name))
                 Name = "default";
             // Lookup real map name (if possible)
@@ -107,7 +107,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
                 using var entriesArr = MonoArray<ulong>.Create(entriesArrPtr, true);
                 foreach (var entryNamePtr in entriesArr)
                 {
-                    var entryName = Memory.ReadUnityString(entryNamePtr);
+                    var entryName = Memory.ReadUnicodeString(entryNamePtr);
                     PmcEntries.Add(entryName);
                 }
             }
@@ -117,7 +117,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
                 using var idsArr = MonoList<ulong>.Create(eligibleIdsPtr, true);
                 foreach (var idPtr in idsArr)
                 {
-                    var idName = Memory.ReadUnityString(idPtr);
+                    var idName = Memory.ReadUnicodeString(idPtr);
                     ScavIds.Add(idName);
                 }
             }

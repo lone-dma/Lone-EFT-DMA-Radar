@@ -105,7 +105,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
             foreach (var slot in slots)
             {
                 var namePtr = Memory.ReadPtr(slot + Offsets.Slot.ID);
-                var name = Memory.ReadUnityString(namePtr);
+                var name = Memory.ReadUnicodeString(namePtr);
                 if (!_skipSlots.Contains(name))
                     slotDict.TryAdd(name, slot);
             }
@@ -120,7 +120,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                     scannedItems.Add(containedItem);
                     var inventorytemplate = Memory.ReadPtr(containedItem + Offsets.LootItem.Template);
                     var idPtr = Memory.ReadValue<MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
-                    var id = Memory.ReadUnityString(idPtr.StringID);
+                    var id = Memory.ReadUnicodeString(idPtr.StringID);
                     if (EftDataManager.AllItems.TryGetValue(id, out var entry))
                     {
                         _ = containerLoot.GetOrAdd(

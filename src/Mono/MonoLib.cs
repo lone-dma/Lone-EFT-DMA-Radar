@@ -114,7 +114,7 @@ namespace EftDmaRadarLite.Mono
         {
             try
             {
-                return Memory.ReadString(addr, size);
+                return Memory.ReadUtf8String(addr, size);
             }
             catch
             {
