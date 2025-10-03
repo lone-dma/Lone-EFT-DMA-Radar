@@ -36,6 +36,7 @@ using EftDmaRadarLite.UI.Radar.ViewModels;
 using EftDmaRadarLite.UI.Skia;
 using EftDmaRadarLite.UI.Skia.Maps;
 using EftDmaRadarLite.Unity;
+using EftDmaRadarLite.Unity.Structures;
 using VmmSharpEx;
 using VmmSharpEx.Scatter;
 using static EftDmaRadarLite.Unity.UnityTransform;

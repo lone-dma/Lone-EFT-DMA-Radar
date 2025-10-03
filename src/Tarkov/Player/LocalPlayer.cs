@@ -29,6 +29,7 @@ SOFTWARE.
 using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Unity.Collections;
+using EftDmaRadarLite.Unity.Structures;
 using VmmSharpEx;
 using VmmSharpEx.Scatter;
 

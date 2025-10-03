@@ -26,10 +26,8 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.UI.Misc;
-using EftDmaRadarLite.Unity;
-using System;
+using EftDmaRadarLite.Unity.Structures;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 

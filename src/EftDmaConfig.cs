@@ -34,6 +34,7 @@ using System.Collections.ObjectModel;
 using EftDmaRadarLite.Misc.JSON;
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Unity;
+using EftDmaRadarLite.Unity.Structures;
 
 namespace EftDmaRadarLite
 {

@@ -31,6 +31,7 @@ using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Unity.Collections;
+using EftDmaRadarLite.Unity.Structures;
 using System.Collections.Frozen;
 
 namespace EftDmaRadarLite.Tarkov.Quests
