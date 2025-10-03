@@ -118,11 +118,12 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                     if (provider.CanRun && provider.CanLookup(profile.AccountID))
                     {
                         var result = await provider.GetProfileAsync(profile.AccountID);
-                        ArgumentNullException.ThrowIfNull(result.Data, nameof(result.Data));
-                        ArgumentException.ThrowIfNullOrWhiteSpace(result.Raw, nameof(result.Raw));
-                        ArgumentOutOfRangeException.ThrowIfEqual(result.Updated, default, nameof(result.Updated));
                         if (result is not null) // Success
                         {
+                            // Validate result members
+                            ArgumentNullException.ThrowIfNull(result.Data, nameof(result.Data));
+                            ArgumentException.ThrowIfNullOrWhiteSpace(result.Raw, nameof(result.Raw));
+                            ArgumentOutOfRangeException.ThrowIfEqual(result.Updated, default, nameof(result.Updated));
                             // Check Cache
                             var dto = cache.FindById(acctIdLong);
                             if (dto is not null && dto.Updated > result.Updated)
