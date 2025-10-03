@@ -202,7 +202,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                 if (isAI)
                 {
                     var voicePtr = Memory.ReadPtr(this + Offsets.ObservedPlayerView.Voice);
-                    string voice = Memory.ReadUnityString(voicePtr);
+                    string voice = Memory.ReadUnicodeString(voicePtr);
                     var role = GetAIRoleInfo(voice);
                     Name = role.Name;
                     Type = role.Type;
@@ -268,7 +268,7 @@ namespace EftDmaRadarLite.Tarkov.Player
             if (!IsHuman)
                 return "AI";
             var idPTR = Memory.ReadPtr(this + Offsets.ObservedPlayerView.AccountId);
-            return Memory.ReadUnityString(idPTR);
+            return Memory.ReadUnicodeString(idPTR);
         }
 
         /// <summary>
@@ -279,7 +279,7 @@ namespace EftDmaRadarLite.Tarkov.Player
             try
             {
                 var groupIdPtr = Memory.ReadPtr(this + Offsets.ObservedPlayerView.GroupID);
-                string groupId = Memory.ReadUnityString(groupIdPtr);
+                string groupId = Memory.ReadUnicodeString(groupIdPtr);
                 return _groups.GetOrAdd(
                     groupId, 
                     _ => Interlocked.Increment(ref _lastGroupNumber));

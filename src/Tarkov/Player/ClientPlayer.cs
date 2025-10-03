@@ -158,7 +158,7 @@ namespace EftDmaRadarLite.Tarkov.Player
         private string GetAccountID()
         {
             var idPTR = Memory.ReadPtr(Profile + Offsets.Profile.AccountId);
-            return Memory.ReadUnityString(idPTR);
+            return Memory.ReadUnicodeString(idPTR);
         }
 
         /// <summary>
@@ -169,7 +169,7 @@ namespace EftDmaRadarLite.Tarkov.Player
             try
             {
                 var groupIdPtr = Memory.ReadPtr(Info + Offsets.PlayerInfo.GroupId);
-                string groupId = Memory.ReadUnityString(groupIdPtr);
+                string groupId = Memory.ReadUnicodeString(groupIdPtr);
                 return _groups.GetOrAdd(
                     groupId, 
                     _ => Interlocked.Increment(ref _lastGroupNumber));

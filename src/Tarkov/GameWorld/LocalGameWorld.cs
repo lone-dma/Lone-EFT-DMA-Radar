@@ -179,7 +179,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
                     mapPtr = Memory.ReadPtr(localPlayer + Offsets.Player.Location, false);
                 }
 
-                var map = Memory.ReadUnityString(mapPtr, 128, false);
+                var map = Memory.ReadUnicodeString(mapPtr, 128, false);
                 Debug.WriteLine("Detected Map " + map);
                 if (!StaticGameData.MapNames.ContainsKey(map)) // Also makes sure we're not in the hideout
                     throw new ArgumentException("Invalid Map ID!");

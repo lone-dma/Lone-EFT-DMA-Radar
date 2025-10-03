@@ -75,12 +75,12 @@ namespace EftDmaRadarLite.Tarkov.Player
             if (IsPmc)
             {
                 var entryPtr = Memory.ReadPtr(Info + Offsets.PlayerInfo.EntryPoint);
-                EntryPoint = Memory.ReadUnityString(entryPtr);
+                EntryPoint = Memory.ReadUnicodeString(entryPtr);
             }
             else if (IsScav)
             {
                 var profileIdPtr = Memory.ReadPtr(Profile + Offsets.Profile.Id);
-                ProfileId = Memory.ReadUnityString(profileIdPtr);
+                ProfileId = Memory.ReadUnicodeString(profileIdPtr);
             }
         }
 
@@ -102,7 +102,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                     {
                         if (item.Key.StringID == 0)
                             continue;
-                        string id = Memory.ReadUnityString(item.Key.StringID);
+                        string id = Memory.ReadUnicodeString(item.Key.StringID);
                         if (string.IsNullOrWhiteSpace(id))
                             continue;
                         wishlist.Add(id);

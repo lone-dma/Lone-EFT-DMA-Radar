@@ -79,7 +79,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                     string thermal = null;
                     var itemTemplate = Memory.ReadPtr(itemBase + Offsets.LootItem.Template);
                     var itemIDPtr = Memory.ReadValue<MongoID>(itemTemplate + Offsets.ItemTemplate._id);
-                    var itemID = Memory.ReadUnityString(itemIDPtr.StringID);
+                    var itemID = Memory.ReadUnicodeString(itemIDPtr.StringID);
                     if (EftDataManager.AllItems.TryGetValue(itemID, out var heldItem)) // Item exists in DB
                     {
                         _cachedItem = new LootItem(heldItem);
@@ -98,7 +98,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                     else // Item doesn't exist in DB , use name from game memory
                     {
                         var itemNamePtr = Memory.ReadPtr(itemTemplate + Offsets.ItemTemplate.ShortName);
-                        var itemName = Memory.ReadUnityString(itemNamePtr)?.Trim();
+                        var itemName = Memory.ReadUnicodeString(itemNamePtr)?.Trim();
                         if (string.IsNullOrEmpty(itemName))
                             itemName = "Item";
                         _cachedItem = new("NULL", itemName);
@@ -116,7 +116,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                         var slotItem = Memory.ReadPtr(slotPtr + Offsets.Slot.ContainedItem);
                         var ammoTemplate = Memory.ReadPtr(slotItem + Offsets.LootItem.Template);
                         var ammoIDPtr = Memory.ReadValue<MongoID>(ammoTemplate + Offsets.ItemTemplate._id);
-                        var ammoID = Memory.ReadUnityString(ammoIDPtr.StringID);
+                        var ammoID = Memory.ReadUnicodeString(ammoIDPtr.StringID);
                         if (EftDataManager.AllItems.TryGetValue(ammoID, out var ammoItem))
                             ammo = ammoItem?.ShortName;
                     }
