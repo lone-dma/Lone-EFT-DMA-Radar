@@ -18,6 +18,7 @@ if %ERRORLEVEL% NEQ 0 (goto ERROR)
 
 ECHO - Kill existing process (if any)...
 TASKKILL /F /IM "eft-dma-radar-lite.exe"
+set PROC_KILLED=%ERRORLEVEL%
 
 ECHO - Copying output to destination(s)...
 CD %OUT_DIR%
@@ -29,6 +30,11 @@ if %ERRORLEVEL% NEQ 0 (goto ERROR)
 ECHO - Build OK
 CD %USERPROFILE%
 RD /S /Q %OUT_DIR%
+if %PROC_KILLED% == 0 (
+	ECHO - Restarting process before exiting...
+	CD %CLIENT_DIR%
+	START "" "eft-dma-radar-lite.exe"
+)
 EXIT 0
 
 :ERROR
