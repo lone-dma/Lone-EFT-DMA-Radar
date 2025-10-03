@@ -33,7 +33,7 @@ using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.UI.Loot;
 using EftDmaRadarLite.UI.Radar.ViewModels;
 using EftDmaRadarLite.Unity;
-using EftDmaRadarLite.Unity.Collections;
+using EftDmaRadarLite.Unity.Mono.Collections;
 using EftDmaRadarLite.Unity.Structures;
 using System.Collections.Frozen;
 using VmmSharpEx;
@@ -130,7 +130,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
         private void GetLoot(CancellationToken ct)
         {
             var lootListAddr = Memory.ReadPtr(_lgw + Offsets.ClientLocalGameWorld.LootList);
-            using var lootList = UnityList<ulong>.Create(
+            using var lootList = MonoList<ulong>.Create(
                 addr: lootListAddr, 
                 useCache: true);
             // Remove any loot no longer present

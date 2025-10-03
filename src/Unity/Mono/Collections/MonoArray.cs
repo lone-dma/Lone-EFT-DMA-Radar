@@ -28,61 +28,48 @@ SOFTWARE.
 
 using Collections.Pooled;
 using EftDmaRadarLite.DMA;
-using EftDmaRadarLite.Misc;
 
-namespace EftDmaRadarLite.Unity.Collections
+namespace EftDmaRadarLite.Unity.Mono.Collections
 {
     /// <summary>
-    /// DMA Wrapper for a C# HashSet
+    /// DMA Wrapper for a C# Array
     /// Must initialize before use. Must dispose after use.
     /// </summary>
-    /// <typeparam name="T">Collection Type</typeparam>
-    public sealed class UnityHashSet<T> : PooledMemory<UnityHashSet<T>.MemHashEntry>
+    /// <typeparam name="T">Array Type</typeparam>
+    public sealed class MonoArray<T> : PooledMemory<T>
         where T : unmanaged
     {
-        public const uint CountOffset = 0x3C;
-        public const uint ArrOffset = 0x18;
-        public const uint ArrStartOffset = 0x20;
+        public const uint CountOffset = 0x18;
+        public const uint ArrBaseOffset = 0x20;
 
-        private UnityHashSet() : base(0) { }
-        private UnityHashSet(int count) : base(count) { }
+        private MonoArray() : base(0) { }
+        private MonoArray(int count) : base(count) { }
 
         /// <summary>
-        /// Factory method to create a new <see cref="UnityHashSet{T}"/> instance from a memory address.
+        /// Factory method to create a new <see cref="MonoArray{T}"/> instance from a memory address.
         /// </summary>
         /// <param name="addr"></param>
         /// <param name="useCache"></param>
         /// <returns></returns>
-        public static UnityHashSet<T> Create(ulong addr, bool useCache = true)
+        public static MonoArray<T> Create(ulong addr, bool useCache = true)
         {
             var count = MemoryInterface.Memory.ReadValue<int>(addr + CountOffset, useCache);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
-            var hs = new UnityHashSet<T>(count);
+            var array = new MonoArray<T>(count);
             try
             {
                 if (count == 0)
                 {
-                    return hs;
+                    return array;
                 }
-                var hashSetBase = MemoryInterface.Memory.ReadPtr(addr + ArrOffset, useCache) + ArrStartOffset;
-                MemoryInterface.Memory.ReadSpan(hashSetBase, hs.Span, useCache);
-                return hs;
+                MemoryInterface.Memory.ReadSpan(addr + ArrBaseOffset, array.Span, useCache);
+                return array;
             }
             catch
             {
-                hs.Dispose();
+                array.Dispose();
                 throw;
             }
-        }
-
-        [StructLayout(LayoutKind.Sequential, Pack = 4)]
-        public readonly struct MemHashEntry
-        {
-            public static implicit operator T(MemHashEntry x) => x.Value;
-
-            private readonly int _hashCode;
-            private readonly int _next;
-            public readonly T Value;
         }
     }
 }

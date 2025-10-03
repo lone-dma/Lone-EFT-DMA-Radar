@@ -30,7 +30,7 @@ using EftDmaRadarLite.DMA;
 using EftDmaRadarLite.Misc;
 using VmmSharpEx;
 
-namespace EftDmaRadarLite.Unity
+namespace EftDmaRadarLite.Unity.Mono
 {
     internal static class MonoLib
     {

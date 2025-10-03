@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Unity.Collections;
+using EftDmaRadarLite.Unity.Mono.Collections;
 using EftDmaRadarLite.Unity.Structures;
 using System;
 using System.Configuration;
@@ -201,8 +201,8 @@ namespace EftDmaRadarLite.Tarkov.Player
             offsets[0] = Offsets.Player._playerBody;
             offsets[1] = PlayerBody.SkeletonRootJoint;
             offsets[2] = DizSkinningSkeleton._values;
-            offsets[3] = UnityList<byte>.ArrOffset;
-            offsets[4] = UnityList<byte>.ArrStartOffset + (uint)bone * 0x8;
+            offsets[3] = MonoList<byte>.ArrOffset;
+            offsets[4] = MonoList<byte>.ArrStartOffset + (uint)bone * 0x8;
             offsets[5] = 0x10;
         }
     }

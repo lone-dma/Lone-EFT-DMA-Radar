@@ -31,7 +31,8 @@ using EftDmaRadarLite.ESP;
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.Unity;
-using EftDmaRadarLite.Unity.Collections;
+using EftDmaRadarLite.Unity.Mono;
+using EftDmaRadarLite.Unity.Mono.Collections;
 using EftDmaRadarLite.Unity.Structures;
 using System.Drawing;
 using VmmSharpEx;
@@ -100,7 +101,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
                 if (OpticCameraActive)
                 {
                     var opticsPtr = Memory.ReadPtr(localPlayer.PWA + Offsets.ProceduralWeaponAnimation._optics);
-                    using var optics = UnityList<VmmPointer>.Create(opticsPtr, true);
+                    using var optics = MonoList<VmmPointer>.Create(opticsPtr, true);
                     if (optics.Count > 0)
                     {
                         var pSightComponent = Memory.ReadPtr(optics[0] + Offsets.SightNBone.Mod);
@@ -177,10 +178,10 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
                 using var zoomArray = SightInterface.Zooms;
                 if (SelectedScope >= zoomArray.Count || SelectedScope is < 0 or > 10)
                     return -1.0f;
-                using var selectedScopeModes = UnityArray<int>.Create(pScopeSelectedModes, false);
+                using var selectedScopeModes = MonoArray<int>.Create(pScopeSelectedModes, false);
                 int selectedScopeMode = SelectedScope >= selectedScopeModes.Count ?
                     0 : selectedScopeModes[SelectedScope];
-                ulong zoomAddr = zoomArray[SelectedScope] + UnityArray<float>.ArrBaseOffset + (uint)selectedScopeMode * 0x4;
+                ulong zoomAddr = zoomArray[SelectedScope] + MonoArray<float>.ArrBaseOffset + (uint)selectedScopeMode * 0x4;
 
                 float zoomLevel = Memory.ReadValue<float>(zoomAddr, false);
                 if (zoomLevel.IsNormalOrZero() && zoomLevel is >= 0f and < 100f)
@@ -199,8 +200,8 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
         {
             [FieldOffset((int)Offsets.SightInterface.Zooms)] private readonly ulong pZooms;
 
-            public readonly UnityArray<ulong> Zooms =>
-                UnityArray<ulong>.Create(pZooms, true);
+            public readonly MonoArray<ulong> Zooms =>
+                MonoArray<ulong>.Create(pZooms, true);
         }
 
         #region Static Interfaces

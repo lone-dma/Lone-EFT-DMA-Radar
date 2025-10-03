@@ -30,10 +30,10 @@ using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.Tarkov.GameWorld.Exits;
 using EftDmaRadarLite.Tarkov.GameWorld.Explosives;
 using EftDmaRadarLite.Tarkov.Loot;
-using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Tarkov.Quests;
 using EftDmaRadarLite.Misc.Workers;
 using EftDmaRadarLite.Tarkov.Data;
+using EftDmaRadarLite.Unity.Mono;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld
 {

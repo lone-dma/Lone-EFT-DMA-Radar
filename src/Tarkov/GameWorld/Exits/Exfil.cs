@@ -29,12 +29,12 @@ SOFTWARE.
 using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.UI.Radar;
 using EftDmaRadarLite.Unity;
-using EftDmaRadarLite.Unity.Collections;
 using EftDmaRadarLite.UI.Skia;
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.UI.Skia.Maps;
 using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.Unity.Structures;
+using EftDmaRadarLite.Unity.Mono.Collections;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
 {
@@ -104,7 +104,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
             if (_isPMC)
             {
                 var entriesArrPtr = Memory.ReadPtr(_addr + Offsets.Exfil.EligibleEntryPoints);
-                using var entriesArr = UnityArray<ulong>.Create(entriesArrPtr, true);
+                using var entriesArr = MonoArray<ulong>.Create(entriesArrPtr, true);
                 foreach (var entryNamePtr in entriesArr)
                 {
                     var entryName = Memory.ReadUnityString(entryNamePtr);
@@ -114,7 +114,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
             else // Scav Exfils
             {
                 var eligibleIdsPtr = Memory.ReadPtr(_addr + Offsets.ScavExfil.EligibleIds);
-                using var idsArr = UnityList<ulong>.Create(eligibleIdsPtr, true);
+                using var idsArr = MonoList<ulong>.Create(eligibleIdsPtr, true);
                 foreach (var idPtr in idsArr)
                 {
                     var idName = Memory.ReadUnityString(idPtr);

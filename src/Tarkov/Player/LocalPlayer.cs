@@ -28,7 +28,7 @@ SOFTWARE.
 
 using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.Unity;
-using EftDmaRadarLite.Unity.Collections;
+using EftDmaRadarLite.Unity.Mono.Collections;
 using EftDmaRadarLite.Unity.Structures;
 using VmmSharpEx;
 using VmmSharpEx.Scatter;
@@ -93,7 +93,7 @@ namespace EftDmaRadarLite.Tarkov.Player
             {
                 var wishlistManager = Memory.ReadPtr(Profile + Offsets.Profile.WishlistManager);
                 var itemsPtr = Memory.ReadPtr(wishlistManager + Offsets.WishlistManager.Items);
-                using var items = UnityDictionary<MongoID, int>.Create(itemsPtr, true);
+                using var items = MonoDictionary<MongoID, int>.Create(itemsPtr, true);
                 var wishlist = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 foreach (var item in items)
                 {

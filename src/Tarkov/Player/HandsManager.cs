@@ -28,7 +28,7 @@ SOFTWARE.
 
 using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.Tarkov.Loot;
-using EftDmaRadarLite.Unity.Collections;
+using EftDmaRadarLite.Unity.Mono.Collections;
 
 namespace EftDmaRadarLite.Tarkov.Player
 {
@@ -112,7 +112,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                     try
                     {
                         var chambers = Memory.ReadPtr(itemBase + Offsets.LootItemWeapon.Chambers);
-                        var slotPtr = Memory.ReadPtr(chambers + UnityList<byte>.ArrStartOffset + 0 * 0x8); // One in the chamber ;)
+                        var slotPtr = Memory.ReadPtr(chambers + MonoList<byte>.ArrStartOffset + 0 * 0x8); // One in the chamber ;)
                         var slotItem = Memory.ReadPtr(slotPtr + Offsets.Slot.ContainedItem);
                         var ammoTemplate = Memory.ReadPtr(slotItem + Offsets.LootItem.Template);
                         var ammoIDPtr = Memory.ReadValue<MongoID>(ammoTemplate + Offsets.ItemTemplate._id);

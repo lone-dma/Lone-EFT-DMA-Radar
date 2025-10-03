@@ -30,7 +30,7 @@ using Collections.Pooled;
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.Tarkov.Loot;
-using EftDmaRadarLite.Unity.Collections;
+using EftDmaRadarLite.Unity.Mono.Collections;
 using System.Collections.Frozen;
 
 namespace EftDmaRadarLite.Tarkov.Player
@@ -52,7 +52,7 @@ namespace EftDmaRadarLite.Tarkov.Player
             var inventory = Memory.ReadPtr(inventorycontroller + Offsets.InventoryController.Inventory);
             var equipment = Memory.ReadPtr(inventory + Offsets.Inventory.Equipment);
             var slots = Memory.ReadPtr(equipment + Offsets.Equipment.Slots);
-            using var slotsArray = UnityArray<ulong>.Create(slots, true);
+            using var slotsArray = MonoArray<ulong>.Create(slots, true);
 
             foreach (var slotPtr in slotsArray)
             {
@@ -124,7 +124,7 @@ namespace EftDmaRadarLite.Tarkov.Player
             try
             {
                 var parentSlots = Memory.ReadPtr(lootItemBase + Offsets.LootItemMod.Slots);
-                using var slotsArray = UnityArray<ulong>.Create(parentSlots, true);
+                using var slotsArray = MonoArray<ulong>.Create(parentSlots, true);
                 using var slotDict = new PooledDictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);
 
                 foreach (var slotPtr in slotsArray)
