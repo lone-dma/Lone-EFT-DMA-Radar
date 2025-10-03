@@ -79,7 +79,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                     string thermal = null;
                     var itemTemplate = Memory.ReadPtr(itemBase + Offsets.LootItem.Template);
                     var itemMongoId = Memory.ReadValue<MongoID>(itemTemplate + Offsets.ItemTemplate._id);
-                    var itemID = itemMongoId.ReadID();
+                    var itemID = itemMongoId.ReadString();
                     if (EftDataManager.AllItems.TryGetValue(itemID, out var heldItem)) // Item exists in DB
                     {
                         _cachedItem = new LootItem(heldItem);
@@ -116,7 +116,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                         var slotItem = Memory.ReadPtr(slotPtr + Offsets.Slot.ContainedItem);
                         var ammoTemplate = Memory.ReadPtr(slotItem + Offsets.LootItem.Template);
                         var ammoMongoId = Memory.ReadValue<MongoID>(ammoTemplate + Offsets.ItemTemplate._id);
-                        var ammoID = ammoMongoId.ReadID();
+                        var ammoID = ammoMongoId.ReadString();
                         if (EftDataManager.AllItems.TryGetValue(ammoID, out var ammoItem))
                             ammo = ammoItem?.ShortName;
                     }

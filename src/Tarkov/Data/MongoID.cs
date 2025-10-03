@@ -19,7 +19,7 @@
         /// <param name="cb"></param>
         /// <param name="useCache"></param>
         /// <returns></returns>
-        public string ReadID(int cb = 128, bool useCache = true)
+        public string ReadString(int cb = 128, bool useCache = true)
         {
             return Memory.ReadUnicodeString(_stringId, cb, useCache);
         }

@@ -100,7 +100,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                     ct.ThrowIfCancellationRequested();
                     try
                     {
-                        string id = item.Key.ReadID();
+                        string id = item.Key.ReadString();
                         if (string.IsNullOrWhiteSpace(id))
                             continue;
                         wishlist.Add(id);

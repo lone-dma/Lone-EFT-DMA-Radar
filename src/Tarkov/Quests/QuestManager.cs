@@ -142,7 +142,7 @@ namespace EftDmaRadarLite.Tarkov.Quests
                         using var completedConditions = new PooledSet<string>();
                         foreach (var c in completedHS)
                         {
-                            var completedCond = c.Value.ReadID();
+                            var completedCond = c.Value.ReadString();
                             completedConditions.Add(completedCond);
                         }
 
@@ -208,7 +208,7 @@ namespace EftDmaRadarLite.Tarkov.Quests
             try
             {
                 var condMongoId = Memory.ReadValue<MongoID>(condition + Offsets.QuestCondition.id);
-                var condID = condMongoId.ReadID();
+                var condID = condMongoId.ReadString();
                 if (completedConditions.Contains(condID))
                     return;
                 var condName = ObjectClass.ReadName(condition);
