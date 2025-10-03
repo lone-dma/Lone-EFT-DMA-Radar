@@ -29,7 +29,7 @@ SOFTWARE.
 using EftDmaRadarLite.Misc.Cache;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi;
 using EftDmaRadarLite.UI.Radar.ViewModels;
-using EftDmaRadarLite.Unity.Collections;
+using EftDmaRadarLite.Unity.Mono.Collections;
 using EftDmaRadarLite.Unity.Structures;
 using VmmSharpEx.Scatter;
 
@@ -346,8 +346,8 @@ namespace EftDmaRadarLite.Tarkov.Player
             offsets[0] = Offsets.ObservedPlayerView.PlayerBody;
             offsets[1] = Offsets.PlayerBody.SkeletonRootJoint;
             offsets[2] = Offsets.DizSkinningSkeleton._values;
-            offsets[3] = UnityList<byte>.ArrOffset;
-            offsets[4] = UnityList<byte>.ArrStartOffset + (uint)bone * 0x8;
+            offsets[3] = MonoList<byte>.ArrOffset;
+            offsets[4] = MonoList<byte>.ArrStartOffset + (uint)bone * 0x8;
             offsets[5] = 0x10;
         }
     }

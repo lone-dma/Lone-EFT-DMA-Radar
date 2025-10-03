@@ -39,7 +39,7 @@ using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Unity.Structures;
 using VmmSharpEx;
 using VmmSharpEx.Scatter;
-using static EftDmaRadarLite.Unity.UnityTransform;
+using static EftDmaRadarLite.Unity.Structures.UnityTransform;
 using static SDK.Offsets;
 
 namespace EftDmaRadarLite.Tarkov.Player

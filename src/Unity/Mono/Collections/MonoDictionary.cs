@@ -30,7 +30,7 @@ using Collections.Pooled;
 using EftDmaRadarLite.DMA;
 using EftDmaRadarLite.Misc;
 
-namespace EftDmaRadarLite.Unity.Collections
+namespace EftDmaRadarLite.Unity.Mono.Collections
 {
     /// <summary>
     /// DMA Wrapper for a C# Dictionary
@@ -38,7 +38,7 @@ namespace EftDmaRadarLite.Unity.Collections
     /// </summary>
     /// <typeparam name="TKey">Key Type between 1-8 bytes.</typeparam>
     /// <typeparam name="TValue">Value Type between 1-8 bytes.</typeparam>
-    public sealed class UnityDictionary<TKey, TValue> : PooledMemory<UnityDictionary<TKey, TValue>.MemDictEntry>
+    public sealed class MonoDictionary<TKey, TValue> : PooledMemory<MonoDictionary<TKey, TValue>.MemDictEntry>
         where TKey : unmanaged
         where TValue : unmanaged
     {
@@ -46,20 +46,20 @@ namespace EftDmaRadarLite.Unity.Collections
         public const uint EntriesOffset = 0x18;
         public const uint EntriesStartOffset = 0x20;
 
-        private UnityDictionary() : base(0) { }
-        private UnityDictionary(int count) : base(count) { }
+        private MonoDictionary() : base(0) { }
+        private MonoDictionary(int count) : base(count) { }
 
         /// <summary>
-        /// Factory method to create a new <see cref="UnityDictionary{TKey, TValue}"/> instance from a memory address.
+        /// Factory method to create a new <see cref="MonoDictionary{TKey, TValue}"/> instance from a memory address.
         /// </summary>
         /// <param name="addr"></param>
         /// <param name="useCache"></param>
         /// <returns></returns>
-        public static UnityDictionary<TKey, TValue> Create(ulong addr, bool useCache = true)
+        public static MonoDictionary<TKey, TValue> Create(ulong addr, bool useCache = true)
         {
             var count = MemoryInterface.Memory.ReadValue<int>(addr + CountOffset, useCache);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
-            var dict = new UnityDictionary<TKey, TValue>(count);
+            var dict = new MonoDictionary<TKey, TValue>(count);
             try
             {
                 if (count == 0)

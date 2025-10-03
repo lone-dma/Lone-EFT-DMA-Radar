@@ -29,7 +29,7 @@ SOFTWARE.
 using Collections.Pooled;
 using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.Tarkov.Player;
-using EftDmaRadarLite.Unity.Collections;
+using EftDmaRadarLite.Unity.Mono.Collections;
 using System.Collections.Frozen;
 
 namespace EftDmaRadarLite.Tarkov.Loot
@@ -100,7 +100,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
         private static void GetItemsInSlots(ulong slotsPtr, ISet<ulong> scannedItems, ConcurrentDictionary<ulong, LootItem> containerLoot, bool isPMC)
         {
             using var slotDict = new PooledDictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);
-            using var slots = UnityArray<ulong>.Create(slotsPtr, true);
+            using var slots = MonoArray<ulong>.Create(slotsPtr, true);
 
             foreach (var slot in slots)
             {
