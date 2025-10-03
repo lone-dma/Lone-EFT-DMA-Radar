@@ -43,7 +43,7 @@ namespace EftDmaRadarLite.Misc.Cache
                 IncludeNonPublic = true
             };
             _db = new LiteDatabase($"Filename={_dbPath};Connection=direct;Upgrade=true", mapper) ??
-                throw new InvalidOperationException("Unable to load LocalCache DB.");
+                throw new InvalidOperationException($"Unable to load LocalCache DB ({_dbPath}).");
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
         }
 
