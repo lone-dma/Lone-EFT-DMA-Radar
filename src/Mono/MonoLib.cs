@@ -110,7 +110,7 @@ namespace EftDmaRadarLite.Mono
             return BitConverter.ToUInt16(utf16Bytes);
         }
 
-        private static string ReadWidechar(ulong addr, int size)
+        private static string MonoReadString(ulong addr, int size)
         {
             try
             {
@@ -122,7 +122,7 @@ namespace EftDmaRadarLite.Mono
             }
         }
 
-        private static string ReadName(ulong addr, int length)
+        private static string MonoReadName(ulong addr, int length)
         {
             try
             {
@@ -368,7 +368,7 @@ namespace EftDmaRadarLite.Mono
             public readonly ulong pName;
 
             public readonly string GetName() =>
-                ReadName(pName, 128);
+                MonoReadName(pName, 128);
         }
         [StructLayout(LayoutKind.Explicit, Pack = 1)]
         public readonly struct MonoClassField
@@ -379,7 +379,7 @@ namespace EftDmaRadarLite.Mono
             public readonly int Offset;
 
             public readonly string GetName() =>
-                ReadName(pName, 128);
+                MonoReadName(pName, 128);
         }
 
         [StructLayout(LayoutKind.Explicit, Pack = 1)]
@@ -447,16 +447,16 @@ namespace EftDmaRadarLite.Mono
                     ulong argumentClassPtr = Memory.ReadPtr(argumentClassTypePtr);
                     ulong monoClassNamePtr = Memory.ReadPtr(argumentClassPtr + 0x48);
 
-                    return ReadName(monoClassNamePtr, 64);
+                    return MonoReadName(monoClassNamePtr, 64);
                 }
                 catch { return string.Empty; }
             }
 
             public readonly string GetName() =>
-                ReadName(pName, 128);
+                MonoReadName(pName, 128);
 
             public readonly string GetNamespaceName() =>
-                ReadName(pNamespaceName, 128);
+                MonoReadName(pNamespaceName, 128);
 
             public readonly int GetNumMethods()
             {
@@ -671,7 +671,7 @@ namespace EftDmaRadarLite.Mono
                     if (data == 0x0)
                         continue;
 
-                    var dataName = ReadWidechar(MonoReadPtr(data + 0x10), 128);
+                    var dataName = MonoReadString(MonoReadPtr(data + 0x10), 128);
                     if (dataName == name)
                         break;
                     domainAssemblies = MonoRead<GList>(domainAssemblies.Value.pNext);
