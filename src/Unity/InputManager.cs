@@ -31,6 +31,7 @@ using VmmSharpEx.Scatter;
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Misc.Workers;
 using EftDmaRadarLite.DMA;
+using EftDmaRadarLite.Unity.Structures;
 
 namespace EftDmaRadarLite.Unity
 {

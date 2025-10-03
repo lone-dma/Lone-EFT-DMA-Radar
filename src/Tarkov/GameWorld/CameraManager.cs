@@ -32,6 +32,7 @@ using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Unity.Collections;
+using EftDmaRadarLite.Unity.Structures;
 using System.Drawing;
 using VmmSharpEx;
 using VmmSharpEx.Scatter;

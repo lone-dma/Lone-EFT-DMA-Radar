@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Unity;
+using EftDmaRadarLite.Unity.Structures;
 
 namespace EftDmaRadarLite.UI.Hotkeys
 {

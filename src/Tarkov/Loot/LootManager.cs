@@ -34,6 +34,7 @@ using EftDmaRadarLite.UI.Loot;
 using EftDmaRadarLite.UI.Radar.ViewModels;
 using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Unity.Collections;
+using EftDmaRadarLite.Unity.Structures;
 using System.Collections.Frozen;
 using VmmSharpEx;
 
