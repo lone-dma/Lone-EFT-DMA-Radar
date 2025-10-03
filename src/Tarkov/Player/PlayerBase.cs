@@ -505,12 +505,12 @@ namespace EftDmaRadarLite.Tarkov.Player
             {
                 round1.AddValueEntry<VmmPointer>((int)(uint)tr.Key,
                     tr.Value.TransformInternal +
-                    UnityOffsets.TransformInternal.TransformAccess); // Bone Hierarchy
+                    UnitySDK.TransformInternal.TransformAccess); // Bone Hierarchy
                 round1.Completed += (sender, x1) =>
                 {
                     if (x1.TryGetValue<VmmPointer>((int)(uint)tr.Key, out var tra))
                     {
-                        round2.AddValueEntry<VmmPointer>((int)(uint)tr.Key, tra + UnityOffsets.TransformAccess.Vertices); // Vertices Ptr
+                        round2.AddValueEntry<VmmPointer>((int)(uint)tr.Key, tra + UnitySDK.TransformAccess.Vertices); // Vertices Ptr
                         round2.Completed += (sender, x2) =>
                         {
                             if (x2.TryGetValue<VmmPointer>((int)(uint)tr.Key, out var verticesPtr))

@@ -63,7 +63,7 @@ namespace EftDmaRadarLite.Unity
         public InputManager(ulong unityBase)
         {
             unityBase.ThrowIfInvalidVirtualAddress(nameof(unityBase));
-            _inputManager = Memory.ReadPtr(unityBase + UnityOffsets.ModuleBase.InputManager, false);
+            _inputManager = Memory.ReadPtr(unityBase + UnitySDK.ModuleBase.InputManager, false);
             _thread = new()
             {
                 Name = nameof(InputManager),
@@ -79,7 +79,7 @@ namespace EftDmaRadarLite.Unity
             var hotkeys = HotkeyManagerViewModel.Hotkeys.AsEnumerable();
             if (hotkeys.Any())
             {
-                var currentKeyState = Memory.ReadPtr(_inputManager + UnityOffsets.UnityInputManager.CurrentKeyState);
+                var currentKeyState = Memory.ReadPtr(_inputManager + UnitySDK.UnityInputManager.CurrentKeyState);
                 using var map = Memory.CreateScatterMap();
                 var round1 = map.AddRound(false);
                 int i = 0;

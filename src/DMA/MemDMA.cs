@@ -86,7 +86,7 @@ namespace EftDmaRadarLite.DMA
 
         static MemDMA()
         {
-            RuntimeHelpers.RunClassConstructor(typeof(MonoLib).TypeHandle);
+            RuntimeHelpers.RunClassConstructor(typeof(Monolib2).TypeHandle);
             RuntimeHelpers.RunClassConstructor(typeof(CameraManager).TypeHandle);
             RuntimeHelpers.RunClassConstructor(typeof(InputManager).TypeHandle);
         }
@@ -596,8 +596,8 @@ namespace EftDmaRadarLite.DMA
         {
             try
             {
-                var gfx = ReadPtr(UnityBase + UnityOffsets.ModuleBase.GfxDevice, false);
-                var res = ReadValue<Rectangle>(gfx + UnityOffsets.GfxDeviceClient.Viewport, false);
+                var gfx = ReadPtr(UnityBase + UnitySDK.ModuleBase.GfxDevice, false);
+                var res = ReadValue<Rectangle>(gfx + UnitySDK.GfxDeviceClient.Viewport, false);
                 if (res.Width <= 0 || res.Width > 10000 ||
                     res.Height <= 0 || res.Height > 5000)
                     throw new ArgumentOutOfRangeException(nameof(res));

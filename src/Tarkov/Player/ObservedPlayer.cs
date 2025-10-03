@@ -29,8 +29,8 @@ SOFTWARE.
 using EftDmaRadarLite.Misc.Cache;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi;
 using EftDmaRadarLite.UI.Radar.ViewModels;
-using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Unity.Collections;
+using EftDmaRadarLite.Unity.Structures;
 using VmmSharpEx.Scatter;
 
 namespace EftDmaRadarLite.Tarkov.Player

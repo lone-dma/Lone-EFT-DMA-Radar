@@ -26,8 +26,8 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Unity.Collections;
+using EftDmaRadarLite.Unity.Structures;
 using System;
 using System.Configuration;
 using static SDK.Offsets;

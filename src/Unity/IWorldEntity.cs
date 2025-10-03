@@ -26,8 +26,6 @@ SOFTWARE.
  *
 */
 
-using System.Numerics;
-
 namespace EftDmaRadarLite.Unity
 {
     /// <summary>
