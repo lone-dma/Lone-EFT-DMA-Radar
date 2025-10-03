@@ -86,7 +86,7 @@ namespace EftDmaRadarLite.DMA
 
         static MemDMA()
         {
-            RuntimeHelpers.RunClassConstructor(typeof(Monolib2).TypeHandle);
+            RuntimeHelpers.RunClassConstructor(typeof(MonoLib).TypeHandle);
             RuntimeHelpers.RunClassConstructor(typeof(CameraManager).TypeHandle);
             RuntimeHelpers.RunClassConstructor(typeof(InputManager).TypeHandle);
         }

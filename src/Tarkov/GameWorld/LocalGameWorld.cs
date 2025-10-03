@@ -170,7 +170,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
             try
             {
                 /// Get LocalGameWorld
-                var localGameWorld = Memory.ReadPtr(Monolib2.GameWorldField, false); // Game world >> Local Game World
+                var localGameWorld = Memory.ReadPtr(MonoLib.GameWorldField, false); // Game world >> Local Game World
                 /// Get Selected Map
                 var mapPtr = Memory.ReadValue<ulong>(localGameWorld + Offsets.GameWorld.Location, false);
                 if (mapPtr == 0x0) // Offline Mode
@@ -243,7 +243,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
         {
             try
             {
-                var localGameWorld = Memory.ReadPtr(Monolib2.GameWorldField, false);
+                var localGameWorld = Memory.ReadPtr(MonoLib.GameWorldField, false);
                 ArgumentOutOfRangeException.ThrowIfNotEqual(localGameWorld, this, nameof(localGameWorld));
                 var mainPlayer = Memory.ReadPtr(localGameWorld + Offsets.ClientLocalGameWorld.MainPlayer, false);
                 ArgumentOutOfRangeException.ThrowIfNotEqual(mainPlayer, _rgtPlayers.LocalPlayer, nameof(mainPlayer));
