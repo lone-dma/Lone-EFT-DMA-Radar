@@ -33,7 +33,7 @@ using EftDmaRadarLite.Tarkov.Loot;
 using EftDmaRadarLite.Tarkov.Quests;
 using EftDmaRadarLite.Misc.Workers;
 using EftDmaRadarLite.Tarkov.Data;
-using EftDmaRadarLite.Unity.Mono;
+using EftDmaRadarLite.Mono;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld
 {

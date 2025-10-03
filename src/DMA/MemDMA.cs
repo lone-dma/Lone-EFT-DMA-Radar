@@ -40,7 +40,7 @@ using VmmSharpEx.Refresh;
 using VmmSharpEx.Options;
 using VmmSharpEx.Scatter;
 using Collections.Pooled;
-using EftDmaRadarLite.Unity.Mono;
+using EftDmaRadarLite.Mono;
 
 namespace EftDmaRadarLite.DMA
 {

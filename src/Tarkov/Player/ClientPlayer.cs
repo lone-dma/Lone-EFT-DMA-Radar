@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Unity.Mono.Collections;
+using EftDmaRadarLite.Mono.Collections;
 using EftDmaRadarLite.Unity.Structures;
 using System;
 using System.Configuration;

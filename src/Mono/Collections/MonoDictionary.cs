@@ -30,59 +30,59 @@ using Collections.Pooled;
 using EftDmaRadarLite.DMA;
 using EftDmaRadarLite.Misc;
 
-namespace EftDmaRadarLite.Unity.Mono.Collections
+namespace EftDmaRadarLite.Mono.Collections
 {
     /// <summary>
-    /// DMA Wrapper for a C# HashSet
+    /// DMA Wrapper for a C# Dictionary
     /// Must initialize before use. Must dispose after use.
     /// </summary>
-    /// <typeparam name="T">Collection Type</typeparam>
-    public sealed class MonoHashSet<T> : PooledMemory<MonoHashSet<T>.MemHashEntry>
-        where T : unmanaged
+    /// <typeparam name="TKey">Key Type between 1-8 bytes.</typeparam>
+    /// <typeparam name="TValue">Value Type between 1-8 bytes.</typeparam>
+    public sealed class MonoDictionary<TKey, TValue> : PooledMemory<MonoDictionary<TKey, TValue>.MemDictEntry>
+        where TKey : unmanaged
+        where TValue : unmanaged
     {
-        public const uint CountOffset = 0x3C;
-        public const uint ArrOffset = 0x18;
-        public const uint ArrStartOffset = 0x20;
+        public const uint CountOffset = 0x40;
+        public const uint EntriesOffset = 0x18;
+        public const uint EntriesStartOffset = 0x20;
 
-        private MonoHashSet() : base(0) { }
-        private MonoHashSet(int count) : base(count) { }
+        private MonoDictionary() : base(0) { }
+        private MonoDictionary(int count) : base(count) { }
 
         /// <summary>
-        /// Factory method to create a new <see cref="MonoHashSet{T}"/> instance from a memory address.
+        /// Factory method to create a new <see cref="MonoDictionary{TKey, TValue}"/> instance from a memory address.
         /// </summary>
         /// <param name="addr"></param>
         /// <param name="useCache"></param>
         /// <returns></returns>
-        public static MonoHashSet<T> Create(ulong addr, bool useCache = true)
+        public static MonoDictionary<TKey, TValue> Create(ulong addr, bool useCache = true)
         {
             var count = MemoryInterface.Memory.ReadValue<int>(addr + CountOffset, useCache);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
-            var hs = new MonoHashSet<T>(count);
+            var dict = new MonoDictionary<TKey, TValue>(count);
             try
             {
                 if (count == 0)
                 {
-                    return hs;
+                    return dict;
                 }
-                var hashSetBase = MemoryInterface.Memory.ReadPtr(addr + ArrOffset, useCache) + ArrStartOffset;
-                MemoryInterface.Memory.ReadSpan(hashSetBase, hs.Span, useCache);
-                return hs;
+                var dictBase = MemoryInterface.Memory.ReadPtr(addr + EntriesOffset, useCache) + EntriesStartOffset;
+                MemoryInterface.Memory.ReadSpan(dictBase, dict.Span, useCache); // Single read into mem buffer
+                return dict;
             }
             catch
             {
-                hs.Dispose();
+                dict.Dispose();
                 throw;
             }
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 4)]
-        public readonly struct MemHashEntry
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
+        public readonly struct MemDictEntry
         {
-            public static implicit operator T(MemHashEntry x) => x.Value;
-
-            private readonly int _hashCode;
-            private readonly int _next;
-            public readonly T Value;
+            private readonly ulong _pad00;
+            public readonly TKey Key;
+            public readonly TValue Value;
         }
     }
 }
