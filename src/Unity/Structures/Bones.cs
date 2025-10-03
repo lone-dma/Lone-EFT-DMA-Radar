@@ -26,9 +26,7 @@ SOFTWARE.
  *
 */
 
-using System.ComponentModel;
-
-namespace EftDmaRadarLite.Unity
+namespace EftDmaRadarLite.Unity.Structures
 {
     /// <summary>
     /// Bones Index for Player Transforms.

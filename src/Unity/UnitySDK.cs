@@ -28,7 +28,7 @@ SOFTWARE.
 
 namespace EftDmaRadarLite.Unity
 {
-    public readonly struct UnityOffsets
+    public readonly struct UnitySDK
     {
         public readonly struct ModuleBase
         {

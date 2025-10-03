@@ -78,7 +78,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
 
         private static void MemDMA_ProcessStarting(object sender, EventArgs e)
         {
-            _opticCameraManagerField = MonoLib.MonoClass.Find("Assembly-CSharp", ClassNames.OpticCameraManagerContainer.ClassName, out _).GetStaticFieldData();
+            _opticCameraManagerField = Monolib2.MonoClass.Find("Assembly-CSharp", ClassNames.OpticCameraManagerContainer.ClassName, out _).GetStaticFieldData();
             _opticCameraManagerField.ThrowIfInvalidVirtualAddress(nameof(_opticCameraManagerField));
         }
 
@@ -129,8 +129,8 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
             IsADS = localPlayer?.CheckIfADS() ?? false;
             IsScoped = IsADS && CheckIfScoped(localPlayer);
             ulong vmAddr = IsADS && IsScoped
-                ? OpticCamera + UnityOffsets.Camera.ViewMatrix
-                : FPSCamera + UnityOffsets.Camera.ViewMatrix;
+                ? OpticCamera + UnitySDK.Camera.ViewMatrix
+                : FPSCamera + UnitySDK.Camera.ViewMatrix;
             index.AddValueEntry<Matrix4x4>(0, vmAddr); // View Matrix
             index.Completed += (sender, x1) =>
             {
@@ -148,8 +148,8 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
             };
             if (IsScoped)
             {
-                index.AddValueEntry<float>(1, FPSCamera + UnityOffsets.Camera.FOV); // FOV
-                index.AddValueEntry<float>(2, FPSCamera + UnityOffsets.Camera.AspectRatio); // Aspect
+                index.AddValueEntry<float>(1, FPSCamera + UnitySDK.Camera.FOV); // FOV
+                index.AddValueEntry<float>(2, FPSCamera + UnitySDK.Camera.AspectRatio); // Aspect
                 index.Completed += (sender, x2) =>
                 {
                     if (x2.TryGetValue<float>(1, out var fov))

@@ -32,14 +32,14 @@ using VmmSharpEx;
 
 namespace EftDmaRadarLite.Unity
 {
-    internal static class MonoLib
+    internal static class Monolib2
     {
         /// <summary>
         /// GameWorld Mono Field. Can be deref'd for a new LocalGameWorld instance each raid.
         /// </summary>
         public static ulong GameWorldField { get; private set; }
 
-        static MonoLib()
+        static Monolib2()
         {
             MemDMA.ProcessStarting += MemDMA_ProcessStarting;
             MemDMA.ProcessStopped += MemDMA_ProcessStopped;

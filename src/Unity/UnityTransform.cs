@@ -49,7 +49,7 @@ namespace EftDmaRadarLite.Unity
             TransformInternal = transformInternal;
             _useCache = useCache;
 
-            var ta = Memory.ReadValue<TransformAccess>(transformInternal + UnityOffsets.TransformInternal.TransformAccess, useCache);
+            var ta = Memory.ReadValue<TransformAccess>(transformInternal + UnitySDK.TransformInternal.TransformAccess, useCache);
             Index = ta.Index;
             HierarchyAddr = ta.Hierarchy;
             var transformHierarchy = Memory.ReadValue<TransformHierarchy>(HierarchyAddr, useCache);
