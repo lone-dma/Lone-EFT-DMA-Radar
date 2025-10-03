@@ -8,15 +8,16 @@ if %ERRORLEVEL% NEQ 0 (goto ERROR)
 
 ECHO - Publishing EFT DMA Radar Lite...
 dotnet publish "src\eft-dma-radar-lite.csproj" ^
-    --configuration Release ^
-    --framework net10.0-windows ^
-    --runtime win-x64 ^
+    -c Release ^
+    -r win-x64 ^
     --no-self-contained ^
     /p:PublishSingleFile=true ^
-    /p:DebugSymbols=false ^
     /p:DebugType=none ^
-    --output %OUT_DIR%
+    -o %OUT_DIR%
 if %ERRORLEVEL% NEQ 0 (goto ERROR)
+
+ECHO - Kill existing process (if any)...
+TASKKILL /F /IM "eft-dma-radar-lite.exe"
 
 ECHO - Copying output to destination(s)...
 CD %OUT_DIR%
