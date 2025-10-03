@@ -97,8 +97,8 @@ namespace EftDmaRadarLite.Tarkov.Player
                     }
                     var containedItem = Memory.ReadPtr(slot.Value + Offsets.Slot.ContainedItem);
                     var inventorytemplate = Memory.ReadPtr(containedItem + Offsets.LootItem.Template);
-                    var idPtr = Memory.ReadValue<MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
-                    var id = Memory.ReadUnicodeString(idPtr.StringID);
+                    var mongoId = Memory.ReadValue<MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
+                    var id = mongoId.ReadID();
                     if (EftDataManager.AllItems.TryGetValue(id, out var entry1))
                         loot.Add(new LootItem(entry1));
 
@@ -142,8 +142,8 @@ namespace EftDmaRadarLite.Tarkov.Player
                         {
                             var containedItem = Memory.ReadPtr(slot + Offsets.Slot.ContainedItem);
                             var inventorytemplate = Memory.ReadPtr(containedItem + Offsets.LootItem.Template);
-                            var idPtr = Memory.ReadValue<MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
-                            var id = Memory.ReadUnicodeString(idPtr.StringID);
+                            var mongoId = Memory.ReadValue<MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
+                            var id = mongoId.ReadID();
                             if (EftDataManager.AllItems.TryGetValue(id, out var entry))
                                 loot.Add(new LootItem(entry)); // Add to loot, get weapon attachment values
                             RecursePlayerGearSlots(containedItem, loot);

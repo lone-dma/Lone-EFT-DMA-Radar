@@ -10,8 +10,18 @@
         private readonly uint _timeStamp;
         [FieldOffset(0x8)]
         private readonly ulong _counter;
+        [FieldOffset(0x10)]
+        private readonly ulong _stringId;
 
-        [field: FieldOffset(0x10)]
-        public ulong StringID { get; }
+        /// <summary>
+        /// Read the string value of the MongoID.
+        /// </summary>
+        /// <param name="cb"></param>
+        /// <param name="useCache"></param>
+        /// <returns></returns>
+        public string ReadID(int cb = 128, bool useCache = true)
+        {
+            return Memory.ReadUnicodeString(_stringId, cb, useCache);
+        }
     }
 }
