@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Unity.Mono.Collections;
+using EftDmaRadarLite.Mono.Collections;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 {

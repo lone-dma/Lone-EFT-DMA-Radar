@@ -26,9 +26,9 @@ SOFTWARE.
  *
 */
 
+using EftDmaRadarLite.Mono.Collections;
 using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.Tarkov.Loot;
-using EftDmaRadarLite.Unity.Mono.Collections;
 
 namespace EftDmaRadarLite.Tarkov.Player
 {

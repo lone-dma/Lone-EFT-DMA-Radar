@@ -29,10 +29,10 @@ SOFTWARE.
 using EftDmaRadarLite.DMA;
 using EftDmaRadarLite.ESP;
 using EftDmaRadarLite.Misc;
+using EftDmaRadarLite.Mono;
+using EftDmaRadarLite.Mono.Collections;
 using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.Unity;
-using EftDmaRadarLite.Unity.Mono;
-using EftDmaRadarLite.Unity.Mono.Collections;
 using EftDmaRadarLite.Unity.Structures;
 using System.Drawing;
 using VmmSharpEx;

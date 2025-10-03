@@ -34,7 +34,7 @@ using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.UI.Skia.Maps;
 using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.Unity.Structures;
-using EftDmaRadarLite.Unity.Mono.Collections;
+using EftDmaRadarLite.Mono.Collections;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
 {
