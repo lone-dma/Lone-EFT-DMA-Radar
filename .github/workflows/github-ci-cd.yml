@@ -26,6 +26,7 @@ jobs:
             --no-self-contained \
             /p:PublishSingleFile=true \
             /p:DebugType=none \
+            /p:EnableWindowsTargeting=true \
             -o out
 
       - name: Archive publish output
