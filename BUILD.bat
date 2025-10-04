@@ -22,8 +22,6 @@ set PROC_KILLED=%ERRORLEVEL%
 
 ECHO - Copying output to destination(s)...
 CD %OUT_DIR%
-7z a "%USERPROFILE%\Downloads\eft-dma-radar-lite.zip" * -r -aoa
-if %ERRORLEVEL% NEQ 0 (goto ERROR)
 XCOPY * %CLIENT_DIR% /E /H /C /Y
 if %ERRORLEVEL% NEQ 0 (goto ERROR)
 
