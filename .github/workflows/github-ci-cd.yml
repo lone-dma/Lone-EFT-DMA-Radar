@@ -1,0 +1,44 @@
+name: Deploy latest version to Github Releases
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Dotnet Publish
+        run: |
+          dotnet publish src/eft-dma-radar-lite.csproj \
+            -c Release \
+            -r win-x64 \
+            --no-self-contained \
+            /p:PublishSingleFile=true \
+            /p:DebugType=none \
+            /p:EnableWindowsTargeting=true \
+            -o out
+
+      - name: Archive publish output
+        run: |
+          cd out
+          zip -r ../eft-dma-radar-lite.zip .
+
+      - name: Upload to "latest" release (overwrite old asset)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload latest eft-dma-radar-lite.zip --clobber
