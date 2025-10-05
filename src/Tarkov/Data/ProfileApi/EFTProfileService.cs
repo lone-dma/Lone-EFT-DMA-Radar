@@ -84,7 +84,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             {
                 try
                 {
-                    if (Memory.InRaid && await _channel.Reader.WaitToReadAsync())
+                    if (await _channel.Reader.WaitToReadAsync())
                     {
                         var cache = LocalCache.GetProfileCollection();
 
