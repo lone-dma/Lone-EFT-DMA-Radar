@@ -102,13 +102,15 @@ namespace EftDmaRadarLite.UI.Skia.Maps
         {
             if (_layers.Length == 0) return;
 
-            using var visibleSrc = _layers
-                .Where(l => l.IsHeightInRange(playerHeight))
-                .Order()
-                .ToPooledMemory();
-            var visible = visibleSrc.Span;
+            using var visible = new PooledList<VectorLayer>(capacity : 8);
+            foreach (var layer in _layers)
+            {
+                if (layer.IsHeightInRange(playerHeight))
+                    visible.Add(layer);
+            }
 
-            if (visible.IsEmpty) return;
+            if (visible.Count == 0) return;
+            visible.Sort();
 
             float scaleX = windowBounds.Width / mapBounds.Width;
             float scaleY = windowBounds.Height / mapBounds.Height;

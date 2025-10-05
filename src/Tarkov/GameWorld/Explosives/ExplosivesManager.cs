@@ -27,6 +27,7 @@ SOFTWARE.
 */
 
 using EftDmaRadarLite.Mono.Collections;
+using VmmSharpEx;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 {
@@ -134,7 +135,9 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
         {
             try
             {
-                var clientShellingController = Memory.ReadPtr(_localGameWorld + Offsets.ClientLocalGameWorld.ClientShellingController);
+                var clientShellingController = Memory.ReadValue<VmmPointer>(_localGameWorld + Offsets.ClientLocalGameWorld.ClientShellingController);
+                if (!clientShellingController.IsValid)
+                    return;
                 var activeProjectilesPtr = Memory.ReadPtr(clientShellingController + Offsets.ClientShellingController.ActiveClientProjectiles);
                 using var activeProjectiles = MonoDictionary<int, ulong>.Create(activeProjectilesPtr, true);
                 foreach (var activeProjectile in activeProjectiles)
