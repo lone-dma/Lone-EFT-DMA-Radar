@@ -70,6 +70,13 @@ namespace EftDmaRadarLite.UI.Skia.Maps
         [JsonPropertyName("svgScale")]
         public float SvgScale { get; private set; }
         /// <summary>
+        /// TRUE if the map drawing should not dim layers, otherwise FALSE if dimming is permitted.
+        /// This is a global setting that applies to all layers.
+        /// </summary>
+        [JsonInclude]
+        [JsonPropertyName("disableDimming")]
+        public bool DisableDimming { get; private set; }
+        /// <summary>
         /// Contains the Map Layers to load for the current Map Configuration.
         /// </summary>
         [JsonInclude]
@@ -96,11 +103,11 @@ namespace EftDmaRadarLite.UI.Skia.Maps
             [JsonPropertyName("maxHeight")]
             public float? MaxHeight { get; private set; }
             /// <summary>
-            /// True if this layer can dim the Base Layer when it is in the foreground.
+            /// TRUE if when this layer is in the foreground, the lower layers cannot be dimmed. Otherwise FALSE.
             /// </summary>
             [JsonInclude]
-            [JsonPropertyName("dimBaseLayer")]
-            public bool DimBaseLayer { get; private set; } = true;
+            [JsonPropertyName("cannotDimLowerLayers")]
+            public bool CannotDimLowerLayers { get; private set; }
             /// <summary>
             /// Relative File path to this map layer's PNG Image.
             /// </summary>

@@ -13,13 +13,13 @@
 	    {
       "minHeight": null,
 	  "maxHeight": -0.7,
-	  "dimBaseLayer": false,
+	  "cannotDimLowerLayers": true,
       "filename": "Streets_-1f.svg"
     },
 	    {
       "minHeight": -0.7,
 	  "maxHeight": null,
-	  "dimBaseLayer": false,
+	  "cannotDimLowerLayers": true,
       "filename": "Streets_1f.svg"
     },
 	    {

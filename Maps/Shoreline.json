@@ -4,11 +4,11 @@
   "y": 648,
   "scale": 0.995,
   "svgScale": 3.5,
+  "disableDimming" : true,
   "mapLayers": [
     {
       "minHeight": null,
 	  "maxHeight": null,
-	  "dimBaseLayer": false,
       "filename": "Shoreline.svg"
     },
 	    {
