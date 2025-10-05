@@ -66,7 +66,6 @@
 		<PackageReference Include="SkiaSharp.Views.WPF" Version="3.119.0" />
 		<PackageReference Include="Svg.Skia" Version="3.2.1" />
 		<PackageReference Include="Extended.Wpf.Toolkit" Version="5.0.0" />
-		<PackageReference Include="System.Threading.Tasks.Dataflow" Version="9.0.9" />
 		<PackageReference Include="TwitchLib.Api" Version="3.9.0" />
 		<PackageReference Include="VmmSharpEx" Version="3.50.9394.154" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="10.0.0-rc.1.25451.107" />
