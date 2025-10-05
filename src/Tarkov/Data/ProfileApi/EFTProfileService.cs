@@ -52,30 +52,30 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                 .Where(x => x.IsEnabled)
                 .OrderBy(x => x.Priority)
                 .ToArray();
-            if (_providers.Length == 0)
-                return; // No providers, exit early
-            // Start Dataflow block
-            _block = new ActionBlock<ProfileJob>(
-            async job =>
+            if (_providers.Length > 0)
             {
-                try
+                _block = new ActionBlock<ProfileJob>(
+                async job =>
                 {
-                    if (job.Token.IsCancellationRequested)
-                        return;
-                    await ProcessProfileAsync(job);
-                }
-                catch (Exception ex)
+                    try
+                    {
+                        if (job.Token.IsCancellationRequested)
+                            return;
+                        await ProcessProfileAsync(job);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"[EFTProfileService] Unhandled Exception: {ex}");
+                    }
+                },
+                new ExecutionDataflowBlockOptions
                 {
-                    Debug.WriteLine($"[EFTProfileService] Unhandled Exception: {ex}");
-                }
-            },
-            new ExecutionDataflowBlockOptions
-            {
-                MaxDegreeOfParallelism = Math.Min(5, Environment.ProcessorCount),
-                BoundedCapacity = DataflowBlockOptions.Unbounded,
-                EnsureOrdered = false
-            });
-            MemDMA.RaidStopped += MemDMA_RaidStopped;
+                    MaxDegreeOfParallelism = Math.Min(5, Environment.ProcessorCount),
+                    BoundedCapacity = DataflowBlockOptions.Unbounded,
+                    EnsureOrdered = false
+                });
+                MemDMA.RaidStopped += MemDMA_RaidStopped;
+            }
         }
 
         private static void MemDMA_RaidStopped(object sender, EventArgs e)
@@ -90,9 +90,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
         /// </summary>
         public static void RegisterProfile(PlayerProfile profile)
         {
-            if (_providers.Length == 0)
-                return; // No providers, skip
-            _block.Post(new ProfileJob(profile, _cts.Token));
+            _block?.Post(new ProfileJob(profile, _cts.Token));
         }
 
         /// <summary>
@@ -106,14 +104,14 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             if (!long.TryParse(profile.AccountID, out var acctIdLong))
                 return; // Skip invalid Account IDs
 
-            var cache = LocalCache.GetProfileCollection();
             // Check Cache for recent data
-            var cachedDto = cache.FindById(acctIdLong);
-            if (cachedDto is not null && cachedDto.IsCachedRecent) // Avoid API lookups if we have recent cached data
+            var cache = LocalCache.GetProfileCollection();
+            var dto = cache.FindById(acctIdLong);
+            if (dto is not null && dto.IsCachedRecent) // Avoid API lookups if we have recent cached data
             {
                 try
                 {
-                    profile.Data ??= cachedDto.ToProfileData();
+                    profile.Data ??= dto.ToProfileData();
                     return; // Done
                 }
                 catch
@@ -134,11 +132,11 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                         ArgumentException.ThrowIfNullOrWhiteSpace(result.Raw, nameof(result.Raw));
                         ArgumentOutOfRangeException.ThrowIfEqual(result.Updated, default, nameof(result.Updated));
                         // Check result against cache
-                        if (cachedDto is not null && cachedDto.Updated > result.Updated)
+                        if (dto is not null && dto.Updated > result.Updated)
                         {
                             try
                             {
-                                profile.Data ??= cachedDto.ToProfileData(); // Use newer cached data
+                                profile.Data ??= dto.ToProfileData(); // Use newer cached data
                                 return; // Don't overwrite with older data
                             }
                             catch
@@ -148,14 +146,14 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                         }
                         // Set result and update cache
                         profile.Data ??= result.Data;
-                        cachedDto ??= new EftProfileDto
+                        dto ??= new EftProfileDto
                         {
                             Id = acctIdLong,
                         };
-                        cachedDto.Data = result.Raw.MinifyJson();
-                        cachedDto.Updated = result.Updated;
-                        cachedDto.Cached = DateTimeOffset.UtcNow;
-                        _ = cache.Upsert(cachedDto);
+                        dto.Data = result.Raw.MinifyJson();
+                        dto.Updated = result.Updated;
+                        dto.Cached = DateTimeOffset.UtcNow;
+                        _ = cache.Upsert(dto);
                         return; // Processed, don't continue
                     }
                     // Failed to get profile, try next provider
@@ -176,7 +174,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             {
                 try
                 {
-                    profile.Data ??= cachedDto?.ToProfileData();
+                    profile.Data ??= dto?.ToProfileData();
                 }
                 catch { } // This may throw, ignore
                 // Can't find it but we have no options left ¯\_(ツ)_/¯
