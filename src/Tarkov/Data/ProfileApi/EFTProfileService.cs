@@ -26,12 +26,14 @@ SOFTWARE.
  *
 */
 
+using Collections.Pooled;
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Misc.Cache;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers;
 using EftDmaRadarLite.Tarkov.Player;
 using LiteDB;
 using System.Threading.Channels;
+using static SDK.Offsets;
 
 namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
 {
@@ -82,12 +84,16 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
             {
                 try
                 {
-                    if (Memory.InRaid)
+                    if (Memory.InRaid && await _channel.Reader.WaitToReadAsync())
                     {
                         var cache = LocalCache.GetProfileCollection();
 
+                        using var items = new PooledList<PlayerProfile>(capacity: 32);
+                        while (_channel.Reader.TryRead(out var item))
+                            items.Add(item);
+
                         await Parallel.ForEachAsync(
-                            _channel.Reader.ReadAllAsync(),
+                            items,
                             _parallelOptions,
                             async (profile, _) => await ProcessProfileAsync(profile, cache));
                     }
@@ -98,7 +104,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                 }
                 finally
                 {
-                    await Task.Delay(TimeSpan.FromMilliseconds(333));
+                    await Task.Delay(TimeSpan.FromSeconds(1));
                 }
             }
         }
