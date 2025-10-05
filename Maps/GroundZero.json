@@ -16,13 +16,12 @@
 				{
 			"minHeight": null,
 			"maxHeight": 16,
-			"dimBaseLayer": false,
 			"filename": "GroundZero_-1f.svg"
 		},
 				{
 			"minHeight": 16,
 			"maxHeight": 26,
-			"dimBaseLayer": false,
+			"cannotDimLowerLayers": true,
 			"filename": "GroundZero_1f.svg"
 		},
 				{

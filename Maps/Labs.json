@@ -7,12 +7,12 @@
 	"mapLayers": [
 		{
 			"minHeight": null,
-			"maxHeight": -1,
+			"maxHeight": null,
 			"filename": "Labs_-1f.svg"
 		},
 		{
 			"minHeight": -1,
-			"maxHeight": 3,
+			"maxHeight": null,
 			"filename": "Labs_1f.svg"
 		},
 		{

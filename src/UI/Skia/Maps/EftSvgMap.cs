@@ -102,12 +102,13 @@ namespace EftDmaRadarLite.UI.Skia.Maps
         {
             if (_layers.Length == 0) return;
 
-            using var visible = _layers
+            using var visibleSrc = _layers
                 .Where(l => l.IsHeightInRange(playerHeight))
                 .Order()
-                .ToPooledList();
+                .ToPooledMemory();
+            var visible = visibleSrc.Span;
 
-            if (visible.Count == 0) return;
+            if (visible.IsEmpty) return;
 
             float scaleX = windowBounds.Width / mapBounds.Width;
             float scaleY = windowBounds.Height / mapBounds.Height;
@@ -120,21 +121,16 @@ namespace EftDmaRadarLite.UI.Skia.Maps
             // Apply configured vector scaling
             canvas.Scale(Config.SvgScale, Config.SvgScale);
 
-            bool allowBaseDim = visible.Any(l => !l.IsBaseLayer && l.DimBaseLayer);
-            int lastIndex = visible.Count - 1;
-
-            for (int i = 0; i < visible.Count; i++)
+            var front = visible[^1];
+            foreach (var layer in visible)
             {
-                var layer = visible[i];
-                var picture = layer.Picture;
-
-                bool dim = visible.Count > 1 &&
-                           i != lastIndex &&
-                           !(layer.IsBaseLayer && !allowBaseDim);
+                bool dim = !Config.DisableDimming &&        // Make sure dimming is enabled globally
+                           layer != front &&                // Make sure the current layer is not in front
+                           !front.CannotDimLowerLayers;     // Don't dim the lower layers if the front layer has dimming disabled upon lower layers
 
                 var paint = dim ? 
                     SKPaints.PaintBitmapAlpha : SKPaints.PaintBitmap;
-                canvas.DrawPicture(picture, paint);
+                canvas.DrawPicture(layer.Picture, paint);
             }
 
             canvas.Restore();
@@ -204,7 +200,7 @@ namespace EftDmaRadarLite.UI.Skia.Maps
         {
             private readonly SKSvg _svg;
             public readonly bool IsBaseLayer;
-            public readonly bool DimBaseLayer;
+            public readonly bool CannotDimLowerLayers;
             public readonly float? MinHeight;
             public readonly float? MaxHeight;
             public readonly float RawWidth;
@@ -222,7 +218,7 @@ namespace EftDmaRadarLite.UI.Skia.Maps
             {
                 _svg = svg;
                 IsBaseLayer = cfgLayer.MinHeight is null && cfgLayer.MaxHeight is null;
-                DimBaseLayer = cfgLayer.DimBaseLayer;
+                CannotDimLowerLayers = cfgLayer.CannotDimLowerLayers;
                 MinHeight = cfgLayer.MinHeight;
                 MaxHeight = cfgLayer.MaxHeight;
 
