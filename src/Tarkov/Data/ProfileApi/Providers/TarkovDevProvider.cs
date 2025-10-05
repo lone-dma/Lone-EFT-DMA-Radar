@@ -88,22 +88,22 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 
         public bool CanLookup(string accountId) => !_skip.ContainsKey(accountId);
 
-        public async Task<EFTProfileResponse> GetProfileAsync(string accountId)
+        public async Task<EFTProfileResponse> GetProfileAsync(string accountId, CancellationToken ct)
         {
-            if (_skip.ContainsKey(accountId))
-            {
-                return null;
-            }
             try
             {
+                if (_skip.ContainsKey(accountId))
+                {
+                    return null;
+                }
                 var client = App.HttpClientFactory.CreateClient(nameof(TarkovDevProvider));
-                using var response = await client.GetAsync($"profile/{accountId}.json");
+                using var response = await client.GetAsync($"profile/{accountId}.json", ct);
                 if (response.StatusCode is HttpStatusCode.NotFound)
                 {
                     _skip.TryAdd(accountId, 0);
                 }
                 response.EnsureSuccessStatusCode();
-                string json = await response.Content.ReadAsStringAsync();
+                string json = await response.Content.ReadAsStringAsync(ct);
                 using var jsonDoc = JsonDocument.Parse(json);
                 long epoch = jsonDoc.RootElement.GetProperty("updated").GetInt64();
                 var result = JsonSerializer.Deserialize<ProfileData>(json, IProfileApiProvider.JsonOptions) ??

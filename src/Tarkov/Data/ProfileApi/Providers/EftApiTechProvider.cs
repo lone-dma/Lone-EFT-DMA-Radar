@@ -98,15 +98,19 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 
         public bool CanLookup(string accountId) => !_skip.ContainsKey(accountId);
 
-        public async Task<EFTProfileResponse> GetProfileAsync(string accountId)
+        public async Task<EFTProfileResponse> GetProfileAsync(string accountId, CancellationToken ct)
         {
             try
             {
-                using var lease = await _limiter.AcquireAsync(1);
+                if (_skip.ContainsKey(accountId))
+                {
+                    return null;
+                }
+                using var lease = await _limiter.AcquireAsync(1, ct);
                 if (!lease.IsAcquired)
                     return null; // Rate limit hit
                 var client = App.HttpClientFactory.CreateClient(nameof(EftApiTechProvider));
-                using var response = await client.GetAsync($"api/profile/{accountId}");
+                using var response = await client.GetAsync($"api/profile/{accountId}", ct);
                 if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
                 {
                     MessageBox.Show(MainWindow.Instance, $"eft-api.tech returned '{response.StatusCode}'. Please make sure your Api Key and IP Address are set correctly.", nameof(EftApiTechProvider), MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -116,7 +120,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                     _skip.TryAdd(accountId, 0);
                 }
                 response.EnsureSuccessStatusCode();
-                string json = await response.Content.ReadAsStringAsync();
+                string json = await response.Content.ReadAsStringAsync(ct);
                 using var jsonDoc = JsonDocument.Parse(json);
                 bool success = jsonDoc.RootElement.GetProperty("success").GetBoolean();
                 if (!success)
