@@ -64,7 +64,7 @@ namespace EftDmaRadarLite.Misc.Cache
         /// TRUE if the data was recently cached, otherwise FALSE.
         /// </summary>
         [BsonIgnore]
-        public bool IsCachedRecent => DateTimeOffset.UtcNow - Cached < TimeSpan.FromDays(1);
+        public bool IsCachedRecent => DateTimeOffset.UtcNow - Cached < TimeSpan.FromDays(2);
 
         /// <summary>
         /// Attempt to deserialize the cached data into a <see cref="ProfileData"/> instance.
