@@ -29,6 +29,7 @@ SOFTWARE.
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
 using Microsoft.Extensions.DependencyInjection;
+using Polly.CircuitBreaker;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Authentication;
@@ -38,6 +39,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 {
     public sealed class EftApiTechProvider : IProfileApiProvider
     {
+        private static readonly CircuitBreakerStateProvider _circuitBreakerStateProvider = new();
         static EftApiTechProvider()
         {
             IProfileApiProvider.Register(new EftApiTechProvider());
@@ -68,6 +70,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
                 options.Retry.ShouldRetryAfterHeader = true;
                 options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(60);
                 options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(20);
+                options.CircuitBreaker.StateProvider = _circuitBreakerStateProvider;
                 options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
                 options.CircuitBreaker.FailureRatio = 1.0;
                 options.CircuitBreaker.MinimumThroughput = 2;
@@ -89,7 +92,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
 
         public bool IsEnabled { get; } = App.Config.ProfileApi.EftApiTech.Enabled;
 
-        public bool CanRun => (_limiter.GetStatistics()?.CurrentAvailablePermits ?? 0) > 0;
+        public bool CanRun => _circuitBreakerStateProvider.CircuitState == CircuitState.Closed && (_limiter.GetStatistics()?.CurrentAvailablePermits ?? 0) > 0;
 
         private EftApiTechProvider() { }
 
