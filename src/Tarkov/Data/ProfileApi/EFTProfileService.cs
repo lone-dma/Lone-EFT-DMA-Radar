@@ -187,7 +187,7 @@ namespace EftDmaRadarLite.Tarkov.Data.ProfileApi
                 // Returns immediately so other processing can continue
                 _ = Task.Run(async () => 
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(1), ct);
+                    await Task.Delay(TimeSpan.FromSeconds(3), ct);
                     _block.Post(job);
                 });
             }
