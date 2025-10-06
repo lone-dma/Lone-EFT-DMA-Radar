@@ -247,8 +247,10 @@ namespace EftDmaRadarLite.UI.Skia.Maps
             public int CompareTo(VectorLayer other)
             {
                 if (other is null) return -1;
-                if (IsBaseLayer != other.IsBaseLayer)
-                    return IsBaseLayer ? -1 : 1;
+                if (IsBaseLayer && !other.IsBaseLayer)
+                    return -1;
+                if (!IsBaseLayer && other.IsBaseLayer)
+                    return 1;
 
                 var thisMin = MinHeight ?? float.MinValue;
                 var otherMin = other.MinHeight ?? float.MinValue;
