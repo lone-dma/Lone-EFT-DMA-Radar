@@ -405,7 +405,7 @@ namespace EftDmaRadarLite.DMA
         public void ReadSpan<T>(ulong addr, Span<T> span, bool useCache = true)
             where T : unmanaged
         {
-            uint cb = (uint)checked(SizeCache<T>.Size * span.Length);
+            uint cb = (uint)checked(Unsafe.SizeOf<T>() * span.Length);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(cb, MAX_READ_SIZE, nameof(cb));
             var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
 
@@ -422,7 +422,7 @@ namespace EftDmaRadarLite.DMA
         public void ReadSpanEnsure<T>(ulong addr, Span<T> span)
             where T : unmanaged
         {
-            uint cb = (uint)checked(SizeCache<T>.Size * span.Length);
+            uint cb = (uint)checked(Unsafe.SizeOf<T>() * span.Length);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(cb, MAX_READ_SIZE, nameof(cb));
             var buffer2 = new T[span.Length].AsSpan();
             var buffer3 = new T[span.Length].AsSpan();
@@ -509,7 +509,7 @@ namespace EftDmaRadarLite.DMA
         public unsafe T ReadValueEnsure<T>(ulong addr)
             where T : unmanaged, allows ref struct
         {
-            int cb = SizeCache<T>.Size;
+            int cb = Unsafe.SizeOf<T>();
             if (!_vmm.MemReadValue<T>(_pid, addr, out var r1, VmmFlags.NOCACHE))
                 throw new VmmException("Memory Read Failed!");
             Thread.SpinWait(5);
