@@ -168,7 +168,7 @@ namespace EftDmaRadarLite.Unity.Structures
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector3 GetLocalPosition()
         {
-            return Memory.ReadValue<TrsX>(VerticesAddr + (uint)Index * SizeCache<TrsX>.SizeU, _useCache).t;
+            return Memory.ReadValue<TrsX>(VerticesAddr + (uint)Index * (uint)Unsafe.SizeOf<TrsX>(), _useCache).t;
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace EftDmaRadarLite.Unity.Structures
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector3 GetLocalScale()
         {
-            return Memory.ReadValue<TrsX>(VerticesAddr + (uint)Index * SizeCache<TrsX>.SizeU, _useCache).s;
+            return Memory.ReadValue<TrsX>(VerticesAddr + (uint)Index * (uint)Unsafe.SizeOf<TrsX>(), _useCache).s;
         }
         /// <summary>
         /// Get Transform's Local Rotation.
@@ -187,7 +187,7 @@ namespace EftDmaRadarLite.Unity.Structures
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Quaternion GetLocalRotation()
         {
-            return Memory.ReadValue<TrsX>(VerticesAddr + (uint)Index * SizeCache<TrsX>.SizeU, _useCache).q;
+            return Memory.ReadValue<TrsX>(VerticesAddr + (uint)Index * (uint)Unsafe.SizeOf<TrsX>(), _useCache).q;
         }
 
 
