@@ -31,10 +31,10 @@ using EftDmaRadarLite.UI.Radar;
 using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.UI.Skia;
 using EftDmaRadarLite.Misc;
-using EftDmaRadarLite.UI.Skia.Maps;
 using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.Unity.Structures;
 using EftDmaRadarLite.Mono.Collections;
+using EftDmaRadarLite.UI.Radar.Maps;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
 {

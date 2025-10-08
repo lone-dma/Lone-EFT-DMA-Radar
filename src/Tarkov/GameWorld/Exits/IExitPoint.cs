@@ -27,7 +27,7 @@ SOFTWARE.
 */
 
 using EftDmaRadarLite.UI.Radar;
-using EftDmaRadarLite.UI.Skia.Maps;
+using EftDmaRadarLite.UI.Radar.Maps;
 using EftDmaRadarLite.Unity;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Exits

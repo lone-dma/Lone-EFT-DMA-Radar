@@ -27,7 +27,7 @@ SOFTWARE.
 */
 
 using EftDmaRadarLite.Tarkov.Player;
-using EftDmaRadarLite.UI.Skia.Maps;
+using EftDmaRadarLite.UI.Radar.Maps;
 
 namespace EftDmaRadarLite.UI.Radar
 {

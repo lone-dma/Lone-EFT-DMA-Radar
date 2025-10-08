@@ -35,9 +35,9 @@ using EftDmaRadarLite.Tarkov.Loot;
 using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.Tarkov.Quests;
 using EftDmaRadarLite.UI.Loot;
+using EftDmaRadarLite.UI.Radar.Maps;
 using EftDmaRadarLite.UI.Radar.Views;
 using EftDmaRadarLite.UI.Skia;
-using EftDmaRadarLite.UI.Skia.Maps;
 using SkiaSharp.Views.WPF;
 using System.Windows.Controls;
 

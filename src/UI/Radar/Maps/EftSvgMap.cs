@@ -27,11 +27,12 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
+using EftDmaRadarLite.UI.Skia;
 using SkiaSharp.Views.WPF;
 using Svg.Skia;
 using System.IO.Compression;
 
-namespace EftDmaRadarLite.UI.Skia.Maps
+namespace EftDmaRadarLite.UI.Radar.Maps
 {
     /// <summary>
     /// SVG map implementation that keeps layers as vector SKPicture objects (no pre-rasterization)

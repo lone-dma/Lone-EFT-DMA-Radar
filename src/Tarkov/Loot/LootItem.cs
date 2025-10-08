@@ -32,8 +32,8 @@ using EftDmaRadarLite.Tarkov.Data.TarkovMarket;
 using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.UI.Loot;
 using EftDmaRadarLite.UI.Radar;
+using EftDmaRadarLite.UI.Radar.Maps;
 using EftDmaRadarLite.UI.Skia;
-using EftDmaRadarLite.UI.Skia.Maps;
 using EftDmaRadarLite.Unity;
 
 namespace EftDmaRadarLite.Tarkov.Loot

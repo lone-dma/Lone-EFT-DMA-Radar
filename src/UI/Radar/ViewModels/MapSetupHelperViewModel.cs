@@ -27,7 +27,7 @@ SOFTWARE.
 */
 
 using EftDmaRadarLite.UI.Misc;
-using EftDmaRadarLite.UI.Skia.Maps;
+using EftDmaRadarLite.UI.Radar.Maps;
 using System.Windows.Input;
 
 namespace EftDmaRadarLite.UI.Radar.ViewModels
