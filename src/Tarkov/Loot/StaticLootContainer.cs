@@ -30,8 +30,8 @@ using Collections.Pooled;
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.UI.Radar.Maps;
 using EftDmaRadarLite.UI.Skia;
-using EftDmaRadarLite.UI.Skia.Maps;
 
 namespace EftDmaRadarLite.Tarkov.Loot
 {

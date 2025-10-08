@@ -29,7 +29,7 @@ SOFTWARE.
 using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.Unity;
 
-namespace EftDmaRadarLite.UI.Skia.Maps
+namespace EftDmaRadarLite.UI.Radar.Maps
 {
     /// <summary>
     /// Defines an entity that can be drawn on the 2D Radar Map.

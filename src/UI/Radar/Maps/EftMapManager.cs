@@ -29,7 +29,7 @@ SOFTWARE.
 using System.Collections.Frozen;
 using System.IO.Compression;
 
-namespace EftDmaRadarLite.UI.Skia.Maps
+namespace EftDmaRadarLite.UI.Radar.Maps
 {
     /// <summary>
     /// Maintains Map Resources for this application.

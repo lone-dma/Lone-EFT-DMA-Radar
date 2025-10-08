@@ -28,7 +28,7 @@ SOFTWARE.
 
 using SkiaSharp.Views.WPF;
 
-namespace EftDmaRadarLite.UI.Skia.Maps
+namespace EftDmaRadarLite.UI.Radar.Maps
 {
     public interface IEftMap : IDisposable
     {

@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.UI.Skia.Maps;
+using EftDmaRadarLite.UI.Radar.Maps;
 using EftDmaRadarLite.Unity;
 using VmmSharpEx.Scatter;
 

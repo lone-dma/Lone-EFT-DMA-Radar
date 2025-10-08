@@ -30,9 +30,9 @@ using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.UI.Skia;
 using EftDmaRadarLite.Misc;
-using EftDmaRadarLite.UI.Skia.Maps;
 using VmmSharpEx.Scatter;
 using EftDmaRadarLite.Unity.Structures;
+using EftDmaRadarLite.UI.Radar.Maps;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 {

@@ -31,8 +31,8 @@ using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.UI.Radar;
+using EftDmaRadarLite.UI.Radar.Maps;
 using EftDmaRadarLite.UI.Skia;
-using EftDmaRadarLite.UI.Skia.Maps;
 using EftDmaRadarLite.Unity;
 
 namespace EftDmaRadarLite.Tarkov.Quests

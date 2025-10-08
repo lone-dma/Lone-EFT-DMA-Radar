@@ -28,8 +28,8 @@ SOFTWARE.
 
 using EftDmaRadarLite.DMA;
 using EftDmaRadarLite.Tarkov.Loot;
+using EftDmaRadarLite.UI.Radar.Maps;
 using EftDmaRadarLite.UI.Skia;
-using EftDmaRadarLite.UI.Skia.Maps;
 using System.Net.Http.Headers;
 
 namespace EftDmaRadarLite.Misc
