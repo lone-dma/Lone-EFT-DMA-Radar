@@ -298,14 +298,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
         /// </summary>
         private void SlowWorker_PerformWork(object sender, WorkerThreadArgs e)
         {
-            UpdateMisc(e.CancellationToken);
-        }
-
-        /// <summary>
-        /// Validates Player Transforms -> Checks Exfils -> Checks Loot -> Checks Quests
-        /// </summary>
-        private void UpdateMisc(CancellationToken ct)
-        {
+            var ct = e.CancellationToken;
             ValidatePlayerTransforms(); // Check for transform anomalies
             // Refresh exfils
             _exfilManager.Refresh();
@@ -382,30 +375,17 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
         /// </summary>
         private void FastWorker_PerformWork(object sender, WorkerThreadArgs e)
         {
-            RefreshFast(e.CancellationToken);
-        }
-
-        /// <summary>
-        /// Refresh various player items via Fast Worker Thread.
-        /// </summary>
-        private void RefreshFast(CancellationToken ct)
-        {
+            var ct = e.CancellationToken;
             try { CameraManager ??= new(); } catch { }
-            try
+            if (_rgtPlayers?
+                .Where(x => x.IsActive && x.IsAlive) is IEnumerable<PlayerBase> players && 
+                players.Any())
             {
-                if (_rgtPlayers?
-                    .Where(x => x.IsActive && x.IsAlive) is IEnumerable<PlayerBase> players &&
-                    players.Any())
+                foreach (var player in players)
                 {
-                    foreach (var player in players)
-                    {
-                        ct.ThrowIfCancellationRequested();
-                        player.RefreshHands();
-                    }
+                    ct.ThrowIfCancellationRequested();
+                    player.RefreshHands();
                 }
-            }
-            catch
-            {
             }
         }
 
