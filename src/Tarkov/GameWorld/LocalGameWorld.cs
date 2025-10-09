@@ -266,41 +266,26 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
         private void RealtimeWorker_PerformWork(object sender, WorkerThreadArgs e)
         {
             bool espRunning = App.Config.EspWidget.Enabled; // Save resources if ESP is not running
-            RealtimeLoop(espRunning); // Realtime update loop (player positions, etc.)
-        }
-
-        /// <summary>
-        /// Updates all Realtime Values (View Matrix, player positions, etc.)
-        /// </summary>
-        private void RealtimeLoop(bool espRunning)
-        {
-            try
+            var players = _rgtPlayers.Where(x => x.IsActive && x.IsAlive);
+            var localPlayer = LocalPlayer;
+            if (!players.Any()) // No players - Throttle
             {
-                var players = _rgtPlayers.Where(x => x.IsActive && x.IsAlive);
-                var localPlayer = LocalPlayer;
-                if (!players.Any()) // No players - Throttle
-                {
-                    Thread.Sleep(1);
-                    return;
-                }
+                Thread.Sleep(1);
+                return;
+            }
 
-                using var map = Memory.CreateScatterMap();
-                var round1 = map.AddRound(false);
-                if (espRunning && CameraManager is CameraManager cm)
-                {
-                    cm.OnRealtimeLoop(round1[-1], localPlayer);
-                }
-                int i = 0;
-                foreach (var player in players)
-                {
-                    player.OnRealtimeLoop(round1[i++], espRunning);
-                }
-                map.Execute(); // Execute scatter read
-            }
-            catch (Exception ex)
+            using var map = Memory.CreateScatterMap();
+            var round1 = map.AddRound(false);
+            if (espRunning && CameraManager is CameraManager cm)
             {
-                Debug.WriteLine($"CRITICAL ERROR - UpdatePlayers Loop FAILED: {ex}");
+                cm.OnRealtimeLoop(round1[-1], localPlayer);
             }
+            int i = 0;
+            foreach (var player in players)
+            {
+                player.OnRealtimeLoop(round1[i++], espRunning);
+            }
+            map.Execute(); // Execute scatter read
         }
 
         #endregion
