@@ -35,6 +35,8 @@ namespace EftDmaRadarLite.Unity.Structures
     {
         private const int MAX_ITERATIONS = 4000;
         private readonly bool _useCache;
+        private readonly int _index;
+        private readonly ulong _hierarchyAddr;
         private readonly ReadOnlyMemory<int> _indices;
 
         private Vector3 _position;
@@ -50,9 +52,10 @@ namespace EftDmaRadarLite.Unity.Structures
             _useCache = useCache;
 
             var ta = Memory.ReadValue<TransformAccess>(transformInternal + UnitySDK.TransformInternal.TransformAccess, useCache);
-            Index = ta.Index;
-            HierarchyAddr = ta.Hierarchy;
-            var transformHierarchy = Memory.ReadValue<TransformHierarchy>(HierarchyAddr, useCache);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(ta.Index, 128000, nameof(ta.Index)); // Sanity check since this is used to size vertices reads
+            _index = ta.Index;
+            _hierarchyAddr = ta.Hierarchy;
+            var transformHierarchy = Memory.ReadValue<TransformHierarchy>(_hierarchyAddr, useCache);
             IndicesAddr = transformHierarchy.Indices;
             VerticesAddr = transformHierarchy.Vertices;
             /// Populate Indices once for the Life of the Transform.
@@ -64,11 +67,22 @@ namespace EftDmaRadarLite.Unity.Structures
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => _indices.Span;
         }
+        /// <summary>
+        /// TransformInternal address for this Transform.
+        /// </summary>
         public ulong TransformInternal { get; }
-        private ulong HierarchyAddr { get; }
+        /// <summary>
+        /// Indices address for this Transform.
+        /// </summary>
         private ulong IndicesAddr { get; }
+        /// <summary>
+        /// Vertices address for this Transform.
+        /// </summary>
         public ulong VerticesAddr { get; }
-        public int Index { get; }
+        /// <summary>
+        /// The number of elements in the indices/vertices arrays for this Transform.
+        /// </summary>
+        public int Count => _index + 1;
 
         #region Transform Methods
 
@@ -87,8 +101,8 @@ namespace EftDmaRadarLite.Unity.Structures
                     vertices = standaloneVertices.Span;
                 }
 
-                var worldPos = vertices[Index].t;
-                int index = Indices[Index];
+                var worldPos = vertices[_index].t;
+                int index = Indices[_index];
                 int iterations = 0;
                 while (index >= 0)
                 {
@@ -127,8 +141,8 @@ namespace EftDmaRadarLite.Unity.Structures
                     vertices = standaloneVertices.Span;
                 }
 
-                var worldRot = vertices[Index].q;
-                int index = Indices[Index];
+                var worldRot = vertices[_index].q;
+                int index = Indices[_index];
                 int iterations = 0;
                 while (index >= 0)
                 {
@@ -156,7 +170,7 @@ namespace EftDmaRadarLite.Unity.Structures
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector3 GetRootPosition()
         {
-            Vector3 rootPos = Memory.ReadValue<TrsX>(HierarchyAddr + TransformHierarchy.RootPositionOffset, _useCache).t;
+            Vector3 rootPos = Memory.ReadValue<TrsX>(_hierarchyAddr + TransformHierarchy.RootPositionOffset, _useCache).t;
             rootPos.ThrowIfAbnormal(nameof(rootPos));
             return rootPos;
         }
@@ -168,7 +182,7 @@ namespace EftDmaRadarLite.Unity.Structures
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector3 GetLocalPosition()
         {
-            return Memory.ReadValue<TrsX>(VerticesAddr + (uint)Index * (uint)Unsafe.SizeOf<TrsX>(), _useCache).t;
+            return Memory.ReadValue<TrsX>(VerticesAddr + (uint)_index * (uint)Unsafe.SizeOf<TrsX>(), _useCache).t;
         }
 
         /// <summary>
@@ -178,7 +192,7 @@ namespace EftDmaRadarLite.Unity.Structures
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector3 GetLocalScale()
         {
-            return Memory.ReadValue<TrsX>(VerticesAddr + (uint)Index * (uint)Unsafe.SizeOf<TrsX>(), _useCache).s;
+            return Memory.ReadValue<TrsX>(VerticesAddr + (uint)_index * (uint)Unsafe.SizeOf<TrsX>(), _useCache).s;
         }
         /// <summary>
         /// Get Transform's Local Rotation.
@@ -187,7 +201,7 @@ namespace EftDmaRadarLite.Unity.Structures
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Quaternion GetLocalRotation()
         {
-            return Memory.ReadValue<TrsX>(VerticesAddr + (uint)Index * (uint)Unsafe.SizeOf<TrsX>(), _useCache).q;
+            return Memory.ReadValue<TrsX>(VerticesAddr + (uint)_index * (uint)Unsafe.SizeOf<TrsX>(), _useCache).q;
         }
 
 
@@ -208,7 +222,7 @@ namespace EftDmaRadarLite.Unity.Structures
                 }
 
                 var worldPos = localPoint;
-                int index = Index;
+                int index = _index;
                 int iterations = 0;
                 while (index >= 0)
                 {
@@ -247,12 +261,12 @@ namespace EftDmaRadarLite.Unity.Structures
                     vertices = standaloneVertices.Span;
                 }
 
-                var worldPos = vertices[Index].t;
-                var worldRot = vertices[Index].q;
+                var worldPos = vertices[_index].t;
+                var worldRot = vertices[_index].q;
 
-                Vector3 localScale = vertices[Index].s;
+                Vector3 localScale = vertices[_index].s;
 
-                int index = Indices[Index];
+                int index = Indices[_index];
                 int iterations = 0;
                 while (index >= 0)
                 {
@@ -318,7 +332,7 @@ namespace EftDmaRadarLite.Unity.Structures
         /// </summary>
         private int[] ReadIndices()
         {
-            var indices = new int[Index + 1];
+            var indices = new int[Count];
             Memory.ReadSpan(IndicesAddr, indices.AsSpan(), _useCache);
             return indices;
         }
@@ -328,7 +342,7 @@ namespace EftDmaRadarLite.Unity.Structures
         /// </summary>
         public PooledMemory<TrsX> ReadVertices()
         {
-            return Memory.ReadArray<TrsX>(VerticesAddr, Index + 1, _useCache);
+            return Memory.ReadArray<TrsX>(VerticesAddr, Count, _useCache);
         }
         #endregion
 

@@ -452,8 +452,7 @@ namespace EftDmaRadarLite.Tarkov.Player
             {
                 if (!espRunning && tr.Key is not Bones.HumanBase)
                     continue;
-                scatter.PrepareReadArray<TrsX>(tr.Value.VerticesAddr,
-                    tr.Value.Index + 1); // ESP Vertices
+                scatter.PrepareReadArray<TrsX>(tr.Value.VerticesAddr, tr.Value.Count); // ESP Vertices
             }
 
             scatter.Completed += (sender, s) =>
@@ -466,7 +465,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                 {
                     if (!espRunning && tr.Key is not Bones.HumanBase)
                         continue;
-                    if (s.ReadArray<TrsX>(tr.Value.VerticesAddr, tr.Value.Index + 1) is PooledMemory<TrsX> vertices)
+                    if (s.ReadArray<TrsX>(tr.Value.VerticesAddr, tr.Value.Count) is PooledMemory<TrsX> vertices)
                     {
                         using (vertices)
                         {
