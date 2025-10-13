@@ -27,7 +27,6 @@ SOFTWARE.
 */
 
 global using static EftDmaRadarLite.DMA.MemoryInterface;
-using VmmSharpEx.Scatter.V2;
 
 namespace EftDmaRadarLite.DMA
 {
@@ -43,7 +42,6 @@ namespace EftDmaRadarLite.DMA
         /// </summary>
         public static void ModuleInit()
         {
-            ScatterReadMap.MaxReadSize = checked((int)MemDMA.MAX_READ_SIZE);
             Memory = new MemDMA();
             Debug.WriteLine("DMA Initialized!");
         }
