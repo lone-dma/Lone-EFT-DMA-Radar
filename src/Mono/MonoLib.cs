@@ -251,11 +251,9 @@ namespace EftDmaRadarLite.Mono
                                             using var mapInner = Memory.CreateScatterMap();
                                             var r11 = mapInner.AddRound();
                                             var r22 = mapInner.AddRound();
-                                            for (int iix = 0; iix < genericClassPtrArray.Count; iix++)
+                                            foreach (var genericClassPtr in genericClassPtrArray)
                                             {
-                                                int ii = iix;
-                                                var genericClassPtr = genericClassPtrArray[ii];
-                                                if (genericClassPtr.Ptr == 0x0)
+                                                if (!genericClassPtr.Ptr.IsValidVirtualAddress())
                                                     continue;
                                                 r11.PrepareReadPtr(genericClassPtr.Ptr + 0x20);
                                                 r11.Completed += (sender, s11) =>
