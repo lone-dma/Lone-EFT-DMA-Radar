@@ -75,49 +75,59 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
         public QuestManager QuestManager { get; }
         public CameraManager CameraManager { get; private set; }
 
+        private LocalGameWorld() { }
+
         /// <summary>
         /// Game Constructor.
         /// Only called internally.
         /// </summary>
         private LocalGameWorld(ulong localGameWorld, string mapID)
         {
-            Base = localGameWorld;
-            MapID = mapID;
-            _t1 = new WorkerThread()
+            try
             {
-                Name = "Realtime Worker",
-                ThreadPriority = ThreadPriority.AboveNormal,
-                SleepDuration = TimeSpan.FromMilliseconds(8),
-                SleepMode = WorkerThreadSleepMode.DynamicSleep
-            };
-            _t1.PerformWork += RealtimeWorker_PerformWork;
-            _t2 = new WorkerThread()
+                Base = localGameWorld;
+                MapID = mapID;
+                _t1 = new WorkerThread()
+                {
+                    Name = "Realtime Worker",
+                    ThreadPriority = ThreadPriority.AboveNormal,
+                    SleepDuration = TimeSpan.FromMilliseconds(8),
+                    SleepMode = WorkerThreadSleepMode.DynamicSleep
+                };
+                _t1.PerformWork += RealtimeWorker_PerformWork;
+                _t2 = new WorkerThread()
+                {
+                    Name = "Slow Worker",
+                    ThreadPriority = ThreadPriority.BelowNormal,
+                    SleepDuration = TimeSpan.FromMilliseconds(50)
+                };
+                _t2.PerformWork += SlowWorker_PerformWork;
+                _t3 = new WorkerThread()
+                {
+                    Name = "Explosives Worker",
+                    SleepDuration = TimeSpan.FromMilliseconds(30),
+                    SleepMode = WorkerThreadSleepMode.DynamicSleep
+                };
+                _t3.PerformWork += ExplosivesWorker_PerformWork;
+                _t4 = new WorkerThread()
+                {
+                    Name = "Fast Worker",
+                    SleepDuration = TimeSpan.FromMilliseconds(100)
+                };
+                _t4.PerformWork += FastWorker_PerformWork;
+                var rgtPlayersAddr = Memory.ReadPtr(localGameWorld + Offsets.ClientLocalGameWorld.RegisteredPlayers, false);
+                _rgtPlayers = new RegisteredPlayers(rgtPlayersAddr, this);
+                ArgumentOutOfRangeException.ThrowIfLessThan(_rgtPlayers.GetPlayerCount(), 1, nameof(_rgtPlayers));
+                QuestManager = new(_rgtPlayers.LocalPlayer.Profile);
+                Loot = new(localGameWorld);
+                _exfilManager = new(localGameWorld, _rgtPlayers.LocalPlayer.IsPmc);
+                _explosivesManager = new(localGameWorld);
+            }
+            catch
             {
-                Name = "Slow Worker",
-                ThreadPriority = ThreadPriority.BelowNormal,
-                SleepDuration = TimeSpan.FromMilliseconds(50)
-            };
-            _t2.PerformWork += SlowWorker_PerformWork;
-            _t3 = new WorkerThread()
-            {
-                Name = "Explosives Worker",
-                SleepDuration = TimeSpan.FromMilliseconds(30),
-                SleepMode = WorkerThreadSleepMode.DynamicSleep
-            };
-            _t3.PerformWork += ExplosivesWorker_PerformWork;
-            _t4 = new WorkerThread()
-            {
-                Name = "Fast Worker",
-                SleepDuration = TimeSpan.FromMilliseconds(100)
-            };
-            _t4.PerformWork += FastWorker_PerformWork;
-            var rgtPlayersAddr = Memory.ReadPtr(localGameWorld + Offsets.ClientLocalGameWorld.RegisteredPlayers, false);
-            _rgtPlayers = new RegisteredPlayers(rgtPlayersAddr, this);
-            ArgumentOutOfRangeException.ThrowIfLessThan(_rgtPlayers.GetPlayerCount(), 1, nameof(_rgtPlayers));
-            QuestManager = new(_rgtPlayers.LocalPlayer.Profile);
-            Loot = new(localGameWorld);
-            _exfilManager = new(localGameWorld, _rgtPlayers.LocalPlayer.IsPmc);
-            _explosivesManager = new(localGameWorld);
+                Dispose();
+                throw;
+            }
         }
 
         /// <summary>
@@ -418,10 +428,10 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
         {
             if (Interlocked.Exchange(ref _disposed, true) == false)
             {
-                _t1.Dispose();
-                _t2.Dispose();
-                _t3.Dispose();
-                _t4.Dispose();
+                _t1?.Dispose();
+                _t2?.Dispose();
+                _t3?.Dispose();
+                _t4?.Dispose();
             }
         }
 

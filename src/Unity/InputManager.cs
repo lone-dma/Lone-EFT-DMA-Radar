@@ -60,18 +60,28 @@ namespace EftDmaRadarLite.Unity
             _instance = null;
         }
 
-        public InputManager(ulong unityBase)
+        private InputManager() { }
+
+        private InputManager(ulong unityBase)
         {
-            unityBase.ThrowIfInvalidVirtualAddress(nameof(unityBase));
-            _inputManager = Memory.ReadPtr(unityBase + UnitySDK.ModuleBase.InputManager, false);
-            _thread = new()
+            try
             {
-                Name = nameof(InputManager),
-                SleepDuration = TimeSpan.FromMilliseconds(12),
-                SleepMode = WorkerThreadSleepMode.DynamicSleep
-            };
-            _thread.PerformWork += InputManager_PerformWork;
-            _thread.Start();
+                unityBase.ThrowIfInvalidVirtualAddress(nameof(unityBase));
+                _inputManager = Memory.ReadPtr(unityBase + UnitySDK.ModuleBase.InputManager, false);
+                _thread = new()
+                {
+                    Name = nameof(InputManager),
+                    SleepDuration = TimeSpan.FromMilliseconds(12),
+                    SleepMode = WorkerThreadSleepMode.DynamicSleep
+                };
+                _thread.PerformWork += InputManager_PerformWork;
+                _thread.Start();
+            }
+            catch
+            {
+                Dispose();
+                throw;
+            }
         }
 
         private void InputManager_PerformWork(object sender, WorkerThreadArgs e)
@@ -117,7 +127,7 @@ namespace EftDmaRadarLite.Unity
 
         public void Dispose()
         {
-            _thread.Dispose();
+            _thread?.Dispose();
         }
     }
 
