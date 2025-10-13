@@ -30,9 +30,10 @@ using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.UI.Skia;
 using EftDmaRadarLite.Misc;
-using VmmSharpEx.Scatter;
+using VmmSharpEx.Scatter.V2;
 using EftDmaRadarLite.Unity.Structures;
 using EftDmaRadarLite.UI.Radar.Maps;
+using VmmSharpEx.Scatter;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 {
@@ -70,22 +71,22 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
         /// <summary>
         /// Get the updated Position of this Grenade.
         /// </summary>
-        public void OnRefresh(ScatterReadIndex index)
+        public void OnRefresh(VmmScatter scatter)
         {
             if (_isSmoke)
             {
                 // Smokes never leave the list, don't remove
                 return;
             }
-            index.AddValueEntry<Vector3>(0, _posAddr);
-            index.AddValueEntry<bool>(1, this + Offsets.Grenade.IsDestroyed);
-            index.Completed += (sender, x1) =>
+            scatter.PrepareReadValue<Vector3>(_posAddr);
+            scatter.PrepareReadValue<bool>(this + Offsets.Grenade.IsDestroyed);
+            scatter.Completed += (sender, x1) =>
             {
-                if (x1.TryGetValue(0, out Vector3 pos) && pos.IsNormal())
+                if (x1.ReadValue(_posAddr, out Vector3 pos) && pos.IsNormal())
                 {
                     _position = pos;
                 }
-                if (x1.TryGetValue(1, out bool isDestroyed) && isDestroyed)
+                if (x1.ReadValue(this + Offsets.Grenade.IsDestroyed, out bool isDestroyed) && isDestroyed)
                 {
                     _parent.TryRemove(this, out _);
                 }

@@ -29,8 +29,9 @@ SOFTWARE.
 using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.UI.Skia;
 using EftDmaRadarLite.Misc;
-using VmmSharpEx.Scatter;
+using VmmSharpEx.Scatter.V2;
 using EftDmaRadarLite.UI.Radar.Maps;
+using VmmSharpEx.Scatter;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 {
@@ -61,12 +62,12 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
             canvas.DrawCircle(circlePosition, size, SKPaints.PaintExplosives); // draw LocalPlayer marker
         }
 
-        public void OnRefresh(ScatterReadIndex index)
+        public void OnRefresh(VmmScatter scatter)
         {
-            index.AddValueEntry<ArtilleryProjectile>(0, this);
-            index.Completed += (sender, x1) =>
+            scatter.PrepareReadValue<ArtilleryProjectile>(this);
+            scatter.Completed += (sender, s) =>
             {
-                if (x1.TryGetValue(0, out ArtilleryProjectile artilleryProjectile))
+                if (s.ReadValue(this, out ArtilleryProjectile artilleryProjectile))
                 {
                     if (artilleryProjectile.Position.IsNormal())
                     {

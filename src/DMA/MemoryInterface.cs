@@ -27,7 +27,7 @@ SOFTWARE.
 */
 
 global using static EftDmaRadarLite.DMA.MemoryInterface;
-using VmmSharpEx.Scatter;
+using VmmSharpEx.Scatter.V2;
 
 namespace EftDmaRadarLite.DMA
 {

@@ -37,6 +37,7 @@ using EftDmaRadarLite.Unity.Structures;
 using System.Drawing;
 using VmmSharpEx;
 using VmmSharpEx.Scatter;
+using VmmSharpEx.Scatter.V2;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld
 {
@@ -125,18 +126,17 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
         /// Executed on each Realtime Loop.
         /// </summary>
         /// <param name="index">Scatter read index dedicated to this object.</param>
-        public void OnRealtimeLoop(ScatterReadIndex index, /* Can Be Null */ LocalPlayer localPlayer)
+        public void OnRealtimeLoop(VmmScatter scatter, /* Can Be Null */ LocalPlayer localPlayer)
         {
             IsADS = localPlayer?.CheckIfADS() ?? false;
             IsScoped = IsADS && CheckIfScoped(localPlayer);
             ulong vmAddr = IsADS && IsScoped
                 ? OpticCamera + UnitySDK.Camera.ViewMatrix
                 : FPSCamera + UnitySDK.Camera.ViewMatrix;
-            index.AddValueEntry<Matrix4x4>(0, vmAddr); // View Matrix
-            index.Completed += (sender, x1) =>
+            scatter.PrepareReadValue<Matrix4x4>(vmAddr); // View Matrix
+            scatter.Completed += (sender, s) =>
             {
-                ref Matrix4x4 vm = ref x1.GetValueRef<Matrix4x4>(0);
-                if (!Unsafe.IsNullRef(ref vm))
+                if (s.ReadValue<Matrix4x4>(vmAddr, out var vm))
                 {
                     float zoom = App.Config.EspWidget.Zoom;
                     if (zoom > 1f)
@@ -149,13 +149,13 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
             };
             if (IsScoped)
             {
-                index.AddValueEntry<float>(1, FPSCamera + UnitySDK.Camera.FOV); // FOV
-                index.AddValueEntry<float>(2, FPSCamera + UnitySDK.Camera.AspectRatio); // Aspect
-                index.Completed += (sender, x2) =>
+                scatter.PrepareReadValue<float>(FPSCamera + UnitySDK.Camera.FOV); // FOV
+                scatter.PrepareReadValue<float>(FPSCamera + UnitySDK.Camera.AspectRatio); // Aspect
+                scatter.Completed += (sender, s) =>
                 {
-                    if (x2.TryGetValue<float>(1, out var fov))
+                    if (s.ReadValue<float>(FPSCamera + UnitySDK.Camera.FOV, out var fov))
                         _fov = fov;
-                    if (x2.TryGetValue<float>(2, out var aspect))
+                    if (s.ReadValue<float>(FPSCamera + UnitySDK.Camera.AspectRatio, out var aspect))
                         _aspect = aspect;
                 };
             }

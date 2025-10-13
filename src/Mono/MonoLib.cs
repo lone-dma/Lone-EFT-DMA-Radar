@@ -221,30 +221,29 @@ namespace EftDmaRadarLite.Mono
                 var r1 = mapOuter.AddRound();
                 var r2 = mapOuter.AddRound();
                 var r3 = mapOuter.AddRound();
-                for (int ix = 0; ix < 1103; ix++)
+                for (int i = 0; i < 1103; i++)
                 {
-                    int i = ix;
                     ulong monoImageSetPtr = monoImageSetPtrArray[i];
                     if (monoImageSetPtr == 0x0)
                         continue;
-                    r1[i].AddValueEntry<VmmPointer>(0, monoImageSetPtr + 0x28); // gclass_cache
-                    r1[i].Completed += (sender, x1) =>
+                    r1.PrepareReadPtr(monoImageSetPtr + 0x28); // gclass_cache
+                    r1.Completed += (sender, s1) =>
                     {
                         if (foundCount == classNames.Length)
                         {
                             return;
                         }
-                        if (x1.TryGetValue<VmmPointer>(0, out var gclassCache))
+                        if (s1.ReadPtr(monoImageSetPtr + 0x28, out var gclassCache))
                         {
-                            r2[i].AddValueEntry<VmmPointer>(1, gclassCache + 0x0);
-                            r2[i].Completed += (sender, x2) =>
+                            r2.PrepareReadPtr(gclassCache + 0x0);
+                            r2.Completed += (sender, s2) =>
                             {
-                                if (x2.TryGetValue<VmmPointer>(1, out var table))
+                                if (s2.ReadPtr(gclassCache + 0x0, out var table))
                                 {
-                                    r3[i].AddValueEntry<SingletonHashTable>(2, table);
-                                    r3[i].Completed += (sender, x3) =>
+                                    r3.PrepareReadValue<SingletonHashTable>(table);
+                                    r3.Completed += (sender, s3) =>
                                     {
-                                        if (x3.TryGetValue<SingletonHashTable>(2, out var tableData))
+                                        if (s3.ReadValue<SingletonHashTable>(table, out var tableData))
                                         {
                                             if (tableData.TableSize > 100000 || tableData.KVS == 0x0)
                                                 return;
@@ -258,19 +257,19 @@ namespace EftDmaRadarLite.Mono
                                                 var genericClassPtr = genericClassPtrArray[ii];
                                                 if (genericClassPtr.Ptr == 0x0)
                                                     continue;
-                                                r11[ii].AddValueEntry<VmmPointer>(0, genericClassPtr.Ptr + 0x20);
-                                                r11[ii].Completed += (sender, x11) =>
+                                                r11.PrepareReadPtr(genericClassPtr.Ptr + 0x20);
+                                                r11.Completed += (sender, s11) =>
                                                 {
                                                     if (foundCount == classNames.Length)
                                                     {
                                                         return;
                                                     }
-                                                    if (x11.TryGetValue<VmmPointer>(0, out var classPtr))
+                                                    if (s11.ReadPtr(genericClassPtr.Ptr + 0x20, out var classPtr))
                                                     {
-                                                        r22[ii].AddValueEntry<MonoClass>(1, classPtr);
-                                                        r22[ii].Completed += (sender, x22) =>
+                                                        r22.PrepareReadValue<MonoClass>(classPtr);
+                                                        r22.Completed += (sender, s22) =>
                                                         {
-                                                            if (x22.TryGetValue<MonoClass>(1, out var monoClass))
+                                                            if (s22.ReadValue<MonoClass>(classPtr, out var monoClass))
                                                             {
                                                                 if ((monoClass.Inited & 1) != 1 ||           // !class->inited
                                                                     (monoClass.Flags & 0x100000) != 0 ||     // class->exception_type != MONO_EXCEPTION_NONE

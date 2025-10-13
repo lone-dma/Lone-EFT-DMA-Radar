@@ -26,7 +26,10 @@ SOFTWARE.
  *
 */
 
+using EftDmaRadarLite.DMA;
+using VmmSharpEx;
 using VmmSharpEx.Scatter;
+using VmmSharpEx.Scatter.V2;
 
 namespace EftDmaRadarLite.Tarkov.Player
 {
@@ -58,12 +61,13 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// Give this function it's own unique Index.
         /// </summary>
         /// <param name="index">Scatter read index to read off of.</param>
-        public override void OnRealtimeLoop(ScatterReadIndex index, bool espRunning)
+        public override void OnRealtimeLoop(VmmScatter scatter, bool espRunning)
         {
-            index.AddValueEntry<Vector3>(0, _btrView + Offsets.BTRView._targetPosition);
-            index.Completed += (sender, x1) =>
+            ulong posAddr = _btrView + Offsets.BTRView._targetPosition;
+            scatter.PrepareReadValue<Vector3>(posAddr);
+            scatter.Completed += (sender, s) =>
             {
-                if (x1.TryGetValue<Vector3>(0, out var position))
+                if (s.ReadValue<Vector3>(posAddr, out var position))
                     _position = position;
             };
         }

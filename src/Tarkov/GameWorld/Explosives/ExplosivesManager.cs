@@ -55,22 +55,20 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
             {
                 return;
             }
-            using var map = Memory.CreateScatterMap();  
-            var rd1 = map.AddRound(useCache: false);
-            int i = 0;
+            using var scatter = Memory.CreateScatter(VmmSharpEx.Options.VmmFlags.NOCACHE);
             foreach (var explosive in explosives)
             {
                 ct.ThrowIfCancellationRequested();
                 try
                 {
-                    explosive.OnRefresh(rd1[i++]);
+                    explosive.OnRefresh(scatter);
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"Error Refreshing Explosive @ 0x{explosive.Addr.ToString("X")}: {ex}");
                 }
             }
-            map.Execute();
+            scatter.Execute();
         }
 
         private void GetGrenades(CancellationToken ct)
