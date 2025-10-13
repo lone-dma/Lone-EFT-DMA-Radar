@@ -26,14 +26,14 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Tarkov.Player;
-using EftDmaRadarLite.UI.Radar;
-using EftDmaRadarLite.Unity;
-using EftDmaRadarLite.UI.Skia;
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Tarkov.Data;
-using EftDmaRadarLite.Unity.Structures;
+using EftDmaRadarLite.Tarkov.Player;
+using EftDmaRadarLite.UI.Radar;
 using EftDmaRadarLite.UI.Radar.Maps;
+using EftDmaRadarLite.UI.Skia;
+using EftDmaRadarLite.Unity;
+using EftDmaRadarLite.Unity.Structures;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
 {

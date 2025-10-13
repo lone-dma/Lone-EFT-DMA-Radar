@@ -26,14 +26,10 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.DMA;
 using EftDmaRadarLite.Mono.Collections;
 using EftDmaRadarLite.Tarkov.Data;
-using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Unity.Structures;
-using VmmSharpEx;
 using VmmSharpEx.Scatter;
-using VmmSharpEx.Scatter.V2;
 
 namespace EftDmaRadarLite.Tarkov.Player
 {

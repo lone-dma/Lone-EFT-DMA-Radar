@@ -26,11 +26,11 @@ SOFTWARE.
  *
 */
 
+using Collections.Pooled;
+using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.UI.Skia;
 using SkiaSharp.Views.WPF;
-using EftDmaRadarLite.Misc;
-using Collections.Pooled;
 
 namespace EftDmaRadarLite.UI.Radar
 {

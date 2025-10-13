@@ -27,7 +27,6 @@ SOFTWARE.
 */
 
 using EftDmaRadarLite.UI.Radar.ViewModels;
-using SkiaSharp.Views.WPF;
 using System.Windows.Controls;
 
 namespace EftDmaRadarLite.UI.Radar.Views

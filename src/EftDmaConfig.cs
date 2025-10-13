@@ -26,15 +26,13 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.UI.Loot;
 using EftDmaRadarLite.DMA;
+using EftDmaRadarLite.Misc.JSON;
 using EftDmaRadarLite.UI.ColorPicker;
 using EftDmaRadarLite.UI.Data;
-using System.Collections.ObjectModel;
-using EftDmaRadarLite.Misc.JSON;
-using EftDmaRadarLite.Misc;
-using EftDmaRadarLite.Unity;
+using EftDmaRadarLite.UI.Loot;
 using EftDmaRadarLite.Unity.Structures;
+using System.Collections.ObjectModel;
 
 namespace EftDmaRadarLite
 {

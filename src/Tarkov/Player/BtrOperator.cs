@@ -26,10 +26,7 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.DMA;
-using VmmSharpEx;
 using VmmSharpEx.Scatter;
-using VmmSharpEx.Scatter.V2;
 
 namespace EftDmaRadarLite.Tarkov.Player
 {

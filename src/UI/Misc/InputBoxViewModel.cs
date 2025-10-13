@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Misc;
 using System.Windows.Input;
 
 namespace EftDmaRadarLite.UI.Misc

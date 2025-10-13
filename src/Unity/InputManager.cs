@@ -26,11 +26,10 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.UI.Hotkeys;
-using VmmSharpEx.Scatter.V2;
+using EftDmaRadarLite.DMA;
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Misc.Workers;
-using EftDmaRadarLite.DMA;
+using EftDmaRadarLite.UI.Hotkeys;
 using EftDmaRadarLite.Unity.Structures;
 using VmmSharpEx.Scatter;
 

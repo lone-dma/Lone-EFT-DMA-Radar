@@ -28,8 +28,6 @@ SOFTWARE.
 
 using EftDmaRadarLite.Mono.Collections;
 using EftDmaRadarLite.Unity.Structures;
-using System;
-using System.Configuration;
 using static SDK.Offsets;
 
 namespace EftDmaRadarLite.Tarkov.Player

@@ -28,7 +28,6 @@ SOFTWARE.
 
 using Collections.Pooled;
 using EftDmaRadarLite.DMA;
-using EftDmaRadarLite.Misc;
 
 namespace EftDmaRadarLite.Mono.Collections
 {

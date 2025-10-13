@@ -28,7 +28,6 @@ SOFTWARE.
 
 using Collections.Pooled;
 using EftDmaRadarLite.Tarkov.Loot;
-using EftDmaRadarLite.UI.Radar;
 
 namespace EftDmaRadarLite.UI.Loot
 {

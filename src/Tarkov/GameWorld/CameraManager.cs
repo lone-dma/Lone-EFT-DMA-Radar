@@ -37,7 +37,6 @@ using EftDmaRadarLite.Unity.Structures;
 using System.Drawing;
 using VmmSharpEx;
 using VmmSharpEx.Scatter;
-using VmmSharpEx.Scatter.V2;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld
 {

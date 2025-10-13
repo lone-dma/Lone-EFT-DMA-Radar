@@ -29,7 +29,6 @@ SOFTWARE.
 using Collections.Pooled;
 using EftDmaRadarLite.DMA;
 using EftDmaRadarLite.Misc;
-using EftDmaRadarLite.Tarkov.Data.TarkovMarket;
 using EftDmaRadarLite.Tarkov.Loot;
 using EftDmaRadarLite.UI.Radar;
 using EftDmaRadarLite.UI.Radar.Maps;
@@ -37,11 +36,8 @@ using EftDmaRadarLite.UI.Radar.ViewModels;
 using EftDmaRadarLite.UI.Skia;
 using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Unity.Structures;
-using VmmSharpEx;
 using VmmSharpEx.Scatter;
-using VmmSharpEx.Scatter.V2;
 using static EftDmaRadarLite.Unity.Structures.UnityTransform;
-using static SDK.Offsets;
 
 namespace EftDmaRadarLite.Tarkov.Player
 {

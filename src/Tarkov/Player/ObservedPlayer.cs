@@ -32,7 +32,6 @@ using EftDmaRadarLite.Tarkov.Data.ProfileApi;
 using EftDmaRadarLite.UI.Radar.ViewModels;
 using EftDmaRadarLite.Unity.Structures;
 using VmmSharpEx.Scatter;
-using VmmSharpEx.Scatter.V2;
 
 namespace EftDmaRadarLite.Tarkov.Player
 {

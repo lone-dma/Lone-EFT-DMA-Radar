@@ -28,7 +28,6 @@ SOFTWARE.
 
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Tarkov.Data;
-using EftDmaRadarLite.Tarkov.Data.ProfileApi;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
 
 namespace EftDmaRadarLite.Tarkov.Player

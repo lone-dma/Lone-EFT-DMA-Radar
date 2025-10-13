@@ -26,8 +26,8 @@ SOFTWARE.
  *
 */
 
-using MessagePack.Formatters;
 using MessagePack;
+using MessagePack.Formatters;
 using MessagePack.Resolvers;
 
 namespace EftDmaRadarLite.WebRadar.MessagePack
