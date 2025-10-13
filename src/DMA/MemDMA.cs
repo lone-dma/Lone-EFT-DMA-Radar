@@ -38,9 +38,10 @@ using System.Drawing;
 using EftDmaRadarLite.Tarkov.Quests;
 using VmmSharpEx.Refresh;
 using VmmSharpEx.Options;
-using VmmSharpEx.Scatter;
+using VmmSharpEx.Scatter.V2;
 using Collections.Pooled;
 using EftDmaRadarLite.Mono;
+using VmmSharpEx.Scatter;
 
 namespace EftDmaRadarLite.DMA
 {
@@ -454,7 +455,7 @@ namespace EftDmaRadarLite.DMA
             where T : unmanaged
         {
             var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
-            var arr = _vmm.MemReadPooledArray<T>(_pid, addr, count, flags) ??
+            var arr = _vmm.MemReadArray<T>(_pid, addr, count, flags) ??
                 throw new VmmException("Memory Read Failed!");
             return arr;
         }
@@ -553,11 +554,23 @@ namespace EftDmaRadarLite.DMA
         #endregion
 
         #region Misc
+
         /// <summary>
-        /// Get a new ScatterReadMap instance for performing batched reads.
+        /// Creates a new <see cref="VmmScatterMap"/>.
         /// </summary>
         /// <returns></returns>
-        public ScatterReadMap CreateScatterMap() => new(_vmm, _pid);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public VmmScatterMap CreateScatterMap() => 
+            _vmm.CreateScatterMap(_pid);
+
+        /// <summary>
+        /// Creates a new <see cref="VmmScatter"/>.
+        /// </summary>
+        /// <param name="flags"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public VmmScatter CreateScatter(VmmFlags flags = VmmFlags.NONE) =>
+            _vmm.CreateScatter(_pid, flags);
 
         /// <summary>
         /// Throws a special exception if no longer in game.

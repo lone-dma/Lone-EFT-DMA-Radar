@@ -26,12 +26,14 @@ SOFTWARE.
  *
 */
 
+using EftDmaRadarLite.DMA;
 using EftDmaRadarLite.Mono.Collections;
 using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Unity.Structures;
 using VmmSharpEx;
 using VmmSharpEx.Scatter;
+using VmmSharpEx.Scatter.V2;
 
 namespace EftDmaRadarLite.Tarkov.Player
 {
@@ -125,15 +127,15 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// Additional realtime reads for LocalPlayer.
         /// </summary>
         /// <param name="index"></param>
-        public override void OnRealtimeLoop(ScatterReadIndex index, bool espRunning)
+        public override void OnRealtimeLoop(VmmScatter scatter, bool espRunning)
         {
-            index.AddValueEntry<VmmPointer>(-11, HandsControllerAddr);
-            index.Completed += (sender, x1) =>
+            scatter.PrepareReadPtr(HandsControllerAddr);
+            scatter.Completed += (sender, s) =>
             {
-                if (x1.TryGetValue<VmmPointer>(-11, out var handsController))
+                if (s.ReadPtr(HandsControllerAddr, out var handsController))
                     LocalPlayer.HandsController = handsController;
             };
-            base.OnRealtimeLoop(index, espRunning);
+            base.OnRealtimeLoop(scatter, espRunning);
         }
 
         /// <summary>

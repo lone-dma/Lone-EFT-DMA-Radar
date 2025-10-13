@@ -28,7 +28,7 @@ SOFTWARE.
 
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Mono.Collections;
-using VmmSharpEx.Scatter;
+using VmmSharpEx.Scatter.V2;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
 {
@@ -99,25 +99,22 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
                 if (_exits is null) // Initialize
                     Init();
                 ArgumentNullException.ThrowIfNull(_exits, nameof(_exits));
-                using var map = Memory.CreateScatterMap();
-                var round1 = map.AddRound();
-                for (int ix = 0; ix < _exits.Count; ix++)
+                using var scatter = Memory.CreateScatter();
+                foreach (var entry in _exits)
                 {
-                    int i = ix;
-                    var entry = _exits[i];
                     if (entry is Exfil exfil)
                     {
-                        round1[i].AddValueEntry<int>(0, exfil + Offsets.Exfil._status);
-                        round1[i].Completed += (sender, index) =>
+                        scatter.PrepareReadValue<int>(exfil + Offsets.Exfil._status);
+                        scatter.Completed += (sender, index) =>
                         {
-                            if (index.TryGetValue<int>(0, out var status))
+                            if (index.ReadValue<int>(exfil + Offsets.Exfil._status, out var status))
                             {
                                 exfil.Update((Enums.EExfiltrationStatus)status);
                             }
                         };
                     }
                 }
-                map.Execute();
+                scatter.Execute();
             }
             catch (Exception ex)
             {

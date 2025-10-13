@@ -39,6 +39,7 @@ using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Unity.Structures;
 using VmmSharpEx;
 using VmmSharpEx.Scatter;
+using VmmSharpEx.Scatter.V2;
 using static EftDmaRadarLite.Unity.Structures.UnityTransform;
 using static SDK.Offsets;
 
@@ -387,10 +388,10 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// <summary>
         /// Refreshes non-realtime player information. Call in the Registered Players Loop (T0).
         /// </summary>
-        /// <param name="index"></param>
+        /// <param name="scatter"></param>
         /// <param name="registered"></param>
         /// <param name="isActiveParam"></param>
-        public virtual void OnRegRefresh(ScatterReadIndex index, ISet<ulong> registered, bool? isActiveParam = null)
+        public virtual void OnRegRefresh(VmmScatter scatter, ISet<ulong> registered, bool? isActiveParam = null)
         {
             if (isActiveParam is not bool isActive)
                 isActive = registered.Contains(this);
@@ -400,10 +401,10 @@ namespace EftDmaRadarLite.Tarkov.Player
             }
             else if (IsAlive) // Not in list, but alive
             {
-                index.AddValueEntry<VmmPointer>(0, CorpseAddr);
-                index.Completed += (sender, x1) =>
+                scatter.PrepareReadPtr(CorpseAddr);
+                scatter.Completed += (sender, x1) =>
                 {
-                    if (x1.TryGetValue<VmmPointer>(0, out var corpsePtr))
+                    if (x1.ReadPtr(CorpseAddr, out var corpsePtr))
                         SetDead(corpsePtr);
                     else
                         SetExfild();
@@ -444,44 +445,47 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// Executed on each Realtime Loop.
         /// </summary>
         /// <param name="index">Scatter read index dedicated to this player.</param>
-        public virtual void OnRealtimeLoop(ScatterReadIndex index, bool espRunning)
+        public virtual void OnRealtimeLoop(VmmScatter scatter, bool espRunning)
         {
-            index.AddValueEntry<Vector2>(-1, RotationAddress); // Rotation
+            scatter.PrepareReadValue<Vector2>(RotationAddress); // Rotation
             foreach (var tr in Skeleton.Bones)
             {
                 if (!espRunning && tr.Key is not Bones.HumanBase)
                     continue;
-                index.AddArrayEntry<TrsX>((int)(uint)tr.Key, tr.Value.VerticesAddr,
+                scatter.PrepareReadArray<TrsX>(tr.Value.VerticesAddr,
                     tr.Value.Index + 1); // ESP Vertices
             }
 
-            index.Completed += (sender, x1) =>
+            scatter.Completed += (sender, s) =>
             {
                 bool p1 = false;
                 bool p2 = true;
-                if (x1.TryGetValue<Vector2>(-1, out var rotation))
+                if (s.ReadValue<Vector2>(RotationAddress, out var rotation))
                     p1 = SetRotation(ref rotation);
                 foreach (var tr in Skeleton.Bones)
                 {
                     if (!espRunning && tr.Key is not Bones.HumanBase)
                         continue;
-                    if (x1.TryGetArray<TrsX>((int)(uint)tr.Key, out var vertices))
+                    if (s.ReadArray<TrsX>(tr.Value.VerticesAddr, tr.Value.Index + 1) is PooledMemory<TrsX> vertices)
                     {
-                        try
+                        using (vertices)
                         {
                             try
                             {
-                                _ = tr.Value.UpdatePosition(vertices);
+                                try
+                                {
+                                    _ = tr.Value.UpdatePosition(vertices.Span);
+                                }
+                                catch (Exception ex) // Attempt to re-allocate Transform on error
+                                {
+                                    Debug.WriteLine($"ERROR getting Player '{Name}' {tr.Key} Position: {ex}");
+                                    Skeleton.ResetTransform(tr.Key);
+                                }
                             }
-                            catch (Exception ex) // Attempt to re-allocate Transform on error
+                            catch
                             {
-                                Debug.WriteLine($"ERROR getting Player '{Name}' {tr.Key} Position: {ex}");
-                                Skeleton.ResetTransform(tr.Key);
+                                p2 = false;
                             }
-                        }
-                        catch
-                        {
-                            p2 = false;
                         }
                     }
                     else
@@ -499,21 +503,19 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// </summary>
         /// <param name="round1">Index (round 1)</param>
         /// <param name="round2">Index (round 2)</param>
-        public void OnValidateTransforms(ScatterReadIndex round1, ScatterReadIndex round2)
+        public void OnValidateTransforms(VmmScatter round1, VmmScatter round2)
         {
             foreach (var tr in Skeleton.Bones)
             {
-                round1.AddValueEntry<VmmPointer>((int)(uint)tr.Key,
-                    tr.Value.TransformInternal +
-                    UnitySDK.TransformInternal.TransformAccess); // Bone Hierarchy
+                round1.PrepareReadPtr(tr.Value.TransformInternal + UnitySDK.TransformInternal.TransformAccess); // Bone Hierarchy
                 round1.Completed += (sender, x1) =>
                 {
-                    if (x1.TryGetValue<VmmPointer>((int)(uint)tr.Key, out var tra))
+                    if (x1.ReadPtr(tr.Value.TransformInternal + UnitySDK.TransformInternal.TransformAccess, out var tra))
                     {
-                        round2.AddValueEntry<VmmPointer>((int)(uint)tr.Key, tra + UnitySDK.TransformAccess.Vertices); // Vertices Ptr
+                        round2.PrepareReadPtr(tra + UnitySDK.TransformAccess.Vertices); // Vertices Ptr
                         round2.Completed += (sender, x2) =>
                         {
-                            if (x2.TryGetValue<VmmPointer>((int)(uint)tr.Key, out var verticesPtr))
+                            if (x2.ReadPtr(tra + UnitySDK.TransformAccess.Vertices, out var verticesPtr))
                             {
                                 if (tr.Value.VerticesAddr != verticesPtr) // check if any addr changed
                                 {

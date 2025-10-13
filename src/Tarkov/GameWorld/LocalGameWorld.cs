@@ -34,6 +34,8 @@ using EftDmaRadarLite.Tarkov.Quests;
 using EftDmaRadarLite.Misc.Workers;
 using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.Mono;
+using EftDmaRadarLite.DMA;
+using VmmSharpEx.Options;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld
 {
@@ -259,7 +261,6 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
 
         #region Realtime Thread T1
 
-
         /// <summary>
         /// Managed Worker Thread that does realtime (player position/info) updates.
         /// </summary>
@@ -274,18 +275,16 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
                 return;
             }
 
-            using var map = Memory.CreateScatterMap();
-            var round1 = map.AddRound(false);
+            using var scatter = Memory.CreateScatter(VmmFlags.NOCACHE);
             if (espRunning && CameraManager is CameraManager cm)
             {
-                cm.OnRealtimeLoop(round1[-1], localPlayer);
+                cm.OnRealtimeLoop(scatter, localPlayer);
             }
-            int i = 0;
             foreach (var player in players)
             {
-                player.OnRealtimeLoop(round1[i++], espRunning);
+                player.OnRealtimeLoop(scatter, espRunning);
             }
-            map.Execute(); // Execute scatter read
+            scatter.Execute();
         }
 
         #endregion
@@ -338,11 +337,9 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
                     using var map = Memory.CreateScatterMap();
                     var round1 = map.AddRound();
                     var round2 = map.AddRound();
-                    int i = 0;
                     foreach (var player in players)
                     {
-                        player.OnValidateTransforms(round1[i], round2[i]);
-                        i++;
+                        player.OnValidateTransforms(round1, round2);
                     }
                     map.Execute(); // execute scatter read
                 }

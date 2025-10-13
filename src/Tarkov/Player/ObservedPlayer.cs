@@ -32,6 +32,7 @@ using EftDmaRadarLite.Tarkov.Data.ProfileApi;
 using EftDmaRadarLite.UI.Radar.ViewModels;
 using EftDmaRadarLite.Unity.Structures;
 using VmmSharpEx.Scatter;
+using VmmSharpEx.Scatter.V2;
 
 namespace EftDmaRadarLite.Tarkov.Player
 {
@@ -299,7 +300,7 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// <summary>
         /// Refresh Player Information.
         /// </summary>
-        public override void OnRegRefresh(ScatterReadIndex index, ISet<ulong> registered, bool? isActiveParam = null)
+        public override void OnRegRefresh(VmmScatter scatter, ISet<ulong> registered, bool? isActiveParam = null)
         {
             if (isActiveParam is not bool isActive)
                 isActive = registered.Contains(this);
@@ -307,7 +308,7 @@ namespace EftDmaRadarLite.Tarkov.Player
             {
                 UpdateHealthStatus();
             }
-            base.OnRegRefresh(index, registered, isActive);
+            base.OnRegRefresh(scatter, registered, isActive);
         }
 
         /// <summary>

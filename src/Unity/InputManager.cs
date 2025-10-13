@@ -27,11 +27,12 @@ SOFTWARE.
 */
 
 using EftDmaRadarLite.UI.Hotkeys;
-using VmmSharpEx.Scatter;
+using VmmSharpEx.Scatter.V2;
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Misc.Workers;
 using EftDmaRadarLite.DMA;
 using EftDmaRadarLite.Unity.Structures;
+using VmmSharpEx.Scatter;
 
 namespace EftDmaRadarLite.Unity
 {
@@ -80,14 +81,12 @@ namespace EftDmaRadarLite.Unity
             if (hotkeys.Any())
             {
                 var currentKeyState = Memory.ReadPtr(_inputManager + UnitySDK.UnityInputManager.CurrentKeyState);
-                using var map = Memory.CreateScatterMap();
-                var round1 = map.AddRound(false);
-                int i = 0;
+                using var scatter = Memory.CreateScatter(VmmSharpEx.Options.VmmFlags.NOCACHE);
                 foreach (var kvp in hotkeys)
                 {
-                    ProcessHotkey(kvp.Key, kvp.Value, currentKeyState, round1[i++]);
+                    ProcessHotkey(kvp.Key, kvp.Value, currentKeyState, scatter);
                 }
-                map.Execute();
+                scatter.Execute();
             }
         }
 
@@ -97,18 +96,19 @@ namespace EftDmaRadarLite.Unity
         /// <param name="keycode">Hotkey key value</param>
         /// <param name="action">Hotkey action controller</param>
         /// <param name="currentKeyState">Current key state addr</param>
-        /// <param name="sr">SR (cached)</param>
-        private static void ProcessHotkey(UnityKeyCode keycode, HotkeyAction action, ulong currentKeyState, ScatterReadIndex sr)
+        /// <param name="scatter">SR (cached)</param>
+        private static void ProcessHotkey(UnityKeyCode keycode, HotkeyAction action, ulong currentKeyState, VmmScatter scatter)
         {
             uint v3 = (uint)keycode;
             uint v6 = v3 >> 5;
             ulong v10 = currentKeyState;
 
             uint v11 = v3 & 0x1F;
-            sr.AddValueEntry<uint>(0, v10 + v6 * 0x4); // v10[v6] = Result
-            sr.Completed += (sender, x1) =>
+            ulong readAddr = v10 + v6 * 0x4;
+            scatter.PrepareReadValue<uint>(readAddr); // v10[v6] = Result
+            scatter.Completed += (sender, s) =>
             {
-                if (x1.TryGetValue<uint>(0, out var v12))
+                if (s.ReadValue<uint>(readAddr, out var v12))
                 {
                     bool isKeyDown = (v12 & 1u << (int)v11) != 0;
                     action.Execute(isKeyDown);

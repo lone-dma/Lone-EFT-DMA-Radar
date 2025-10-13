@@ -29,6 +29,7 @@ SOFTWARE.
 using EftDmaRadarLite.UI.Radar.Maps;
 using EftDmaRadarLite.Unity;
 using VmmSharpEx.Scatter;
+using VmmSharpEx.Scatter.V2;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 {
@@ -41,6 +42,6 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
         /// <summary>
         /// Refresh the state of the explosive item.
         /// </summary>
-        void OnRefresh(ScatterReadIndex index);
+        void OnRefresh(VmmScatter scatter);
     }
 }

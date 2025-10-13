@@ -30,8 +30,9 @@ using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.UI.Skia;
 using EftDmaRadarLite.Misc;
-using VmmSharpEx.Scatter;
+using VmmSharpEx.Scatter.V2;
 using EftDmaRadarLite.UI.Radar.Maps;
+using VmmSharpEx.Scatter;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
 {
@@ -57,16 +58,16 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
             _position.ThrowIfAbnormal("Tripwire Position");
         }
 
-        public void OnRefresh(ScatterReadIndex index)
+        public void OnRefresh(VmmScatter scatter)
         {
             if (_destroyed)
             {
                 return;
             }
-            index.AddValueEntry<int>(0, this + Offsets.TripwireSynchronizableObject._tripwireState);
-            index.Completed += (sender, x1) =>
+            scatter.PrepareReadValue<int>(this + Offsets.TripwireSynchronizableObject._tripwireState);
+            scatter.Completed += (sender, s) =>
             {
-                if (x1.TryGetValue(0, out int nState))
+                if (s.ReadValue(this + Offsets.TripwireSynchronizableObject._tripwireState, out int nState))
                 {
                     var state = (Enums.ETripwireState)nState;
                     _destroyed = state is Enums.ETripwireState.Exploded or Enums.ETripwireState.Inert;

@@ -150,49 +150,46 @@ namespace EftDmaRadarLite.Tarkov.Loot
             var round2 = map.AddRound();
             var round3 = map.AddRound();
             var round4 = map.AddRound();
-            for (int ix = 0; ix < lootList.Count; ix++)
+            foreach (var lootBase in lootList)
             {
-                int i = ix;
                 ct.ThrowIfCancellationRequested();
-                var lootBase = lootList[i];
                 if (_loot.ContainsKey(lootBase))
                 {
                     continue; // Already processed this loot item once before
                 }
-                round1[i].AddValueEntry<VmmPointer>(0, lootBase + ObjectClass.MonoBehaviourOffset); // MonoBehaviour
-                round1[i].AddValueEntry<VmmPointer>(1, lootBase + ObjectClass.To_NamePtr[0]); // C1
-                round1[i].Completed += (sender, x1) =>
+                round1.PrepareReadPtr(lootBase + ObjectClass.MonoBehaviourOffset); // MonoBehaviour
+                round1.PrepareReadPtr(lootBase + ObjectClass.To_NamePtr[0]); // C1
+                round1.Completed += (sender, s1) =>
                 {
-                    if (x1.TryGetValue<VmmPointer>(0, out var monoBehaviour) && x1.TryGetValue<VmmPointer>(1, out var c1))
+                    if (s1.ReadPtr(lootBase + ObjectClass.MonoBehaviourOffset, out var monoBehaviour) && 
+                        s1.ReadPtr(lootBase + ObjectClass.To_NamePtr[0], out var c1))
                     {
-                        round2[i].AddValueEntry<VmmPointer>(2,
-                            monoBehaviour + MonoBehaviour.ObjectClassOffset); // InteractiveClass
-                        round2[i].AddValueEntry<VmmPointer>(3, monoBehaviour + MonoBehaviour.GameObjectOffset); // GameObject
-                        round2[i].AddValueEntry<VmmPointer>(4, c1 + ObjectClass.To_NamePtr[1]); // C2
-                        round2[i].Completed += (sender, x2) =>
+                        round2.PrepareReadPtr(monoBehaviour + MonoBehaviour.ObjectClassOffset); // InteractiveClass
+                        round2.PrepareReadPtr(monoBehaviour + MonoBehaviour.GameObjectOffset); // GameObject
+                        round2.PrepareReadPtr(c1 + ObjectClass.To_NamePtr[1]); // C2
+                        round2.Completed += (sender, s2) =>
                         {
-                            if (x2.TryGetValue<VmmPointer>(2, out var interactiveClass) &&
-                                x2.TryGetValue<VmmPointer>(3, out var gameObject) &&
-                                x2.TryGetValue<VmmPointer>(4, out var c2))
+                            if (s2.ReadPtr(monoBehaviour + MonoBehaviour.ObjectClassOffset, out var interactiveClass) &&
+                                s2.ReadPtr(monoBehaviour + MonoBehaviour.GameObjectOffset, out var gameObject) &&
+                                s2.ReadPtr(c1 + ObjectClass.To_NamePtr[1], out var c2))
                             {
-                                round3[i].AddValueEntry<VmmPointer>(5, c2 + ObjectClass.To_NamePtr[2]); // ClassNamePtr
-                                round3[i].AddValueEntry<VmmPointer>(6, gameObject + GameObject.ComponentsOffset); // Components
-                                round3[i].AddValueEntry<VmmPointer>(7, gameObject + GameObject.NameOffset); // PGameObjectName
-                                round3[i].Completed += (sender, x3) =>
+                                round3.PrepareReadPtr(c2 + ObjectClass.To_NamePtr[2]); // ClassNamePtr
+                                round3.PrepareReadPtr(gameObject + GameObject.ComponentsOffset); // Components
+                                round3.PrepareReadPtr(gameObject + GameObject.NameOffset); // PGameObjectName
+                                round3.Completed += (sender, s3) =>
                                 {
-                                    if (x3.TryGetValue<VmmPointer>(5, out var classNamePtr) &&
-                                        x3.TryGetValue<VmmPointer>(6, out var components)
-                                        && x3.TryGetValue<VmmPointer>(7, out var pGameObjectName))
+                                    if (s3.ReadPtr(c2 + ObjectClass.To_NamePtr[2], out var classNamePtr) &&
+                                        s3.ReadPtr(gameObject + GameObject.ComponentsOffset, out var components)
+                                        && s3.ReadPtr(gameObject + GameObject.NameOffset, out var pGameObjectName))
                                     {
-                                        round4[i].AddStringEntry(8, classNamePtr, 64, Encoding.UTF8); // ClassName
-                                        round4[i].AddStringEntry(9, pGameObjectName, 64, Encoding.UTF8); // ObjectName
-                                        round4[i].AddValueEntry<VmmPointer>(10,
-                                            components + 0x8); // T1
-                                        round4[i].Completed += (sender, x4) =>
+                                        round4.PrepareRead(classNamePtr, 64); // ClassName
+                                        round4.PrepareRead(pGameObjectName, 64); // ObjectName
+                                        round4.PrepareReadPtr(components + 0x8); // T1
+                                        round4.Completed += (sender, s4) =>
                                         {
-                                            if (x4.TryGetString(8, out var className) &&
-                                                x4.TryGetString(9, out var objectName) &&
-                                                x4.TryGetValue<VmmPointer>(10, out var transformInternal))
+                                            if (s4.ReadString(classNamePtr, 64, Encoding.UTF8) is string className &&
+                                                s4.ReadString(pGameObjectName, 64, Encoding.UTF8) is string objectName &&
+                                                s4.ReadPtr(components + 0x8, out var transformInternal))
                                             {
                                                 map.Completed += (sender, _) => // Store this as callback, let scatter reads all finish first (benchmarked faster)
                                                 {
