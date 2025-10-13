@@ -54,8 +54,11 @@ namespace EftDmaRadarLite.Unity.Structures
             var ta = Memory.ReadValue<TransformAccess>(transformInternal + UnitySDK.TransformInternal.TransformAccess, useCache);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(ta.Index, 128000, nameof(ta.Index)); // Sanity check since this is used to size vertices reads
             _index = ta.Index;
+            ta.Hierarchy.ThrowIfInvalidVirtualAddress(nameof(ta.Hierarchy));
             _hierarchyAddr = ta.Hierarchy;
             var transformHierarchy = Memory.ReadValue<TransformHierarchy>(_hierarchyAddr, useCache);
+            transformHierarchy.Vertices.ThrowIfInvalidVirtualAddress(nameof(transformHierarchy.Vertices));
+            transformHierarchy.Indices.ThrowIfInvalidVirtualAddress(nameof(transformHierarchy.Indices));
             IndicesAddr = transformHierarchy.Indices;
             VerticesAddr = transformHierarchy.Vertices;
             /// Populate Indices once for the Life of the Transform.
