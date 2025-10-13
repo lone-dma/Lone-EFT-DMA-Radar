@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Misc.Cache;
 using LiteDB;
 using System.Text.RegularExpressions;
 using TwitchLib.Api;

@@ -28,7 +28,6 @@ SOFTWARE.
 
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Mono.Collections;
-using VmmSharpEx.Scatter.V2;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
 {

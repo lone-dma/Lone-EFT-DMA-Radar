@@ -27,16 +27,12 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Mono.Collections;
 using EftDmaRadarLite.Tarkov.Data;
 using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.UI.Loot;
 using EftDmaRadarLite.UI.Radar.ViewModels;
-using EftDmaRadarLite.Unity;
 using EftDmaRadarLite.Unity.Structures;
-using System.Collections.Frozen;
-using VmmSharpEx;
 
 namespace EftDmaRadarLite.Tarkov.Loot
 {

@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
 using Microsoft.Extensions.DependencyInjection;
 using Polly.CircuitBreaker;

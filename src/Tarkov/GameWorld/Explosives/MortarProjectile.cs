@@ -26,11 +26,10 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Tarkov.Player;
-using EftDmaRadarLite.UI.Skia;
 using EftDmaRadarLite.Misc;
-using VmmSharpEx.Scatter.V2;
+using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.UI.Radar.Maps;
+using EftDmaRadarLite.UI.Skia;
 using VmmSharpEx.Scatter;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives

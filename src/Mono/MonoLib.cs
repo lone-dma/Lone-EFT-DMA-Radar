@@ -28,7 +28,6 @@ SOFTWARE.
 
 using EftDmaRadarLite.DMA;
 using EftDmaRadarLite.Misc;
-using VmmSharpEx;
 
 namespace EftDmaRadarLite.Mono
 {

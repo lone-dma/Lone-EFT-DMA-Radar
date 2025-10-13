@@ -26,9 +26,9 @@ SOFTWARE.
  *
 */
 
-using System.Collections.ObjectModel;
 using EftDmaRadarLite.UI.Data;
 using EftDmaRadarLite.UI.Radar.Views;
+using System.Collections.ObjectModel;
 
 namespace EftDmaRadarLite.UI.Radar.ViewModels
 {

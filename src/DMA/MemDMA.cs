@@ -26,21 +26,20 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Tarkov.Player;
+using Collections.Pooled;
+using EftDmaRadarLite.Misc;
+using EftDmaRadarLite.Mono;
 using EftDmaRadarLite.Tarkov.GameWorld;
 using EftDmaRadarLite.Tarkov.GameWorld.Exits;
 using EftDmaRadarLite.Tarkov.GameWorld.Explosives;
 using EftDmaRadarLite.Tarkov.Loot;
-using EftDmaRadarLite.Misc;
-using EftDmaRadarLite.Unity;
-using VmmSharpEx;
-using System.Drawing;
+using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.Tarkov.Quests;
-using VmmSharpEx.Refresh;
+using EftDmaRadarLite.Unity;
+using System.Drawing;
+using VmmSharpEx;
 using VmmSharpEx.Options;
-using VmmSharpEx.Scatter.V2;
-using Collections.Pooled;
-using EftDmaRadarLite.Mono;
+using VmmSharpEx.Refresh;
 using VmmSharpEx.Scatter;
 
 namespace EftDmaRadarLite.DMA

@@ -28,7 +28,6 @@ SOFTWARE.
 
 using EftDmaRadarLite.UI.Radar.ViewModels;
 using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace EftDmaRadarLite.UI.Radar.Views
 {

@@ -26,9 +26,9 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.Tarkov.GameWorld;
 using EftDmaRadarLite.Tarkov.Loot;
+using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.UI.Skia;
 using SkiaSharp.Views.WPF;
 
