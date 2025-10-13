@@ -34,7 +34,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
 {
     public sealed class MapSetupHelperViewModel : INotifyPropertyChanged
     {
-        private float _x, _y, _scale;
+        private string _x, _y, _scale;
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string name = null) =>
@@ -65,7 +65,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
             }
         }
 
-        public float X
+        public string X
         {
             get => _x;
             set
@@ -76,7 +76,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
             }
         }
 
-        public float Y
+        public string Y
         {
             get => _y;
             set
@@ -87,7 +87,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
             }
         }
 
-        public float Scale
+        public string Scale
         {
             get => _scale;
             set
@@ -110,19 +110,22 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
         {
             if (EftMapManager.Map?.Config is EftMapConfig currentMap)
             {
-                X = currentMap.X;
-                Y = currentMap.Y;
-                Scale = currentMap.Scale;
+                X = currentMap.X.ToString();
+                Y = currentMap.Y.ToString();
+                Scale = currentMap.Scale.ToString();
             }
         }
 
         private void OnApply()
         {
-            if (EftMapManager.Map?.Config is EftMapConfig currentMap)
+            if (EftMapManager.Map?.Config is EftMapConfig currentMap &&
+                float.TryParse(_x, out float x) &&
+                float.TryParse(_y, out float y) &&
+                float.TryParse(_scale, out float scale))
             {
-                currentMap.X = _x;
-                currentMap.Y = _y;
-                currentMap.Scale = _scale;
+                currentMap.X = x;
+                currentMap.Y = y;
+                currentMap.Scale = scale;
             }
             else
             {
