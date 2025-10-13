@@ -34,10 +34,10 @@
                     <TextBlock Text="X,Y"
                                Foreground="White"
                                VerticalAlignment="Center" />
-                    <TextBox Width="60"
+                    <TextBox Width="100"
                              Margin="8,0"
                              Text="{Binding X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBox Width="60"
+                    <TextBox Width="100"
                              Text="{Binding Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
 
@@ -47,7 +47,7 @@
                     <TextBlock Text="Scale"
                                Foreground="White"
                                VerticalAlignment="Center" />
-                    <TextBox Width="60"
+                    <TextBox Width="100"
                              Margin="8,0"
                              Text="{Binding Scale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
