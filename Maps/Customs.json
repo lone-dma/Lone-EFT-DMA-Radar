@@ -1,7 +1,7 @@
 {
 	"mapID": ["bigmap"],
-	"x": 369,
-	"y": 265.6,
+	"x": 369.40,
+	"y": 232.91,
 	"scale": 0.992,
 	"svgScale" : 5.00,
 	"disableDimming" : true,
@@ -18,12 +18,12 @@
 		},
 				{
 			"minHeight": -1.8,
-			"maxHeight": 1.82,
+			"maxHeight": null,
 			"filename": "Customs_1f.svg"
 		},
 				{
 			"minHeight": 1.82,
-			"maxHeight": 4.7,
+			"maxHeight": null,
 			"filename": "Customs_2f.svg"
 		},
 				{
