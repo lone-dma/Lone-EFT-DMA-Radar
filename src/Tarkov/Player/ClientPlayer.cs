@@ -32,7 +32,7 @@ using static SDK.Offsets;
 
 namespace EftDmaRadarLite.Tarkov.Player
 {
-    public class ClientPlayer : PlayerBase
+    public class ClientPlayer : AbstractPlayer
     {
         /// <summary>
         /// EFT.Profile Address
@@ -195,7 +195,7 @@ namespace EftDmaRadarLite.Tarkov.Player
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected override void GetTransformInternalChain(Bones bone, Span<uint> offsets)
         {
-            ArgumentOutOfRangeException.ThrowIfNotEqual(offsets.Length, PlayerBase.TransformInternalChainCount, nameof(offsets));
+            ArgumentOutOfRangeException.ThrowIfNotEqual(offsets.Length, AbstractPlayer.TransformInternalChainCount, nameof(offsets));
             offsets[0] = Offsets.Player._playerBody;
             offsets[1] = PlayerBody.SkeletonRootJoint;
             offsets[2] = DizSkinningSkeleton._values;

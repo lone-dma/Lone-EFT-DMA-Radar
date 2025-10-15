@@ -44,7 +44,7 @@ namespace EftDmaRadarLite.Tarkov.Player
         public static ReadOnlyMemory<Bones> AllSkeletonBones { get; } = Enum.GetValues<SkeletonBones>().Cast<Bones>().ToArray();
 
         private readonly Dictionary<Bones, UnityTransform> _bones;
-        private readonly PlayerBase _player;
+        private readonly AbstractPlayer _player;
 
         /// <summary>
         /// Skeleton Root Transform.
@@ -56,10 +56,10 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// </summary>
         public IReadOnlyDictionary<Bones, UnityTransform> Bones => _bones;
 
-        public Skeleton(PlayerBase player, Action<Bones, Span<uint>> getTransformChainFunc)
+        public Skeleton(AbstractPlayer player, Action<Bones, Span<uint>> getTransformChainFunc)
         {
             _player = player;
-            Span<uint> tiOffsets = stackalloc uint[PlayerBase.TransformInternalChainCount];
+            Span<uint> tiOffsets = stackalloc uint[AbstractPlayer.TransformInternalChainCount];
             getTransformChainFunc(Unity.Structures.Bones.HumanBase, tiOffsets);
             var tiRoot = Memory.ReadPtrChain(player.Base, true, tiOffsets);
             Root = new UnityTransform(tiRoot);

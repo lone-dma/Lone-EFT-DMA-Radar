@@ -34,7 +34,7 @@ using SkiaSharp.Views.WPF;
 
 namespace EftDmaRadarLite.UI.Radar
 {
-    public sealed class EspWidget : SKWidgetControl
+    public sealed class EspWidget : AbstractSKWidget
     {
         private SKBitmap _espBitmap;
         private SKCanvas _espCanvas;
@@ -54,7 +54,7 @@ namespace EftDmaRadarLite.UI.Radar
         }
 
         private static LocalPlayer LocalPlayer => Memory.LocalPlayer;
-        private static IReadOnlyCollection<PlayerBase> AllPlayers => Memory.Players;
+        private static IReadOnlyCollection<AbstractPlayer> AllPlayers => Memory.Players;
         private static bool InRaid => Memory.InRaid;
         private static IEnumerable<LootItem> Loot => Memory.Loot?.FilteredLoot;
         private static IEnumerable<StaticLootContainer> Containers => Memory.Loot?.StaticContainers;
@@ -256,7 +256,7 @@ namespace EftDmaRadarLite.UI.Radar
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static SKPaint GetPaint(PlayerBase player)
+        private static SKPaint GetPaint(AbstractPlayer player)
         {
             if (player.IsFocused)
                 return SKPaints.PaintESPWidgetFocused;

@@ -35,7 +35,7 @@ using VmmSharpEx.Scatter;
 
 namespace EftDmaRadarLite.Tarkov.Player
 {
-    public class ObservedPlayer : PlayerBase
+    public class ObservedPlayer : AbstractPlayer
     {
         /// <summary>
         /// Player's Profile & Stats.
@@ -342,7 +342,7 @@ namespace EftDmaRadarLite.Tarkov.Player
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected override void GetTransformInternalChain(Bones bone, Span<uint> offsets)
         {
-            ArgumentOutOfRangeException.ThrowIfNotEqual(offsets.Length, PlayerBase.TransformInternalChainCount, nameof(offsets));
+            ArgumentOutOfRangeException.ThrowIfNotEqual(offsets.Length, AbstractPlayer.TransformInternalChainCount, nameof(offsets));
             offsets[0] = Offsets.ObservedPlayerView.PlayerBody;
             offsets[1] = Offsets.PlayerBody.SkeletonRootJoint;
             offsets[2] = Offsets.DizSkinningSkeleton._values;

@@ -35,7 +35,7 @@ namespace EftDmaRadarLite.UI.Skia
     /// Base class for interactive Skia widgets hosted in an <see cref="SKGLElement"/>.
     /// Provides dragging, optional resizing, minimizing and basic chrome rendering.
     /// </summary>
-    public abstract class SKWidgetControl : IDisposable
+    public abstract class AbstractSKWidget : IDisposable
     {
         private readonly Lock _sync = new();
         private readonly SKGLElement _parent;
@@ -148,7 +148,7 @@ namespace EftDmaRadarLite.UI.Skia
             Location.X + Size.Width,
             Location.Y + Size.Height + TitleBarHeight);
 
-        protected SKWidgetControl(
+        protected AbstractSKWidget(
             SKGLElement parent,
             string title,
             SKPoint location,

@@ -77,7 +77,7 @@ namespace EftDmaRadarLite.DMA
             }
         }
 
-        public IReadOnlyCollection<PlayerBase> Players => Game?.Players;
+        public IReadOnlyCollection<AbstractPlayer> Players => Game?.Players;
         public IReadOnlyCollection<IExplosiveItem> Explosives => Game?.Explosives;
         public IReadOnlyCollection<IExitPoint> Exits => Game?.Exits;
         public LocalPlayer LocalPlayer => Game?.LocalPlayer;

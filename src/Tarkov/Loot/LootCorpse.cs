@@ -45,7 +45,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
         /// <summary>
         /// Corpse container's associated player object (if any).
         /// </summary>
-        public PlayerBase Player { get; private set; }
+        public AbstractPlayer Player { get; private set; }
         /// <summary>
         /// Name of the corpse.
         /// </summary>
@@ -63,7 +63,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
         /// Refresh the loot on this corpse. Only slots are shown not bag contents.
         /// </summary>
         /// <param name="deadPlayers"></param>
-        public void Refresh(IReadOnlyList<PlayerBase> deadPlayers)
+        public void Refresh(IReadOnlyList<AbstractPlayer> deadPlayers)
         {
             var now = DateTimeOffset.UtcNow;
             if (now - _last < TimeSpan.FromSeconds(5))

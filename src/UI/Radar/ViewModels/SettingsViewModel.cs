@@ -275,7 +275,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
             SKFonts.EspWidgetFont.Size = 9f * newScale;
             SKFonts.InfoWidgetFont.Size = 12f * newScale;
             // SKWidgetControl
-            SKWidgetControl.SetScaleFactorInternal(newScale);
+            AbstractSKWidget.SetScaleFactorInternal(newScale);
             // Loot Paints
             Tarkov.Loot.LootItem.ScaleLootPaints(newScale);
 
