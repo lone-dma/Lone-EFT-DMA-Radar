@@ -32,14 +32,14 @@ using EftDmaRadarLite.Tarkov.Player;
 
 namespace EftDmaRadarLite.Tarkov.GameWorld
 {
-    public sealed class RegisteredPlayers : IReadOnlyCollection<PlayerBase>
+    public sealed class RegisteredPlayers : IReadOnlyCollection<AbstractPlayer>
     {
         #region Fields/Properties/Constructor
 
         public static implicit operator ulong(RegisteredPlayers x) => x.Base;
         private ulong Base { get; }
         private readonly LocalGameWorld _game;
-        private readonly ConcurrentDictionary<ulong, PlayerBase> _players = new();
+        private readonly ConcurrentDictionary<ulong, AbstractPlayer> _players = new();
 
         /// <summary>
         /// LocalPlayer Instance.
@@ -75,7 +75,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
                     if (playerBase == LocalPlayer) // Skip LocalPlayer, already allocated
                         continue;
                     // Add new player
-                    PlayerBase.Allocate(_players, playerBase);
+                    AbstractPlayer.Allocate(_players, playerBase);
                 }
                 /// Update Existing Players incl LocalPlayer
                 UpdateExistingPlayers(registered);
@@ -131,7 +131,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
 
         #region IReadOnlyCollection
         public int Count => _players.Values.Count;
-        public IEnumerator<PlayerBase> GetEnumerator() =>
+        public IEnumerator<AbstractPlayer> GetEnumerator() =>
             _players.Values.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         #endregion

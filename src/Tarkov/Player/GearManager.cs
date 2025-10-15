@@ -44,7 +44,7 @@ namespace EftDmaRadarLite.Tarkov.Player
 
         private readonly bool _isPMC;
 
-        public GearManager(PlayerBase player, bool isPMC = false)
+        public GearManager(AbstractPlayer player, bool isPMC = false)
         {
             _isPMC = isPMC;
             var slotDict = new Dictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);

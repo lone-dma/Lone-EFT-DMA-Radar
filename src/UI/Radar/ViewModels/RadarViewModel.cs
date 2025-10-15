@@ -93,7 +93,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
         /// <summary>
         /// All Players in Local Game World (including dead/exfil'd) 'Player' collection.
         /// </summary>
-        private static IReadOnlyCollection<PlayerBase> AllPlayers => Memory?.Players;
+        private static IReadOnlyCollection<AbstractPlayer> AllPlayers => Memory?.Players;
 
         /// <summary>
         /// Contains all 'Hot' explosives in Local Game World, and their position(s).
@@ -126,7 +126,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
                 var players = AllPlayers
                     .Where(x => x is not Tarkov.Player.LocalPlayer
                         && !x.HasExfild && (LootCorpsesVisible ? x.IsAlive : true)) ?? 
-                        Enumerable.Empty<PlayerBase>();
+                        Enumerable.Empty<AbstractPlayer>();
 
                 var loot = Loot ?? Enumerable.Empty<IMouseoverEntity>();
                 var containers = Containers ?? Enumerable.Empty<IMouseoverEntity>();
@@ -623,7 +623,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
             }
             if (e.RightButton is System.Windows.Input.MouseButtonState.Pressed)
             {
-                if (_mouseOverItem is PlayerBase player)
+                if (_mouseOverItem is AbstractPlayer player)
                 {
                     player.IsFocused = !player.IsFocused;
                 }
@@ -681,7 +681,7 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
 
                 switch (closest)
                 {
-                    case PlayerBase player:
+                    case AbstractPlayer player:
                         _mouseOverItem = player;
                         MouseoverGroup = (player.IsHumanHostile && player.GroupID != -1)
                             ? player.GroupID

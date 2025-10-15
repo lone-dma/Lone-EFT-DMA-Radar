@@ -135,7 +135,7 @@ namespace EftDmaRadarLite.WebRadar
                     try
 
                     {
-                        if (Memory.InRaid && Memory.Players is IReadOnlyCollection<PlayerBase> players && players.Count > 0)
+                        if (Memory.InRaid && Memory.Players is IReadOnlyCollection<AbstractPlayer> players && players.Count > 0)
                         {
                             update.InGame = true;
                             update.MapID = Memory.MapID;

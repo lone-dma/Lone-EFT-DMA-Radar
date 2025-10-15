@@ -45,16 +45,16 @@ namespace EftDmaRadarLite.Tarkov.Player
     /// Base class for Tarkov Players.
     /// Tarkov implements several distinct classes that implement a similar player interface.
     /// </summary>
-    public abstract class PlayerBase : IWorldEntity, IMapEntity, IMouseoverEntity
+    public abstract class AbstractPlayer : IWorldEntity, IMapEntity, IMouseoverEntity
     {
         #region Static Interfaces
 
-        public static implicit operator ulong(PlayerBase x) => x.Base;
+        public static implicit operator ulong(AbstractPlayer x) => x.Base;
         protected static readonly ConcurrentDictionary<string, int> _groups = new(StringComparer.OrdinalIgnoreCase);
         protected static int _lastGroupNumber;
         protected static int _lastPscavNumber;
 
-        static PlayerBase()
+        static AbstractPlayer()
         {
             MemDMA.RaidStopped += MemDMA_RaidStopped;
         }
@@ -75,7 +75,7 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// </summary>
         /// <param name="regPlayers">Player Dictionary collection to add the newly allocated player to.</param>
         /// <param name="playerBase">Player base memory address.</param>
-        public static void Allocate(ConcurrentDictionary<ulong, PlayerBase> regPlayers, ulong playerBase)
+        public static void Allocate(ConcurrentDictionary<ulong, AbstractPlayer> regPlayers, ulong playerBase)
         {
             try
             {
@@ -89,9 +89,9 @@ namespace EftDmaRadarLite.Tarkov.Player
             }
         }
 
-        private static PlayerBase AllocateInternal(ulong playerBase)
+        private static AbstractPlayer AllocateInternal(ulong playerBase)
         {
-            PlayerBase player;
+            AbstractPlayer player;
             var className = ObjectClass.ReadName(playerBase, 64);
             var isClientPlayer = className == "ClientPlayer" || className == "LocalPlayer";
 
@@ -106,7 +106,7 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// <summary>
         /// Player Constructor.
         /// </summary>
-        protected PlayerBase(ulong playerBase)
+        protected AbstractPlayer(ulong playerBase)
         {
             ArgumentOutOfRangeException.ThrowIfZero(playerBase, nameof(playerBase));
             Base = playerBase;
@@ -1010,7 +1010,7 @@ namespace EftDmaRadarLite.Tarkov.Player
         /// <summary>
         /// True if Current Player is facing <paramref name="target"/>.
         /// </summary>
-        public bool IsFacingTarget(PlayerBase target, float? maxDist = null)
+        public bool IsFacingTarget(AbstractPlayer target, float? maxDist = null)
         {
             Vector3 delta = target.Position - this.Position;
 

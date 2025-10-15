@@ -326,7 +326,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
 
         private readonly struct LootIndexParams
         {
-            public IReadOnlyList<PlayerBase> DeadPlayers { get; init; }
+            public IReadOnlyList<AbstractPlayer> DeadPlayers { get; init; }
 
             public ulong ItemBase { get; init; }
             public ulong InteractiveClass { get; init; }

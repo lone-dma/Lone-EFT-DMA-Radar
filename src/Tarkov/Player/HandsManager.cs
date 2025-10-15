@@ -34,7 +34,7 @@ namespace EftDmaRadarLite.Tarkov.Player
 {
     public sealed class HandsManager
     {
-        private readonly PlayerBase _parent;
+        private readonly AbstractPlayer _parent;
         private LootItem _cachedItem;
         private ulong _cached;
         private string CurrentItem => _cachedItem?.ShortName ?? "--";
@@ -55,7 +55,7 @@ namespace EftDmaRadarLite.Tarkov.Player
             }
         }
 
-        public HandsManager(PlayerBase player)
+        public HandsManager(AbstractPlayer player)
         {
             _parent = player;
         }

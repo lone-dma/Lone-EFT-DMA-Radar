@@ -70,7 +70,7 @@ namespace EftDmaRadarLite.WebRadar.Data
         /// </summary>
         /// <param name="player">Full EFT Player Object.</param>
         /// <returns>Compact WebRadarPlayer object.</returns>
-        public static WebRadarPlayer Create(PlayerBase player)
+        public static WebRadarPlayer Create(AbstractPlayer player)
         {
             WebPlayerType type = player is LocalPlayer ?
                 WebPlayerType.LocalPlayer : player.IsFriendly ?

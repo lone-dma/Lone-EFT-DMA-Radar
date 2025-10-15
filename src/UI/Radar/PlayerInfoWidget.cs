@@ -34,7 +34,7 @@ using SkiaSharp.Views.WPF;
 
 namespace EftDmaRadarLite.UI.Radar
 {
-    public sealed class PlayerInfoWidget : SKWidgetControl
+    public sealed class PlayerInfoWidget : AbstractSKWidget
     {
         /// <summary>
         /// Constructs a Player Info Overlay.
@@ -48,7 +48,7 @@ namespace EftDmaRadarLite.UI.Radar
         }
 
 
-        public void Draw(SKCanvas canvas, PlayerBase localPlayer, IEnumerable<PlayerBase> players)
+        public void Draw(SKCanvas canvas, AbstractPlayer localPlayer, IEnumerable<AbstractPlayer> players)
         {
             if (Minimized)
             {

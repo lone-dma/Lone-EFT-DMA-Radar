@@ -67,7 +67,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
         public string MapID { get; }
 
         public bool InRaid => !_disposed;
-        public IReadOnlyCollection<PlayerBase> Players => _rgtPlayers;
+        public IReadOnlyCollection<AbstractPlayer> Players => _rgtPlayers;
         public IReadOnlyCollection<IExplosiveItem> Explosives => _explosivesManager;
         public IReadOnlyCollection<IExitPoint> Exits => _exfilManager;
         public LocalPlayer LocalPlayer => _rgtPlayers?.LocalPlayer;
@@ -325,7 +325,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
         private void RefreshGear(CancellationToken ct)
         {
             if (_rgtPlayers?
-                .Where(x => x.IsHostileActive) is IEnumerable<PlayerBase> players && players.Any())
+                .Where(x => x.IsHostileActive) is IEnumerable<AbstractPlayer> players && players.Any())
             {
                 foreach (var player in players)
                 {
@@ -384,7 +384,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
             var ct = e.CancellationToken;
             try { CameraManager ??= new(); } catch { }
             if (_rgtPlayers?
-                .Where(x => x.IsActive && x.IsAlive) is IEnumerable<PlayerBase> players && 
+                .Where(x => x.IsActive && x.IsAlive) is IEnumerable<AbstractPlayer> players && 
                 players.Any())
             {
                 foreach (var player in players)
