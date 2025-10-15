@@ -771,7 +771,7 @@ namespace EftDmaRadarLite.Tarkov.Player
 
         #region Interfaces
 
-        public virtual ref Vector3 Position => ref Skeleton.Root.Position;
+        public virtual ref readonly Vector3 Position => ref Skeleton.Root.Position;
         public Vector2 MouseoverPosition { get; set; }
 
         public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)

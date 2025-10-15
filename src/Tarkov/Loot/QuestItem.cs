@@ -35,11 +35,11 @@ namespace EftDmaRadarLite.Tarkov.Loot
     /// </summary>
     public sealed class QuestItem : LootItem
     {
-        public QuestItem(TarkovMarketItem entry) : base(entry)
+        public QuestItem(TarkovMarketItem entry, Vector3 position) : base(entry, position)
         {
         }
 
-        public QuestItem(string id, string name) : base(id, name)
+        public QuestItem(string id, string name, Vector3 position) : base(id, name, position)
         {
         }
     }

@@ -53,7 +53,7 @@ namespace EftDmaRadarLite.Tarkov.Quests
                 Name = q.Name;
             else
                 Name = target;
-            Position = position;
+            _position = position;
         }
 
         public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
@@ -92,7 +92,7 @@ namespace EftDmaRadarLite.Tarkov.Quests
             Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams).DrawMouseoverText(canvas, lines);
         }
 
-        private Vector3 _position;
-        public ref Vector3 Position => ref _position;
+        private readonly Vector3 _position;
+        public ref readonly Vector3 Position => ref _position;
     }
 }

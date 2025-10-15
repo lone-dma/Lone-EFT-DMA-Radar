@@ -38,7 +38,7 @@ namespace EftDmaRadarLite.Tarkov.Player
         private readonly ulong _btrView;
         private Vector3 _position;
 
-        public override ref Vector3 Position
+        public override ref readonly Vector3 Position
         {
             get => ref _position;
         }

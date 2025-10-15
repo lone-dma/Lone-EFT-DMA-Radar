@@ -34,7 +34,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
         /// <summary>
         /// Constructor.
         /// </summary>
-        public LootAirdrop() : base()
+        public LootAirdrop(Vector3 position) : base(position)
         {
         }
     }

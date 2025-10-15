@@ -252,7 +252,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld
         /// <param name="scrPos">Entity's screen position.</param>
         /// <param name="onScreenCheck">Check if the screen positions are 'on screen'. Returns false if off screen.</param>
         /// <returns>True if successful, otherwise False.</returns>
-        public static bool WorldToScreen(ref Vector3 worldPos, out SKPoint scrPos, bool onScreenCheck = false, bool useTolerance = false)
+        public static bool WorldToScreen(ref readonly Vector3 worldPos, out SKPoint scrPos, bool onScreenCheck = false, bool useTolerance = false)
         {
             float w = Vector3.Dot(_viewMatrix.Translation, worldPos) + _viewMatrix.M44; // Transposed
 
