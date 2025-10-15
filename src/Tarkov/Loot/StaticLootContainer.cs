@@ -46,7 +46,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
         /// </summary>
         public bool Searched { get; private set; }
 
-        public StaticLootContainer(string containerId, ulong interactiveClass) : base()
+        public StaticLootContainer(string containerId, ulong interactiveClass, Vector3 position) : base(position)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(containerId, nameof(containerId));
             ID = containerId;

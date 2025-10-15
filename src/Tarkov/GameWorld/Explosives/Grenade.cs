@@ -95,7 +95,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
         #region Interfaces
 
         private Vector3 _position;
-        public ref Vector3 Position => ref _position;
+        public ref readonly Vector3 Position => ref _position;
 
         public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {

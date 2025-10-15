@@ -49,7 +49,7 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
         public ulong Addr { get; }
 
         private Vector3 _position;
-        public ref Vector3 Position => ref _position;
+        public ref readonly Vector3 Position => ref _position;
 
         public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {

@@ -76,8 +76,8 @@ namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
 
         #region Interfaces
 
-        private Vector3 _position;
-        public ref Vector3 Position => ref _position;
+        private readonly Vector3 _position;
+        public ref readonly Vector3 Position => ref _position;
         public Vector2 MouseoverPosition { get; set; }
 
         public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)

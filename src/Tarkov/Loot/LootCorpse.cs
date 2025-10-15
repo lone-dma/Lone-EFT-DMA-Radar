@@ -54,7 +54,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
         /// <summary>
         /// Constructor.
         /// </summary>
-        public LootCorpse(ulong corpseAddr) : base()
+        public LootCorpse(ulong corpseAddr, Vector3 position) : base(position)
         {
             _corpse = corpseAddr;
         }
@@ -125,7 +125,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                     {
                         _ = containerLoot.GetOrAdd(
                             containedItem, 
-                            _ => new LootItem(entry));
+                            _ => new LootItem(entry, default));
                     }
                 }
                 catch

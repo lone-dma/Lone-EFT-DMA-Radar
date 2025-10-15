@@ -43,7 +43,7 @@ namespace EftDmaRadarLite.Unity.Structures
         /// <summary>
         /// Unity World Position for this Transform.
         /// </summary>
-        public ref Vector3 Position => ref _position;
+        public ref readonly Vector3 Position => ref _position;
 
         public UnityTransform(ulong transformInternal, bool useCache = false)
         {

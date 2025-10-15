@@ -243,10 +243,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                 var pos = new UnityTransform(p.TransformInternal, true).UpdatePosition();
                 if (isCorpse)
                 {
-                    var corpse = new LootCorpse(interactiveClass)
-                    {
-                        Position = pos
-                    };
+                    var corpse = new LootCorpse(interactiveClass, pos);
                     _ = _loot.TryAdd(p.ItemBase, corpse);
                 }
                 else if (isContainer)
@@ -255,10 +252,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                     {
                         if (p.ObjectName.Equals("loot_collider", StringComparison.OrdinalIgnoreCase))
                         {
-                            _ = _loot.TryAdd(p.ItemBase, new LootAirdrop
-                            {
-                                Position = pos
-                            });
+                            _ = _loot.TryAdd(p.ItemBase, new LootAirdrop(pos));
                         }
                         else
                         {
@@ -267,10 +261,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                             var ownerItemTemplate = Memory.ReadPtr(ownerItemBase + Offsets.LootItem.Template);
                             var ownerItemMongoId = Memory.ReadValue<MongoID>(ownerItemTemplate + Offsets.ItemTemplate._id);
                             var ownerItemId = ownerItemMongoId.ReadString();
-                            _ = _loot.TryAdd(p.ItemBase, new StaticLootContainer(ownerItemId, interactiveClass)
-                            {
-                                Position = pos
-                            });
+                            _ = _loot.TryAdd(p.ItemBase, new StaticLootContainer(ownerItemId, interactiveClass, pos));
                         }
                     }
                     catch
@@ -292,10 +283,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                         QuestItem questItem;
                         if (EftDataManager.AllItems.TryGetValue(id, out var entry))
                         {
-                            questItem = new QuestItem(entry)
-                            {
-                                Position = pos
-                            };
+                            questItem = new QuestItem(entry, pos);
                         }
                         else
                         {
@@ -303,10 +291,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                             var shortName = Memory.ReadUnicodeString(shortNamePtr)?.Trim();
                             if (string.IsNullOrEmpty(shortName))
                                 shortName = "Item";
-                            questItem = new QuestItem(id, $"Q_{shortName}")
-                            {
-                                Position = pos
-                            };
+                            questItem = new QuestItem(id, $"Q_{shortName}", pos);
                         }
                         _ = _loot.TryAdd(p.ItemBase, questItem);
                     }
@@ -314,10 +299,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                     {
                         if (EftDataManager.AllItems.TryGetValue(id, out var entry))
                         {
-                            _ = _loot.TryAdd(p.ItemBase, new LootItem(entry)
-                            {
-                                Position = pos
-                            });
+                            _ = _loot.TryAdd(p.ItemBase, new LootItem(entry, pos));
                         }
                     }
                 }

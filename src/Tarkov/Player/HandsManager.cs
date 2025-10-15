@@ -82,7 +82,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                     var itemID = itemMongoId.ReadString();
                     if (EftDataManager.AllItems.TryGetValue(itemID, out var heldItem)) // Item exists in DB
                     {
-                        _cachedItem = new LootItem(heldItem);
+                        _cachedItem = new LootItem(heldItem, default);
                         if (heldItem?.IsWeapon ?? false)
                         {
                             bool hasThermal = _parent.Gear?.Loot?.Any(x =>
@@ -101,7 +101,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                         var itemName = Memory.ReadUnicodeString(itemNamePtr)?.Trim();
                         if (string.IsNullOrEmpty(itemName))
                             itemName = "Item";
-                        _cachedItem = new("NULL", itemName);
+                        _cachedItem = new("NULL", itemName, default);
                     }
                     _cached = itemBase;
                     _thermal = thermal;

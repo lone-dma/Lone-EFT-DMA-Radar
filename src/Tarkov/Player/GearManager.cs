@@ -100,7 +100,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                     var mongoId = Memory.ReadValue<MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
                     var id = mongoId.ReadString();
                     if (EftDataManager.AllItems.TryGetValue(id, out var entry1))
-                        loot.Add(new LootItem(entry1));
+                        loot.Add(new LootItem(entry1, default));
 
                     if (EftDataManager.AllItems.TryGetValue(id, out var entry2))
                     {
@@ -145,7 +145,7 @@ namespace EftDmaRadarLite.Tarkov.Player
                             var mongoId = Memory.ReadValue<MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
                             var id = mongoId.ReadString();
                             if (EftDataManager.AllItems.TryGetValue(id, out var entry))
-                                loot.Add(new LootItem(entry)); // Add to loot, get weapon attachment values
+                                loot.Add(new LootItem(entry, default)); // Add to loot, get weapon attachment values
                             RecursePlayerGearSlots(containedItem, loot);
                         }
                     }

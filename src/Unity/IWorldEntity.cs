@@ -36,6 +36,6 @@ namespace EftDmaRadarLite.Unity
         /// <summary>
         /// Entity's Unity Position in Local Game World.
         /// </summary>
-        ref Vector3 Position { get; }
+        ref readonly Vector3 Position { get; }
     }
 }

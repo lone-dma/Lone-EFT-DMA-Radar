@@ -102,37 +102,37 @@ namespace EftDmaRadarLite.Tarkov.Player
         public bool UpdateESPWidgetBuffer(float scaleX, float scaleY, out SKPoint[] buffer)
         {
             buffer = default;
-            if (!CameraManager.WorldToScreen(ref _bones[Unity.Structures.Bones.HumanSpine2].Position, out var midTorsoScreen, true, true))
+            if (!CameraManager.WorldToScreen(in _bones[Unity.Structures.Bones.HumanSpine2].Position, out var midTorsoScreen, true, true))
                 return false;
-            if (!CameraManager.WorldToScreen(ref _bones[Unity.Structures.Bones.HumanHead].Position, out var headScreen))
+            if (!CameraManager.WorldToScreen(in _bones[Unity.Structures.Bones.HumanHead].Position, out var headScreen))
                 return false;
-            if (!CameraManager.WorldToScreen(ref _bones[Unity.Structures.Bones.HumanNeck].Position, out var neckScreen))
+            if (!CameraManager.WorldToScreen(in _bones[Unity.Structures.Bones.HumanNeck].Position, out var neckScreen))
                 return false;
-            if (!CameraManager.WorldToScreen(ref _bones[Unity.Structures.Bones.HumanLCollarbone].Position, out var leftCollarScreen))
+            if (!CameraManager.WorldToScreen(in _bones[Unity.Structures.Bones.HumanLCollarbone].Position, out var leftCollarScreen))
                 return false;
-            if (!CameraManager.WorldToScreen(ref _bones[Unity.Structures.Bones.HumanRCollarbone].Position, out var rightCollarScreen))
+            if (!CameraManager.WorldToScreen(in _bones[Unity.Structures.Bones.HumanRCollarbone].Position, out var rightCollarScreen))
                 return false;
-            if (!CameraManager.WorldToScreen(ref _bones[Unity.Structures.Bones.HumanLPalm].Position, out var leftHandScreen))
+            if (!CameraManager.WorldToScreen(in _bones[Unity.Structures.Bones.HumanLPalm].Position, out var leftHandScreen))
                 return false;
-            if (!CameraManager.WorldToScreen(ref _bones[Unity.Structures.Bones.HumanRPalm].Position, out var rightHandScreen))
+            if (!CameraManager.WorldToScreen(in _bones[Unity.Structures.Bones.HumanRPalm].Position, out var rightHandScreen))
                 return false;
-            if (!CameraManager.WorldToScreen(ref _bones[Unity.Structures.Bones.HumanSpine3].Position, out var upperTorsoScreen))
+            if (!CameraManager.WorldToScreen(in _bones[Unity.Structures.Bones.HumanSpine3].Position, out var upperTorsoScreen))
                 return false;
-            if (!CameraManager.WorldToScreen(ref _bones[Unity.Structures.Bones.HumanSpine1].Position, out var lowerTorsoScreen))
+            if (!CameraManager.WorldToScreen(in _bones[Unity.Structures.Bones.HumanSpine1].Position, out var lowerTorsoScreen))
                 return false;
-            if (!CameraManager.WorldToScreen(ref _bones[Unity.Structures.Bones.HumanPelvis].Position, out var pelvisScreen))
+            if (!CameraManager.WorldToScreen(in _bones[Unity.Structures.Bones.HumanPelvis].Position, out var pelvisScreen))
                 return false;
-            if (!CameraManager.WorldToScreen(ref _bones[Unity.Structures.Bones.HumanLFoot].Position, out var leftFootScreen))
+            if (!CameraManager.WorldToScreen(in _bones[Unity.Structures.Bones.HumanLFoot].Position, out var leftFootScreen))
                 return false;
-            if (!CameraManager.WorldToScreen(ref _bones[Unity.Structures.Bones.HumanRFoot].Position, out var rightFootScreen))
+            if (!CameraManager.WorldToScreen(in _bones[Unity.Structures.Bones.HumanRFoot].Position, out var rightFootScreen))
                 return false;
-            if (!CameraManager.WorldToScreen(ref _bones[Unity.Structures.Bones.HumanLThigh2].Position, out var leftKneeScreen))
+            if (!CameraManager.WorldToScreen(in _bones[Unity.Structures.Bones.HumanLThigh2].Position, out var leftKneeScreen))
                 return false;
-            if (!CameraManager.WorldToScreen(ref _bones[Unity.Structures.Bones.HumanRThigh2].Position, out var rightKneeScreen))
+            if (!CameraManager.WorldToScreen(in _bones[Unity.Structures.Bones.HumanRThigh2].Position, out var rightKneeScreen))
                 return false;
-            if (!CameraManager.WorldToScreen(ref _bones[Unity.Structures.Bones.HumanLForearm2].Position, out var leftElbowScreen))
+            if (!CameraManager.WorldToScreen(in _bones[Unity.Structures.Bones.HumanLForearm2].Position, out var leftElbowScreen))
                 return false;
-            if (!CameraManager.WorldToScreen(ref _bones[Unity.Structures.Bones.HumanRForearm2].Position, out var rightElbowScreen))
+            if (!CameraManager.WorldToScreen(in _bones[Unity.Structures.Bones.HumanRForearm2].Position, out var rightElbowScreen))
                 return false;
             int index = 0;
             var center = CameraManager.ViewportCenter;

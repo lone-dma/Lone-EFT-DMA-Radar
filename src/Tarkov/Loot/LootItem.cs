@@ -43,13 +43,14 @@ namespace EftDmaRadarLite.Tarkov.Loot
         private static EftDmaConfig Config { get; } = App.Config;
         private readonly TarkovMarketItem _item;
 
-        public LootItem(TarkovMarketItem item)
+        public LootItem(TarkovMarketItem item, Vector3 position)
         {
             ArgumentNullException.ThrowIfNull(item, nameof(item));
             _item = item;
+            _position = position;
         }
 
-        public LootItem(string id, string name)
+        public LootItem(string id, string name, Vector3 position)
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
             ArgumentNullException.ThrowIfNull(name, nameof(name));
@@ -61,6 +62,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
                 TraderPrice = -1,
                 BsgId = id
             };
+            _position = position;
         }
 
         /// <summary>
@@ -251,8 +253,8 @@ namespace EftDmaRadarLite.Tarkov.Loot
             return predicate(this);
         }
 
-        private Vector3 _position;
-        public ref Vector3 Position => ref _position;
+        private readonly Vector3 _position; // Loot doesn't move, readonly ok
+        public ref readonly Vector3 Position => ref _position;
         public Vector2 MouseoverPosition { get; set; }
 
         public virtual void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)

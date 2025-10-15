@@ -48,7 +48,7 @@ namespace EftDmaRadarLite.Tarkov.Loot
             }
         }
 
-        protected LootContainer() : base(_defaultItem) { }
+        protected LootContainer(Vector3 position) : base(_defaultItem, position) { }
 
         /// <summary>
         /// Update the filter for this container.
