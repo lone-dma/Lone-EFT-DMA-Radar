@@ -158,7 +158,7 @@ namespace EftDmaRadarLite
             await loadingWindow.ViewModel.UpdateProgressAsync(35, "Loading Map Assets...");
             EftMapManager.ModuleInit();
             await loadingWindow.ViewModel.UpdateProgressAsync(50, "Starting DMA Connection...");
-            MemoryInterface.ModuleInit();
+            RuntimeHelpers.RunClassConstructor(typeof(MemoryInterface).TypeHandle);
             await loadingWindow.ViewModel.UpdateProgressAsync(75, "Loading Remaining Modules...");
             IsDarkMode = GetIsDarkMode();
             if (IsDarkMode)

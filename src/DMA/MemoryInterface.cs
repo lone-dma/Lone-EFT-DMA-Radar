@@ -32,18 +32,15 @@ namespace EftDmaRadarLite.DMA
 {
     internal static class MemoryInterface
     {
-        /// <summary>
-        /// Singleton Instance for use in this assembly.
-        /// </summary>
-        public static MemDMA Memory { get; private set; }
-
-        /// <summary>
-        /// Initialize the Memory Interface.
-        /// </summary>
-        public static void ModuleInit()
+        static MemoryInterface()
         {
             Memory = new MemDMA();
             Debug.WriteLine("DMA Initialized!");
         }
+
+        /// <summary>
+        /// Singleton Instance for use in this assembly.
+        /// </summary>
+        public static MemDMA Memory { get; }
     }
 }
