@@ -280,8 +280,6 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
                     };
                     // Draw Map
                     map.Draw(canvas, localPlayer.Position.Y, mapParams.Bounds, mapCanvasBounds);
-                    // Draw LocalPlayer
-                    localPlayer.Draw(canvas, mapParams, localPlayer);
                     // Draw other players
                     var allPlayers = AllPlayers?
                         .Where(x => !x.HasExfild); // Skip exfil'd players
@@ -394,6 +392,9 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
                             }
                         }
                     }
+
+                    // Draw LocalPlayer over everything else
+                    localPlayer.Draw(canvas, mapParams, localPlayer);
 
                     if (allPlayers is not null && App.Config.InfoWidget.Enabled) // Players Overlay
                     {
