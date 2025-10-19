@@ -191,8 +191,27 @@ namespace LoneEftDmaRadar.UI.Radar
                     drawPt,
                     SKTextAlign.Left,
                     font,
-                    player.IsFocused ? SKPaints.TextPlayersOverlayFocused : SKPaints.TextPlayersOverlay);
+                    GetTextPaint(player));
                 drawPt.Y += font.Spacing;
+            }
+        }
+
+        private static SKPaint GetTextPaint(AbstractPlayer player)
+        {
+            if (player.IsFocused)
+                return SKPaints.TextPlayersOverlayFocused;
+            switch (player.Type)
+            {
+                case PlayerType.PMC:
+                    return SKPaints.TextPlayersOverlayPMC;
+                case PlayerType.PScav:
+                    return SKPaints.TextPlayersOverlayPScav;
+                case PlayerType.Streamer:
+                    return SKPaints.TextPlayersOverlayStreamer;
+                case PlayerType.SpecialPlayer:
+                    return SKPaints.TextPlayersOverlaySpecial;
+                default:
+                    return SKPaints.TextPlayersOverlay;
             }
         }
 

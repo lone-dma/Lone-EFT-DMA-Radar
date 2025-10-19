@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.UI.Misc;
 using LoneEftDmaRadar.UI.Skia;
 using SkiaSharp.Views.WPF;
@@ -92,6 +93,7 @@ namespace LoneEftDmaRadar.UI.ColorPicker
             {
                 _ = SKColor.Parse(kv.Value); // throws if invalid
             }
+            SetColors(App.Config.RadarColors);
             _parent.DialogResult = true;
         }
 
@@ -100,7 +102,6 @@ namespace LoneEftDmaRadar.UI.ColorPicker
         void OnPropertyChanged(string n)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(n));
         #endregion
-
 
         #region Static Interfaces
 
@@ -173,21 +174,25 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                             SKPaints.PaintPMC.Color = skColor;
                             SKPaints.TextPMC.Color = skColor;
                             SKPaints.PaintESPWidgetPMC.Color = skColor;
+                            SKPaints.TextPlayersOverlayPMC.Color = skColor.AdjustBrightness(0.5f);
                             break;
                         case ColorPickerOption.WatchlistPlayer:
                             SKPaints.PaintWatchlist.Color = skColor;
                             SKPaints.TextWatchlist.Color = skColor;
                             SKPaints.PaintESPWidgetWatchlist.Color = skColor;
+                            SKPaints.TextPlayersOverlaySpecial.Color = skColor.AdjustBrightness(0.5f);
                             break;
                         case ColorPickerOption.StreamerPlayer:
                             SKPaints.PaintStreamer.Color = skColor;
                             SKPaints.TextStreamer.Color = skColor;
                             SKPaints.PaintESPWidgetStreamer.Color = skColor;
+                            SKPaints.TextPlayersOverlayStreamer.Color = skColor.AdjustBrightness(0.5f);
                             break;
                         case ColorPickerOption.HumanScavPlayer:
                             SKPaints.PaintPScav.Color = skColor;
                             SKPaints.TextPScav.Color = skColor;
                             SKPaints.PaintESPWidgetPScav.Color = skColor;
+                            SKPaints.TextPlayersOverlayPScav.Color = skColor.AdjustBrightness(0.5f);
                             break;
                         case ColorPickerOption.ScavPlayer:
                             SKPaints.PaintScav.Color = skColor;
@@ -208,6 +213,7 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                             SKPaints.PaintFocused.Color = skColor;
                             SKPaints.TextFocused.Color = skColor;
                             SKPaints.PaintESPWidgetFocused.Color = skColor;
+                            SKPaints.TextPlayersOverlayFocused.Color = skColor.AdjustBrightness(0.5f);
                             break;
                         case ColorPickerOption.DeathMarker:
                             SKPaints.PaintDeathMarker.Color = skColor;
