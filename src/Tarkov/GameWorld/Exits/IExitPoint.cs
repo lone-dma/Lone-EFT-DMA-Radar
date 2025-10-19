@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,11 +26,11 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.UI.Radar;
-using EftDmaRadarLite.UI.Radar.Maps;
-using EftDmaRadarLite.Unity;
+using LoneEftDmaRadar.UI.Radar;
+using LoneEftDmaRadar.UI.Radar.Maps;
+using LoneEftDmaRadar.Unity;
 
-namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
+namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
 {
     /// <summary>
     /// Defines a contract for a point that can be used to exit the map.

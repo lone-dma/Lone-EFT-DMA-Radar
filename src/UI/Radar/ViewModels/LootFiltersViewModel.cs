@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,16 +26,16 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Tarkov.Data;
-using EftDmaRadarLite.Tarkov.Data.TarkovMarket;
-using EftDmaRadarLite.UI.Loot;
-using EftDmaRadarLite.UI.Misc;
-using EftDmaRadarLite.UI.Radar.Views;
+using LoneEftDmaRadar.Tarkov.Data;
+using LoneEftDmaRadar.Tarkov.Data.TarkovMarket;
+using LoneEftDmaRadar.UI.Loot;
+using LoneEftDmaRadar.UI.Misc;
+using LoneEftDmaRadar.UI.Radar.Views;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
 using System.Windows.Input;
 
-namespace EftDmaRadarLite.UI.Radar.ViewModels
+namespace LoneEftDmaRadar.UI.Radar.ViewModels
 {
     public sealed class LootFiltersViewModel : INotifyPropertyChanged
     {

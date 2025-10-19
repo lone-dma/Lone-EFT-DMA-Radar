@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,9 +26,9 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.UI.Loot;
+using LoneEftDmaRadar.UI.Loot;
 
-namespace EftDmaRadarLite.Tarkov.Data.TarkovMarket
+namespace LoneEftDmaRadar.Tarkov.Data.TarkovMarket
 {
     /// <summary>
     /// Class JSON Representation of Tarkov Market Data.

@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-namespace EftDmaRadarLite.Tarkov.Data.TarkovMarket
+namespace LoneEftDmaRadar.Tarkov.Data.TarkovMarket
 {
     internal static class FleaTax
     {

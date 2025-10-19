@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -28,7 +28,7 @@ SOFTWARE.
 
 
 /*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -55,9 +55,9 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Tarkov.Data;
+using LoneEftDmaRadar.Tarkov.Data;
 
-namespace EftDmaRadarLite.UI.Radar.Maps
+namespace LoneEftDmaRadar.UI.Radar.Maps
 {
     /// <summary>
     /// Defines a .JSON Map Config File

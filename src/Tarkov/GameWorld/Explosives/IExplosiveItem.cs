@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,11 +26,11 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.UI.Radar.Maps;
-using EftDmaRadarLite.Unity;
+using LoneEftDmaRadar.UI.Radar.Maps;
+using LoneEftDmaRadar.Unity;
 using VmmSharpEx.Scatter;
 
-namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
+namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives
 {
     public interface IExplosiveItem : IWorldEntity, IMapEntity
     {

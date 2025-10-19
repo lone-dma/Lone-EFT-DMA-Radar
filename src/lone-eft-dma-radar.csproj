@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
-    <RootNamespace>EftDmaRadarLite</RootNamespace>
+    <RootNamespace>LoneEftDmaRadar</RootNamespace>
     <Nullable>warnings</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
@@ -13,6 +13,7 @@
 	<ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
 	<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
 	<Deterministic>False</Deterministic>
+	<ApplicationIcon>..\Resources\lone-icon.ico</ApplicationIcon>
   </PropertyGroup>
 
 	<PropertyGroup>
@@ -57,6 +58,7 @@
 	<ItemGroup>
 		<EmbeddedResource Include="..\Resources\NeoSansStdRegular.otf" />
 		<EmbeddedResource Include="..\Resources\DEFAULT_DATA.json" />
+		<Resource Include="..\Resources\lone-icon.ico" />
 	</ItemGroup>
 
 	<ItemGroup>

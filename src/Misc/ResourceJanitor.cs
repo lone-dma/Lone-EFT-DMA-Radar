@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,10 +26,10 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.DMA;
+using LoneEftDmaRadar.DMA;
 using System.Runtime;
 
-namespace EftDmaRadarLite.Common
+namespace LoneEftDmaRadar.Misc
 {
     internal static partial class ResourceJanitor
     {

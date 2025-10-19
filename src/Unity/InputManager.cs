@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,14 +26,14 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.DMA;
-using EftDmaRadarLite.Misc;
-using EftDmaRadarLite.Misc.Workers;
-using EftDmaRadarLite.UI.Hotkeys;
-using EftDmaRadarLite.Unity.Structures;
+using LoneEftDmaRadar.DMA;
+using LoneEftDmaRadar.Misc;
+using LoneEftDmaRadar.Misc.Workers;
+using LoneEftDmaRadar.UI.Hotkeys;
+using LoneEftDmaRadar.Unity.Structures;
 using VmmSharpEx.Scatter;
 
-namespace EftDmaRadarLite.Unity
+namespace LoneEftDmaRadar.Unity
 {
     public sealed class InputManager : IDisposable
     {

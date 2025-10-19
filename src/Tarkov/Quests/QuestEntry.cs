@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,9 +26,9 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Tarkov.Data;
+using LoneEftDmaRadar.Tarkov.Data;
 
-namespace EftDmaRadarLite.Tarkov.Quests
+namespace LoneEftDmaRadar.Tarkov.Quests
 {
     /// <summary>
     /// One-Way Binding Only

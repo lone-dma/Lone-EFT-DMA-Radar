@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -27,15 +27,15 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using EftDmaRadarLite.Misc;
-using EftDmaRadarLite.Tarkov.Player;
-using EftDmaRadarLite.UI.Skia;
-using EftDmaRadarLite.Unity.Structures;
+using LoneEftDmaRadar.Misc;
+using LoneEftDmaRadar.Tarkov.Player;
+using LoneEftDmaRadar.UI.Skia;
+using LoneEftDmaRadar.Unity.Structures;
 using SkiaSharp.Views.WPF;
 using System.Windows.Shapes;
 using static SDK.Offsets;
 
-namespace EftDmaRadarLite.UI.Radar
+namespace LoneEftDmaRadar.UI.Radar
 {
     public sealed class PlayerInfoWidget : AbstractSKWidget
     {

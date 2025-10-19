@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,15 +26,15 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.DMA;
-using EftDmaRadarLite.Misc.JSON;
-using EftDmaRadarLite.UI.ColorPicker;
-using EftDmaRadarLite.UI.Data;
-using EftDmaRadarLite.UI.Loot;
-using EftDmaRadarLite.Unity.Structures;
+using LoneEftDmaRadar.DMA;
+using LoneEftDmaRadar.Misc.JSON;
+using LoneEftDmaRadar.UI.ColorPicker;
+using LoneEftDmaRadar.UI.Data;
+using LoneEftDmaRadar.UI.Loot;
+using LoneEftDmaRadar.Unity.Structures;
 using System.Collections.ObjectModel;
 
-namespace EftDmaRadarLite
+namespace LoneEftDmaRadar
 {
     /// <summary>
     /// Global Program Configuration (Config.json)

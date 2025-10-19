@@ -1,4 +1,4 @@
-﻿namespace EftDmaRadarLite.Unity.Structures
+﻿namespace LoneEftDmaRadar.Unity.Structures
 {
 
     /// <summary>

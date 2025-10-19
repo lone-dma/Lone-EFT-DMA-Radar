@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -27,9 +27,9 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using EftDmaRadarLite.DMA;
+using LoneEftDmaRadar.DMA;
 
-namespace EftDmaRadarLite.Mono.Collections
+namespace LoneEftDmaRadar.Mono.Collections
 {
     /// <summary>
     /// DMA Wrapper for a C# Dictionary

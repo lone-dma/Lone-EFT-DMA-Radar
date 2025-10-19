@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,10 +26,10 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Misc;
+using LoneEftDmaRadar.Misc;
 using SkiaSharp.Views.WPF;
 
-namespace EftDmaRadarLite.UI.Skia
+namespace LoneEftDmaRadar.UI.Skia
 {
     /// <summary>
     /// Base class for interactive Skia widgets hosted in an <see cref="SKGLElement"/>.

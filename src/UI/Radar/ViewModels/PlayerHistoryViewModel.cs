@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,13 +26,13 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Tarkov.Player;
-using EftDmaRadarLite.UI.Data;
-using EftDmaRadarLite.UI.Misc;
-using EftDmaRadarLite.UI.Radar.Views;
+using LoneEftDmaRadar.Tarkov.Player;
+using LoneEftDmaRadar.UI.Data;
+using LoneEftDmaRadar.UI.Misc;
+using LoneEftDmaRadar.UI.Radar.Views;
 using System.Collections.ObjectModel;
 
-namespace EftDmaRadarLite.UI.Radar.ViewModels
+namespace LoneEftDmaRadar.UI.Radar.ViewModels
 {
     public sealed class PlayerHistoryViewModel : INotifyPropertyChanged
     {

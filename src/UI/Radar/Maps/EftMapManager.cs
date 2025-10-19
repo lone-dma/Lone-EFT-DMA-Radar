@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -29,7 +29,7 @@ SOFTWARE.
 using System.Collections.Frozen;
 using System.IO.Compression;
 
-namespace EftDmaRadarLite.UI.Radar.Maps
+namespace LoneEftDmaRadar.UI.Radar.Maps
 {
     /// <summary>
     /// Maintains Map Resources for this application.

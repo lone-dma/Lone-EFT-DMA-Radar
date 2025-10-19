@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,10 +26,10 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Tarkov.GameWorld;
-using EftDmaRadarLite.Unity.Structures;
+using LoneEftDmaRadar.Tarkov.GameWorld;
+using LoneEftDmaRadar.Unity.Structures;
 
-namespace EftDmaRadarLite.Tarkov.Player
+namespace LoneEftDmaRadar.Tarkov.Player
 {
     /// <summary>
     /// Contains abstractions for drawing Player Skeletons.

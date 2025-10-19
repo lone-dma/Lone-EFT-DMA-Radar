@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -27,12 +27,12 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using EftDmaRadarLite.UI.Skia;
+using LoneEftDmaRadar.UI.Skia;
 using SkiaSharp.Views.WPF;
 using Svg.Skia;
 using System.IO.Compression;
 
-namespace EftDmaRadarLite.UI.Radar.Maps
+namespace LoneEftDmaRadar.UI.Radar.Maps
 {
     /// <summary>
     /// SVG map implementation that keeps layers as vector SKPicture objects (no pre-rasterization)

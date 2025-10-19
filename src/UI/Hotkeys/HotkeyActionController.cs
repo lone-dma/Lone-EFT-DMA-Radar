@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-namespace EftDmaRadarLite.UI.Hotkeys
+namespace LoneEftDmaRadar.UI.Hotkeys
 {
     /// <summary>
     /// Wraps a Unity Hotkey/Event Delegate, and maintains it's State.

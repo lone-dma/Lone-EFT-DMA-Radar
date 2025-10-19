@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -29,7 +29,7 @@ SOFTWARE.
 using MessagePack;
 using MessagePack.Formatters;
 
-namespace EftDmaRadarLite.WebRadar.MessagePack
+namespace LoneEftDmaRadar.WebRadar.MessagePack
 {
     public class Vector3Formatter : IMessagePackFormatter<Vector3>
     {

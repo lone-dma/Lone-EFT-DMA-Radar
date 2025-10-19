@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -27,10 +27,10 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using EftDmaRadarLite.Mono.Collections;
-using EftDmaRadarLite.Tarkov.Player;
+using LoneEftDmaRadar.Mono.Collections;
+using LoneEftDmaRadar.Tarkov.Player;
 
-namespace EftDmaRadarLite.Tarkov.GameWorld
+namespace LoneEftDmaRadar.Tarkov.GameWorld
 {
     public sealed class RegisteredPlayers : IReadOnlyCollection<AbstractPlayer>
     {

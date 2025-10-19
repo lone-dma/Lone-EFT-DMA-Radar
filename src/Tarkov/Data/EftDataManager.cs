@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,11 +26,11 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Tarkov.Data.TarkovMarket;
-using EftDmaRadarLite.UI.Misc;
+using LoneEftDmaRadar.Tarkov.Data.TarkovMarket;
+using LoneEftDmaRadar.UI.Misc;
 using System.Collections.Frozen;
 
-namespace EftDmaRadarLite.Tarkov.Data
+namespace LoneEftDmaRadar.Tarkov.Data
 {
     internal static class EftDataManager
     {
@@ -133,7 +133,7 @@ namespace EftDmaRadarLite.Tarkov.Data
 
         private static async Task<string> GetDefaultDataAsync()
         {
-            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("EftDmaRadarLite.DEFAULT_DATA.json"))
+            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LoneEftDmaRadar.DEFAULT_DATA.json"))
             {
                 var data = new byte[stream!.Length];
                 await stream.ReadExactlyAsync(data);

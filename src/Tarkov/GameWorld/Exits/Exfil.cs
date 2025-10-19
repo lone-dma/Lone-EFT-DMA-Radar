@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,17 +26,17 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Misc;
-using EftDmaRadarLite.Mono.Collections;
-using EftDmaRadarLite.Tarkov.Data;
-using EftDmaRadarLite.Tarkov.Player;
-using EftDmaRadarLite.UI.Radar;
-using EftDmaRadarLite.UI.Radar.Maps;
-using EftDmaRadarLite.UI.Skia;
-using EftDmaRadarLite.Unity;
-using EftDmaRadarLite.Unity.Structures;
+using LoneEftDmaRadar.Misc;
+using LoneEftDmaRadar.Mono.Collections;
+using LoneEftDmaRadar.Tarkov.Data;
+using LoneEftDmaRadar.Tarkov.Player;
+using LoneEftDmaRadar.UI.Radar;
+using LoneEftDmaRadar.UI.Radar.Maps;
+using LoneEftDmaRadar.UI.Skia;
+using LoneEftDmaRadar.Unity;
+using LoneEftDmaRadar.Unity.Structures;
 
-namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
+namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
 {
     public class Exfil : IExitPoint, IWorldEntity, IMapEntity, IMouseoverEntity
     {

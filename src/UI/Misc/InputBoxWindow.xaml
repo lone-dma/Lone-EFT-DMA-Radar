@@ -1,8 +1,8 @@
-﻿<Window x:Class="EftDmaRadarLite.UI.Misc.InputBoxWindow"
+﻿<Window x:Class="LoneEftDmaRadar.UI.Misc.InputBoxWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:EftDmaRadarLite.UI.Misc"
-        xmlns:vm="clr-namespace:EftDmaRadarLite.UI.Misc"
+        xmlns:local="clr-namespace:LoneEftDmaRadar.UI.Misc"
+        xmlns:vm="clr-namespace:LoneEftDmaRadar.UI.Misc"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
@@ -11,7 +11,8 @@
         SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        FocusManager.FocusedElement="{Binding ElementName=InputTextBox}">
+        FocusManager.FocusedElement="{Binding ElementName=InputTextBox}"
+        Icon="/lone-icon.ico">
     <d:Window.DataContext>
         <d:DesignInstance Type="{x:Type vm:InputBoxViewModel}"
                       IsDesignTimeCreatable="False"/>

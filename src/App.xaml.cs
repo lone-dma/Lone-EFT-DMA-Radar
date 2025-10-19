@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-global using EftDmaRadarLite.Common;
 global using SDK;
 global using SkiaSharp;
 global using SkiaSharp.Views.Desktop;
@@ -46,14 +45,14 @@ global using System.Text;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
 global using System.Windows;
-using EftDmaRadarLite.DMA;
-using EftDmaRadarLite.Misc.Cache;
-using EftDmaRadarLite.Tarkov.Data;
-using EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers;
-using EftDmaRadarLite.UI.ColorPicker;
-using EftDmaRadarLite.UI.Misc;
-using EftDmaRadarLite.UI.Radar.Maps;
-using EftDmaRadarLite.UI.Skia;
+using LoneEftDmaRadar.DMA;
+using LoneEftDmaRadar.Misc.Cache;
+using LoneEftDmaRadar.Tarkov.Data;
+using LoneEftDmaRadar.Tarkov.Data.ProfileApi.Providers;
+using LoneEftDmaRadar.UI.ColorPicker;
+using LoneEftDmaRadar.UI.Misc;
+using LoneEftDmaRadar.UI.Radar.Maps;
+using LoneEftDmaRadar.UI.Skia;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -63,14 +62,14 @@ using System.Security.Authentication;
 [assembly: SupportedOSPlatform("Windows")]
 [assembly: AssemblyVersion("1.0.*")]
 
-namespace EftDmaRadarLite
+namespace LoneEftDmaRadar
 {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
-        internal const string Name = "EFT DMA Radar Lite";
+        internal const string Name = "Lone EFT DMA Radar";
         private const string MUTEX_ID = "0f908ff7-e614-6a93-60a3-cee36c9cea91";
         private static readonly Mutex _mutex;
 

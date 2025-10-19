@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -27,19 +27,19 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using EftDmaRadarLite.DMA;
-using EftDmaRadarLite.Misc;
-using EftDmaRadarLite.Tarkov.Loot;
-using EftDmaRadarLite.UI.Radar;
-using EftDmaRadarLite.UI.Radar.Maps;
-using EftDmaRadarLite.UI.Radar.ViewModels;
-using EftDmaRadarLite.UI.Skia;
-using EftDmaRadarLite.Unity;
-using EftDmaRadarLite.Unity.Structures;
+using LoneEftDmaRadar.DMA;
+using LoneEftDmaRadar.Misc;
+using LoneEftDmaRadar.Tarkov.Loot;
+using LoneEftDmaRadar.UI.Radar;
+using LoneEftDmaRadar.UI.Radar.Maps;
+using LoneEftDmaRadar.UI.Radar.ViewModels;
+using LoneEftDmaRadar.UI.Skia;
+using LoneEftDmaRadar.Unity;
+using LoneEftDmaRadar.Unity.Structures;
 using VmmSharpEx.Scatter;
-using static EftDmaRadarLite.Unity.Structures.UnityTransform;
+using static LoneEftDmaRadar.Unity.Structures.UnityTransform;
 
-namespace EftDmaRadarLite.Tarkov.Player
+namespace LoneEftDmaRadar.Tarkov.Player
 {
     /// <summary>
     /// Base class for Tarkov Players.

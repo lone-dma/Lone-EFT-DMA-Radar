@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,9 +26,9 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Unity.Structures;
+using LoneEftDmaRadar.Unity.Structures;
 
-namespace EftDmaRadarLite.UI.Hotkeys
+namespace LoneEftDmaRadar.UI.Hotkeys
 {
     /// <summary>
     /// ListBox wrapper for Hotkey/Action Entries in Hotkey Manager.

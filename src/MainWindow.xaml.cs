@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,12 +26,12 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.UI.Radar;
-using EftDmaRadarLite.UI.Radar.ViewModels;
+using LoneEftDmaRadar.UI.Radar;
+using LoneEftDmaRadar.UI.Radar.ViewModels;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
 
-namespace EftDmaRadarLite
+namespace LoneEftDmaRadar
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

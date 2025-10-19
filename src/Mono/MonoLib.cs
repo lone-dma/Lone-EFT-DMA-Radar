@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,10 +26,10 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.DMA;
-using EftDmaRadarLite.Misc;
+using LoneEftDmaRadar.DMA;
+using LoneEftDmaRadar.Misc;
 
-namespace EftDmaRadarLite.Mono
+namespace LoneEftDmaRadar.Mono
 {
     internal static class MonoLib
     {

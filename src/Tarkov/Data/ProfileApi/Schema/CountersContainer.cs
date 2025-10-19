@@ -1,4 +1,4 @@
-﻿namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema
+﻿namespace LoneEftDmaRadar.Tarkov.Data.ProfileApi.Schema
 {
     public sealed class CountersContainer
     {

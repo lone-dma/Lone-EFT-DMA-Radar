@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,13 +26,13 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.DMA;
-using EftDmaRadarLite.Tarkov.Loot;
-using EftDmaRadarLite.UI.Radar.Maps;
-using EftDmaRadarLite.UI.Skia;
+using LoneEftDmaRadar.DMA;
+using LoneEftDmaRadar.Tarkov.Loot;
+using LoneEftDmaRadar.UI.Radar.Maps;
+using LoneEftDmaRadar.UI.Skia;
 using System.Net.Http.Headers;
 
-namespace EftDmaRadarLite.Misc
+namespace LoneEftDmaRadar.Misc
 {
     /// <summary>
     /// Extension methods go here.

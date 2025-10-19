@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -32,7 +32,7 @@ using TwitchLib.Api;
 using TwitchLib.Api.Core;
 using TwitchLib.Api.Core.Exceptions;
 
-namespace EftDmaRadarLite.Misc
+namespace LoneEftDmaRadar.Misc
 {
     internal static class TwitchService
     {

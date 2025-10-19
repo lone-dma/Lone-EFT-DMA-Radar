@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,12 +26,12 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.UI.Misc;
-using EftDmaRadarLite.Unity.Structures;
+using LoneEftDmaRadar.UI.Misc;
+using LoneEftDmaRadar.Unity.Structures;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
-namespace EftDmaRadarLite.UI.Hotkeys
+namespace LoneEftDmaRadar.UI.Hotkeys
 {
     public sealed class HotkeyManagerViewModel : INotifyPropertyChanged
     {

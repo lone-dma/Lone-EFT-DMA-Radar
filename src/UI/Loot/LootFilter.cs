@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -27,9 +27,9 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using EftDmaRadarLite.Tarkov.Loot;
+using LoneEftDmaRadar.Tarkov.Loot;
 
-namespace EftDmaRadarLite.UI.Loot
+namespace LoneEftDmaRadar.UI.Loot
 {
     /// <summary>
     /// Enumerable Loot Filter Class.

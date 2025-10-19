@@ -1,4 +1,4 @@
-﻿namespace EftDmaRadarLite.Tarkov.Data
+﻿namespace LoneEftDmaRadar.Tarkov.Data
 {
     /// <summary>
     /// EFT.MongoID Struct
