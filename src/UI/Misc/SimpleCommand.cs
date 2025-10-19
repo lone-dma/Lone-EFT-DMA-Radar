@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -28,7 +28,7 @@ SOFTWARE.
 
 using System.Windows.Input;
 
-namespace EftDmaRadarLite.UI.Misc
+namespace LoneEftDmaRadar.UI.Misc
 {
     public class SimpleCommand : ICommand
     {

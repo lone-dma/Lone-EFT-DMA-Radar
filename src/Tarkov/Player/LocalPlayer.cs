@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,12 +26,12 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Mono.Collections;
-using EftDmaRadarLite.Tarkov.Data;
-using EftDmaRadarLite.Unity.Structures;
+using LoneEftDmaRadar.Mono.Collections;
+using LoneEftDmaRadar.Tarkov.Data;
+using LoneEftDmaRadar.Unity.Structures;
 using VmmSharpEx.Scatter;
 
-namespace EftDmaRadarLite.Tarkov.Player
+namespace LoneEftDmaRadar.Tarkov.Player
 {
     public sealed class LocalPlayer : ClientPlayer
     {

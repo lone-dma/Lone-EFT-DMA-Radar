@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,17 +26,18 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Misc.Workers;
-using EftDmaRadarLite.Mono;
-using EftDmaRadarLite.Tarkov.Data;
-using EftDmaRadarLite.Tarkov.GameWorld.Exits;
-using EftDmaRadarLite.Tarkov.GameWorld.Explosives;
-using EftDmaRadarLite.Tarkov.Loot;
-using EftDmaRadarLite.Tarkov.Player;
-using EftDmaRadarLite.Tarkov.Quests;
+using LoneEftDmaRadar.Misc;
+using LoneEftDmaRadar.Misc.Workers;
+using LoneEftDmaRadar.Mono;
+using LoneEftDmaRadar.Tarkov.Data;
+using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
+using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
+using LoneEftDmaRadar.Tarkov.Loot;
+using LoneEftDmaRadar.Tarkov.Player;
+using LoneEftDmaRadar.Tarkov.Quests;
 using VmmSharpEx.Options;
 
-namespace EftDmaRadarLite.Tarkov.GameWorld
+namespace LoneEftDmaRadar.Tarkov.GameWorld
 {
     /// <summary>
     /// Class containing Game (Raid) instance.

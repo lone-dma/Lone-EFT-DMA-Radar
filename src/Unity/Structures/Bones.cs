@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-namespace EftDmaRadarLite.Unity.Structures
+namespace LoneEftDmaRadar.Unity.Structures
 {
     /// <summary>
     /// Bones Index for Player Transforms.

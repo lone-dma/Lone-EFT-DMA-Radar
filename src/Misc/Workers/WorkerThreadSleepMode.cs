@@ -1,4 +1,4 @@
-﻿namespace EftDmaRadarLite.Misc.Workers
+﻿namespace LoneEftDmaRadar.Misc.Workers
 {
     /// <summary>
     /// Defines how a worker thread should sleep between work cycles.

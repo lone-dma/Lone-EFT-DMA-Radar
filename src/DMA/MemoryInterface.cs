@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,9 +26,9 @@ SOFTWARE.
  *
 */
 
-global using static EftDmaRadarLite.DMA.MemoryInterface;
+global using static LoneEftDmaRadar.DMA.MemoryInterface;
 
-namespace EftDmaRadarLite.DMA
+namespace LoneEftDmaRadar.DMA
 {
     internal static class MemoryInterface
     {

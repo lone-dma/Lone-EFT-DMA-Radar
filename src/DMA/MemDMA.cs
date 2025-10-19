@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -27,22 +27,22 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using EftDmaRadarLite.Misc;
-using EftDmaRadarLite.Mono;
-using EftDmaRadarLite.Tarkov.GameWorld;
-using EftDmaRadarLite.Tarkov.GameWorld.Exits;
-using EftDmaRadarLite.Tarkov.GameWorld.Explosives;
-using EftDmaRadarLite.Tarkov.Loot;
-using EftDmaRadarLite.Tarkov.Player;
-using EftDmaRadarLite.Tarkov.Quests;
-using EftDmaRadarLite.Unity;
+using LoneEftDmaRadar.Misc;
+using LoneEftDmaRadar.Mono;
+using LoneEftDmaRadar.Tarkov.GameWorld;
+using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
+using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
+using LoneEftDmaRadar.Tarkov.Loot;
+using LoneEftDmaRadar.Tarkov.Player;
+using LoneEftDmaRadar.Tarkov.Quests;
+using LoneEftDmaRadar.Unity;
 using System.Drawing;
 using VmmSharpEx;
 using VmmSharpEx.Options;
 using VmmSharpEx.Refresh;
 using VmmSharpEx.Scatter;
 
-namespace EftDmaRadarLite.DMA
+namespace LoneEftDmaRadar.DMA
 {
     /// <summary>
     /// DMA Memory Module.

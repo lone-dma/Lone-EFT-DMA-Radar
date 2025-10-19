@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,9 +26,9 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Tarkov.Data.TarkovMarket;
+using LoneEftDmaRadar.Tarkov.Data.TarkovMarket;
 
-namespace EftDmaRadarLite.UI.Data
+namespace LoneEftDmaRadar.UI.Data
 {
     public sealed class StaticContainerEntry : INotifyPropertyChanged
     {

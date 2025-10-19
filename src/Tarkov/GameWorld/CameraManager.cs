@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,19 +26,19 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.DMA;
-using EftDmaRadarLite.ESP;
-using EftDmaRadarLite.Misc;
-using EftDmaRadarLite.Mono;
-using EftDmaRadarLite.Mono.Collections;
-using EftDmaRadarLite.Tarkov.Player;
-using EftDmaRadarLite.Unity;
-using EftDmaRadarLite.Unity.Structures;
+using LoneEftDmaRadar.DMA;
+using LoneEftDmaRadar.ESP;
+using LoneEftDmaRadar.Misc;
+using LoneEftDmaRadar.Mono;
+using LoneEftDmaRadar.Mono.Collections;
+using LoneEftDmaRadar.Tarkov.Player;
+using LoneEftDmaRadar.Unity;
+using LoneEftDmaRadar.Unity.Structures;
 using System.Drawing;
 using VmmSharpEx;
 using VmmSharpEx.Scatter;
 
-namespace EftDmaRadarLite.Tarkov.GameWorld
+namespace LoneEftDmaRadar.Tarkov.GameWorld
 {
     public sealed class CameraManager
     {

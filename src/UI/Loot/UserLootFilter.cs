@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -28,7 +28,7 @@ SOFTWARE.
 
 using System.Collections.ObjectModel;
 
-namespace EftDmaRadarLite.UI.Loot
+namespace LoneEftDmaRadar.UI.Loot
 {
     public sealed class UserLootFilter
     {

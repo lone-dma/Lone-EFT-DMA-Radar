@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,14 +26,14 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.UI.Misc;
-using EftDmaRadarLite.UI.Skia;
+using LoneEftDmaRadar.UI.Misc;
+using LoneEftDmaRadar.UI.Skia;
 using SkiaSharp.Views.WPF;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace EftDmaRadarLite.UI.ColorPicker
+namespace LoneEftDmaRadar.UI.ColorPicker
 {
     public sealed class ColorPickerViewModel : INotifyPropertyChanged
     {

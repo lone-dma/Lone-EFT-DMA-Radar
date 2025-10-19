@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,9 +26,9 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.UI.Skia;
+using LoneEftDmaRadar.UI.Skia;
 
-namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
+namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
 {
     public sealed class SecretExfil : Exfil
     {

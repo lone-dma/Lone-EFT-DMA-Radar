@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -28,7 +28,7 @@ SOFTWARE.
 
 using SkiaSharp.Views.WPF;
 
-namespace EftDmaRadarLite.UI.Radar.Maps
+namespace LoneEftDmaRadar.UI.Radar.Maps
 {
     public interface IEftMap : IDisposable
     {

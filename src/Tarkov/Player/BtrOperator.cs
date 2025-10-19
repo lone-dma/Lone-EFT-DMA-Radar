@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -28,7 +28,7 @@ SOFTWARE.
 
 using VmmSharpEx.Scatter;
 
-namespace EftDmaRadarLite.Tarkov.Player
+namespace LoneEftDmaRadar.Tarkov.Player
 {
     /// <summary>
     /// BTR Bot Operator.

@@ -1,14 +1,15 @@
-﻿<Window x:Class="EftDmaRadarLite.MainWindow"
+﻿<Window x:Class="LoneEftDmaRadar.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:EftDmaRadarLite"
-        xmlns:vm="clr-namespace:EftDmaRadarLite"
-        xmlns:tabs="clr-namespace:EftDmaRadarLite.UI.Radar.Views"
+        xmlns:local="clr-namespace:LoneEftDmaRadar"
+        xmlns:vm="clr-namespace:LoneEftDmaRadar"
+        xmlns:tabs="clr-namespace:LoneEftDmaRadar.UI.Radar.Views"
         mc:Ignorable="d"
-        Title="EFT DMA Radar Lite"
-        Width="1280" Height="720">
+        Title="Lone EFT DMA Radar"
+        Width="1280" Height="720"
+        Icon="/lone-icon.ico">
     <d:Window.DataContext>
         <d:DesignInstance Type="{x:Type vm:MainWindowViewModel}"
                       IsDesignTimeCreatable="False"/>

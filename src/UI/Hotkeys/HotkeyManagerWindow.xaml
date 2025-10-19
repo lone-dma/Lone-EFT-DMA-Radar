@@ -1,14 +1,15 @@
-﻿<Window x:Class="EftDmaRadarLite.UI.Hotkeys.HotkeyManagerWindow"
+﻿<Window x:Class="LoneEftDmaRadar.UI.Hotkeys.HotkeyManagerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:EftDmaRadarLite.UI.Hotkeys"
-        xmlns:vm="clr-namespace:EftDmaRadarLite.UI.Hotkeys"
+        xmlns:local="clr-namespace:LoneEftDmaRadar.UI.Hotkeys"
+        xmlns:vm="clr-namespace:LoneEftDmaRadar.UI.Hotkeys"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Hotkey Manager"
         Width="800" Height="450"
-        MinWidth="600" MinHeight="300">
+        MinWidth="600" MinHeight="300"
+        Icon="/lone-icon.ico">
     <d:UserControl.DataContext>
         <d:DesignInstance Type="{x:Type vm:HotkeyManagerViewModel}"
                       IsDesignTimeCreatable="False"/>

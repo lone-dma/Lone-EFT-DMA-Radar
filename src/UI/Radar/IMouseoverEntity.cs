@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,10 +26,10 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Tarkov.Player;
-using EftDmaRadarLite.UI.Radar.Maps;
+using LoneEftDmaRadar.Tarkov.Player;
+using LoneEftDmaRadar.UI.Radar.Maps;
 
-namespace EftDmaRadarLite.UI.Radar
+namespace LoneEftDmaRadar.UI.Radar
 {
     /// <summary>
     /// Defines a Radar Map Mouseover Entity.

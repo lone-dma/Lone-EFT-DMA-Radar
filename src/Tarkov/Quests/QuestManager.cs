@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -27,12 +27,12 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using EftDmaRadarLite.Mono.Collections;
-using EftDmaRadarLite.Tarkov.Data;
-using EftDmaRadarLite.Unity.Structures;
+using LoneEftDmaRadar.Mono.Collections;
+using LoneEftDmaRadar.Tarkov.Data;
+using LoneEftDmaRadar.Unity.Structures;
 using System.Collections.Frozen;
 
-namespace EftDmaRadarLite.Tarkov.Quests
+namespace LoneEftDmaRadar.Tarkov.Quests
 {
     public sealed class QuestManager
     {

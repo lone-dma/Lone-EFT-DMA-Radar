@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,10 +26,10 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Misc;
-using EftDmaRadarLite.Mono.Collections;
+using LoneEftDmaRadar.Misc;
+using LoneEftDmaRadar.Mono.Collections;
 
-namespace EftDmaRadarLite.Tarkov.GameWorld.Exits
+namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
 {
     /// <summary>
     /// List of PMC/Scav 'Exits' in Local Game World and their position/status.

@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,10 +26,10 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Misc;
-using EftDmaRadarLite.Tarkov.Player;
-using EftDmaRadarLite.WebRadar.Data;
-using EftDmaRadarLite.WebRadar.MessagePack;
+using LoneEftDmaRadar.Misc;
+using LoneEftDmaRadar.Tarkov.Player;
+using LoneEftDmaRadar.WebRadar.Data;
+using LoneEftDmaRadar.WebRadar.MessagePack;
 using MessagePack;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -39,7 +39,7 @@ using Microsoft.Extensions.Hosting;
 using Open.Nat;
 using System.Net.Sockets;
 
-namespace EftDmaRadarLite.WebRadar
+namespace LoneEftDmaRadar.WebRadar
 {
     internal static class WebRadarServer
     {

@@ -1,4 +1,4 @@
-﻿namespace EftDmaRadarLite.Unity.Structures
+﻿namespace LoneEftDmaRadar.Unity.Structures
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public readonly struct ComponentArray

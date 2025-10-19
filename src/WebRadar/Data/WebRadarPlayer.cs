@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,10 +26,10 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Tarkov.Player;
+using LoneEftDmaRadar.Tarkov.Player;
 using MessagePack;
 
-namespace EftDmaRadarLite.WebRadar.Data
+namespace LoneEftDmaRadar.WebRadar.Data
 {
     [MessagePackObject]
     public readonly struct WebRadarPlayer

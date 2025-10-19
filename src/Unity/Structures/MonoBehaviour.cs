@@ -1,4 +1,4 @@
-﻿namespace EftDmaRadarLite.Unity.Structures
+﻿namespace LoneEftDmaRadar.Unity.Structures
 {
     [StructLayout(LayoutKind.Explicit, Pack = 1)]
     public readonly struct MonoBehaviour // Behaviour : Component : EditorExtension : Object
@@ -36,7 +36,7 @@
         public static ulong GetComponent(ulong behaviour, string className)
         {
             var go = Memory.ReadPtr(behaviour + GameObjectOffset);
-            return EftDmaRadarLite.Unity.Structures.GameObject.GetComponent(go, className);
+            return LoneEftDmaRadar.Unity.Structures.GameObject.GetComponent(go, className);
         }
     }
 }

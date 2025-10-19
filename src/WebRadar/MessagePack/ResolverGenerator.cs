@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -30,7 +30,7 @@ using MessagePack;
 using MessagePack.Formatters;
 using MessagePack.Resolvers;
 
-namespace EftDmaRadarLite.WebRadar.MessagePack
+namespace LoneEftDmaRadar.WebRadar.MessagePack
 {
     public static class ResolverGenerator
     {

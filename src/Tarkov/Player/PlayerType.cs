@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-namespace EftDmaRadarLite.Tarkov.Player
+namespace LoneEftDmaRadar.Tarkov.Player
 {
     /// <summary>
     /// Defines Player Unit Type (Player,PMC,Scav,etc.)

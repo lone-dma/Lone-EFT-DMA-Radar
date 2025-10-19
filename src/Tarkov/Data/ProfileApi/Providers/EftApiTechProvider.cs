@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Tarkov.Data.ProfileApi.Schema;
+using LoneEftDmaRadar.Tarkov.Data.ProfileApi.Schema;
 using Microsoft.Extensions.DependencyInjection;
 using Polly.CircuitBreaker;
 using System.Net.Http;
@@ -34,7 +34,7 @@ using System.Net.Http.Headers;
 using System.Security.Authentication;
 using System.Threading.RateLimiting;
 
-namespace EftDmaRadarLite.Tarkov.Data.ProfileApi.Providers
+namespace LoneEftDmaRadar.Tarkov.Data.ProfileApi.Providers
 {
     public sealed class EftApiTechProvider : IProfileApiProvider
     {

@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,11 +26,11 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.UI.Misc;
-using EftDmaRadarLite.UI.Radar.Maps;
+using LoneEftDmaRadar.UI.Misc;
+using LoneEftDmaRadar.UI.Radar.Maps;
 using System.Windows.Input;
 
-namespace EftDmaRadarLite.UI.Radar.ViewModels
+namespace LoneEftDmaRadar.UI.Radar.ViewModels
 {
     public sealed class MapSetupHelperViewModel : INotifyPropertyChanged
     {

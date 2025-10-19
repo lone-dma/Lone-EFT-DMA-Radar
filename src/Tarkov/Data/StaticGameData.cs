@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -28,7 +28,7 @@ SOFTWARE.
 
 using System.Collections.Frozen;
 
-namespace EftDmaRadarLite.Tarkov.Data
+namespace LoneEftDmaRadar.Tarkov.Data
 {
     /// <summary>
     /// Contains Static Game Data.

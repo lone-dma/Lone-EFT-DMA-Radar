@@ -1,5 +1,5 @@
 /*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,15 +26,15 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Misc;
-using EftDmaRadarLite.Tarkov.Player;
-using EftDmaRadarLite.UI.Radar.Maps;
-using EftDmaRadarLite.UI.Skia;
-using EftDmaRadarLite.Unity;
-using EftDmaRadarLite.Unity.Structures;
+using LoneEftDmaRadar.Misc;
+using LoneEftDmaRadar.Tarkov.Player;
+using LoneEftDmaRadar.UI.Radar.Maps;
+using LoneEftDmaRadar.UI.Skia;
+using LoneEftDmaRadar.Unity;
+using LoneEftDmaRadar.Unity.Structures;
 using VmmSharpEx.Scatter;
 
-namespace EftDmaRadarLite.Tarkov.GameWorld.Explosives
+namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives
 {
     /// <summary>
     /// Represents a 'Hot' grenade in Local Game World.

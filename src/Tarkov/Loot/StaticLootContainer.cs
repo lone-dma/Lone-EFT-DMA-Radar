@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -27,13 +27,13 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using EftDmaRadarLite.Misc;
-using EftDmaRadarLite.Tarkov.Data;
-using EftDmaRadarLite.Tarkov.Player;
-using EftDmaRadarLite.UI.Radar.Maps;
-using EftDmaRadarLite.UI.Skia;
+using LoneEftDmaRadar.Misc;
+using LoneEftDmaRadar.Tarkov.Data;
+using LoneEftDmaRadar.Tarkov.Player;
+using LoneEftDmaRadar.UI.Radar.Maps;
+using LoneEftDmaRadar.UI.Skia;
 
-namespace EftDmaRadarLite.Tarkov.Loot
+namespace LoneEftDmaRadar.Tarkov.Loot
 {
     public sealed class StaticLootContainer : LootContainer
     {

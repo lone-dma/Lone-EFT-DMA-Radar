@@ -1,7 +1,7 @@
-﻿<Window x:Class="EftDmaRadarLite.UI.Misc.LoadingWindow"
+﻿<Window x:Class="LoneEftDmaRadar.UI.Misc.LoadingWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="clr-namespace:EftDmaRadarLite.UI.Misc"
+        xmlns:vm="clr-namespace:LoneEftDmaRadar.UI.Misc"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
@@ -13,7 +13,8 @@
         ShowInTaskbar="False"
         Topmost="True"
         Background="White"
-        AllowsTransparency="False">
+        AllowsTransparency="False"
+        Icon="/lone-icon.ico">
 
     <!-- design-time only -->
     <d:Window.DataContext>

@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -27,21 +27,21 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using EftDmaRadarLite.Misc;
-using EftDmaRadarLite.Tarkov.Data;
-using EftDmaRadarLite.Tarkov.GameWorld.Exits;
-using EftDmaRadarLite.Tarkov.GameWorld.Explosives;
-using EftDmaRadarLite.Tarkov.Loot;
-using EftDmaRadarLite.Tarkov.Player;
-using EftDmaRadarLite.Tarkov.Quests;
-using EftDmaRadarLite.UI.Loot;
-using EftDmaRadarLite.UI.Radar.Maps;
-using EftDmaRadarLite.UI.Radar.Views;
-using EftDmaRadarLite.UI.Skia;
+using LoneEftDmaRadar.Misc;
+using LoneEftDmaRadar.Tarkov.Data;
+using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
+using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
+using LoneEftDmaRadar.Tarkov.Loot;
+using LoneEftDmaRadar.Tarkov.Player;
+using LoneEftDmaRadar.Tarkov.Quests;
+using LoneEftDmaRadar.UI.Loot;
+using LoneEftDmaRadar.UI.Radar.Maps;
+using LoneEftDmaRadar.UI.Radar.Views;
+using LoneEftDmaRadar.UI.Skia;
 using SkiaSharp.Views.WPF;
 using System.Windows.Controls;
 
-namespace EftDmaRadarLite.UI.Radar.ViewModels
+namespace LoneEftDmaRadar.UI.Radar.ViewModels
 {
     public sealed class RadarViewModel
     {

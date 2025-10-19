@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -27,19 +27,19 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using EftDmaRadarLite.Tarkov.Data;
-using EftDmaRadarLite.Tarkov.GameWorld;
-using EftDmaRadarLite.Tarkov.Quests;
-using EftDmaRadarLite.UI.ColorPicker;
-using EftDmaRadarLite.UI.Data;
-using EftDmaRadarLite.UI.Hotkeys;
-using EftDmaRadarLite.UI.Misc;
-using EftDmaRadarLite.UI.Radar.Views;
-using EftDmaRadarLite.UI.Skia;
+using LoneEftDmaRadar.Tarkov.Data;
+using LoneEftDmaRadar.Tarkov.GameWorld;
+using LoneEftDmaRadar.Tarkov.Quests;
+using LoneEftDmaRadar.UI.ColorPicker;
+using LoneEftDmaRadar.UI.Data;
+using LoneEftDmaRadar.UI.Hotkeys;
+using LoneEftDmaRadar.UI.Misc;
+using LoneEftDmaRadar.UI.Radar.Views;
+using LoneEftDmaRadar.UI.Skia;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
-namespace EftDmaRadarLite.UI.Radar.ViewModels
+namespace LoneEftDmaRadar.UI.Radar.ViewModels
 {
     public sealed class SettingsViewModel : INotifyPropertyChanged
     {

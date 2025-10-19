@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -30,7 +30,7 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace EftDmaRadarLite.UI.Misc
+namespace LoneEftDmaRadar.UI.Misc
 {
     /// <summary>
     /// Converts a hex/color‐name string ↔ System.Windows.Media.Color.

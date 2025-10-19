@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-namespace EftDmaRadarLite.UI.Skia
+namespace LoneEftDmaRadar.UI.Skia
 {
     internal static class CustomFonts
     {
@@ -40,7 +40,7 @@ namespace EftDmaRadarLite.UI.Skia
             try
             {
                 byte[] neoSansStdRegular;
-                using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("EftDmaRadarLite.NeoSansStdRegular.otf"))
+                using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LoneEftDmaRadar.NeoSansStdRegular.otf"))
                 {
                     neoSansStdRegular = new byte[stream!.Length];
                     stream.ReadExactly(neoSansStdRegular);

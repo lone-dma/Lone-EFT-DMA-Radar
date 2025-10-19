@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -28,7 +28,7 @@ SOFTWARE.
 
 using System.Net.Http.Json;
 
-namespace EftDmaRadarLite.Tarkov.Data.TarkovMarket
+namespace LoneEftDmaRadar.Tarkov.Data.TarkovMarket
 {
     internal static class TarkovDevCore
     {

@@ -1,5 +1,5 @@
 ﻿/*
- * EFT DMA Radar Lite
+ * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
 MIT License
@@ -26,13 +26,13 @@ SOFTWARE.
  *
 */
 
-using EftDmaRadarLite.Tarkov.GameWorld;
-using EftDmaRadarLite.Tarkov.Loot;
-using EftDmaRadarLite.Tarkov.Player;
-using EftDmaRadarLite.UI.Skia;
+using LoneEftDmaRadar.Tarkov.GameWorld;
+using LoneEftDmaRadar.Tarkov.Loot;
+using LoneEftDmaRadar.Tarkov.Player;
+using LoneEftDmaRadar.UI.Skia;
 using SkiaSharp.Views.WPF;
 
-namespace EftDmaRadarLite.UI.Radar
+namespace LoneEftDmaRadar.UI.Radar
 {
     public sealed class EspWidget : AbstractSKWidget
     {
@@ -163,7 +163,7 @@ namespace EftDmaRadarLite.UI.Radar
         private void DrawPlayers(float scaleX, float scaleY)
         {
             var players = AllPlayers?
-                .Where(p => p.IsActive && p.IsAlive && p is not EftDmaRadarLite.Tarkov.Player.LocalPlayer);
+                .Where(p => p.IsActive && p.IsAlive && p is not LoneEftDmaRadar.Tarkov.Player.LocalPlayer);
 
             if (players is null)
                 return;
