@@ -546,7 +546,7 @@ namespace EftDmaRadarLite
         /// Mark players with suspicious stats.
         /// </summary>
         [JsonPropertyName("markSusPlayers")]
-        public bool MarkSusPlayers { get; set; } = true;
+        public bool MarkSusPlayers { get; set; } = false;
     }
 
     public sealed class LootConfig
