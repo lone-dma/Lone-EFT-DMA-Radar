@@ -26,6 +26,8 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.Misc;
+
 namespace LoneEftDmaRadar.UI.Skia
 {
     internal static class SKPaints
@@ -594,9 +596,32 @@ namespace LoneEftDmaRadar.UI.Skia
             IsAntialias = true
         };
 
+        public static SKPaint TextPlayersOverlayPMC { get; } = new()
+        {
+            IsStroke = false,
+            IsAntialias = true
+        };
+
+        public static SKPaint TextPlayersOverlayPScav { get; } = new()
+        {
+            IsStroke = false,
+            IsAntialias = true
+        };
+
+        public static SKPaint TextPlayersOverlayStreamer { get; } = new()
+        {
+            IsStroke = false,
+            IsAntialias = true
+        };
+
+        public static SKPaint TextPlayersOverlaySpecial { get; } = new()
+        {
+            IsStroke = false,
+            IsAntialias = true
+        };
+
         public static SKPaint TextPlayersOverlayFocused { get; } = new()
         {
-            Color = SKColors.Moccasin,
             IsStroke = false,
             IsAntialias = true
         };
