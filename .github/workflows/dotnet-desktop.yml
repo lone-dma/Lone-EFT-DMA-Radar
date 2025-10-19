@@ -23,7 +23,7 @@ jobs:
 
       - name: Dotnet Publish
         run: |
-          dotnet publish src/eft-dma-radar-lite.csproj \
+          dotnet publish src/lone-eft-dma-radar.csproj \
             -c Release \
             -r win-x64 \
             --no-self-contained \
@@ -35,10 +35,10 @@ jobs:
       - name: Archive publish output
         run: |
           cd out
-          zip -r ../eft-dma-radar-lite.zip .
+          zip -r ../lone-eft-dma-radar.zip .
 
       - name: Upload to "latest" release (overwrite old asset)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload latest eft-dma-radar-lite.zip --clobber
+          gh release upload latest lone-eft-dma-radar.zip --clobber
