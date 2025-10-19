@@ -30,7 +30,10 @@ using Collections.Pooled;
 using EftDmaRadarLite.Misc;
 using EftDmaRadarLite.Tarkov.Player;
 using EftDmaRadarLite.UI.Skia;
+using EftDmaRadarLite.Unity.Structures;
 using SkiaSharp.Views.WPF;
+using System.Windows.Shapes;
+using static SDK.Offsets;
 
 namespace EftDmaRadarLite.UI.Radar
 {
@@ -95,10 +98,22 @@ namespace EftDmaRadarLite.UI.Radar
                 pos += width;
             }
 
-            using var lines = new PooledList<string>(capacity: 32);
+            // Sort & filter
+            var localPos = localPlayer.Position;
+            using var filteredPlayers = players
+                .Where(p => p.IsHumanHostileActive)
+                .OrderBy(p => Vector3.Distance(localPos, p.Position))
+                .ToPooledList();
 
-            // Header
-            lines.Add(MakeRow(
+            // Setup Frame and Draw Header
+            var font = SKFonts.InfoWidgetFont;
+            float pad = 2.5f * ScaleFactor;
+            float maxLength = 0f;
+            var drawPt = new SKPoint(
+                ClientRectangle.Left + pad,
+                ClientRectangle.Top + font.Spacing / 2 + pad);
+
+            string header = MakeRow(
                 "Fac / Lvl / Name", // c1
                 "Acct",             // c2
                 "K/D",              // c3
@@ -107,13 +122,20 @@ namespace EftDmaRadarLite.UI.Radar
                 "S/R%",             // c6
                 "Grp",              // c7
                 "Value",            // c8
-                "In Hands"));       // c9
+                "In Hands");       // c9
 
-            // Sort & filter
-            var localPos = localPlayer.Position;
-            var filteredPlayers = players
-                .Where(p => p.IsHumanHostileActive)
-                .OrderBy(p => Vector3.Distance(localPos, p.Position));
+            var len = font.MeasureText(header);
+            if (len > maxLength) maxLength = len;
+
+            Size = new SKSize(maxLength + pad, filteredPlayers.Count * font.Spacing);
+            Draw(canvas); // Background/frame
+
+            canvas.DrawText(header,
+                drawPt,
+                SKTextAlign.Left,
+                font,
+                SKPaints.TextPlayersOverlay);
+            drawPt.Y += font.Spacing;
 
             foreach (var player in filteredPlayers)
             {
@@ -151,11 +173,10 @@ namespace EftDmaRadarLite.UI.Radar
                 }
 
                 string grp = player.GroupID != -1 ? player.GroupID.ToString() : "--";
-                string focused = player.IsFocused ? "*" : string.Empty;
-                string facLvlName = $"{focused}{faction}{level}:{name}";
+                string facLvlName = $"{faction}{level}:{name}";
                 string value = Utilities.FormatNumberKM(player.Gear?.Value ?? 0);
 
-                lines.Add(MakeRow(
+                string line = MakeRow(
                     facLvlName,
                     edition,
                     kd,
@@ -164,35 +185,14 @@ namespace EftDmaRadarLite.UI.Radar
                     survivePercent,
                     grp,
                     value,
-                    inHands));
-            }
+                    inHands);
 
-            var font = SKFonts.InfoWidgetFont;
-            float lineSpacing = font.Spacing;
-            float pad = 2.5f * ScaleFactor;
-            float maxLength = 0f;
-
-            foreach (var line in lines)
-            {
-                var len = font.MeasureText(line);
-                if (len > maxLength) maxLength = len;
-            }
-
-            Size = new SKSize(maxLength + pad, lines.Count * lineSpacing);
-            Draw(canvas); // Background/frame
-
-            var drawPt = new SKPoint(
-                ClientRectangle.Left + pad,
-                ClientRectangle.Top + lineSpacing / 2 + pad);
-
-            foreach (var line in lines)
-            {
                 canvas.DrawText(line,
-                                drawPt,
-                                SKTextAlign.Left,
-                                font,
-                                SKPaints.TextPlayersOverlay);
-                drawPt.Y += lineSpacing;
+                    drawPt,
+                    SKTextAlign.Left,
+                    font,
+                    player.IsFocused ? SKPaints.TextPlayersOverlayFocused : SKPaints.TextPlayersOverlay);
+                drawPt.Y += font.Spacing;
             }
         }
 

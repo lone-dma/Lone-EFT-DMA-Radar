@@ -594,6 +594,13 @@ namespace EftDmaRadarLite.UI.Skia
             IsAntialias = true
         };
 
+        public static SKPaint TextPlayersOverlayFocused { get; } = new()
+        {
+            Color = SKColors.Moccasin,
+            IsStroke = false,
+            IsAntialias = true
+        };
+
         #endregion
 
     }

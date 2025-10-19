@@ -541,6 +541,12 @@ namespace EftDmaRadarLite
         /// </summary>
         [JsonPropertyName("aiAimlines")]
         public bool AIAimlines { get; set; } = true;
+
+        /// <summary>
+        /// Mark players with suspicious stats.
+        /// </summary>
+        [JsonPropertyName("markSusPlayers")]
+        public bool MarkSusPlayers { get; set; } = true;
     }
 
     public sealed class LootConfig

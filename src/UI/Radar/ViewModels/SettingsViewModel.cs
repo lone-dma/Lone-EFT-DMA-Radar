@@ -404,6 +404,19 @@ namespace EftDmaRadarLite.UI.Radar.ViewModels
             }
         }
 
+        public bool MarkSusPlayers
+        {
+            get => App.Config.UI.MarkSusPlayers;
+            set
+            {
+                if (App.Config.UI.MarkSusPlayers != value)
+                {
+                    App.Config.UI.MarkSusPlayers = value;
+                    OnPropertyChanged(nameof(MarkSusPlayers));
+                }
+            }
+        }
+
         public bool ShowLoot
         {
             get => App.Config.Loot.Enabled;

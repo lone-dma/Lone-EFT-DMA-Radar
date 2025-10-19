@@ -112,6 +112,28 @@ namespace EftDmaRadarLite.Tarkov.Player
                 Acct = "--";
         }
 
+        /// <summary>
+        /// Focuses the player if they meet "suspicious" criteria.
+        /// Can be clicked off by the user.
+        /// </summary>
+        private void FocusIfSus()
+        {
+            if (_player.Type is not PlayerType.PMC or PlayerType.PScav)
+                return;
+            if (Overall_KD is float kd && kd >= 15f) // Excessive KD (or they are just really good and we should watch them anyway!)
+            {
+                _player.IsFocused = true;
+            }
+            else if (Hours is int hrs && hrs < 100) // Low hours played, could be a smurf
+            {
+                _player.IsFocused = true;
+            }
+            else if (SurvivedRate is float sr && (sr >= 65f || sr <= 25f)) // Very high survival rate, or if they excessively KD dropped a really low s/r
+            {
+                _player.IsFocused = true;
+            }
+        }
+
         private void RefreshMemberCategory(Enums.EMemberCategory memberCategory)
         {
             try
@@ -166,6 +188,10 @@ namespace EftDmaRadarLite.Tarkov.Player
                 if (_data == value) return;
                 _data = value;
                 RefreshProfile();
+                if (App.Config.UI.MarkSusPlayers)
+                {
+                    FocusIfSus();
+                }
                 OnPropertyChanged(nameof(Data));
             }
         }

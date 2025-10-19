@@ -178,6 +178,10 @@ Toggle Fullscreen: F11
                                   ToolTip="Enables dynamic aimlines for AI Players. When you are being aimed at the aimlines will extend."
                                   IsChecked="{Binding AIAimlines, Mode=TwoWay}"
                                   Margin="0,0,0,8" />
+                        <CheckBox Content="Mark Sus Players"
+                                  ToolTip="Marks players as suspicious based on certain criteria (K/D, S/R, etc.)"
+                                  IsChecked="{Binding MarkSusPlayers, Mode=TwoWay}"
+                                  Margin="0,0,0,8" />
                     </WrapPanel>
 
                 </StackPanel>
