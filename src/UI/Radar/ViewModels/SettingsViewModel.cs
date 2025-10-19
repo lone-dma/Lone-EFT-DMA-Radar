@@ -38,6 +38,7 @@ using LoneEftDmaRadar.UI.Radar.Views;
 using LoneEftDmaRadar.UI.Skia;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using System.Windows.Navigation;
 
 namespace LoneEftDmaRadar.UI.Radar.ViewModels
 {
@@ -47,10 +48,12 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        public ICommand AboutUrlCommand { get; }
 
         public SettingsViewModel(SettingsTab parent)
         {
             _parent = parent ?? throw new ArgumentNullException(nameof(parent));
+            AboutUrlCommand = new SimpleCommand(OnAboutUrl);
             RestartRadarCommand = new SimpleCommand(OnRestartRadar);
             OpenHotkeyManagerCommand = new SimpleCommand(OnOpenHotkeyManager);
             OpenColorPickerCommand = new SimpleCommand(OnOpenColorPicker);
@@ -61,6 +64,12 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             CameraManager.UpdateViewportRes();
             SetScaleValues(UIScale);
             parent.IsVisibleChanged += Parent_IsVisibleChanged;
+        }
+
+        private void OnAboutUrl()
+        {
+            const string url = "https://lone-dma.org/";
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
         }
 
         private void Parent_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)

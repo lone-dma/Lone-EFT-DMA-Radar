@@ -16,6 +16,11 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Orientation="Vertical"
                     Margin="0,0,0,10">
+            <!-- About Info -->
+            <TextBlock 
+                TextWrapping="Wrap" 
+                FontSize="16">ℹ️ Get the latest version at <Hyperlink Command="{Binding AboutUrlCommand}">lone-dma.org</Hyperlink>
+            </TextBlock>
 
             <!-- Radar / General Settings -->
             <GroupBox Header="Radar / General Settings"
