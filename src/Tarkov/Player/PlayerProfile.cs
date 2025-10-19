@@ -128,7 +128,7 @@ namespace LoneEftDmaRadar.Tarkov.Player
             {
                 _player.IsFocused = true;
             }
-            else if (SurvivedRate is float sr && (sr >= 65f || sr <= 25f)) // Very high survival rate, or if they excessively KD dropped a really low s/r
+            else if (SurvivedRate is float sr && (sr >= 65f || sr < 20f)) // Very high survival rate, or if they excessively KD dropped a really low s/r
             {
                 _player.IsFocused = true;
             }
