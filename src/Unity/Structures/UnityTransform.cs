@@ -27,6 +27,7 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
+using LoneEftDmaRadar.DMA;
 using LoneEftDmaRadar.Misc;
 
 namespace LoneEftDmaRadar.Unity.Structures
