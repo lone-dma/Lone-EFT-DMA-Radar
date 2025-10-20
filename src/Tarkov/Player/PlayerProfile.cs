@@ -124,7 +124,7 @@ namespace LoneEftDmaRadar.Tarkov.Player
             {
                 _player.IsFocused = true;
             }
-            else if (Hours is int hrs && hrs < 100) // Low hours played, could be a smurf
+            else if (Hours is int hrs && hrs < 50) // Low hours played, could be a smurf
             {
                 _player.IsFocused = true;
             }
