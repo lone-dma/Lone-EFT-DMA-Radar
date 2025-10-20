@@ -29,10 +29,9 @@ SOFTWARE.
 using LoneEftDmaRadar.Tarkov.GameWorld;
 using LoneEftDmaRadar.Tarkov.Loot;
 using LoneEftDmaRadar.Tarkov.Player;
-using LoneEftDmaRadar.UI.Skia;
 using SkiaSharp.Views.WPF;
 
-namespace LoneEftDmaRadar.UI.Radar
+namespace LoneEftDmaRadar.UI.Skia
 {
     public sealed class EspWidget : AbstractSKWidget
     {

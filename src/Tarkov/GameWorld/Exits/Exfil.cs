@@ -30,7 +30,6 @@ using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Mono.Collections;
 using LoneEftDmaRadar.Tarkov.Data;
 using LoneEftDmaRadar.Tarkov.Player;
-using LoneEftDmaRadar.UI.Radar;
 using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Skia;
 using LoneEftDmaRadar.Unity;
@@ -180,11 +179,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
 
         public void DrawMouseover(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
-            List<string> lines = new();
             var exfilName = Name;
             exfilName ??= "unknown";
-            lines.Add($"{exfilName} ({Status.ToString()})");
-            Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams).DrawMouseoverText(canvas, lines);
+            Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams).DrawMouseoverText(canvas, $"{exfilName} ({Status.ToString()})");
         }
 
         #endregion

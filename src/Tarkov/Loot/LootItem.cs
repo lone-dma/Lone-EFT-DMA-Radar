@@ -31,7 +31,6 @@ using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.Data.TarkovMarket;
 using LoneEftDmaRadar.Tarkov.Player;
 using LoneEftDmaRadar.UI.Loot;
-using LoneEftDmaRadar.UI.Radar;
 using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Skia;
 using LoneEftDmaRadar.Unity;
@@ -342,7 +341,7 @@ namespace LoneEftDmaRadar.Tarkov.Loot
                     return; // Don't draw single items
                 }
 
-                Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams).DrawMouseoverText(canvas, lines);
+                Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams).DrawMouseoverText(canvas, lines.Span);
             }
         }
 

@@ -103,11 +103,7 @@ namespace LoneEftDmaRadar.Tarkov.Loot
 
         public override void DrawMouseover(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
-            using var lines = new PooledList<string>
-            {
-                Name
-            };
-            Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams).DrawMouseoverText(canvas, lines);
+            Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams).DrawMouseoverText(canvas, Name);
         }
     }
 }

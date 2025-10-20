@@ -26,8 +26,8 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.UI.Radar;
 using LoneEftDmaRadar.UI.Radar.ViewModels;
+using LoneEftDmaRadar.UI.Skia;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
 
