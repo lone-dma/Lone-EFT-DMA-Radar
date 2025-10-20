@@ -1,9 +1,49 @@
-﻿using LoneEftDmaRadar.UI.Radar.Maps;
+﻿/*
+ * Lone EFT DMA Radar
+ * Brought to you by Lone (Lone DMA)
+ * 
+MIT License
+
+Copyright (c) 2025 Lone DMA
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ *
+*/
+
+using LoneEftDmaRadar.UI.Radar.Maps;
 
 namespace LoneEftDmaRadar.UI.Skia
 {
     internal static class SkiaExtensions
     {
+        private static readonly SKPath _arrowBase;
+
+        static SkiaExtensions()
+        {
+            // Define a down arrow centered at (0,0)
+            _arrowBase = new SKPath();
+            _arrowBase.MoveTo(0, 0);      // tip (down)
+            _arrowBase.LineTo(-1, -1);    // top-left
+            _arrowBase.LineTo(1, -1);     // top-right
+            _arrowBase.Close();
+        }
+
         /// <summary>
         /// Adjusts perceived brightness by changing HSL lightness, preserving hue/saturation and alpha.
         /// Black and white are returned unchanged.
@@ -121,36 +161,38 @@ namespace LoneEftDmaRadar.UI.Skia
         /// <summary>
         /// Gets a drawable 'Up Arrow'. IDisposable. Applies UI Scaling internally.
         /// </summary>
-        public static SKPath GetUpArrow(this SKPoint point, float size = 6, float offsetX = 0, float offsetY = 0)
+        public static SKPath GetUpArrow(this SKPoint point, float size = 6f, float offsetX = 0f, float offsetY = 0f)
         {
-            float x = point.X + offsetX;
-            float y = point.Y + offsetY;
+            float scale = size * App.Config.UI.UIScale;
+            float tx = point.X + offsetX;
+            float ty = point.Y + offsetY;
 
-            size *= App.Config.UI.UIScale;
-            var path = new SKPath();
-            path.MoveTo(x, y);
-            path.LineTo(x - size, y + size);
-            path.LineTo(x + size, y + size);
-            path.Close();
+            // Flip vertically by using a negative Y scale
+            var matrix = SKMatrix.CreateScale(scale, -scale);
+            var translate = SKMatrix.CreateTranslation(tx, ty);
+            var transform = SKMatrix.Concat(translate, matrix);
 
+            var path = new SKPath(_arrowBase);
+            path.Transform(transform);
             return path;
         }
+
 
         /// <summary>
         /// Gets a drawable 'Down Arrow'. IDisposable. Applies UI Scaling internally.
         /// </summary>
-        public static SKPath GetDownArrow(this SKPoint point, float size = 6, float offsetX = 0, float offsetY = 0)
+        public static SKPath GetDownArrow(this SKPoint point, float size = 6f, float offsetX = 0f, float offsetY = 0f)
         {
-            float x = point.X + offsetX;
-            float y = point.Y + offsetY;
+            float scale = size * App.Config.UI.UIScale;
+            float tx = point.X + offsetX;
+            float ty = point.Y + offsetY;
 
-            size *= App.Config.UI.UIScale;
-            var path = new SKPath();
-            path.MoveTo(x, y);
-            path.LineTo(x - size, y - size);
-            path.LineTo(x + size, y - size);
-            path.Close();
+            var matrix = SKMatrix.CreateScale(scale, scale);
+            var translate = SKMatrix.CreateTranslation(tx, ty);
+            var transform = SKMatrix.Concat(translate, matrix);
 
+            var path = new SKPath(_arrowBase);
+            path.Transform(transform);
             return path;
         }
 
@@ -160,45 +202,60 @@ namespace LoneEftDmaRadar.UI.Skia
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void DrawMineMarker(this SKPoint zoomedMapPos, SKCanvas canvas)
         {
-            float length = 3.5f * App.Config.UI.UIScale;
-            canvas.DrawLine(new SKPoint(zoomedMapPos.X - length, zoomedMapPos.Y + length), new SKPoint(zoomedMapPos.X + length, zoomedMapPos.Y - length), SKPaints.PaintExplosives);
-            canvas.DrawLine(new SKPoint(zoomedMapPos.X - length, zoomedMapPos.Y - length), new SKPoint(zoomedMapPos.X + length, zoomedMapPos.Y + length), SKPaints.PaintExplosives);
+            float scale = App.Config.UI.UIScale;
+            float len = 3.5f * scale;
+            float x = zoomedMapPos.X;
+            float y = zoomedMapPos.Y;
+
+            // Use inline coordinates instead of allocating SKPoints
+            var paint = SKPaints.PaintExplosives;
+
+            canvas.DrawLine(x - len, y + len, x + len, y - len, paint);
+            canvas.DrawLine(x - len, y - len, x + len, y + len, paint);
         }
 
         /// <summary>
         /// Draws Mouseover Text (with backer) on this zoomed location.
         /// </summary>
-        public static void DrawMouseoverText(this SKPoint zoomedMapPos, SKCanvas canvas, IEnumerable<string> lines)
+        public static void DrawMouseoverText(this SKPoint zoomedMapPos, SKCanvas canvas, params ReadOnlySpan<string> lines)
         {
+            if (lines.IsEmpty)
+                return;
 
-            float maxLength = 0;
+            // Measure
+            var font = SKFonts.UIRegular;
+            SKSize backerSize = default;
             foreach (var line in lines)
             {
-                var length = SKFonts.UIRegular.MeasureText(line);
-                if (length > maxLength)
-                    maxLength = length;
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+                backerSize.Height += font.Spacing;
+                var textWidth = font.MeasureText(line);
+                if (textWidth > backerSize.Width)
+                    backerSize.Width = textWidth;
             }
+            // Draw Backer
             var backer = new SKRect
             {
-                Bottom = zoomedMapPos.Y + ((lines.Count() * 12f) - 2) * App.Config.UI.UIScale,
-                Left = zoomedMapPos.X + (9 * App.Config.UI.UIScale),
-                Top = zoomedMapPos.Y - (9 * App.Config.UI.UIScale),
-                Right = zoomedMapPos.X + (9 * App.Config.UI.UIScale) + maxLength + (6 * App.Config.UI.UIScale)
+                Bottom = zoomedMapPos.Y + backerSize.Height,
+                Left = zoomedMapPos.X,
+                Top = zoomedMapPos.Y,
+                Right = zoomedMapPos.X + backerSize.Width
             };
             canvas.DrawRect(backer, SKPaints.PaintTransparentBacker); // Draw tooltip backer
-            zoomedMapPos.Offset(11 * App.Config.UI.UIScale, 3 * App.Config.UI.UIScale);
+            // Draw Lines
+            zoomedMapPos.Offset(0, font.Size);
             foreach (var line in lines) // Draw tooltip text
             {
-                if (string.IsNullOrEmpty(line?.Trim()))
+                if (string.IsNullOrWhiteSpace(line))
                     continue;
                 canvas.DrawText(line,
                     zoomedMapPos,
                     SKTextAlign.Left,
-                    SKFonts.UIRegular,
+                    font,
                     SKPaints.TextMouseover); // draw line text
-                zoomedMapPos.Offset(0, 12f * App.Config.UI.UIScale);
+                zoomedMapPos.Offset(0, font.Spacing);
             }
-
         }
     }
 }

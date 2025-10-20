@@ -29,7 +29,7 @@ SOFTWARE.
 using LoneEftDmaRadar.Tarkov.Player;
 using LoneEftDmaRadar.UI.Radar.Maps;
 
-namespace LoneEftDmaRadar.UI.Radar
+namespace LoneEftDmaRadar.UI.Skia
 {
     /// <summary>
     /// Defines a Radar Map Mouseover Entity.

@@ -26,8 +26,8 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.UI.Radar;
 using LoneEftDmaRadar.UI.Radar.Maps;
+using LoneEftDmaRadar.UI.Skia;
 using LoneEftDmaRadar.Unity;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits

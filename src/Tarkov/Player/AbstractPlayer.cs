@@ -30,7 +30,6 @@ using Collections.Pooled;
 using LoneEftDmaRadar.DMA;
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.Loot;
-using LoneEftDmaRadar.UI.Radar;
 using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Radar.ViewModels;
 using LoneEftDmaRadar.UI.Skia;
@@ -1000,7 +999,7 @@ namespace LoneEftDmaRadar.Tarkov.Player
                 lines.Add(name);
             }
 
-            Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams).DrawMouseoverText(canvas, lines);
+            Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams).DrawMouseoverText(canvas, lines.Span);
         }
 
         #endregion

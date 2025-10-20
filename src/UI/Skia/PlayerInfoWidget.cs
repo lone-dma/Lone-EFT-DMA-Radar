@@ -29,13 +29,12 @@ SOFTWARE.
 using Collections.Pooled;
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.Player;
-using LoneEftDmaRadar.UI.Skia;
 using LoneEftDmaRadar.Unity.Structures;
 using SkiaSharp.Views.WPF;
 using System.Windows.Shapes;
 using static SDK.Offsets;
 
-namespace LoneEftDmaRadar.UI.Radar
+namespace LoneEftDmaRadar.UI.Skia
 {
     public sealed class PlayerInfoWidget : AbstractSKWidget
     {
@@ -135,7 +134,7 @@ namespace LoneEftDmaRadar.UI.Radar
                 SKTextAlign.Left,
                 font,
                 SKPaints.TextPlayersOverlay);
-            drawPt.Y += font.Spacing;
+            drawPt.Offset(0, font.Spacing);
 
             foreach (var player in filteredPlayers)
             {
@@ -144,12 +143,12 @@ namespace LoneEftDmaRadar.UI.Radar
                 string inHands = player.Hands?.DisplayString ?? "--";
 
                 // Defaults
-                string edition = "--";
-                string level = "0";
-                string kd = "--";
-                string raidCount = "--";
-                string survivePercent = "--";
-                string hours = "--";
+                string edition = null;
+                string level = null;
+                string kd = null;
+                string raidCount = null;
+                string survivePercent = null;
+                string hours = null;
 
                 if (player is ObservedPlayer { Profile: { } profile })
                 {
@@ -173,16 +172,16 @@ namespace LoneEftDmaRadar.UI.Radar
                 }
 
                 string grp = player.GroupID != -1 ? player.GroupID.ToString() : "--";
-                string facLvlName = $"{faction}{level}:{name}";
+                string facLvlName = $"{faction}{level ?? "0"}:{name}";
                 string value = Utilities.FormatNumberKM(player.Gear?.Value ?? 0);
 
                 string line = MakeRow(
                     facLvlName,
-                    edition,
-                    kd,
-                    hours,
-                    raidCount,
-                    survivePercent,
+                    edition ?? "--",
+                    kd ?? "--",
+                    hours ?? "--",
+                    raidCount ?? "--",
+                    survivePercent ?? "--",
                     grp,
                     value,
                     inHands);
@@ -192,7 +191,7 @@ namespace LoneEftDmaRadar.UI.Radar
                     SKTextAlign.Left,
                     font,
                     GetTextPaint(player));
-                drawPt.Y += font.Spacing;
+                drawPt.Offset(0, font.Spacing);
             }
         }
 
