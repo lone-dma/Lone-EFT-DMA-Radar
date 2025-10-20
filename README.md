@@ -12,3 +12,9 @@ This is the original Lone EFT DMA Radar by Lone, with some key differences from 
 2. New & Improved WPF User Interface.
 
 This version is designed to be as safe as possible from any future detections, and gives you the information that you need while allowing you to fully experience the game for yourself.
+
+## 💖 Special Thanks
+- @xx0m and @Mambo-Noob
+  - For keeping the DER Community running, and doing an awesome job keeping the other eft-dma-radar fork maintained. Thank you!
+- Marazm
+  - For your hard work on maps, and your willingness to contribute them to the open domain. Thank you!
