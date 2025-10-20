@@ -15,6 +15,6 @@ This version is designed to be as safe as possible from any future detections, a
 
 ## 💖 Special Thanks
 - @xx0m and @Mambo-Noob
-  - For keeping the DER Community running, and doing an awesome job keeping the other eft-dma-radar fork maintained!
+  - For keeping the DER Community running, and doing an awesome job keeping the other eft-dma-radar fork maintained. Thank you!
 - Marazm
   - For your hard work on maps, and your willingness to contribute them to the open domain. Thank you!
