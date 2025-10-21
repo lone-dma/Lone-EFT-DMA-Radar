@@ -49,7 +49,6 @@ namespace LoneEftDmaRadar.Tarkov.Player
         #region Static Interfaces
 
         public static implicit operator ulong(AbstractPlayer x) => x.Base;
-        private static readonly SKPath _deathMarker = CreateDeathMarkerPath();
         protected static readonly ConcurrentDictionary<string, int> _groups = new(StringComparer.OrdinalIgnoreCase);
         protected static int _lastGroupNumber;
         protected static int _lastPscavNumber;
@@ -64,6 +63,40 @@ namespace LoneEftDmaRadar.Tarkov.Player
             _groups.Clear();
             _lastGroupNumber = default;
             _lastPscavNumber = default;
+        }
+
+        #endregion
+
+        #region Cached Skia Paths
+
+        private static readonly SKPath _playerPill = CreatePlayerPillBase();
+        private static readonly SKPath _deathMarker = CreateDeathMarkerPath();
+        private const float PP_LENGTH = 9f;
+        private const float PP_RADIUS = 3f;
+        private const float PP_HALF_HEIGHT = PP_RADIUS * 0.85f;
+        private const float PP_NOSE_X = PP_LENGTH / 2f + PP_RADIUS * 0.18f;
+
+        private static SKPath CreatePlayerPillBase()
+        {
+            var path = new SKPath();
+
+            // Rounded back (left side)
+            var backRect = new SKRect(-PP_LENGTH / 2f, -PP_HALF_HEIGHT, -PP_LENGTH / 2f + PP_RADIUS * 2f, PP_HALF_HEIGHT);
+            path.AddArc(backRect, 90, 180);
+
+            // Pointed nose (right side)
+            float backFrontX = -PP_LENGTH / 2f + PP_RADIUS;
+
+            float c1X = backFrontX + PP_RADIUS * 1.1f;
+            float c2X = PP_NOSE_X - PP_RADIUS * 0.28f;
+            float c1Y = -PP_HALF_HEIGHT * 0.55f;
+            float c2Y = -PP_HALF_HEIGHT * 0.3f;
+
+            path.CubicTo(c1X, c1Y, c2X, c2Y, PP_NOSE_X, 0f);
+            path.CubicTo(c2X, -c2Y, c1X, -c1Y, backFrontX, PP_HALF_HEIGHT);
+
+            path.Close();
+            return path;
         }
 
         private static SKPath CreateDeathMarkerPath()
@@ -799,7 +832,7 @@ namespace LoneEftDmaRadar.Tarkov.Player
                 }
                 else
                 {
-                    DrawPlayerMarker(canvas, localPlayer, point);
+                    DrawPlayerPill(canvas, localPlayer, point);
                     if (this == localPlayer)
                         return;
                     var height = Position.Y - localPlayer.Position.Y;
@@ -846,30 +879,41 @@ namespace LoneEftDmaRadar.Tarkov.Player
         }
 
         /// <summary>
-        /// Draws a Player Marker on this location.
+        /// Draws a Player Pill on this location.
         /// </summary>
-        private void DrawPlayerMarker(SKCanvas canvas, LocalPlayer localPlayer, SKPoint point)
+        private void DrawPlayerPill(SKCanvas canvas, LocalPlayer localPlayer, SKPoint point)
         {
-            var radians = MapRotation.ToRadians();
             var paints = GetPaints();
             if (this != localPlayer && RadarViewModel.MouseoverGroup is int grp && grp == GroupID)
                 paints.Item1 = SKPaints.PaintMouseoverGroup;
-            SKPaints.ShapeOutline.StrokeWidth = paints.Item1.StrokeWidth + 2f * App.Config.UI.UIScale;
 
-            var size = 6 * App.Config.UI.UIScale;
-            canvas.DrawCircle(point, size, SKPaints.ShapeOutline); // Draw outline
-            canvas.DrawCircle(point, size, paints.Item1); // draw LocalPlayer marker
+            float scale = 1.65f * App.Config.UI.UIScale;
+
+            canvas.Save();
+            canvas.Translate(point.X, point.Y);
+            canvas.Scale(scale, scale);
+            canvas.RotateDegrees(MapRotation);
+
+            SKPaints.ShapeOutline.StrokeWidth = paints.Item1.StrokeWidth * 1.3f;
+            // Draw the pill
+            canvas.DrawPath(_playerPill, SKPaints.ShapeOutline); // outline
+            canvas.DrawPath(_playerPill, paints.Item1);
 
             var aimlineLength = this == localPlayer || (IsFriendly && App.Config.UI.TeammateAimlines) ? 
-                App.Config.UI.AimLineLength : 15;
+                App.Config.UI.AimLineLength : 0;
             if (!IsFriendly && 
                 !(IsAI && !App.Config.UI.AIAimlines) &&
                 this.IsFacingTarget(localPlayer, App.Config.UI.MaxDistance)) // Hostile Player, check if aiming at a friendly (High Alert)
                 aimlineLength = 9999;
 
-            var aimlineEnd = GetAimlineEndpoint(point, radians, aimlineLength);
-            canvas.DrawLine(point, aimlineEnd, SKPaints.ShapeOutline); // Draw outline
-            canvas.DrawLine(point, aimlineEnd, paints.Item1); // draw LocalPlayer aimline
+            if (aimlineLength > 0)
+            {
+                // Draw line from nose tip forward
+                canvas.DrawLine(PP_NOSE_X, 0, PP_NOSE_X + aimlineLength, 0, SKPaints.ShapeOutline); // outline
+                canvas.DrawLine(PP_NOSE_X, 0, PP_NOSE_X + aimlineLength, 0, paints.Item1);
+            }
+
+            canvas.Restore();
         }
 
         /// <summary>
@@ -887,17 +931,6 @@ namespace LoneEftDmaRadar.Tarkov.Player
         }
 
         /// <summary>
-        /// Gets the point where the Aimline 'Line' ends. Applies UI Scaling internally.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static SKPoint GetAimlineEndpoint(SKPoint start, float radians, float aimlineLength)
-        {
-            aimlineLength *= App.Config.UI.UIScale;
-            return new SKPoint(start.X + MathF.Cos(radians) * aimlineLength,
-                start.Y + MathF.Sin(radians) * aimlineLength);
-        }
-
-        /// <summary>
         /// Draws Player Text on this location.
         /// </summary>
         private void DrawPlayerText(SKCanvas canvas, SKPoint point, IList<string> lines)
@@ -905,8 +938,7 @@ namespace LoneEftDmaRadar.Tarkov.Player
             var paints = GetPaints();
             if (RadarViewModel.MouseoverGroup is int grp && grp == GroupID)
                 paints.Item2 = SKPaints.TextMouseoverGroup;
-            var spacing = 3 * App.Config.UI.UIScale;
-            point.Offset(9 * App.Config.UI.UIScale, spacing);
+            point.Offset(9.5f * App.Config.UI.UIScale, 0);
             foreach (var line in lines)
             {
                 if (string.IsNullOrEmpty(line?.Trim()))
@@ -916,7 +948,7 @@ namespace LoneEftDmaRadar.Tarkov.Player
                 canvas.DrawText(line, point, SKTextAlign.Left, SKFonts.UIRegular, SKPaints.TextOutline); // Draw outline
                 canvas.DrawText(line, point, SKTextAlign.Left, SKFonts.UIRegular, paints.Item2); // draw line text
 
-                point.Offset(0, 12 * App.Config.UI.UIScale);
+                point.Offset(0, SKFonts.UIRegular.Spacing);
             }
         }
 
