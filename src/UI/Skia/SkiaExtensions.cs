@@ -32,16 +32,32 @@ namespace LoneEftDmaRadar.UI.Skia
 {
     internal static class SkiaExtensions
     {
-        private static readonly SKPath _arrowBase;
+        private static readonly SKPath _arrowBase = CreateArrowPath();
+        private static readonly SKPath _minePath = CreateMineMarkerPath();
 
-        static SkiaExtensions()
+        private static SKPath CreateArrowPath()
         {
             // Define a down arrow centered at (0,0)
-            _arrowBase = new SKPath();
-            _arrowBase.MoveTo(0, 0);      // tip (down)
-            _arrowBase.LineTo(-1, -1);    // top-left
-            _arrowBase.LineTo(1, -1);     // top-right
-            _arrowBase.Close();
+            var path = new SKPath();
+            path.MoveTo(0, 0);      // tip (down)
+            path.LineTo(-1, -1);    // top-left
+            path.LineTo(1, -1);     // top-right
+            path.Close();
+            return path;
+        }
+
+        private static SKPath CreateMineMarkerPath()
+        {
+            const float len = 3.5f; // base, unscaled length
+            var path = new SKPath();
+
+            path.MoveTo(-len, len);
+            path.LineTo(len, -len);
+
+            path.MoveTo(-len, -len);
+            path.LineTo(len, len);
+
+            return path;
         }
 
         /// <summary>
@@ -199,19 +215,15 @@ namespace LoneEftDmaRadar.UI.Skia
         /// <summary>
         /// Draws a Mine/Explosive Marker on this zoomed location.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void DrawMineMarker(this SKPoint zoomedMapPos, SKCanvas canvas)
         {
             float scale = App.Config.UI.UIScale;
-            float len = 3.5f * scale;
-            float x = zoomedMapPos.X;
-            float y = zoomedMapPos.Y;
 
-            // Use inline coordinates instead of allocating SKPoints
-            var paint = SKPaints.PaintExplosives;
-
-            canvas.DrawLine(x - len, y + len, x + len, y - len, paint);
-            canvas.DrawLine(x - len, y - len, x + len, y + len, paint);
+            canvas.Save();
+            canvas.Translate(zoomedMapPos.X, zoomedMapPos.Y);
+            canvas.Scale(scale, scale);
+            canvas.DrawPath(_minePath, SKPaints.PaintExplosives);
+            canvas.Restore();
         }
 
         /// <summary>

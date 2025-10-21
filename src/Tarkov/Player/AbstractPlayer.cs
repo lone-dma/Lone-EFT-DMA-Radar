@@ -49,6 +49,7 @@ namespace LoneEftDmaRadar.Tarkov.Player
         #region Static Interfaces
 
         public static implicit operator ulong(AbstractPlayer x) => x.Base;
+        private static readonly SKPath _deathMarker = CreateDeathMarkerPath();
         protected static readonly ConcurrentDictionary<string, int> _groups = new(StringComparer.OrdinalIgnoreCase);
         protected static int _lastGroupNumber;
         protected static int _lastPscavNumber;
@@ -63,6 +64,19 @@ namespace LoneEftDmaRadar.Tarkov.Player
             _groups.Clear();
             _lastGroupNumber = default;
             _lastPscavNumber = default;
+        }
+
+        private static SKPath CreateDeathMarkerPath()
+        {
+            const float length = 6f;
+            var path = new SKPath();
+
+            path.MoveTo(-length, length);
+            path.LineTo(length, -length);
+            path.MoveTo(-length, -length);
+            path.LineTo(length, length);
+
+            return path;
         }
 
         #endregion
@@ -861,14 +875,15 @@ namespace LoneEftDmaRadar.Tarkov.Player
         /// <summary>
         /// Draws a Death Marker on this location.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void DrawDeathMarker(SKCanvas canvas, SKPoint point)
         {
-            var length = 6 * App.Config.UI.UIScale;
-            canvas.DrawLine(new SKPoint(point.X - length, point.Y + length),
-                new SKPoint(point.X + length, point.Y - length), SKPaints.PaintDeathMarker);
-            canvas.DrawLine(new SKPoint(point.X - length, point.Y - length),
-                new SKPoint(point.X + length, point.Y + length), SKPaints.PaintDeathMarker);
+            float scale = App.Config.UI.UIScale;
+
+            canvas.Save();
+            canvas.Translate(point.X, point.Y);
+            canvas.Scale(scale, scale);
+            canvas.DrawPath(_deathMarker, SKPaints.PaintDeathMarker);
+            canvas.Restore();
         }
 
         /// <summary>
