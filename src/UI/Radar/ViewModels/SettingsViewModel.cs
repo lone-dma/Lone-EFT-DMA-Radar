@@ -249,17 +249,17 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             // Shape Outline is computed before usage due to different stroke widths
 
             SKPaints.PaintConnectorGroup.StrokeWidth = 2.25f * newScale;
-            SKPaints.PaintMouseoverGroup.StrokeWidth = 3 * newScale;
-            SKPaints.PaintLocalPlayer.StrokeWidth = 3 * newScale;
-            SKPaints.PaintTeammate.StrokeWidth = 3 * newScale;
-            SKPaints.PaintPMC.StrokeWidth = 3 * newScale;
-            SKPaints.PaintWatchlist.StrokeWidth = 3 * newScale;
-            SKPaints.PaintStreamer.StrokeWidth = 3 * newScale;
-            SKPaints.PaintScav.StrokeWidth = 3 * newScale;
-            SKPaints.PaintRaider.StrokeWidth = 3 * newScale;
-            SKPaints.PaintBoss.StrokeWidth = 3 * newScale;
-            SKPaints.PaintFocused.StrokeWidth = 3 * newScale;
-            SKPaints.PaintPScav.StrokeWidth = 3 * newScale;
+            SKPaints.PaintMouseoverGroup.StrokeWidth = 1.66f * newScale;
+            SKPaints.PaintLocalPlayer.StrokeWidth = 1.66f * newScale;
+            SKPaints.PaintTeammate.StrokeWidth = 1.66f * newScale;
+            SKPaints.PaintPMC.StrokeWidth = 1.66f * newScale;
+            SKPaints.PaintWatchlist.StrokeWidth = 1.66f * newScale;
+            SKPaints.PaintStreamer.StrokeWidth = 1.66f * newScale;
+            SKPaints.PaintScav.StrokeWidth = 1.66f * newScale;
+            SKPaints.PaintRaider.StrokeWidth = 1.66f * newScale;
+            SKPaints.PaintBoss.StrokeWidth = 1.66f * newScale;
+            SKPaints.PaintFocused.StrokeWidth = 1.66f * newScale;
+            SKPaints.PaintPScav.StrokeWidth = 1.66f * newScale;
             SKPaints.PaintCorpse.StrokeWidth = 3 * newScale;
             SKPaints.PaintMeds.StrokeWidth = 3 * newScale;
             SKPaints.PaintFood.StrokeWidth = 3 * newScale;

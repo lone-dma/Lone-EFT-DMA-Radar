@@ -83,7 +83,7 @@ Toggle Fullscreen: F11
                             <Slider x:Name="AimlineLengthSlider"
                                     Width="150"
                                     Margin="8,0"
-                                    Minimum="10"
+                                    Minimum="0"
                                     Maximum="1500"
                                     SmallChange="1"
                                     LargeChange="10"
