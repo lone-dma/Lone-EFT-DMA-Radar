@@ -28,11 +28,9 @@ SOFTWARE.
 
 using Collections.Pooled;
 using LoneEftDmaRadar.Misc;
-using LoneEftDmaRadar.Tarkov.Player;
-using LoneEftDmaRadar.Unity.Structures;
+using LoneEftDmaRadar.Tarkov.GameWorld.Player;
+using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
 using SkiaSharp.Views.WPF;
-using System.Windows.Shapes;
-using static SDK.Offsets;
 
 namespace LoneEftDmaRadar.UI.Skia
 {

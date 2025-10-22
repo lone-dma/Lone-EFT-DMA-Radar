@@ -46,19 +46,18 @@ global using System.Text.Json;
 global using System.Text.Json.Serialization;
 global using System.Windows;
 using LoneEftDmaRadar.DMA;
-using LoneEftDmaRadar.Misc.Cache;
-using LoneEftDmaRadar.Tarkov.Data;
-using LoneEftDmaRadar.Tarkov.Data.ProfileApi.Providers;
-using LoneEftDmaRadar.Tarkov.Data.TarkovMarket;
+using LoneEftDmaRadar.Misc.Services;
+using LoneEftDmaRadar.Tarkov;
 using LoneEftDmaRadar.UI.ColorPicker;
 using LoneEftDmaRadar.UI.Misc;
 using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Skia;
+using LoneEftDmaRadar.Web.EftApiTech;
+using LoneEftDmaRadar.Web.TarkovDev.Data;
+using LoneEftDmaRadar.Web.TarkovDev.Profiles;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Runtime.Versioning;
-using System.Security.Authentication;
 
 [assembly: SupportedOSPlatform("Windows")]
 [assembly: AssemblyVersion("1.0.*")]
@@ -154,7 +153,7 @@ namespace LoneEftDmaRadar
         await Task.Run(async () =>
         {
             await loadingWindow.ViewModel.UpdateProgressAsync(15, "Loading Tarkov.Dev Data...");
-            await EftDataManager.ModuleInitAsync(loadingWindow);
+            await TarkovDataManager.ModuleInitAsync(loadingWindow);
             await loadingWindow.ViewModel.UpdateProgressAsync(35, "Loading Map Assets...");
             EftMapManager.ModuleInit();
             await loadingWindow.ViewModel.UpdateProgressAsync(50, "Starting DMA Connection...");
@@ -184,41 +183,11 @@ namespace LoneEftDmaRadar
         private static IServiceProvider BuildServiceProvider()
         {
             var services = new ServiceCollection();
-            ConfigureHttpClientFactory(services);
-            TarkovDevApi.Configure(services);
-            TarkovDevProfilesProvider.Configure(services);
+            services.AddHttpClient(); // Add default HttpClientFactory
+            TarkovDevGraphQLApi.Configure(services);
+            TarkovDevProfileProvider.Configure(services);
             EftApiTechProvider.Configure(services);
             return services.BuildServiceProvider();
-        }
-
-        /// <summary>
-        /// Sets up the HttpClientFactory for the application.
-        /// </summary>
-        /// <param name="services"></param>
-        private static void ConfigureHttpClientFactory(IServiceCollection services)
-        {
-            services.AddHttpClient("default", client =>
-            {
-                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("br"));
-                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
-                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
-                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("identity"));
-            })
-            .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler()
-            {
-                SslOptions = new()
-                {
-                    EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13
-                },
-                AllowAutoRedirect = true,
-                AutomaticDecompression = DecompressionMethods.Brotli | DecompressionMethods.GZip | DecompressionMethods.Deflate
-            })
-            .AddStandardResilienceHandler(options =>
-            {
-                options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(100);
-                options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(30);
-                options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
-            });
         }
 
         /// <summary>

@@ -26,8 +26,8 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.UI.Misc;
-using LoneEftDmaRadar.Unity.Structures;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 

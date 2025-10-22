@@ -55,7 +55,7 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Tarkov.Data;
+using LoneEftDmaRadar.Tarkov;
 
 namespace LoneEftDmaRadar.UI.Radar.Maps
 {

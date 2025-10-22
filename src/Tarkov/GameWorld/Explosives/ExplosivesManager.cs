@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Mono.Collections;
+using LoneEftDmaRadar.Tarkov.Mono.Collections;
 using VmmSharpEx;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives

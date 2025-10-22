@@ -26,8 +26,8 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Tarkov.Player;
-using LoneEftDmaRadar.Unity;
+using LoneEftDmaRadar.Tarkov.GameWorld.Player;
+using LoneEftDmaRadar.Tarkov.Unity;
 
 namespace LoneEftDmaRadar.UI.Radar.Maps
 {

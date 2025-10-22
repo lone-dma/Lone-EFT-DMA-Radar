@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Unity.Structures;
+using LoneEftDmaRadar.Tarkov.Unity.Structures;
 
 namespace LoneEftDmaRadar.UI.Hotkeys
 {

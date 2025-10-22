@@ -27,8 +27,7 @@ SOFTWARE.
 */
 
 using LoneEftDmaRadar.DMA;
-using LoneEftDmaRadar.Misc;
-using LoneEftDmaRadar.Mono.Collections;
+using LoneEftDmaRadar.Tarkov.Mono.Collections;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
 {

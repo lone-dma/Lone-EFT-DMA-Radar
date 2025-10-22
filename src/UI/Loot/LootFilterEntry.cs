@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Tarkov.Data;
+using LoneEftDmaRadar.Tarkov;
 
 namespace LoneEftDmaRadar.UI.Loot
 {
@@ -88,7 +88,7 @@ namespace LoneEftDmaRadar.UI.Loot
             get
             {
                 // lazy‑load via your EftDataManager
-                return EftDataManager.AllItems?
+                return TarkovDataManager.AllItems?
                            .FirstOrDefault(x => x.Key.Equals(ItemID, StringComparison.OrdinalIgnoreCase))
                            .Value?.Name
                        ?? "NULL";

@@ -27,8 +27,8 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using LoneEftDmaRadar.Mono.Collections;
-using LoneEftDmaRadar.Tarkov.Player;
+using LoneEftDmaRadar.Tarkov.GameWorld.Player;
+using LoneEftDmaRadar.Tarkov.Mono.Collections;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld
 {
@@ -121,9 +121,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         /// <param name="btrPlayerBase">Player Base Addr for BTR Operator.</param>
         public void TryAllocateBTR(ulong btrView, ulong btrPlayerBase)
         {
-            if (_players.TryGetValue(btrPlayerBase, out var existing) && existing is not BtrOperator)
+            if (_players.TryGetValue(btrPlayerBase, out var existing) && existing is not BtrPlayer)
             {
-                var btr = new BtrOperator(btrView, btrPlayerBase);
+                var btr = new BtrPlayer(btrView, btrPlayerBase);
                 _players[btrPlayerBase] = btr;
                 Debug.WriteLine("BTR Allocated!");
             }

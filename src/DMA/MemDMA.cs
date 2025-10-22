@@ -28,14 +28,15 @@ SOFTWARE.
 
 using Collections.Pooled;
 using LoneEftDmaRadar.Misc;
-using LoneEftDmaRadar.Mono;
 using LoneEftDmaRadar.Tarkov.GameWorld;
+using LoneEftDmaRadar.Tarkov.GameWorld.Camera;
 using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
-using LoneEftDmaRadar.Tarkov.Loot;
-using LoneEftDmaRadar.Tarkov.Player;
-using LoneEftDmaRadar.Tarkov.Quests;
-using LoneEftDmaRadar.Unity;
+using LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers;
+using LoneEftDmaRadar.Tarkov.GameWorld.Player;
+using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
+using LoneEftDmaRadar.Tarkov.Mono;
+using LoneEftDmaRadar.Tarkov.Unity;
 using System.Drawing;
 using VmmSharpEx;
 using VmmSharpEx.Options;
