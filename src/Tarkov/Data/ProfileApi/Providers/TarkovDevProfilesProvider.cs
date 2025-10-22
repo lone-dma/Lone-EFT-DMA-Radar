@@ -35,18 +35,19 @@ using System.Security.Authentication;
 
 namespace LoneEftDmaRadar.Tarkov.Data.ProfileApi.Providers
 {
-    public sealed class TarkovDevProvider : IProfileApiProvider
+    public sealed class TarkovDevProfilesProvider : IProfileApiProvider
     {
+        private const string HTTP_CLIENT_NAME = "tarkov.dev/profiles";
         private static readonly CircuitBreakerStateProvider _circuitBreakerStateProvider = new();
 
-        static TarkovDevProvider()
+        static TarkovDevProfilesProvider()
         {
-            IProfileApiProvider.Register(new TarkovDevProvider());
+            IProfileApiProvider.Register(new TarkovDevProfilesProvider());
         }
 
         internal static void Configure(IServiceCollection services)
         {
-            services.AddHttpClient(nameof(TarkovDevProvider), client =>
+            services.AddHttpClient(HTTP_CLIENT_NAME, client =>
             {
                 client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("br"));
                 client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
@@ -84,7 +85,7 @@ namespace LoneEftDmaRadar.Tarkov.Data.ProfileApi.Providers
 
         public bool CanRun => _circuitBreakerStateProvider.CircuitState == CircuitState.Closed; // true
 
-        private TarkovDevProvider() { }
+        private TarkovDevProfilesProvider() { }
 
         public bool CanLookup(string accountId) => !_skip.ContainsKey(accountId);
 
@@ -96,7 +97,7 @@ namespace LoneEftDmaRadar.Tarkov.Data.ProfileApi.Providers
                 {
                     return null;
                 }
-                var client = App.HttpClientFactory.CreateClient(nameof(TarkovDevProvider));
+                var client = App.HttpClientFactory.CreateClient(HTTP_CLIENT_NAME);
                 using var response = await client.GetAsync($"profile/{accountId}.json", ct);
                 if (response.StatusCode is HttpStatusCode.NotFound)
                 {

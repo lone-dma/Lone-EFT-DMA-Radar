@@ -49,6 +49,7 @@ using LoneEftDmaRadar.DMA;
 using LoneEftDmaRadar.Misc.Cache;
 using LoneEftDmaRadar.Tarkov.Data;
 using LoneEftDmaRadar.Tarkov.Data.ProfileApi.Providers;
+using LoneEftDmaRadar.Tarkov.Data.TarkovMarket;
 using LoneEftDmaRadar.UI.ColorPicker;
 using LoneEftDmaRadar.UI.Misc;
 using LoneEftDmaRadar.UI.Radar.Maps;
@@ -184,7 +185,8 @@ namespace LoneEftDmaRadar
         {
             var services = new ServiceCollection();
             ConfigureHttpClientFactory(services);
-            TarkovDevProvider.Configure(services);
+            TarkovDevApi.Configure(services);
+            TarkovDevProfilesProvider.Configure(services);
             EftApiTechProvider.Configure(services);
             return services.BuildServiceProvider();
         }

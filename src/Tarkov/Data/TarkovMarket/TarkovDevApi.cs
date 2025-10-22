@@ -26,16 +26,55 @@ SOFTWARE.
  *
 */
 
+using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Security.Authentication;
 
 namespace LoneEftDmaRadar.Tarkov.Data.TarkovMarket
 {
-    internal static class TarkovDevCore
+    internal static class TarkovDevApi
     {
+        private const string HTTP_CLIENT_NAME = "tarkov.dev";
         private static readonly JsonSerializerOptions _jsonOptions = new()
         {
             PropertyNameCaseInsensitive = true
         };
+
+        internal static void Configure(IServiceCollection services)
+        {
+            services.AddHttpClient(HTTP_CLIENT_NAME, client =>
+            {
+                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("br"));
+                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
+                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("identity"));
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler()
+            {
+                SslOptions = new()
+                {
+                    EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13
+                },
+                AllowAutoRedirect = true,
+                AutomaticDecompression = DecompressionMethods.Brotli | DecompressionMethods.GZip | DecompressionMethods.Deflate
+            })
+            .AddStandardResilienceHandler(options =>
+            {
+                // Add retry logic for 403 responses -> sometimes tarkov.dev returns 403 for no reason but works immediately on retry
+                options.Retry.ShouldHandle = args =>
+                {
+                    if (args.Outcome.Result is HttpResponseMessage response)
+                        return ValueTask.FromResult(response.StatusCode == HttpStatusCode.Forbidden);
+
+                    return ValueTask.FromResult(false);
+                };
+                options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(100);
+                options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(30);
+                options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
+            });
+        }
 
         public static async Task<TarkovDevQuery> QueryTarkovDevAsync()
         {
@@ -222,7 +261,7 @@ namespace LoneEftDmaRadar.Tarkov.Data.TarkovMarket
                 """
                 }
             };
-            var client = App.HttpClientFactory.CreateClient("default");
+            var client = App.HttpClientFactory.CreateClient(HTTP_CLIENT_NAME);
             using var response = await client.PostAsJsonAsync(
                 requestUri: "https://api.tarkov.dev/graphql", 
                 value: query);
