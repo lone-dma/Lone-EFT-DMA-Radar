@@ -23,7 +23,7 @@ jobs:
 
       - name: Dotnet Publish
         run: |
-          dotnet publish src/lone-eft-dma-radar.csproj \
+          dotnet publish src/Lone-EFT-DMA-Radar.csproj \
             -c Release \
             -r win-x64 \
             --no-self-contained \
