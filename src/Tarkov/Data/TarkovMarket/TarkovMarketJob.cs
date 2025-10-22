@@ -35,7 +35,7 @@ namespace LoneEftDmaRadar.Tarkov.Data.TarkovMarket
         {
             try
             {
-                var data = await TarkovDevCore.QueryTarkovDevAsync();
+                var data = await TarkovDevApi.QueryTarkovDevAsync();
                 var result = new TarkovMarketData
                 {
                     Items = ParseMarketData(data),

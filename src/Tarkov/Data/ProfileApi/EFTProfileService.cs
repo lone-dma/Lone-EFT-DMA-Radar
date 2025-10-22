@@ -46,7 +46,7 @@ namespace LoneEftDmaRadar.Tarkov.Data.ProfileApi
         {
             // Ensure static ctors run
             RuntimeHelpers.RunClassConstructor(typeof(EftApiTechProvider).TypeHandle);
-            RuntimeHelpers.RunClassConstructor(typeof(TarkovDevProvider).TypeHandle);
+            RuntimeHelpers.RunClassConstructor(typeof(TarkovDevProfilesProvider).TypeHandle);
             // Get providers
             _providers = IProfileApiProvider.AllProviders
                 .Where(x => x.IsEnabled)
