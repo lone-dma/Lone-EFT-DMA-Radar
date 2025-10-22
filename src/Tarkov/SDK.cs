@@ -203,7 +203,7 @@ namespace SDK
 		public readonly partial struct QuestData
 		{
 			public const uint Id = 0x10; // String
-			public const uint CompletedConditions = 0x20; // System.Collections.Generic.HashSet<MongoID>
+			public const uint CompletedConditions = 0x20; // -.HashSet<MongoID>
 			public const uint Template = 0x28; // -.\uF287
 			public const uint Status = 0x34; // System.Int32
 		}
