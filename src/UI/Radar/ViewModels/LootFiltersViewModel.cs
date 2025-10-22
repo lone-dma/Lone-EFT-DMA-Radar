@@ -26,11 +26,11 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Tarkov.Data;
-using LoneEftDmaRadar.Tarkov.Data.TarkovMarket;
+using LoneEftDmaRadar.Tarkov;
 using LoneEftDmaRadar.UI.Loot;
 using LoneEftDmaRadar.UI.Misc;
 using LoneEftDmaRadar.UI.Radar.Views;
+using LoneEftDmaRadar.Web.TarkovDev.Data;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -51,7 +51,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
         {
             FilterNames = new ObservableCollection<string>(App.Config.LootFilters.Filters.Keys);
             AvailableItems = new ObservableCollection<TarkovMarketItem>(
-                EftDataManager.AllItems.Values.OrderBy(x => x.Name));
+                TarkovDataManager.AllItems.Values.OrderBy(x => x.Name));
 
             AddFilterCommand = new SimpleCommand(OnAddFilter);
             RenameFilterCommand = new SimpleCommand(OnRenameFilter);
@@ -335,7 +335,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
         private static void RefreshLootFilter()
         {
             /// Remove old filters (if any)
-            foreach (var item in EftDataManager.AllItems.Values)
+            foreach (var item in TarkovDataManager.AllItems.Values)
                 item.SetFilter(null);
             /// Set new filters
             var currentFilters = App.Config.LootFilters.Filters
@@ -348,7 +348,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             {
                 if (string.IsNullOrEmpty(filter.ItemID))
                     continue;
-                if (EftDataManager.AllItems.TryGetValue(filter.ItemID, out var item))
+                if (TarkovDataManager.AllItems.TryGetValue(filter.ItemID, out var item))
                     item.SetFilter(filter);
             }
         }

@@ -27,9 +27,10 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using LoneEftDmaRadar.Tarkov.Data;
-using LoneEftDmaRadar.Tarkov.GameWorld;
-using LoneEftDmaRadar.Tarkov.Quests;
+using LoneEftDmaRadar.Tarkov;
+using LoneEftDmaRadar.Tarkov.GameWorld.Camera;
+using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
+using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
 using LoneEftDmaRadar.UI.ColorPicker;
 using LoneEftDmaRadar.UI.Data;
 using LoneEftDmaRadar.UI.Hotkeys;
@@ -38,7 +39,6 @@ using LoneEftDmaRadar.UI.Radar.Views;
 using LoneEftDmaRadar.UI.Skia;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using System.Windows.Navigation;
 
 namespace LoneEftDmaRadar.UI.Radar.ViewModels
 {
@@ -286,7 +286,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             // SKWidgetControl
             AbstractSKWidget.SetScaleFactorInternal(newScale);
             // Loot Paints
-            Tarkov.Loot.LootItem.ScaleLootPaints(newScale);
+            LootItem.ScaleLootPaints(newScale);
 
             #endregion
         }
@@ -502,7 +502,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
 
         private void InitializeContainers()
         {
-            var entries = EftDataManager.AllContainers.Values
+            var entries = TarkovDataManager.AllContainers.Values
                 .OrderBy(x => x.Name)
                 .Select(x => new StaticContainerEntry(x));
             foreach (var entry in entries)

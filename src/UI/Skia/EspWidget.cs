@@ -26,9 +26,10 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Tarkov.GameWorld;
-using LoneEftDmaRadar.Tarkov.Loot;
-using LoneEftDmaRadar.Tarkov.Player;
+using LoneEftDmaRadar.Tarkov.GameWorld.Camera;
+using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
+using LoneEftDmaRadar.Tarkov.GameWorld.Player;
+using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
 using SkiaSharp.Views.WPF;
 
 namespace LoneEftDmaRadar.UI.Skia
@@ -162,7 +163,7 @@ namespace LoneEftDmaRadar.UI.Skia
         private void DrawPlayers(float scaleX, float scaleY)
         {
             var players = AllPlayers?
-                .Where(p => p.IsActive && p.IsAlive && p is not LoneEftDmaRadar.Tarkov.Player.LocalPlayer);
+                .Where(p => p.IsActive && p.IsAlive && p is not Tarkov.GameWorld.Player.LocalPlayer);
 
             if (players is null)
                 return;

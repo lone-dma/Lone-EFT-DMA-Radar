@@ -28,10 +28,10 @@ SOFTWARE.
 
 using LoneEftDmaRadar.DMA;
 using LoneEftDmaRadar.Misc;
-using LoneEftDmaRadar.Tarkov.Player;
+using LoneEftDmaRadar.Tarkov.GameWorld.Player;
+using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Skia;
-using LoneEftDmaRadar.Unity;
 using VmmSharpEx.Scatter;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives

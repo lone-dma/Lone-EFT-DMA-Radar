@@ -27,13 +27,12 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using LoneEftDmaRadar.Misc;
-using LoneEftDmaRadar.Tarkov.Data;
+using LoneEftDmaRadar.Tarkov;
 using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
-using LoneEftDmaRadar.Tarkov.Loot;
-using LoneEftDmaRadar.Tarkov.Player;
-using LoneEftDmaRadar.Tarkov.Quests;
+using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
+using LoneEftDmaRadar.Tarkov.GameWorld.Player;
+using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
 using LoneEftDmaRadar.UI.Loot;
 using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Radar.Views;
@@ -124,7 +123,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             get
             {
                 var players = AllPlayers
-                    .Where(x => x is not Tarkov.Player.LocalPlayer
+                    .Where(x => x is not Tarkov.GameWorld.Player.LocalPlayer
                         && !x.HasExfild && (LootCorpsesVisible ? x.IsAlive : true)) ?? 
                         Enumerable.Empty<AbstractPlayer>();
 

@@ -28,13 +28,13 @@ SOFTWARE.
 
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Misc.Workers;
-using LoneEftDmaRadar.Mono;
-using LoneEftDmaRadar.Tarkov.Data;
+using LoneEftDmaRadar.Tarkov.GameWorld.Camera;
 using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
-using LoneEftDmaRadar.Tarkov.Loot;
-using LoneEftDmaRadar.Tarkov.Player;
-using LoneEftDmaRadar.Tarkov.Quests;
+using LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers;
+using LoneEftDmaRadar.Tarkov.GameWorld.Player;
+using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
+using LoneEftDmaRadar.Tarkov.Mono;
 using VmmSharpEx.Options;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld
@@ -341,7 +341,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             try
             {
                 var players = _rgtPlayers
-                    .Where(x => x.IsActive && x.IsAlive && x is not BtrOperator);
+                    .Where(x => x.IsActive && x.IsAlive && x is not BtrPlayer);
                 if (players.Any()) // at least 1 player
                 {
                     using var map = Memory.CreateScatterMap();

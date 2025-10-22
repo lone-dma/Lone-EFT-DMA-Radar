@@ -26,13 +26,11 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Misc;
-using LoneEftDmaRadar.Tarkov.Data;
-using LoneEftDmaRadar.Tarkov.Player;
+using LoneEftDmaRadar.Tarkov.GameWorld.Player;
+using LoneEftDmaRadar.Tarkov.Unity;
+using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Skia;
-using LoneEftDmaRadar.Unity;
-using LoneEftDmaRadar.Unity.Structures;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
 {

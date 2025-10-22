@@ -27,7 +27,7 @@ SOFTWARE.
 */
 
 using LoneEftDmaRadar.UI.Misc;
-using LoneEftDmaRadar.WebRadar;
+using LoneEftDmaRadar.Web.WebRadar;
 using System.Windows.Input;
 
 namespace LoneEftDmaRadar.UI.Radar.ViewModels

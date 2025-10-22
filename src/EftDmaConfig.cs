@@ -28,10 +28,10 @@ SOFTWARE.
 
 using LoneEftDmaRadar.DMA;
 using LoneEftDmaRadar.Misc.JSON;
+using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.UI.ColorPicker;
 using LoneEftDmaRadar.UI.Data;
 using LoneEftDmaRadar.UI.Loot;
-using LoneEftDmaRadar.Unity.Structures;
 using System.Collections.ObjectModel;
 
 namespace LoneEftDmaRadar
