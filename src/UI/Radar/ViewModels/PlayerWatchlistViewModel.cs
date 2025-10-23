@@ -104,7 +104,18 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                 playerWatchlist.Dispatcher.Invoke(() =>
                 {
                     // Add the entry to the watchlist
-                    playerWatchlist.ViewModel?.Entries.Add(entry);
+                    if (playerWatchlist.ViewModel?.Entries is not null)
+                    {
+                        var existing = playerWatchlist.ViewModel.Entries.FirstOrDefault(x => string.Equals(x.AcctID, entry.AcctID, StringComparison.OrdinalIgnoreCase));
+                        if (existing is not null)
+                        {
+                            existing.Reason = $"{entry.Reason} | {existing.Reason}";
+                        }
+                        else
+                        {
+                            playerWatchlist.ViewModel.Entries.Add(entry);
+                        }
+                    }
                 });
             }
         }
