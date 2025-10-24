@@ -39,10 +39,6 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
         /// </summary>
         public ulong Profile { get; }
         /// <summary>
-        /// ICharacterController
-        /// </summary>
-        public ulong CharacterController { get; }
-        /// <summary>
         /// PlayerInfo Address (GClass1044)
         /// </summary>
         public ulong Info { get; }

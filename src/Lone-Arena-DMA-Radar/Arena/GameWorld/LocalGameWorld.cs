@@ -67,13 +67,11 @@ namespace LoneArenaDmaRadar.Arena.GameWorld
         {
             get
             {
-                switch (MatchMode)
+                return MatchMode switch
                 {
-                    case Enums.ERaidMode.LastHero:
-                        return false;
-                    default:
-                        return true;
-                }
+                    Enums.ERaidMode.LastHero => false,
+                    _ => true,
+                };
             }
         }
 
@@ -284,7 +282,6 @@ namespace LoneArenaDmaRadar.Arena.GameWorld
         /// </summary>
         private void SlowWorker_PerformWork(object sender, WorkerThreadArgs e)
         {
-            var ct = e.CancellationToken;
             ValidatePlayerTransforms(); // Check for transform anomalies
         }
 

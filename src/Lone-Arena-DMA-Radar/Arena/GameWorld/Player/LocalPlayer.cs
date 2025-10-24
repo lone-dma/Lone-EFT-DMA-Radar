@@ -50,7 +50,7 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
         {
             string classType = ObjectClass.ReadName(this);
             if (classType != "ArenaClientPlayer")
-                throw new ArgumentOutOfRangeException(nameof(classType));
+                throw new ArgumentException(nameof(classType));
         }
     }
 }
