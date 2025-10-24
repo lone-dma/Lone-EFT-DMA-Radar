@@ -68,8 +68,6 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
             ArgumentOutOfRangeException.ThrowIfNotEqual(this,
                 Memory.ReadValue<ulong>(ObservedHealthController + Offsets.ObservedHealthController.Player),
                 nameof(ObservedHealthController));
-            Body = Memory.ReadPtr(this + Offsets.ObservedPlayerView.PlayerBody);
-            InventoryControllerAddr = ObservedPlayerController + Offsets.ObservedPlayerController.InventoryController;
             CorpseAddr = ObservedHealthController + Offsets.ObservedHealthController.PlayerCorpse;
 
             AccountID = GetAccountID();

@@ -51,7 +51,6 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
         {
             Profile = Memory.ReadPtr(this + Offsets.Player.Profile);
             Info = Memory.ReadPtr(Profile + Offsets.Profile.Info);
-            Body = Memory.ReadPtr(this + Offsets.Player._playerBody);
             CorpseAddr = this + Offsets.Player.Corpse;
 
             AccountID = GetAccountID();
