@@ -103,7 +103,7 @@ namespace LoneArenaDmaRadar.Arena.GameWorld
                 {
                     Name = "Realtime Worker",
                     ThreadPriority = ThreadPriority.AboveNormal,
-                    SleepDuration = TimeSpan.FromMilliseconds(4),
+                    SleepDuration = TimeSpan.FromMilliseconds(6),
                     SleepMode = WorkerThreadSleepMode.DynamicSleep
                 };
                 _t1.PerformWork += RealtimeWorker_PerformWork;
