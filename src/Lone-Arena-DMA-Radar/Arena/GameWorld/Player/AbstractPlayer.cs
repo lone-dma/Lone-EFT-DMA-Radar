@@ -183,7 +183,7 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
         /// <summary>
         /// Player is Human-Controlled.
         /// </summary>
-        public bool IsHuman { get; protected set; }
+        public virtual bool IsHuman { get; protected set; }
 
         /// <summary>
         /// MovementContext / StateContext
