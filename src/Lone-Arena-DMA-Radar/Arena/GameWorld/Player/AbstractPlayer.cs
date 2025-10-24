@@ -27,7 +27,6 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using LoneArenaDmaRadar.Arena.GameWorld.Player.Helpers;
 using LoneArenaDmaRadar.Arena.Mono.Collections;
 using LoneArenaDmaRadar.Arena.Unity;
 using LoneArenaDmaRadar.Arena.Unity.Structures;
@@ -256,11 +255,6 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
         /// TRUE if critical memory reads (position/rotation) have failed.
         /// </summary>
         public bool IsError { get; set; }
-
-        /// <summary>
-        /// Player's Gear/Loadout Information and contained items.
-        /// </summary>
-        public GearManager Gear { get; private set; }
 
         /// <summary>
         /// True if player is being focused via Right-Click (UI).
@@ -559,22 +553,6 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
         }
 
         /// <summary>
-        /// Refresh Gear if Active Human Player.
-        /// </summary>
-        public void RefreshGear()
-        {
-            try
-            {
-                Gear ??= new GearManager(this);
-                Gear?.Refresh();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[GearManager] ERROR for Player {Name}: {ex}");
-            }
-        }
-
-        /// <summary>
         /// All implementations are 6 elements long, so this is fine for now. If the chain ever updates we'll need to tweak this.
         /// </summary>
         internal const int TransformInternalChainCount = 6;
@@ -740,22 +718,10 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
             if (IsHostileActive) // Enemy Players, display information
             {
                 lines.Add($"{name}{health} {AccountID}".Trim());
-                var gear = Gear;
                 string g = null;
                 if (GroupID != -1)
                     g = $" G:{GroupID} ";
                 lines.Add(g);
-                var loot = gear?.Loot;
-                if (loot is not null)
-                {
-                    var iterations = 0;
-                    foreach (var item in loot)
-                    {
-                        if (iterations++ >= 5)
-                            break; // Only show first 5 Items (HV is on top)
-                        lines.Add(item.ShortName);
-                    }
-                }
             }
             else if (!IsAlive)
             {

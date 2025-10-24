@@ -26,47 +26,32 @@ SOFTWARE.
  *
 */
 
-using LoneArenaDmaRadar.Web.TarkovDev.Data;
-
-namespace LoneArenaDmaRadar.Arena.GameWorld.Loot
+namespace LoneArenaDmaRadar.Arena.GameWorld.Player
 {
-    public class LootItem
+    /// <summary>
+    /// Defines Player Unit Type (Player,PMC,Scav,etc.)
+    /// </summary>
+    public enum PlayerType
     {
-        private readonly TarkovMarketItem _item;
-
-        public LootItem(TarkovMarketItem item)
-        {
-            ArgumentNullException.ThrowIfNull(item, nameof(item));
-            _item = item;
-        }
-
-        public LootItem(string id, string name)
-        {
-            ArgumentNullException.ThrowIfNull(id, nameof(id));
-            ArgumentNullException.ThrowIfNull(name, nameof(name));
-            _item = new TarkovMarketItem
-            {
-                Name = name,
-                ShortName = name,
-                FleaPrice = -1,
-                TraderPrice = -1,
-                BsgId = id
-            };
-        }
-
         /// <summary>
-        /// Item's BSG ID.
+        /// Default value if a type cannot be established.
         /// </summary>
-        public virtual string ID => _item.BsgId;
-
+        Default,
         /// <summary>
-        /// Item's Long Name.
+        /// Teammate of LocalPlayer.
         /// </summary>
-        public virtual string Name => _item.Name;
-
+        Teammate,
         /// <summary>
-        /// Item's Short Name.
+        /// Hostile/Enemy Player.
         /// </summary>
-        public string ShortName => _item.ShortName;
+        Player,
+        /// <summary>
+        /// Normal Bot.
+        /// </summary>
+        Bot,
+        /// <summary>
+        /// Human Controlled Hostile PMC/Scav that has a Twitch account name as their IGN.
+        /// </summary>
+        Streamer
     }
 }
