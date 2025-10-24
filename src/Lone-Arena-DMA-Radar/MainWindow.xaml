@@ -1,0 +1,28 @@
+﻿<Window x:Class="LoneArenaDmaRadar.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LoneArenaDmaRadar"
+        xmlns:vm="clr-namespace:LoneArenaDmaRadar"
+        xmlns:tabs="clr-namespace:LoneArenaDmaRadar.UI.Radar.Views"
+        mc:Ignorable="d"
+        Title="Lone EFT DMA Radar"
+        Width="1280" Height="720"
+        Icon="/lone-icon.ico">
+    <d:Window.DataContext>
+        <d:DesignInstance Type="{x:Type vm:MainWindowViewModel}"
+                      IsDesignTimeCreatable="False"/>
+    </d:Window.DataContext>
+    <Grid>
+        <TabControl Margin="0">
+            <TabItem Header="Radar"
+                     x:Name="RadarTab">
+                <tabs:RadarTab x:Name="Radar" />
+            </TabItem>
+            <TabItem Header="Settings">
+                <tabs:SettingsTab x:Name="Settings" />
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

@@ -1,0 +1,52 @@
+﻿<Window x:Class="LoneArenaDmaRadar.UI.ColorPicker.ColorPickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LoneArenaDmaRadar.UI.ColorPicker"
+        xmlns:vm="clr-namespace:LoneArenaDmaRadar.UI.ColorPicker"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="Radar Color Picker"
+        Height="200" Width="450"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Icon="/lone-icon.ico">
+    <d:UserControl.DataContext>
+        <d:DesignInstance Type="{x:Type vm:ColorPickerViewModel}"
+                      IsDesignTimeCreatable="False"/>
+    </d:UserControl.DataContext>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- combo + picker + hex -->
+        <StackPanel Orientation="Horizontal" Grid.Row="0" VerticalAlignment="Center" Margin="0,0,0,10">
+            <TextBlock Text="Select Color:" VerticalAlignment="Center"/>
+            <ComboBox ItemsSource="{Binding Options}"
+                      SelectedItem="{Binding SelectedOption}" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      Width="140"
+                      Margin="5,0"/>
+            <xctk:ColorPicker SelectedColor="{Binding SelectedMediaColor, Mode=TwoWay}"
+                              ShowDropDownButton="True"
+                              Width="200"
+                              Margin="5,0"/>
+            <TextBox Text="{Binding ColorValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Width="100"
+                     Margin="5,0"/>
+        </StackPanel>
+
+        <!-- filler -->
+        <Border Grid.Row="1"/>
+
+        <!-- save -->
+        <Button Content="Close"
+                Command="{Binding CloseCommand}"
+                Grid.Row="2"
+                Width="100"
+                HorizontalAlignment="Center"/>
+    </Grid>
+</Window>

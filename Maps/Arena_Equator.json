@@ -1,0 +1,14 @@
+{
+	"mapID": ["Arena_equator_TDM_02"],
+	"x": 633,
+	"y": 577.5,
+	"scale": 9.5,
+	"svgScale" : 2.00,
+	"mapLayers": [
+		{
+			"minHeight": null,
+			"maxHeight": null,
+			"filename": "Arena_Equator.svg"
+		}
+	]
+}

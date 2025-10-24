@@ -1,0 +1,142 @@
+﻿/*
+ * Lone EFT DMA Radar
+ * Brought to you by Lone (Lone DMA)
+ * 
+MIT License
+
+Copyright (c) 2025 Lone DMA
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ *
+*/
+
+using Collections.Pooled;
+using LoneArenaDmaRadar.Arena.GameWorld.Loot;
+using LoneArenaDmaRadar.Arena.Mono.Collections;
+using System.Collections.Frozen;
+
+namespace LoneArenaDmaRadar.Arena.GameWorld.Player.Helpers
+{
+    public sealed class GearManager
+    {
+        private static readonly FrozenSet<string> _skipSlots = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "SecuredContainer", "Dogtag", "Compass"
+        }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
+
+        public GearManager(AbstractPlayer player)
+        {
+            var slotDict = new Dictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);
+            var inventorycontroller = Memory.ReadPtr(player.InventoryControllerAddr);
+            var inventory = Memory.ReadPtr(inventorycontroller + Offsets.InventoryController.Inventory);
+            var equipment = Memory.ReadPtr(inventory + Offsets.Inventory.Equipment);
+            var slots = Memory.ReadPtr(equipment + Offsets.Equipment.Slots);
+            using var slotsArray = MonoArray<ulong>.Create(slots, true);
+
+            foreach (var slotPtr in slotsArray)
+            {
+                var namePtr = Memory.ReadPtr(slotPtr + Offsets.Slot.ID);
+                var name = Memory.ReadUnicodeString(namePtr);
+                if (_skipSlots.Contains(name))
+                    continue;
+                slotDict.TryAdd(name, slotPtr);
+            }
+
+            Slots = slotDict;
+            Refresh();
+        }
+
+        private IReadOnlyDictionary<string, ulong> Slots { get; }
+
+        /// <summary>
+        /// Player's contained gear/loot.
+        /// </summary>
+        public IReadOnlyList<LootItem> Loot { get; private set; }
+
+        public void Refresh()
+        {
+            using var loot = new PooledList<LootItem>();
+            foreach (var slot in Slots)
+            {
+                try
+                {
+                    if (slot.Key == "Scabbard")
+                    {
+                        continue; // skip scabbard
+                    }
+                    var containedItem = Memory.ReadPtr(slot.Value + Offsets.Slot.ContainedItem);
+                    var inventorytemplate = Memory.ReadPtr(containedItem + Offsets.LootItem.Template);
+                    var mongoId = Memory.ReadValue<MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
+                    var id = mongoId.ReadString();
+                    if (TarkovDataManager.AllItems.TryGetValue(id, out var entry1))
+                        loot.Add(new LootItem(entry1));
+
+                    if (TarkovDataManager.AllItems.TryGetValue(id, out var entry2))
+                    {
+                        if (slot.Key == "FirstPrimaryWeapon" || slot.Key == "SecondPrimaryWeapon") // Only interested in weapons / helmets
+                        {
+                            RecursePlayerGearSlots(containedItem, loot);
+                        }
+                    }
+                }
+                catch { } // Skip over empty slots
+            }
+            Loot = loot.OrderBy(x => x.Name).ToList();
+        }
+
+        /// <summary>
+        /// Checks a 'Primary' weapon for Ammo Type, and Thermal Scope.
+        /// </summary>
+        private static void RecursePlayerGearSlots(ulong lootItemBase, IList<LootItem> loot)
+        {
+            try
+            {
+                var parentSlots = Memory.ReadPtr(lootItemBase + Offsets.LootItemMod.Slots);
+                using var slotsArray = MonoArray<ulong>.Create(parentSlots, true);
+                using var slotDict = new PooledDictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);
+
+                foreach (var slotPtr in slotsArray)
+                {
+                    var namePtr = Memory.ReadPtr(slotPtr + Offsets.Slot.ID);
+                    var name = Memory.ReadUnicodeString(namePtr);
+                    slotDict.TryAdd(name, slotPtr);
+                }
+
+                foreach (var slotName in slotDict.Keys)
+                {
+                    try
+                    {
+                        if (slotDict.TryGetValue(slotName, out var slot))
+                        {
+                            var containedItem = Memory.ReadPtr(slot + Offsets.Slot.ContainedItem);
+                            var inventorytemplate = Memory.ReadPtr(containedItem + Offsets.LootItem.Template);
+                            var mongoId = Memory.ReadValue<MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
+                            var id = mongoId.ReadString();
+                            if (TarkovDataManager.AllItems.TryGetValue(id, out var entry))
+                                loot.Add(new LootItem(entry)); // Add to loot, get weapon attachment values
+                            RecursePlayerGearSlots(containedItem, loot);
+                        }
+                    }
+                    catch { } // Skip over empty slots
+                }
+            }
+            catch { }
+        }
+    }
+}

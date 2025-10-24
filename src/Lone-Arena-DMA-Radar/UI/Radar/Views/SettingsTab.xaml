@@ -1,0 +1,128 @@
+﻿<UserControl x:Class="LoneArenaDmaRadar.UI.Radar.Views.SettingsTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:LoneArenaDmaRadar.UI.Radar.Views"
+             xmlns:vm="clr-namespace:LoneArenaDmaRadar.UI.Radar.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             Padding="10">
+
+    <d:UserControl.DataContext>
+        <d:DesignInstance Type="{x:Type vm:SettingsViewModel}"
+                          IsDesignTimeCreatable="False" />
+    </d:UserControl.DataContext>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Orientation="Vertical"
+                    Margin="0,0,0,10">
+            <!-- About Info -->
+            <TextBlock 
+                TextWrapping="Wrap" 
+                FontSize="16">ℹ️ Get the latest version at <Hyperlink Command="{Binding AboutUrlCommand}">lone-dma.org</Hyperlink>
+            </TextBlock>
+
+            <!-- Radar / General Settings -->
+            <GroupBox Header="Radar / General Settings"
+                      Margin="0,0,0,12">
+                <StackPanel>
+
+                    <!-- help text -->
+                    <TextBlock TextWrapping="Wrap"
+                               Margin="0,0,0,12"
+                               FontStyle="Italic">
+Zoom In: F1 / Mouse Wheel Up<LineBreak />
+Zoom Out: F2 / Mouse Wheel Down<LineBreak />
+Toggle Fullscreen: F11
+                    </TextBlock>
+
+                    <!-- buttons -->
+                    <WrapPanel Margin="0,0,0,12">
+                        <Button Content="Restart Radar"
+                                ToolTip="Restarts the Radar for the current raid instance."
+                                Command="{Binding RestartRadarCommand}"
+                                MinWidth="100"
+                                Height="35"
+                                Margin="0,0,8,8" />
+                        <Button Content="Hotkey Manager"
+                                ToolTip="Opens the Hotkey Manager. This is used to create Custom Hotkeys that can be pressed IN GAME to control the Radar Application."
+                                IsEnabled="{Binding HotkeyManagerIsEnabled}"
+                                Command="{Binding OpenHotkeyManagerCommand}"
+                                MinWidth="100"
+                                Height="35"
+                                Margin="0,0,8,8" />
+                        <Button Content="Color Picker"
+                                ToolTip="Allows customizing entity colors on the Radar UI."
+                                IsEnabled="{Binding ColorPickerIsEnabled}"
+                                Command="{Binding OpenColorPickerCommand}"
+                                MinWidth="100"
+                                Height="35"
+                                Margin="0,0,8,8" />
+                        <Button Content="Backup Config"
+                                ToolTip="Backs up your configuration (Recommended)."
+                                Command="{Binding BackupConfigCommand}"
+                                MinWidth="100"
+                                Height="35"
+                                Margin="0,0,8,8" />
+                        <Button Content="Save Config"
+                                ToolTip="Forces a Config Save (this is still done automatically when closing the app)."
+                                Command="{Binding SaveConfigCommand}"
+                                MinWidth="100"
+                                Height="35"
+                                Margin="0,0,8,8" />
+                    </WrapPanel>
+
+                    <!-- sliders -->
+                    <WrapPanel Margin="0,0,0,12">
+                        <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,16,8">
+                            <TextBlock Text="Aimline Length"
+                                       VerticalAlignment="Center"
+                                       ToolTip="Sets the Aimline Length for Local Player/Teammates" />
+                            <Slider x:Name="AimlineLengthSlider"
+                                    Width="150"
+                                    Margin="8,0"
+                                    Minimum="0"
+                                    Maximum="1500"
+                                    SmallChange="1"
+                                    LargeChange="10"
+                                    Value="{Binding AimlineLength, Mode=TwoWay}" />
+                            <TextBlock Text="{Binding Value, ElementName=AimlineLengthSlider}"
+                                       VerticalAlignment="Center"
+                                       Margin="8,0,0,0" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,16,8">
+                            <TextBlock Text="UI Scale"
+                                       VerticalAlignment="Center"
+                                       ToolTip="Sets the scaling factor for the Radar/User Interface. For high‑resolution monitors you may want to increase this." />
+                            <Slider x:Name="UIScaleSlider"
+                                    Width="150"
+                                    Margin="8,0"
+                                    Minimum="0.5"
+                                    Maximum="2.0"
+                                    SmallChange="0.01"
+                                    LargeChange="0.1"
+                                    Value="{Binding UIScale, Mode=TwoWay}" />
+                            <TextBlock Text="{Binding Value, ElementName=UIScaleSlider, StringFormat=F2}"
+                                       VerticalAlignment="Center"
+                                       Margin="8,0,0,0" />
+                        </StackPanel>
+                    </WrapPanel>
+
+                    <!-- toggles -->
+                    <WrapPanel>
+                        <CheckBox Content="Show Map Setup Helper"
+                                  ToolTip="Toggles the 'Map Setup Helper' to assist with getting Map Bounds/Scaling"
+                                  IsChecked="{Binding ShowMapSetupHelper, Mode=TwoWay}"
+                                  Margin="0,0,16,8" />
+                    </WrapPanel>
+
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
