@@ -49,8 +49,11 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
 
         public static implicit operator ulong(AbstractPlayer x) => x.Base;
         protected static readonly ConcurrentDictionary<string, int> _groups = new(StringComparer.OrdinalIgnoreCase);
+#pragma warning disable CA2211 // Non-constant fields should not be visible
         protected static int _lastGroupNumber;
         protected static int _lastPscavNumber;
+#pragma warning restore CA2211 // Non-constant fields should not be visible
+
 
         static AbstractPlayer()
         {
@@ -134,15 +137,15 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ERROR during Player Allocation for player @ 0x{playerBase.ToString("X")}: {ex}");
+                Debug.WriteLine($"ERROR during Player Allocation for player @ 0x{playerBase:X}: {ex}");
             }
         }
 
-        private static AbstractPlayer AllocateInternal(ulong playerBase)
+        private static ObservedPlayer AllocateInternal(ulong playerBase)
         {
             var className = ObjectClass.ReadName(playerBase, 64);
             if (className != "ArenaObservedPlayerView")
-                throw new ArgumentOutOfRangeException(nameof(className));
+                throw new ArgumentException(nameof(className));
             var player = new ObservedPlayer(playerBase);
             Debug.WriteLine($"Player '{player.Name}' allocated.");
             return player;
@@ -571,9 +574,11 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
                             ? null
                             : $" ({observed.HealthStatus})"; // Only display abnormal health status
                     }
-                    using var lines = new PooledList<string>();
-                    lines.Add($"{name}{health}");
-                    lines.Add($"H: {height:n0} D: {dist:n0}");
+                    using var lines = new PooledList<string>
+                    {
+                        $"{name}{health}",
+                        $"H: {height:n0} D: {dist:n0}"
+                    };
                     if (IsError)
                         lines[0] = "ERROR"; // In case POS stops updating, let us know!
 
@@ -663,19 +668,14 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
                 return new ValueTuple<SKPaint, SKPaint>(SKPaints.PaintFocused, SKPaints.TextFocused);
             if (this is LocalPlayer)
                 return new ValueTuple<SKPaint, SKPaint>(SKPaints.PaintLocalPlayer, SKPaints.TextLocalPlayer);
-            switch (Type)
+            return Type switch
             {
-                case PlayerType.Teammate:
-                    return new ValueTuple<SKPaint, SKPaint>(SKPaints.PaintTeammate, SKPaints.TextTeammate);
-                case PlayerType.Player:
-                    return new ValueTuple<SKPaint, SKPaint>(SKPaints.PaintPlayer, SKPaints.TextPlayer);
-                case PlayerType.Bot:
-                    return new ValueTuple<SKPaint, SKPaint>(SKPaints.PaintBot, SKPaints.TextBot);
-                case PlayerType.Streamer:
-                    return new ValueTuple<SKPaint, SKPaint>(SKPaints.PaintStreamer, SKPaints.TextStreamer);
-                default:
-                    return new ValueTuple<SKPaint, SKPaint>(SKPaints.PaintPlayer, SKPaints.TextPlayer);
-            }
+                PlayerType.Teammate => new ValueTuple<SKPaint, SKPaint>(SKPaints.PaintTeammate, SKPaints.TextTeammate),
+                PlayerType.Player => new ValueTuple<SKPaint, SKPaint>(SKPaints.PaintPlayer, SKPaints.TextPlayer),
+                PlayerType.Bot => new ValueTuple<SKPaint, SKPaint>(SKPaints.PaintBot, SKPaints.TextBot),
+                PlayerType.Streamer => new ValueTuple<SKPaint, SKPaint>(SKPaints.PaintStreamer, SKPaints.TextStreamer),
+                _ => new ValueTuple<SKPaint, SKPaint>(SKPaints.PaintPlayer, SKPaints.TextPlayer),
+            };
         }
 
         public void DrawMouseover(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
@@ -687,7 +687,7 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
             if (this is ObservedPlayer observed)
                 health = observed.HealthStatus is Enums.ETagStatus.Healthy
                     ? null
-                    : $" ({observed.HealthStatus.ToString()})"; // Only display abnormal health status
+                    : $" ({observed.HealthStatus})"; // Only display abnormal health status
             if (this is ObservedPlayer obs && obs.IsStreaming) // Streamer Notice
                 lines.Add("[LIVE TTV - Double Click]");
             string name = Name ?? "<Unknown>";
@@ -701,7 +701,7 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
             }
             else if (!IsAlive)
             {
-                lines.Add($"{Type.ToString()}:{name}");
+                lines.Add($"{Type}:{name}");
                 string g = null;
                 if (GroupID != -1)
                     g = $"G:{GroupID} ";
