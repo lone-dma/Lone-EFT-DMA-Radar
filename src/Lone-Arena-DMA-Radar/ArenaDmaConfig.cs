@@ -269,6 +269,12 @@ namespace LoneArenaDmaRadar
         /// </summary>
         [JsonPropertyName("aimLineLength")]
         public int AimLineLength { get; set; } = 1500;
+
+        /// <summary>
+        /// Show enemy aimlines when aiming at you.
+        /// </summary>
+        [JsonPropertyName("highAlert")]
+        public bool HighAlert { get; set; } = true;
     }
 
     public sealed class TwitchApiConfig

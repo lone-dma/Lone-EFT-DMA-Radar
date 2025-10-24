@@ -234,6 +234,19 @@ namespace LoneArenaDmaRadar.UI.Radar.ViewModels
             }
         }
 
+        public bool HighAlert
+        {
+            get => App.Config.UI.HighAlert;
+            set
+            {
+                if (App.Config.UI.HighAlert != value)
+                {
+                    App.Config.UI.HighAlert = value;
+                    OnPropertyChanged(nameof(HighAlert));
+                }
+            }
+        }
+
         #endregion
     }
 }

@@ -119,6 +119,10 @@ Toggle Fullscreen: F11
                                   ToolTip="Toggles the 'Map Setup Helper' to assist with getting Map Bounds/Scaling"
                                   IsChecked="{Binding ShowMapSetupHelper, Mode=TwoWay}"
                                   Margin="0,0,16,8" />
+                        <CheckBox Content="High Alert"
+                                  ToolTip="Show enemy aimlines when aiming at you"
+                                  IsChecked="{Binding HighAlert, Mode=TwoWay}"
+                                  Margin="0,0,16,8" />
                     </WrapPanel>
 
                 </StackPanel>
