@@ -633,8 +633,10 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
 
             var aimlineLength = this == localPlayer ? 
                 App.Config.UI.AimLineLength : 0;
-            if (!IsFriendly && 
-                this.IsFacingTarget(localPlayer)) // Hostile Player, check if aiming at a friendly (High Alert)
+            // High Alert -> Check if aiming at Local Player
+            if (App.Config.UI.HighAlert &&
+                !IsFriendly && 
+                this.IsFacingTarget(localPlayer))
                 aimlineLength = 9999;
 
             if (aimlineLength > 0)
