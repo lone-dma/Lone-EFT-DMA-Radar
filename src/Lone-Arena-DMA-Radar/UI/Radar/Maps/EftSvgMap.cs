@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using Collections.Pooled;
 using LoneArenaDmaRadar.UI.Skia;
 using SkiaSharp.Views.WPF;
 using Svg.Skia;
@@ -35,237 +34,138 @@ using System.IO.Compression;
 namespace LoneArenaDmaRadar.UI.Radar.Maps
 {
     /// <summary>
-    /// SVG map implementation that keeps layers as vector SKPicture objects (no pre-rasterization)
-    /// and renders them each frame with appropriate scaling, height filtering and optional dimming.
+    /// SVG Map Implementation.
     /// </summary>
-    public sealed class EftSvgMap : IEftMap
+    public sealed class EftSvgMap : IEFTMap
     {
-        private readonly VectorLayer[] _layers;
+        private static readonly SKSamplingOptions _sampling = new SKSamplingOptions(SKCubicResampler.Mitchell);
+        private readonly EftMapConfig.LoadedLayer[] _layers;
 
-        /// <summary>Raw map ID.</summary>
         public string ID { get; }
-        /// <summary>Loaded configuration for this map instance.</summary>
         public EftMapConfig Config { get; }
 
-        /// <summary>
-        /// Construct a new vector map by loading each SVG layer from the supplied zip archive.
-        /// Layers are stored as SKSvg (vector) instead of rasterizing to SKImage.
-        /// </summary>
-        /// <param name="zip">Archive containing the SVG layer files.</param>
-        /// <param name="id">External map identifier.</param>
-        /// <param name="config">Configuration describing layers and scaling.</param>
-        /// <exception cref="InvalidOperationException">Thrown if any SVG fails to load.</exception>
         public EftSvgMap(ZipArchive zip, string id, EftMapConfig config)
         {
             ID = id;
             Config = config;
-
-            var loaded = new List<VectorLayer>();
+            var layers = new List<EftMapConfig.LoadedLayer>();
             try
             {
-                foreach (var layerCfg in config.MapLayers)
+                using var paint = new SKPaint()
                 {
-                    var entry = zip.Entries.First(x =>
-                        x.Name.Equals(layerCfg.Filename, StringComparison.OrdinalIgnoreCase));
-
-                    using var stream = entry.Open();
-
-                    var svg = new SKSvg();
-                    if (svg.Load(stream) is null || svg.Picture is null)
-                        throw new InvalidOperationException($"Failed to load SVG '{layerCfg.Filename}'.");
-
-                    loaded.Add(new VectorLayer(svg, layerCfg));
+                    IsAntialias = true
+                };
+                foreach (var layer in config.MapLayers) // Load resources for new map
+                {
+                    using var stream = zip.Entries.First(x => x.Name
+                            .Equals(layer.Filename,
+                                StringComparison.OrdinalIgnoreCase))
+                        .Open();
+                    using var svg = SKSvg.CreateFromStream(stream);
+                    // Create an image info with the desired dimensions
+                    var scaleInfo = new SKImageInfo(
+                        (int)Math.Round(svg.Picture!.CullRect.Width * config.SvgScale),
+                        (int)Math.Round(svg.Picture!.CullRect.Height * config.SvgScale));
+                    // Rasterize the SVG to a surface
+                    using (var surface = SKSurface.Create(scaleInfo))
+                    {
+                        // Clear the surface
+                        surface.Canvas.Clear(SKColors.Transparent);
+                        // Apply the scale and draw the SVG picture
+                        surface.Canvas.Scale(config.SvgScale);
+                        surface.Canvas.DrawPicture(svg.Picture, paint);
+                        layers.Add(new EftMapConfig.LoadedLayer(surface.Snapshot(), layer));
+                    }
                 }
-
-                _layers = loaded.Order().ToArray();
+                _layers = layers.Order().ToArray();
             }
             catch
             {
-                foreach (var l in loaded) l.Dispose();
+                foreach (var layer in layers) // Unload any partially loaded layers
+                {
+                    layer.Dispose();
+                }
                 throw;
             }
         }
 
-        /// <summary>
-        /// Draw visible layers into the target canvas.
-        /// Applies:
-        ///  - Height filtering
-        ///  - Map bounds → window bounds transform
-        ///  - Configured SVG scale
-        ///  - Optional dimming of non-top layers
-        ///  - Transparent clearing of the window region
-        /// </summary>
-        /// <param name="canvas">Destination Skia canvas.</param>
-        /// <param name="playerHeight">Current player Y height for layer filtering.</param>
-        /// <param name="mapBounds">Logical source rectangle (in map coordinates) to show.</param>
-        /// <param name="windowBounds">Destination rectangle inside the control.</param>
         public void Draw(SKCanvas canvas, float playerHeight, SKRect mapBounds, SKRect windowBounds)
         {
-            if (_layers.Length == 0) return;
-
-            using var visible = new PooledList<VectorLayer>(capacity : 8);
-            foreach (var layer in _layers)
+            var layers = _layers // Use overridden equality operators
+                .Where(layer => layer.IsHeightInRange(playerHeight))
+                .Order()
+                .ToArray();
+            foreach (var layer in layers)
             {
-                if (layer.IsHeightInRange(playerHeight))
-                    visible.Add(layer);
+                SKPaint paint;
+                if (layers.Length > 1 && layer != layers.Last() && !(layer.IsBaseLayer && layers.Any(x => !x.DimBaseLayer)))
+                {
+                    paint = SKPaints.PaintBitmapAlpha;
+                }
+                else
+                {
+                    paint = SKPaints.PaintBitmap;
+                }
+                canvas.DrawImage(
+                    image: layer.Image, 
+                    source: mapBounds, 
+                    dest: windowBounds, 
+                    paint: paint,
+                    sampling: _sampling);
             }
-
-            if (visible.Count == 0) return;
-            visible.Sort();
-
-            float scaleX = windowBounds.Width / mapBounds.Width;
-            float scaleY = windowBounds.Height / mapBounds.Height;
-
-            canvas.Save();
-            // Map coordinate system -> window region
-            canvas.Translate(windowBounds.Left, windowBounds.Top);
-            canvas.Scale(scaleX, scaleY);
-            canvas.Translate(-mapBounds.Left, -mapBounds.Top);
-            // Apply configured vector scaling
-            canvas.Scale(Config.SvgScale, Config.SvgScale);
-
-            var front = visible[^1];
-            foreach (var layer in visible)
-            {
-                bool dim = !Config.DisableDimming &&        // Make sure dimming is enabled globally
-                           layer != front &&                // Make sure the current layer is not in front
-                           !front.CannotDimLowerLayers;     // Don't dim the lower layers if the front layer has dimming disabled upon lower layers
-
-                var paint = dim ? 
-                    SKPaints.PaintBitmapAlpha : SKPaints.PaintBitmap;
-                canvas.DrawPicture(layer.Picture, paint);
-            }
-
-            canvas.Restore();
         }
 
         /// <summary>
-        /// Compute per-frame map parameters (bounds and scaling factors) based on the
-        /// current zoom and player-centered position. Returns the rectangle of the map
-        /// (in map coordinates) that should be displayed and the X/Y zoom scale factors.
+        /// Provides miscellaneous map parameters used throughout the entire render.
         /// </summary>
-        /// <param name="control">Skia GL element hosting the canvas.</param>
-        /// <param name="zoom">Zoom percentage (e.g. 100 = 1:1).</param>
-        /// <param name="localPlayerMapPos">Player map-space position (center target); value may be adjusted externally.</param>
-        /// <returns>Computed parameters for rendering this frame.</returns>
-        public EftMapParams GetParameters(SKGLElement control, int zoom, ref Vector2 localPlayerMapPos)
+        public EftMapParams GetParameters(SKGLElement element, int zoom, ref Vector2 localPlayerMapPos)
         {
-            if (_layers.Length == 0)
-            {
-                return new EftMapParams
-                {
-                    Map = Config,
-                    Bounds = SKRect.Empty,
-                    XScale = 1f,
-                    YScale = 1f
-                };
-            }
+            var zoomWidth = _layers[0].Image.Width * (.01f * zoom);
+            var zoomHeight = _layers[0].Image.Height * (.01f * zoom);
 
-            var baseLayer = _layers[0];
+            // Get the size of the element using the CanvasSize property
+            var canvasSize = element.CanvasSize;
 
-            float fullWidth  = baseLayer.RawWidth  * Config.SvgScale;
-            float fullHeight = baseLayer.RawHeight * Config.SvgScale;
-
-            var zoomWidth  = fullWidth  * (0.01f * zoom);
-            var zoomHeight = fullHeight * (0.01f * zoom);
-
-            var size = control.CanvasSize;
-            var bounds = new SKRect(
-                localPlayerMapPos.X - zoomWidth  * 0.5f,
-                localPlayerMapPos.Y - zoomHeight * 0.5f,
-                localPlayerMapPos.X + zoomWidth  * 0.5f,
-                localPlayerMapPos.Y + zoomHeight * 0.5f
-            ).AspectFill(size);
+            var bounds = new SKRect(localPlayerMapPos.X - zoomWidth / 2,
+                    localPlayerMapPos.Y - zoomHeight / 2,
+                    localPlayerMapPos.X + zoomWidth / 2,
+                    localPlayerMapPos.Y + zoomHeight / 2)
+                .AspectFill(canvasSize);
 
             return new EftMapParams
             {
                 Map = Config,
                 Bounds = bounds,
-                XScale = (float)size.Width / bounds.Width,
-                YScale = (float)size.Height / bounds.Height
+                XScale = canvasSize.Width / bounds.Width, // Set scale for this frame
+                YScale = canvasSize.Height / bounds.Height // Set scale for this frame
             };
         }
+        public EftMapParams GetParametersE(SKSize control, float zoom, ref Vector2 localPlayerMapPos)
+        {
+            var zoomWidth = _layers[0].Image.Width * (.01f * zoom);
+            var zoomHeight = _layers[0].Image.Height * (.01f * zoom);
 
-        /// <summary>
-        /// Dispose all vector layers (releasing their SKSvg / SKPicture resources).
-        /// </summary>
+            var bounds = new SKRect(localPlayerMapPos.X - zoomWidth / 2,
+                    localPlayerMapPos.Y - zoomHeight / 2,
+                    localPlayerMapPos.X + zoomWidth / 2,
+                    localPlayerMapPos.Y + zoomHeight / 2)
+                .AspectFill(control);
+
+            return new EftMapParams
+            {
+                Map = Config,
+                Bounds = bounds,
+                XScale = control.Width / bounds.Width, // Set scale for this frame
+                YScale = control.Height / bounds.Height // Set scale for this frame
+            };
+        }
         public void Dispose()
         {
             for (int i = 0; i < _layers.Length; i++)
-                _layers[i].Dispose();
+            {
+                _layers[i]?.Dispose();
+                _layers[i] = null;
+            }
         }
-
-        /// <summary>
-        /// Internal wrapper for a single SVG layer that preserves the SKSvg lifetime
-        /// (disposing SKSvg also disposes its SKPicture). Stores raw (unscaled) dimensions.
-        /// </summary>
-        private sealed class VectorLayer : IComparable<VectorLayer>, IDisposable
-        {
-            private readonly SKSvg _svg;
-            public readonly bool IsBaseLayer;
-            public readonly bool CannotDimLowerLayers;
-            public readonly float? MinHeight;
-            public readonly float? MaxHeight;
-            public readonly float RawWidth;
-            public readonly float RawHeight;
-
-            /// <summary>
-            /// The SKPicture representing this layer's vector content.
-            /// </summary>
-            public SKPicture Picture => _svg.Picture!;
-
-            /// <summary>
-            /// Create a vector layer from a loaded SKSvg and its configuration.
-            /// </summary>
-            public VectorLayer(SKSvg svg, EftMapConfig.Layer cfgLayer)
-            {
-                _svg = svg;
-                IsBaseLayer = cfgLayer.MinHeight is null && cfgLayer.MaxHeight is null;
-                CannotDimLowerLayers = cfgLayer.CannotDimLowerLayers;
-                MinHeight = cfgLayer.MinHeight;
-                MaxHeight = cfgLayer.MaxHeight;
-
-                var cr = svg.Picture!.CullRect;
-                RawWidth = cr.Width;
-                RawHeight = cr.Height;
-            }
-
-            /// <summary>
-            /// Determines whether the provided height is inside this layer's vertical range.
-            /// Base layers always return true.
-            /// </summary>
-            public bool IsHeightInRange(float h)
-            {
-                if (IsBaseLayer) return true;
-                if (MinHeight.HasValue && h < MinHeight.Value) return false;
-                if (MaxHeight.HasValue && h > MaxHeight.Value) return false;
-                return true;
-            }
-
-            /// <summary>
-            /// Ordering: base layers first, then ascending MinHeight, then ascending MaxHeight.
-            /// </summary>
-            public int CompareTo(VectorLayer other)
-            {
-                if (other is null) return -1;
-                if (IsBaseLayer && !other.IsBaseLayer)
-                    return -1;
-                if (!IsBaseLayer && other.IsBaseLayer)
-                    return 1;
-
-                var thisMin = MinHeight ?? float.MinValue;
-                var otherMin = other.MinHeight ?? float.MinValue;
-                int cmp = thisMin.CompareTo(otherMin);
-                if (cmp != 0) return cmp;
-
-                var thisMax = MaxHeight ?? float.MaxValue;
-                var otherMax = other.MaxHeight ?? float.MaxValue;
-                return thisMax.CompareTo(otherMax);
-            }
-
-            /// <summary>Dispose backing SKSvg (and thus the SKPicture).</summary>
-            public void Dispose() => _svg.Dispose();
-        }
-
     }
 }
