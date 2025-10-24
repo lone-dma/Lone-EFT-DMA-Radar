@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using LiteDB;
 using System.Text.RegularExpressions;
 using TwitchLib.Api;
 using TwitchLib.Api.Core;
