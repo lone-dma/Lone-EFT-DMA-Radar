@@ -26,11 +26,12 @@ SOFTWARE.
  *
 */
 
+
 using SkiaSharp.Views.WPF;
 
 namespace LoneArenaDmaRadar.UI.Radar.Maps
 {
-    public interface IEftMap : IDisposable
+    public interface IEFTMap : IDisposable
     {
         /// <summary>
         /// Raw Map ID for this Map.
@@ -58,6 +59,7 @@ namespace LoneArenaDmaRadar.UI.Radar.Maps
         /// <param name="zoom"></param>
         /// <param name="localPlayerMapPos"></param>
         /// <returns></returns>
-        EftMapParams GetParameters(SKGLElement control, int zoom, ref Vector2 localPlayerMapPos);
+        EftMapParams GetParameters(SKGLElement element, int zoom, ref Vector2 localPlayerMapPos);
+        EftMapParams GetParametersE(SKSize control, float zoom, ref Vector2 localPlayerMapPos);
     }
 }

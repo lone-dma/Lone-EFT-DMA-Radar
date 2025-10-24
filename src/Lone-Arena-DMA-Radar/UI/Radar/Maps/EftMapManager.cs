@@ -34,7 +34,7 @@ namespace LoneArenaDmaRadar.UI.Radar.Maps
     /// <summary>
     /// Maintains Map Resources for this application.
     /// </summary>
-    internal static class EftMapManager
+    public static class EftMapManager
     {
         private static readonly Lock _sync = new();
         private static ZipArchive _zip;
@@ -43,7 +43,7 @@ namespace LoneArenaDmaRadar.UI.Radar.Maps
         /// <summary>
         /// Currently Loaded Map.
         /// </summary>
-        public static IEftMap Map { get; private set; }
+        public static IEFTMap Map { get; private set; }
 
         /// <summary>
         /// Initialize this Module.
@@ -73,7 +73,7 @@ namespace LoneArenaDmaRadar.UI.Radar.Maps
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("Failed to Initialize Maps!", ex);
+                throw new ApplicationException("Failed to Initialize Maps!", ex);
             }
         }
 
@@ -97,7 +97,7 @@ namespace LoneArenaDmaRadar.UI.Radar.Maps
                 }
                 catch (Exception ex)
                 {
-                    throw new InvalidOperationException($"ERROR loading '{mapId}'", ex);
+                    throw new Exception($"ERROR loading '{mapId}'", ex);
                 }
             }
         }
