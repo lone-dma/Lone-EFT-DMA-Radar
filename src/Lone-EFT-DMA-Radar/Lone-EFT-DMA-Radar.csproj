@@ -1,0 +1,78 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>LoneEftDmaRadar</RootNamespace>
+    <Nullable>warnings</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+	<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	<Platforms>x64</Platforms>
+	<Configurations>Debug;Release</Configurations>
+	<ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+	<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+	<Deterministic>False</Deterministic>
+	<ApplicationIcon>..\..\Resources\lone-icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+	<PropertyGroup>
+		<!-- GC Tuning for optimal performance -->
+		<ServerGarbageCollection>true</ServerGarbageCollection>
+		<ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+		<RetainVMGarbageCollection>true</RetainVMGarbageCollection>
+		<!-- Disable DATAS GC Mode | https://learn.microsoft.com/en-us/dotnet/core/runtime-config/garbage-collector#enabling-or-disabling-datas -->
+		<GarbageCollectionAdaptationMode>0</GarbageCollectionAdaptationMode>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- enable RDP GPU acceleration in .NET 8 and later -->
+		<RuntimeHostConfigurationOption Include="Switch.System.Windows.Media.EnableHardwareAccelerationInRdp" Value="true" />
+	</ItemGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+		<DebugType>none</DebugType>
+		<DebugSymbols>false</DebugSymbols>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<DebugType>none</DebugType>
+		<DebugSymbols>false</DebugSymbols>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+	  <DebugType>none</DebugType>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+	  <DebugType>none</DebugType>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+		<Content Include="..\..\Resources\Maps.bin">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="..\..\Resources\NeoSansStdRegular.otf" />
+		<EmbeddedResource Include="..\..\Resources\DEFAULT_DATA.json" />
+		<Resource Include="..\..\Resources\lone-icon.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Collections.Pooled.V2" Version="2.1.3" />
+		<PackageReference Include="LiteDB" Version="5.0.21" />
+		<PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.10.0" />
+		<PackageReference Include="SkiaSharp.Views.WPF" Version="3.119.1" />
+		<PackageReference Include="Svg.Skia" Version="3.2.1" />
+		<PackageReference Include="Extended.Wpf.Toolkit" Version="5.0.0" />
+		<PackageReference Include="TwitchLib.Api" Version="3.9.0" />
+		<PackageReference Include="VmmSharpEx" Version="3.80.9424.971" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="10.0.0-rc.1.25451.107" />
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+		<PackageReference Include="Open.Nat.V2" Version="3.0.1" />
+	</ItemGroup>
+	
+</Project>

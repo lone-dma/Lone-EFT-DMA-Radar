@@ -1,0 +1,14 @@
+{
+	"mapID": ["Arena_saw"],
+	"x": 4277.5,
+	"y": -800,
+	"scale": 6.65,
+	"svgScale" : 2.00,
+	"mapLayers": [
+		{
+			"minHeight": null,
+			"maxHeight": null,
+			"filename": "Arena_Sawmill.svg"
+		}
+	]
+}
