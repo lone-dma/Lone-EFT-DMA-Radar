@@ -63,6 +63,10 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
             _groups.Clear();
             _lastGroupNumber = default;
             _lastPscavNumber = default;
+            lock (_focusedPlayers)
+            {
+                _focusedPlayers.Clear();
+            }
         }
 
         #endregion
@@ -261,7 +265,7 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
         /// <summary>
         /// True if player is being focused via Right-Click (UI).
         /// </summary>
-        public bool IsFocused { get; set; }
+        public bool IsFocused { get; protected set; }
 
         #endregion
 
@@ -838,10 +842,9 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
         /// </summary>
         public void ToggleFocus()
         {
-            if (this is not ObservedPlayer ||
-                !this.IsHumanActive)
+            if (this is not ObservedPlayer || !this.IsHumanActive)
                 return;
-            string id = this.AccountID?.Trim();
+            string id = this.AccountID;
             if (string.IsNullOrEmpty(id))
                 return;
             lock (_focusedPlayers)

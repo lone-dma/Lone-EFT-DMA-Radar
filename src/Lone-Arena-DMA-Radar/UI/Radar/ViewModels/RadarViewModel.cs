@@ -453,7 +453,7 @@ namespace LoneArenaDmaRadar.UI.Radar.ViewModels
             {
                 if (_mouseOverItem is AbstractPlayer player)
                 {
-                    player.IsFocused = !player.IsFocused;
+                    player.ToggleFocus();
                 }
             }
         }
