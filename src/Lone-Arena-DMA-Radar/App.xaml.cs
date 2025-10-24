@@ -51,7 +51,6 @@ using LoneArenaDmaRadar.UI.ColorPicker;
 using LoneArenaDmaRadar.UI.Misc;
 using LoneArenaDmaRadar.UI.Radar.Maps;
 using LoneArenaDmaRadar.UI.Skia;
-using LoneArenaDmaRadar.Web.TarkovDev.Data;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
 using System.Runtime.Versioning;
@@ -149,9 +148,7 @@ namespace LoneArenaDmaRadar
         private async Task ConfigureProgramAsync(LoadingWindow loadingWindow) =>
         await Task.Run(async () =>
         {
-            await loadingWindow.ViewModel.UpdateProgressAsync(15, "Loading Tarkov.Dev Data...");
-            await TarkovDataManager.ModuleInitAsync(loadingWindow);
-            await loadingWindow.ViewModel.UpdateProgressAsync(35, "Loading Map Assets...");
+            await loadingWindow.ViewModel.UpdateProgressAsync(15, "Loading Map Assets...");
             EftMapManager.ModuleInit();
             await loadingWindow.ViewModel.UpdateProgressAsync(50, "Starting DMA Connection...");
             RuntimeHelpers.RunClassConstructor(typeof(MemoryInterface).TypeHandle);
@@ -180,7 +177,6 @@ namespace LoneArenaDmaRadar
         {
             var services = new ServiceCollection();
             services.AddHttpClient(); // Add default HttpClientFactory
-            TarkovDevGraphQLApi.Configure(services);
             return services.BuildServiceProvider();
         }
 
