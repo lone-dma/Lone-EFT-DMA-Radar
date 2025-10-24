@@ -80,12 +80,12 @@ namespace LoneArenaDmaRadar.Arena.Mono
         {
             Debug.WriteLine("Initializing Mono...");
             var singletons = Singleton.FindMany("GameWorld", "AbstractGame");
-            if (!singletons[0].IsValidVirtualAddress())
-                throw new ArgumentOutOfRangeException("GameWorld");
-            if (!singletons[1].IsValidVirtualAddress())
-                throw new ArgumentOutOfRangeException("AbstractGame");
-            GameWorldField = singletons[0];
-            AbstractGameField = singletons[1];
+            var gameWorldField = singletons[0];
+            var abstractGameField = singletons[1];
+            gameWorldField.ThrowIfInvalidVirtualAddress(nameof(gameWorldField));
+            abstractGameField.ThrowIfInvalidVirtualAddress(nameof(abstractGameField));
+            GameWorldField = gameWorldField;
+            AbstractGameField = abstractGameField;
             Debug.WriteLine("Mono Init [OK]");
         }
 

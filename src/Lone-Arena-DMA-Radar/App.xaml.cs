@@ -36,7 +36,6 @@ global using System.ComponentModel;
 global using System.Data;
 global using System.Diagnostics;
 global using System.IO;
-global using System.Net;
 global using System.Numerics;
 global using System.Reflection;
 global using System.Runtime.CompilerServices;
@@ -45,14 +44,11 @@ global using System.Text;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
 global using System.Windows;
-using LoneArenaDmaRadar.Arena;
 using LoneArenaDmaRadar.DMA;
 using LoneArenaDmaRadar.UI.ColorPicker;
 using LoneArenaDmaRadar.UI.Misc;
 using LoneArenaDmaRadar.UI.Radar.Maps;
 using LoneArenaDmaRadar.UI.Skia;
-using Microsoft.Extensions.DependencyInjection;
-using System.Net.Http;
 using System.Runtime.Versioning;
 
 [assembly: SupportedOSPlatform("Windows")]
@@ -79,15 +75,6 @@ namespace LoneArenaDmaRadar
         /// </summary>
         public static ArenaDmaConfig Config { get; }
         /// <summary>
-        /// Service Provider for Dependency Injection.
-        /// NOTE: Web Radar has it's own container.
-        /// </summary>
-        public static IServiceProvider ServiceProvider { get; }
-        /// <summary>
-        /// HttpClientFactory for creating HttpClients.
-        /// </summary>
-        public static IHttpClientFactory HttpClientFactory { get; }
-        /// <summary>
         /// TRUE if the application is currently using Dark Mode resources, otherwise FALSE for Light Mode.
         /// </summary>
         public static bool IsDarkMode { get; private set; }
@@ -100,8 +87,6 @@ namespace LoneArenaDmaRadar
                 if (!singleton)
                     throw new InvalidOperationException("The Application Is Already Running!");
                 Config = ArenaDmaConfig.Load();
-                ServiceProvider = BuildServiceProvider();
-                HttpClientFactory = ServiceProvider.GetRequiredService<IHttpClientFactory>();
                 SetHighPerformanceMode();
             }
             catch (Exception ex)
@@ -167,17 +152,6 @@ namespace LoneArenaDmaRadar
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             Config.Save();
-        }
-
-        /// <summary>
-        /// Sets up the Dependency Injection container for the application.
-        /// </summary>
-        /// <returns></returns>
-        private static IServiceProvider BuildServiceProvider()
-        {
-            var services = new ServiceCollection();
-            services.AddHttpClient(); // Add default HttpClientFactory
-            return services.BuildServiceProvider();
         }
 
         /// <summary>
