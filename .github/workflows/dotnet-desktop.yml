@@ -47,7 +47,7 @@ jobs:
         run: |
           cd out-eft
           zip -r ../lone-eft-dma-radar.zip .
-          cd out-arena
+          cd ..\out-arena
           zip -r ../lone-arena-dma-radar.zip .
 
       - name: Upload to "latest" release (overwrite old asset)
