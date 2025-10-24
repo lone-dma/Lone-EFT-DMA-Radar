@@ -1,0 +1,14 @@
+{
+	"mapID": ["Arena_AirPit"],
+	"x": 699.5,
+	"y": 665.5,
+	"scale": 6.725,
+	"svgScale" : 2.00,
+	"mapLayers": [
+		{
+			"minHeight": null,
+			"maxHeight": null,
+			"filename": "Arena_Airpit.svg"
+		}
+	]
+}
