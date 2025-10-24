@@ -63,7 +63,7 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
             ArgumentOutOfRangeException.ThrowIfNotEqual(cameraType, (int)Enums.ECameraType.Default, nameof(cameraType));
             ObservedPlayerController = Memory.ReadPtr(this + Offsets.ObservedPlayerView.ObservedPlayerController);
             ArgumentOutOfRangeException.ThrowIfNotEqual(this,
-                Memory.ReadValue<ulong>(ObservedPlayerController + 0x10), // TODO: Get proper offset
+                Memory.ReadValue<ulong>(ObservedPlayerController + Offsets.ObservedPlayerController.Player),
                 nameof(ObservedPlayerController));
             ObservedHealthController = Memory.ReadPtr(ObservedPlayerController + Offsets.ObservedPlayerController.HealthController);
             ArgumentOutOfRangeException.ThrowIfNotEqual(this,

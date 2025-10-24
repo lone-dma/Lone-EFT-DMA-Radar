@@ -44,10 +44,6 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
         /// </summary>
         public ulong CharacterController { get; }
         /// <summary>
-        /// Procedural Weapon Animation
-        /// </summary>
-        public ulong PWA { get; }
-        /// <summary>
         /// PlayerInfo Address (GClass1044)
         /// </summary>
         public ulong Info { get; }
@@ -56,7 +52,6 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
         {
             Profile = Memory.ReadPtr(this + Offsets.Player.Profile);
             Info = Memory.ReadPtr(Profile + Offsets.Profile.Info);
-            PWA = Memory.ReadPtr(this + Offsets.Player.ProceduralWeaponAnimation);
             Body = Memory.ReadPtr(this + Offsets.Player._playerBody);
             CorpseAddr = this + Offsets.Player.Corpse;
 
