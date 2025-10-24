@@ -29,8 +29,8 @@ SOFTWARE.
 using LoneArenaDmaRadar.Arena.GameWorld.Player.Helpers;
 using LoneArenaDmaRadar.Arena.Mono.Collections;
 using LoneArenaDmaRadar.Arena.Unity.Structures;
+using LoneArenaDmaRadar.Web.Twitch;
 using VmmSharpEx.Scatter;
-using static SDK.Offsets;
 
 namespace LoneArenaDmaRadar.Arena.GameWorld.Player
 {
@@ -100,6 +100,23 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
                 Name = GetName();
                 Type = GroupID != -1 && GroupID == Memory.LocalPlayer.GroupID ?
                     PlayerType.Teammate : PlayerType.Player;
+            }
+            if (IsHumanHostile)
+            {
+                _ = RunTwitchLookupAsync(Name);
+            }
+        }
+
+        /// <summary>
+        /// Runs the Twitch Lookup for the Player's Nickname.
+        /// </summary>
+        private async Task RunTwitchLookupAsync(string nickname)
+        {
+            string twitchLogin = await TwitchService.LookupAsync(nickname);
+            if (twitchLogin is not null)
+            {
+                TwitchChannelURL = $"https://twitch.tv/{twitchLogin}";
+                Type = PlayerType.Streamer; // Flag streamers
             }
         }
 
