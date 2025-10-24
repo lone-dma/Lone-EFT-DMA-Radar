@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using LoneArenaDmaRadar.Arena.GameWorld.Player.Helpers;
 using LoneArenaDmaRadar.Arena.Mono.Collections;
 using LoneArenaDmaRadar.Arena.Unity.Structures;
 using static SDK.Offsets;

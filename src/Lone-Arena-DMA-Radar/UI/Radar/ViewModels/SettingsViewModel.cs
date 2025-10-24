@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using LoneArenaDmaRadar.Arena.GameWorld.Loot;
 using LoneArenaDmaRadar.UI.ColorPicker;
 using LoneArenaDmaRadar.UI.Hotkeys;
 using LoneArenaDmaRadar.UI.Misc;
