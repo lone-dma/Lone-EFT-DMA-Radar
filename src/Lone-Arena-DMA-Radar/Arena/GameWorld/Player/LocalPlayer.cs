@@ -40,13 +40,17 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
             get => "localPlayer";
             protected set { }
         }
+        public override bool IsHuman
+        {
+            get => true;
+            protected set { }
+        }
 
         public LocalPlayer(ulong playerBase) : base(playerBase)
         {
             string classType = ObjectClass.ReadName(this);
             if (classType != "ArenaClientPlayer")
                 throw new ArgumentOutOfRangeException(nameof(classType));
-            IsHuman = true;
         }
     }
 }
