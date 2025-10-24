@@ -106,10 +106,7 @@ namespace LoneArenaDmaRadar.UI.Radar.ViewModels
         private readonly RadarTab _parent;
         private readonly PeriodicTimer _periodicTimer = new PeriodicTimer(period: TimeSpan.FromSeconds(1));
         private int _fps = 0;
-        private bool _mouseDown;
         private IMouseoverEntity _mouseOverItem;
-        private Vector2 _lastMousePosition;
-        private Vector2 _mapPanPosition;
 
         /// <summary>
         /// Skia Radar Viewport.
@@ -121,8 +118,6 @@ namespace LoneArenaDmaRadar.UI.Radar.ViewModels
             _parent = parent ?? throw new ArgumentNullException(nameof(parent));
             parent.Radar.MouseMove += Radar_MouseMove;
             parent.Radar.MouseDown += Radar_MouseDown;
-            parent.Radar.MouseUp += Radar_MouseUp;
-            parent.Radar.MouseLeave += Radar_MouseLeave;
             _ = OnStartupAsync();
             _ = RunPeriodicTimerAsync();
         }
@@ -183,20 +178,7 @@ namespace LoneArenaDmaRadar.UI.Radar.ViewModels
                         mapSetup.Coords = $"Unity X,Y,Z: {localPlayerPos.X},{localPlayerPos.Y},{localPlayerPos.Z}";
                     }
                     // Prepare to draw Game Map
-                    EftMapParams mapParams; // Drawing Source
-                    if (MainWindow.Instance?.Radar?.Overlay?.ViewModel?.IsMapFreeEnabled ?? false) // Map fixed location, click to pan map
-                    {
-                        if (_mapPanPosition == default)
-                        {
-                            _mapPanPosition = localPlayerMapPos;
-                        }
-                        mapParams = map.GetParameters(Radar, App.Config.UI.Zoom, ref _mapPanPosition);
-                    }
-                    else
-                    {
-                        _mapPanPosition = default;
-                        mapParams = map.GetParameters(Radar, App.Config.UI.Zoom, ref localPlayerMapPos); // Map auto follow LocalPlayer
-                    }
+                    var mapParams = map.GetParameters(Radar, App.Config.UI.Zoom, ref localPlayerMapPos); // Map auto follow LocalPlayer
                     var info = e.RawInfo;
                     var mapCanvasBounds = new SKRect() // Drawing Destination
                     {
@@ -414,28 +396,12 @@ namespace LoneArenaDmaRadar.UI.Radar.ViewModels
 
         #region Event Handlers
 
-        private void Radar_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            _mouseDown = false;
-        }
-
-        private void Radar_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            _mouseDown = false;
-        }
-
         private void Radar_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             // get mouse pos relative to the Radar control
             var element = sender as IInputElement;
-            var pt = e.GetPosition(element);
-            var mouseX = (float)pt.X;
-            var mouseY = (float)pt.Y;
-            var mouse = new Vector2(mouseX, mouseY);
             if (e.LeftButton is System.Windows.Input.MouseButtonState.Pressed)
             {
-                _lastMousePosition = mouse;
-                _mouseDown = true;
                 if (e.ClickCount >= 2 && _mouseOverItem is ObservedPlayer observed)
                 {
                     if (InRaid && observed.IsStreaming)
@@ -467,57 +433,45 @@ namespace LoneArenaDmaRadar.UI.Radar.ViewModels
             var mouseY = (float)pt.Y;
             var mouse = new Vector2(mouseX, mouseY);
 
-            if (_mouseDown && MainWindow.Instance?.Radar?.Overlay?.ViewModel is RadarOverlayViewModel vm && vm.IsMapFreeEnabled) // panning
+            if (!InRaid)
             {
-                var deltaX = -(mouseX - _lastMousePosition.X);
-                var deltaY = -(mouseY - _lastMousePosition.Y);
-
-                _mapPanPosition.X += (float)deltaX;
-                _mapPanPosition.Y += (float)deltaY;
-                _lastMousePosition = mouse;
+                ClearRefs();
+                return;
             }
-            else
+
+            var items = MouseOverItems;
+            if (items?.Any() != true)
             {
-                if (!InRaid)
-                {
+                ClearRefs();
+                return;
+            }
+
+            // find closest
+            var closest = items.Aggregate(
+                (x1, x2) => Vector2.Distance(x1.MouseoverPosition, mouse)
+                         < Vector2.Distance(x2.MouseoverPosition, mouse)
+                    ? x1 : x2);
+
+            if (Vector2.Distance(closest.MouseoverPosition, mouse) >= 12)
+            {
+                ClearRefs();
+                return;
+            }
+
+            switch (closest)
+            {
+                case AbstractPlayer player:
+                    _mouseOverItem = player;
+                    break;
+
+                default:
                     ClearRefs();
-                    return;
-                }
+                    break;
+            }
 
-                var items = MouseOverItems;
-                if (items?.Any() != true)
-                {
-                    ClearRefs();
-                    return;
-                }
-
-                // find closest
-                var closest = items.Aggregate(
-                    (x1, x2) => Vector2.Distance(x1.MouseoverPosition, mouse)
-                             < Vector2.Distance(x2.MouseoverPosition, mouse)
-                        ? x1 : x2);
-
-                if (Vector2.Distance(closest.MouseoverPosition, mouse) >= 12)
-                {
-                    ClearRefs();
-                    return;
-                }
-
-                switch (closest)
-                {
-                    case AbstractPlayer player:
-                        _mouseOverItem = player;
-                        break;
-
-                    default:
-                        ClearRefs();
-                        break;
-                }
-
-                void ClearRefs()
-                {
-                    _mouseOverItem = null;
-                }
+            void ClearRefs()
+            {
+                _mouseOverItem = null;
             }
         }
 

@@ -18,9 +18,7 @@
         <skia:SKGLElement x:Name="Radar"
                           RenderContinuously="True"
                           Panel.ZIndex="0" />
-        <local:RadarOverlay x:Name="Overlay"
-                            Panel.ZIndex="1" />
         <local:MapSetupHelper x:Name="MapSetupHelper"
-                              Panel.ZIndex="2" />
+                              Panel.ZIndex="1" />
     </Grid>
 </UserControl>
