@@ -191,16 +191,6 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
         public ulong MovementContext { get; protected set; }
 
         /// <summary>
-        /// EFT.PlayerBody
-        /// </summary>
-        public ulong Body { get; protected set; }
-
-        /// <summary>
-        /// Inventory Controller field address.
-        /// </summary>
-        public ulong InventoryControllerAddr { get; protected set; }
-
-        /// <summary>
         /// Corpse field address..
         /// </summary>
         public ulong CorpseAddr { get; protected set; }
@@ -286,25 +276,9 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
         public bool IsHostile => !IsFriendly;
 
         /// <summary>
-        /// Player is Alive/Active and NOT LocalPlayer.
-        /// </summary>
-        public bool IsNotLocalPlayerAlive =>
-            this is not LocalPlayer && IsActive && IsAlive;
-
-        /// <summary>
-        /// Player is human-controlled (Not LocalPlayer).
-        /// </summary>
-        public bool IsHumanOther => IsHuman && this is not LocalPlayer;
-
-        /// <summary>
         /// Player is AI Controlled and Alive/Active.
         /// </summary>
         public bool IsAIActive => IsAI && IsActive && IsAlive;
-
-        /// <summary>
-        /// Player is AI Controlled and Alive/Active & their AI Role is default.
-        /// </summary>
-        public bool IsDefaultAIActive => IsAI && Name == "defaultAI" && IsActive && IsAlive;
 
         /// <summary>
         /// Player is human-controlled and Active/Alive.
