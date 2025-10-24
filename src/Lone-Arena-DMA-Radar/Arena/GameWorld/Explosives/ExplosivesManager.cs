@@ -27,7 +27,6 @@ SOFTWARE.
 */
 
 using LoneArenaDmaRadar.Arena.Mono.Collections;
-using VmmSharpEx;
 
 namespace LoneArenaDmaRadar.Arena.GameWorld.Explosives
 {
