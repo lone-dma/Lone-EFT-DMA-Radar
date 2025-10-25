@@ -36,7 +36,7 @@ jobs:
             /p:PublishSingleFile=true \
             /p:DebugType=none \
             /p:EnableWindowsTargeting=true \
-            /p:AssemblyVersion=$VERSION \
+            /p:Version=$VERSION \
             /p:FileVersion=$VERSION \
             -o out-eft
             
@@ -49,7 +49,7 @@ jobs:
             /p:PublishSingleFile=true \
             /p:DebugType=none \
             /p:EnableWindowsTargeting=true \
-            /p:AssemblyVersion=$VERSION \
+            /p:Version=$VERSION \
             /p:FileVersion=$VERSION \
             -o out-arena
 
