@@ -51,9 +51,6 @@ using LoneArenaDmaRadar.UI.Radar.Maps;
 using LoneArenaDmaRadar.UI.Skia;
 using System.Runtime.Versioning;
 
-[assembly: SupportedOSPlatform("Windows")]
-[assembly: AssemblyVersion("1.0.*")]
-
 namespace LoneArenaDmaRadar
 {
     /// <summary>
