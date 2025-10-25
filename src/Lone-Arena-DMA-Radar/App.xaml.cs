@@ -49,7 +49,6 @@ using LoneArenaDmaRadar.UI.ColorPicker;
 using LoneArenaDmaRadar.UI.Misc;
 using LoneArenaDmaRadar.UI.Radar.Maps;
 using LoneArenaDmaRadar.UI.Skia;
-using System.Runtime.Versioning;
 
 namespace LoneArenaDmaRadar
 {

@@ -181,7 +181,7 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
         /// <summary>
         /// Group that the player belongs to.
         /// </summary>
-        public int GroupID { get; protected set; } = -1;
+        public int TeamID { get; protected set; } = -1;
 
         /// <summary>
         /// Player is Human-Controlled.
@@ -529,19 +529,6 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
             }
         }
 
-        /// <summary>
-        /// All implementations are 6 elements long, so this is fine for now. If the chain ever updates we'll need to tweak this.
-        /// </summary>
-        internal const int TransformInternalChainCount = 6;
-        /// <summary>
-        /// Get the Transform Internal Chain for this Player.
-        /// </summary>
-        /// <param name="bone">Bone to lookup.</param>
-        /// <param name="offsets">Buffer to receive offsets.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual void GetTransformInternalChain(Bones bone, scoped Span<uint> offsets) =>
-            throw new NotImplementedException();
-
         #endregion
 
         #region Interfaces
@@ -695,16 +682,16 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
             {
                 lines.Add($"{name}{health} {AccountID}".Trim());
                 string g = null;
-                if (GroupID != -1)
-                    g = $" G:{GroupID} ";
+                if (TeamID != -1)
+                    g = $" G:{TeamID} ";
                 lines.Add(g);
             }
             else if (!IsAlive)
             {
                 lines.Add($"{Type}:{name}");
                 string g = null;
-                if (GroupID != -1)
-                    g = $"G:{GroupID} ";
+                if (TeamID != -1)
+                    g = $"G:{TeamID} ";
                 if (g is not null) lines.Add(g);
             }
             else if (IsAIActive)

@@ -57,7 +57,6 @@ using LoneEftDmaRadar.Web.TarkovDev.Data;
 using LoneEftDmaRadar.Web.TarkovDev.Profiles;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
-using System.Runtime.Versioning;
 
 namespace LoneEftDmaRadar
 {
