@@ -23,7 +23,7 @@ jobs:
 
       - name: Set version
         run: |
-          version="1.0.${{ github.run_number }}"
+          version="1.0.0.${{ github.run_number }}"
           echo "VERSION=$version" >> $GITHUB_ENV
           echo "Using version $version"
 
