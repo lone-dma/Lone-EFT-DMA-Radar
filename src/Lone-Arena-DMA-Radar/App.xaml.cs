@@ -62,11 +62,13 @@ namespace LoneArenaDmaRadar
         private const string MUTEX_ID = "0f908ff7-e614-6a93-60a3-cee36c9cea91";
         private static readonly Mutex _mutex;
 
+        private static readonly DirectoryInfo _oldConfigPath =
+            new(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "eft-dma-radar-4e90"));
         /// <summary>
         /// Path to the Configuration Folder in %AppData%
         /// </summary>
         public static DirectoryInfo ConfigPath { get; } =
-            new(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "eft-dma-radar-4e90"));
+            new(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Lone-EFT-DMA"));
         /// <summary>
         /// Global Program Configuration.
         /// </summary>
@@ -83,6 +85,8 @@ namespace LoneArenaDmaRadar
                 _mutex = new Mutex(true, MUTEX_ID, out bool singleton);
                 if (!singleton)
                     throw new InvalidOperationException("The Application Is Already Running!");
+                if (_oldConfigPath.Exists && !ConfigPath.Exists)
+                    _oldConfigPath.MoveTo(ConfigPath.FullName);
                 Config = ArenaDmaConfig.Load();
                 SetHighPerformanceMode();
             }
