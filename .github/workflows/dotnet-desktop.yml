@@ -21,6 +21,12 @@ jobs:
         with:
           dotnet-version: "10.0.x"
 
+      - name: Set version
+        run: |
+          version="1.0.${{ github.run_number }}"
+          echo "VERSION=$version" >> $GITHUB_ENV
+          echo "Using version $version"
+
       - name: Publish EFT
         run: |
           dotnet publish src/Lone-EFT-DMA-Radar/Lone-EFT-DMA-Radar.csproj \
@@ -30,6 +36,8 @@ jobs:
             /p:PublishSingleFile=true \
             /p:DebugType=none \
             /p:EnableWindowsTargeting=true \
+            /p:AssemblyVersion=$VERSION \
+            /p:FileVersion=$VERSION \
             -o out-eft
             
       - name: Publish Arena
@@ -41,6 +49,8 @@ jobs:
             /p:PublishSingleFile=true \
             /p:DebugType=none \
             /p:EnableWindowsTargeting=true \
+            /p:AssemblyVersion=$VERSION \
+            /p:FileVersion=$VERSION \
             -o out-arena
 
       - name: Archive publish output
