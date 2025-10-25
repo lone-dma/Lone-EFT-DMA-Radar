@@ -11,8 +11,6 @@
 	<Platforms>x64</Platforms>
 	<Configurations>Debug;Release</Configurations>
 	<ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
-	<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-	<Deterministic>False</Deterministic>
 	<ApplicationIcon>..\..\Resources\lone-icon.ico</ApplicationIcon>
   </PropertyGroup>
 

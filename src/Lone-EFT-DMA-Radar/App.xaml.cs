@@ -59,9 +59,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
 using System.Runtime.Versioning;
 
-[assembly: SupportedOSPlatform("Windows")]
-[assembly: AssemblyVersion("1.0.*")]
-
 namespace LoneEftDmaRadar
 {
     /// <summary>
