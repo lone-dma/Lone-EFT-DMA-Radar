@@ -50,13 +50,13 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
             CorpseAddr = this + Offsets.Player.Corpse;
 
             AccountID = GetAccountID();
-            GroupID = GetTeamID();
+            TeamID = GetTeamID();
             if (LocalGameWorld.MatchHasTeams)
-                ArgumentOutOfRangeException.ThrowIfEqual(GroupID, -1, nameof(GroupID)); 
+                ArgumentOutOfRangeException.ThrowIfEqual(TeamID, -1, nameof(TeamID)); 
             MovementContext = GetMovementContext();
             RotationAddress = ValidateRotationAddr(MovementContext + Offsets.MovementContext._rotation);
             /// Setup Transform
-            Span<uint> tiOffsets = stackalloc uint[ClientPlayer.TransformInternalChainCount];
+            Span<uint> tiOffsets = stackalloc uint[6];
             GetTransformInternalChain(Unity.Structures.Bones.HumanBase, tiOffsets);
             var tiRoot = Memory.ReadPtrChain(this, true, tiOffsets);
             SkeletonRoot = new UnityTransform(tiRoot);
@@ -124,9 +124,9 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
         /// <param name="bone">Bone to lookup.</param>
         /// <param name="offsets">Buffer to receive offsets.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected override void GetTransformInternalChain(Bones bone, Span<uint> offsets)
+        private static void GetTransformInternalChain(Bones bone, Span<uint> offsets)
         {
-            ArgumentOutOfRangeException.ThrowIfNotEqual(offsets.Length, AbstractPlayer.TransformInternalChainCount, nameof(offsets));
+            ArgumentOutOfRangeException.ThrowIfNotEqual(offsets.Length, 6, nameof(offsets));
             offsets[0] = Offsets.Player._playerBody;
             offsets[1] = PlayerBody.SkeletonRootJoint;
             offsets[2] = DizSkinningSkeleton._values;
