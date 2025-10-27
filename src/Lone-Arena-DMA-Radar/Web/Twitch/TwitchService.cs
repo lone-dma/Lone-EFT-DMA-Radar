@@ -33,7 +33,10 @@ using TwitchLib.Api.Core.Exceptions;
 
 namespace LoneArenaDmaRadar.Web.Twitch
 {
-    internal static class TwitchService
+    /// <summary>
+    /// Twitch Integration Module.
+    /// </summary>
+    internal static partial class TwitchService
     {
         private static readonly ConcurrentDictionary<string, CachedTwitchEntry> _cache = new(StringComparer.OrdinalIgnoreCase);
         private static readonly SemaphoreSlim _lock = new(1, 1);
@@ -68,30 +71,31 @@ namespace LoneArenaDmaRadar.Web.Twitch
         /// <returns>Twitch Channel URL. Null if not streaming.</returns>
         public static async Task<string> LookupAsync(string username)
         {
-            string channel = null;
             try
             {
                 if (_api is null) // Twitch API is not configured
                     return null;
-                username = username.ToLower(); // Cache is case-sensitive
+
+                if (string.IsNullOrWhiteSpace(username)) // Invalid input
+                    return null;
 
                 if (_cache.TryGetValue(username, out var cached) && !cached.IsExpired)
                 {
-                    if ((channel = cached.Channel) is not null)
+                    if (cached.Channel is string cachedChannel)
                     {
-                        return channel;
+                        return cachedChannel;
                     }
                     return null;
                 }
 
-                var replacedName = GetTTVName(username)?.ToLower();
+                var replacedName = GetTTVName(username);
 
                 // Exit early if they are apparently not a TTVer
                 if (replacedName is null)
                     return null;
 
-                Debug.WriteLine($"[Twitch] Checking {username}..."); // replacedName
-                channel = await LookupTwitchApiAsync(replacedName);
+                Debug.WriteLine($"[Twitch] Checking {username}...");
+                string channel = await LookupTwitchApiAsync(replacedName);
                 _cache[username] = new CachedTwitchEntry()
                 {
                     Channel = channel,
@@ -104,65 +108,32 @@ namespace LoneArenaDmaRadar.Web.Twitch
             {
                 return null;
             }
-            finally
-            {
-                if (channel is not null)
-                    Debug.WriteLine($"[Twitch] {username} is LIVE!");
-            }
         }
 
         /// <summary>
-        /// Takes an input username and attempts to normalize the username by removing the TV/TTV portions.
-        /// If a user is *not* streaming, the return value should be the same as the input.
-        /// </summary>
-        /// <param name="username">Input username.</param>
-        /// <param name="substring">Substring to check the input for.</param>
-        /// <returns>Normalized TTV Name. ex: LoneSurvivorTTV --> LoneSurvivor</returns>
-        private static string NormalizeTTVName(string username, string substring)
-        {
-            // Matches names with any number of _ or - before/after the target substring
-            string pattern = $"^[_-]*{substring}[_-]*|[_-]*{substring}[_-]*$";
-            var regex = new Regex(pattern, RegexOptions.IgnoreCase);
-            return regex.Replace(username, "");
-        }
-
-        /// <summary>
-        /// Checks a base string for a substring (Helper Method)
-        /// </summary>
-        /// <param name="baseString">Base string.</param>
-        /// <param name="substring">Substring to check the base string for.</param>
-        /// <returns>True if the base string contains the substring.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool StrContains(string baseString, string substring)
-        {
-            return baseString.Contains(substring, StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// Takes an input Player Name and checks if it is a valid TV/TTV Name.
-        /// Checks several different combinations.
-        /// Attempts to normalize the username by removing the "TV" portions.
+        /// Takes an input Player Name and checks if it is a valid TV/TTV-like name.
+        /// Removes twitch/ttv/tv tokens from the edges (with optional '_' or '-') and normalizes.
+        /// Returns null if not a TTVer-like name.
         /// </summary>
         /// <param name="username">Player's Name</param>
-        /// <returns>Player's Normalized TTV Name.</returns>
+        /// <returns>Normalized base name in lowercase, or null.</returns>
         private static string GetTTVName(string username)
         {
-            // The regex will match _ and - at the start and end of usernames.
-            // This check prevents a username like CoolDude_ or -CoolDude from being matched as a TTVer
-            if (!StrContains(username, "ttv") && !StrContains(username, "tv") && !StrContains(username, "twitch"))
+            // Fast bail-out for obvious non-TTV names
+            if (!username.Contains("tv", StringComparison.OrdinalIgnoreCase) && // Also handles 'ttv'
+                !username.Contains("twitch", StringComparison.OrdinalIgnoreCase))
                 return null;
 
-            // Regex is really fast on strings as small as usernames
-            // This just makes the overall logic flow flatter and more understandable
-            var c1 = NormalizeTTVName(username, "ttv");
-            var c2 = NormalizeTTVName(username, "tv");
-            var c3 = NormalizeTTVName(username, "twitch");
+            // Precompiled regex to strip "twitch|ttv|tv" that appear at the start or end,
+            // with optional '-' or '_' around them. Culture invariant and compiled for speed.
+            // This version fixes edge cases better than the previous implementation particularly with _ - tokens.
+            var stripped = StripUsername().Replace(username, string.Empty).Trim('_', '-');
 
-            if (c1 != username) return c1;
-            else if (c2 != username) return c2;
-            else if (c3 != username) return c3;
+            // If nothing changed or became empty, it's not considered a TTVer-like name
+            if (stripped.Length == 0 || string.Equals(stripped, username, StringComparison.Ordinal))
+                return null;
 
-            return null;
+            return stripped;
         }
 
         /// <summary>
@@ -200,5 +171,8 @@ namespace LoneArenaDmaRadar.Web.Twitch
 
             public bool IsExpired => (DateTimeOffset.UtcNow - Timestamp) > TimeSpan.FromMinutes(10);
         }
+
+        [GeneratedRegex(@"^[-_]*(?:twitch|ttv|tv)[-_]*|[-_]*(?:twitch|ttv|tv)[-_]*$", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant)]
+        private static partial Regex StripUsername();
     }
 }
