@@ -40,14 +40,19 @@ namespace LoneArenaDmaRadar.Web.Twitch
     {
         private static readonly ConcurrentDictionary<string, CachedTwitchEntry> _cache = new(StringComparer.OrdinalIgnoreCase);
         private static readonly SemaphoreSlim _lock = new(1, 1);
-        private static readonly IReadOnlyList<string> _ttvAppends = new List<string>()
+        private static readonly IReadOnlyList<string> _ttvAppends = new List<string>
         {
-            null,
-            "ttv",
+            null, // plain name
             "tv",
+            "ttv",
             "_tv",
             "_ttv",
-            "_"
+            "tv_",
+            "ttv_",
+            "_twitch",
+            "twitch",
+            "_",
+            "__"
         };
         private static readonly TwitchAPI _api;
 
