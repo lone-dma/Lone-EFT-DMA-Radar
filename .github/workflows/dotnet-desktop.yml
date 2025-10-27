@@ -15,18 +15,18 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Get version info
+        uses: dotnet/nbgv@master
+        id: nbgv
 
       - name: Setup .NET 10 SDK
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: "10.0.x"
-
-      - name: Set version
-        run: |
-          version="1.0.0.${{ github.run_number }}"
-          echo "VERSION=$version" >> $GITHUB_ENV
-          echo "Using version $version"
 
       - name: Publish EFT
         run: |
@@ -37,8 +37,9 @@ jobs:
             /p:PublishSingleFile=true \
             /p:DebugType=none \
             /p:EnableWindowsTargeting=true \
-            /p:Version=$VERSION \
-            /p:FileVersion=$VERSION \
+            /p:Version=${{ steps.nbgv.outputs.SemVer2 }} \
+            /p:FileVersion=${{ steps.nbgv.outputs.AssemblyFileVersion }} \
+            /p:AssemblyVersion=${{ steps.nbgv.outputs.AssemblyVersion }} \
             -o out-eft
             
       - name: Publish Arena
@@ -50,8 +51,9 @@ jobs:
             /p:PublishSingleFile=true \
             /p:DebugType=none \
             /p:EnableWindowsTargeting=true \
-            /p:Version=$VERSION \
-            /p:FileVersion=$VERSION \
+            /p:Version=${{ steps.nbgv.outputs.SemVer2 }} \
+            /p:FileVersion=${{ steps.nbgv.outputs.AssemblyFileVersion }} \
+            /p:AssemblyVersion=${{ steps.nbgv.outputs.AssemblyVersion }} \
             -o out-arena
 
       - name: Archive publish output
