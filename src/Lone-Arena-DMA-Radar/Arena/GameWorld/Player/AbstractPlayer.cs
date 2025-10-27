@@ -213,26 +213,29 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
         /// </summary>
         public virtual PlayerType Type { get; protected set; }
 
+        private Vector2 _rotation;
         /// <summary>
         /// Player's Rotation in Local Game World.
         /// </summary>
-        public Vector2 Rotation { get; private set; }
+        public Vector2 Rotation
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _rotation;
+            private set
+            {
+                _rotation = value;
+                float mapRotation = value.X; // Cache value
+                mapRotation -= 90f;
+                while (mapRotation < 0f)
+                    mapRotation += 360f;
+                MapRotation = mapRotation;
+            }
+        }
 
         /// <summary>
         /// Player's Map Rotation (with 90 degree correction applied).
         /// </summary>
-        public float MapRotation
-        {
-            get
-            {
-                float mapRotation = Rotation.X; // Cache value
-                mapRotation -= 90f;
-                while (mapRotation < 0f)
-                    mapRotation += 360f;
-
-                return mapRotation;
-            }
-        }
+        public float MapRotation { get; private set; }
 
         /// <summary>
         /// Corpse field value.
@@ -445,10 +448,10 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
 
             scatter.Completed += (sender, s) =>
             {
-                bool p1 = false;
-                bool p2 = false;
+                bool successRot = false;
+                bool successPos = false;
                 if (s.ReadValue<Vector2>(RotationAddress, out var rotation))
-                    p1 = SetRotation(ref rotation);
+                    successRot = SetRotation(rotation);
                 if (s.ReadArray<TrsX>(SkeletonRoot.VerticesAddr, SkeletonRoot.Count) is PooledMemory<TrsX> vertices)
                 {
                     using (vertices)
@@ -458,7 +461,7 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
                             try
                             {
                                 _ = SkeletonRoot.UpdatePosition(vertices.Span);
-                                p2 = true;
+                                successPos = true;
                             }
                             catch (Exception ex) // Attempt to re-allocate Transform on error
                             {
@@ -473,7 +476,7 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
                     }
                 }
 
-                IsError = !(p1 && p2);
+                IsError = !successRot || !successPos;
             };
         }
 
@@ -509,8 +512,7 @@ namespace LoneArenaDmaRadar.Arena.GameWorld.Player
         /// <summary>
         /// Set player rotation (Direction/Pitch)
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual bool SetRotation(ref Vector2 rotation)
+        protected virtual bool SetRotation(Vector2 rotation)
         {
             try
             {
