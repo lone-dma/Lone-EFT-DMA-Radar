@@ -133,18 +133,20 @@ namespace LoneArenaDmaRadar
         private async Task ConfigureProgramAsync(LoadingWindow loadingWindow) =>
         await Task.Run(async () =>
         {
-            await loadingWindow.ViewModel.UpdateProgressAsync(15, "Loading Map Assets...");
-            EftMapManager.ModuleInit();
-            await loadingWindow.ViewModel.UpdateProgressAsync(50, "Starting DMA Connection...");
-            RuntimeHelpers.RunClassConstructor(typeof(MemoryInterface).TypeHandle);
-            await loadingWindow.ViewModel.UpdateProgressAsync(75, "Loading Remaining Modules...");
-            IsDarkMode = GetIsDarkMode();
-            if (IsDarkMode)
+            await loadingWindow.ViewModel.UpdateProgressAsync(15, "Loading, Please Wait...");
+            var eftMapManager = EftMapManager.ModuleInitAsync();
+            var memoryInterface = MemoryInterface.ModuleInitAsync();
+            var misc = Task.Run(() =>
             {
-                SKPaints.PaintBitmap.ColorFilter = SKPaints.GetDarkModeColorFilter(0.7f);
-                SKPaints.PaintBitmapAlpha.ColorFilter = SKPaints.GetDarkModeColorFilter(0.7f);
-            }
-            RuntimeHelpers.RunClassConstructor(typeof(ColorPickerViewModel).TypeHandle);
+                IsDarkMode = GetIsDarkMode();
+                if (IsDarkMode)
+                {
+                    SKPaints.PaintBitmap.ColorFilter = SKPaints.GetDarkModeColorFilter(0.7f);
+                    SKPaints.PaintBitmapAlpha.ColorFilter = SKPaints.GetDarkModeColorFilter(0.7f);
+                }
+                RuntimeHelpers.RunClassConstructor(typeof(ColorPickerViewModel).TypeHandle);
+            });
+            await Task.WhenAll(eftMapManager, memoryInterface, misc);
             await loadingWindow.ViewModel.UpdateProgressAsync(100, "Loading Completed!");
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         });
