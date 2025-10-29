@@ -49,7 +49,7 @@ namespace LoneArenaDmaRadar.UI.Radar.Maps
         /// Initialize this Module.
         /// ONLY CALL ONCE!
         /// </summary>
-        public static void ModuleInit()
+        public static async Task ModuleInitAsync()
         {
             const string mapsPath = "Maps.bin";
             try
@@ -63,7 +63,7 @@ namespace LoneArenaDmaRadar.UI.Radar.Maps
                     if (file.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
                     {
                         using var stream = file.Open();
-                        var config = JsonSerializer.Deserialize<EftMapConfig>(stream);
+                        var config = await JsonSerializer.DeserializeAsync<EftMapConfig>(stream);
                         foreach (var id in config!.MapID)
                             mapsBuilder.Add(id, config);
                     }

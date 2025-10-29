@@ -64,11 +64,11 @@ namespace LoneEftDmaRadar.Tarkov
         /// <param name="defaultOnly">True if you want to load cached/default data only.</param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public static async Task ModuleInitAsync(LoadingWindow loading, bool defaultOnly = false)
+        public static async Task ModuleInitAsync(bool defaultOnly = false)
         {
             try
             {
-                var data = await GetDataAsync(loading, defaultOnly);
+                var data = await GetDataAsync(defaultOnly);
                 AllItems = data.Items.Where(x => !x.Tags?.Contains("Static Container") ?? false)
                     .DistinctBy(x => x.BsgId, StringComparer.OrdinalIgnoreCase)
                     .ToDictionary(k => k.BsgId, v => v, StringComparer.OrdinalIgnoreCase)
@@ -96,7 +96,7 @@ namespace LoneEftDmaRadar.Tarkov
         /// Loads Market data via several possible methods (cached,web,embedded resource).
         /// </summary>
         /// <returns>Collection of TarkovMarketItems.</returns>
-        private static async Task<TarkovMarketData> GetDataAsync(LoadingWindow loading, bool defaultOnly)
+        private static async Task<TarkovMarketData> GetDataAsync(bool defaultOnly)
         {
             TarkovMarketData data;
             string json = null;
@@ -104,7 +104,6 @@ namespace LoneEftDmaRadar.Tarkov
                 (!File.Exists(_dataFile) ||
             File.GetLastWriteTime(_dataFile).AddHours(4) < DateTime.Now)) // only update every 4h
             {
-                await loading.ViewModel.UpdateProgressAsync(loading.ViewModel.Progress, "Getting Updated Tarkov.Dev Data...");
                 json = await GetUpdatedDataJsonAsync();
                 if (json is not null)
                 {

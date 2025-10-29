@@ -32,15 +32,18 @@ namespace LoneEftDmaRadar.DMA
 {
     internal static class MemoryInterface
     {
-        static MemoryInterface()
+        public static async Task ModuleInitAsync()
         {
-            Memory = new MemDMA();
-            Debug.WriteLine("DMA Initialized!");
+            await Task.Run(() =>
+            {
+                Memory = new MemDMA();
+                Debug.WriteLine("DMA Initialized!");
+            });
         }
 
         /// <summary>
         /// Singleton Instance for use in this assembly.
         /// </summary>
-        public static MemDMA Memory { get; }
+        public static MemDMA Memory { get; private set; }
     }
 }

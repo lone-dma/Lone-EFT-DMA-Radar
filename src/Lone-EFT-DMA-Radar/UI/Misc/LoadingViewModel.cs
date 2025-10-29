@@ -28,9 +28,8 @@ SOFTWARE.
 
 namespace LoneEftDmaRadar.UI.Misc
 {
-    public class LoadingViewModel : INotifyPropertyChanged, IDisposable
+    public class LoadingViewModel : INotifyPropertyChanged
     {
-        private readonly PeriodicTimer _intervalTimer = new(TimeSpan.FromMilliseconds(233));
         private readonly LoadingWindow _parent;
 
         public LoadingViewModel(LoadingWindow parent)
@@ -81,17 +80,11 @@ namespace LoneEftDmaRadar.UI.Misc
         /// </summary>
         public async Task UpdateProgressAsync(double percent, string status)
         {
-            _parent.Dispatcher.Invoke(() =>
+            await _parent.Dispatcher.InvokeAsync(() =>
             {
                 Progress = percent;
                 StatusText = status;
             });
-            await _intervalTimer.WaitForNextTickAsync();
-        }
-
-        public void Dispose()
-        {
-            _intervalTimer.Dispose();
         }
     }
 }
