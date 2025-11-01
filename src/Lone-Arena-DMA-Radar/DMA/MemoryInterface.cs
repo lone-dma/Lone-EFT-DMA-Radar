@@ -36,7 +36,7 @@ namespace LoneArenaDmaRadar.DMA
         {
             await Task.Run(() =>
             {
-                Memory = new MemDMA();
+                Memory ??= new MemDMA();
                 Debug.WriteLine("DMA Initialized!");
             });
         }
