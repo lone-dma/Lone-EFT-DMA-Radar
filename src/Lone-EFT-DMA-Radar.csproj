@@ -50,6 +50,11 @@
 	<ItemGroup>
 		<Content Include="..\Resources\Maps.bin">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Visible>false</Visible>
+		</Content>
+		<Content Include="..\guides-and-setup.zip">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Visible>false</Visible>
 		</Content>
 	</ItemGroup>
 
