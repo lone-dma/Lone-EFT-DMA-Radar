@@ -66,7 +66,8 @@ jobs:
 
       - name: Pack EFT
         run: |
-          vpk [win] pack \
+          vpk pack \
+            --channel win \
             --packId github.lonedma.eft \
             --packVersion "${{ steps.nbgv.outputs.SemVer2 }}" \
             --packDir "out" \
@@ -79,7 +80,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          vpk [win] upload github \
+          vpk upload github \
+            --channel win \
             --repoUrl "https://github.com/${{ github.repository }}" \
             --outputDir "Releases/EFT" \
             --publish \
