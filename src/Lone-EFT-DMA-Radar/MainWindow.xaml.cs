@@ -97,6 +97,8 @@ namespace LoneEftDmaRadar
         {
             try
             {
+                if (!Radar?.IsVisible ?? false)
+                    return; // Ignore if radar is not visible
                 if (e.Key is Key.F1)
                 {
                     Radar?.ViewModel?.ZoomIn(5);
@@ -126,6 +128,8 @@ namespace LoneEftDmaRadar
             const double wheelDelta = 120d; // Standard mouse wheel delta value
             try
             {
+                if (!Radar?.IsVisible ?? false)
+                    return; // Ignore if radar is not visible
                 if (e.Delta > 0) // mouse wheel up (zoom in)
                 {
                     int amt = (int)((e.Delta / wheelDelta) * 5d); // Calculate zoom amount based on number of deltas
