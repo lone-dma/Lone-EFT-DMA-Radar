@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - vpk
     paths:
       - 'src/Lone-Arena-DMA-Radar/**'
       - '.github/workflows/deploy-arena.yml'
