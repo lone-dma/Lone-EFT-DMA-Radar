@@ -52,11 +52,6 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<Visible>false</Visible>
 		</Content>
-		<Content Include="..\guides-and-setup\**\*.*">
-			<Link>guides-and-setup\%(RecursiveDir)%(Filename)%(Extension)</Link>
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<Visible>false</Visible>
-		</Content>
 	</ItemGroup>
 
 	<ItemGroup>
