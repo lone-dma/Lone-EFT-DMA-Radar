@@ -6,8 +6,8 @@ on:
       - master
       - vpk
     paths:
+      - 'Resources/**'
       - 'src/Lone-EFT-DMA-Radar/**'
-      - '.github/workflows/deploy-eft.yml'
   workflow_dispatch:
 
 permissions:
@@ -47,8 +47,11 @@ jobs:
       - name: Publish EFT
         run: |
           dotnet publish src/Lone-EFT-DMA-Radar/Lone-EFT-DMA-Radar.csproj `
-            -c Release -r win-x64 --no-self-contained `
-            /p:PublishSingleFile=true /p:DebugType=none /p:EnableWindowsTargeting=true `
+            -c Release `
+            -r win-x64 `
+            --no-self-contained `
+            /p:PublishSingleFile=true `
+            /p:DebugType=none `
             /p:Version=${{ steps.nbgv.outputs.SemVer2 }} `
             /p:FileVersion=${{ steps.nbgv.outputs.AssemblyFileVersion }} `
             /p:AssemblyVersion=${{ steps.nbgv.outputs.AssemblyVersion }} `
