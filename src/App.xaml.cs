@@ -154,6 +154,7 @@ namespace LoneEftDmaRadar
         /// </summary>
         private async Task ConfigureProgramAsync(LoadingWindow loadingWindow)
         {
+            Debug.WriteLine("Testing");
             await loadingWindow.ViewModel.UpdateProgressAsync(15, "Loading, Please Wait...");
             var updater = CheckForUpdatesAsync(loadingWindow);
             var tarkovDataManager = TarkovDataManager.ModuleInitAsync();
