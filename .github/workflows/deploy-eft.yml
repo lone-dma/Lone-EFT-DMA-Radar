@@ -63,7 +63,7 @@ jobs:
             --packId github.lonedma.eft `
             --packVersion "${{ steps.nbgv.outputs.SemVer2 }}-eft" `
             --packDir "out" `
-            --delta None
+            --delta None `
             --mainExe "Lone-EFT-DMA-Radar.exe" `
             --outputDir "Releases" `
             --packTitle "Lone EFT DMA Radar" `
