@@ -1,0 +1,88 @@
+name: Deploy to GitHub Releases
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'Resources/**'
+      - 'src/**'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build & Deploy
+    runs-on: windows-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Get version info
+        uses: dotnet/nbgv@master
+        id: nbgv
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Install Velopack CLI
+        run: |
+          dotnet tool install -g vpk
+
+      - name: Dotnet Publish
+        run: |
+          dotnet publish src/Lone-EFT-DMA-Radar.csproj `
+            -c Release `
+            -r win-x64 `
+            --no-self-contained `
+            /p:PublishSingleFile=true `
+            /p:DebugType=none `
+            /p:Version=${{ steps.nbgv.outputs.SemVer2 }} `
+            /p:FileVersion=${{ steps.nbgv.outputs.AssemblyFileVersion }} `
+            /p:AssemblyVersion=${{ steps.nbgv.outputs.AssemblyVersion }} `
+            -o out
+
+      - name: Download previous release data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          vpk download github `
+            --repoUrl "https://github.com/${{ github.repository }}" `
+            --outputDir "Releases" `
+            --token "$env:GITHUB_TOKEN"
+
+      - name: Pack with Velopack
+        run: |
+          vpk pack `
+            --packId github.lonedma.eft `
+            --packVersion "${{ steps.nbgv.outputs.SemVer2 }}" `
+            --packDir "out" `
+            --mainExe "Lone-EFT-DMA-Radar.exe" `
+            --outputDir "Releases" `
+            --packTitle "Lone EFT DMA Radar" `
+            --icon "Resources/lone-icon.ico"
+
+      - name: Upload to GitHub Releases
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          vpk upload github `
+            --repoUrl "https://github.com/${{ github.repository }}" `
+            --outputDir "Releases" `
+            --publish `
+            --merge `
+            --releaseName "EFT ${{ steps.nbgv.outputs.SemVer2 }}" `
+            --tag "v${{ steps.nbgv.outputs.SemVer2 }}" `
+            --targetCommitish "${{ github.sha }}" `
+            --token "$env:GITHUB_TOKEN"
