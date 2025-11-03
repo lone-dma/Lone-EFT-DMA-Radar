@@ -52,7 +52,7 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<Visible>false</Visible>
 		</Content>
-		<Content Include="..\guides-and-setup.zip">
+		<Content Include="..\guides-and-setup\**\*.*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<Visible>false</Visible>
 		</Content>
