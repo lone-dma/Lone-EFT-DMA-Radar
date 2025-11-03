@@ -36,6 +36,7 @@ global using System.ComponentModel;
 global using System.Data;
 global using System.Diagnostics;
 global using System.IO;
+global using System.Net;
 global using System.Numerics;
 global using System.Reflection;
 global using System.Runtime.CompilerServices;
@@ -44,20 +45,29 @@ global using System.Text;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
 global using System.Windows;
-using LoneArenaDmaRadar.DMA;
-using LoneArenaDmaRadar.UI.ColorPicker;
-using LoneArenaDmaRadar.UI.Misc;
-using LoneArenaDmaRadar.UI.Radar.Maps;
-using LoneArenaDmaRadar.UI.Skia;
+using LoneEftDmaRadar.DMA;
+using LoneEftDmaRadar.Misc.Services;
+using LoneEftDmaRadar.Tarkov;
+using LoneEftDmaRadar.UI.ColorPicker;
+using LoneEftDmaRadar.UI.Misc;
+using LoneEftDmaRadar.UI.Radar.Maps;
+using LoneEftDmaRadar.UI.Skia;
+using LoneEftDmaRadar.Web.EftApiTech;
+using LoneEftDmaRadar.Web.TarkovDev.Data;
+using LoneEftDmaRadar.Web.TarkovDev.Profiles;
+using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http;
+using Velopack;
+using Velopack.Sources;
 
-namespace LoneArenaDmaRadar
+namespace LoneEftDmaRadar
 {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
-        internal const string Name = "Lone Arena DMA Radar";
+        internal const string Name = "Lone EFT DMA Radar";
         private const string MUTEX_ID = "0f908ff7-e614-6a93-60a3-cee36c9cea91";
         private static readonly Mutex _mutex;
 
@@ -71,7 +81,16 @@ namespace LoneArenaDmaRadar
         /// <summary>
         /// Global Program Configuration.
         /// </summary>
-        public static ArenaDmaConfig Config { get; }
+        public static EftDmaConfig Config { get; }
+        /// <summary>
+        /// Service Provider for Dependency Injection.
+        /// NOTE: Web Radar has it's own container.
+        /// </summary>
+        public static IServiceProvider ServiceProvider { get; }
+        /// <summary>
+        /// HttpClientFactory for creating HttpClients.
+        /// </summary>
+        public static IHttpClientFactory HttpClientFactory { get; }
         /// <summary>
         /// TRUE if the application is currently using Dark Mode resources, otherwise FALSE for Light Mode.
         /// </summary>
@@ -81,12 +100,15 @@ namespace LoneArenaDmaRadar
         {
             try
             {
+                VelopackApp.Build().Run();
                 _mutex = new Mutex(true, MUTEX_ID, out bool singleton);
                 if (!singleton)
                     throw new InvalidOperationException("The Application Is Already Running!");
                 if (_oldConfigPath.Exists && !ConfigPath.Exists)
                     _oldConfigPath.MoveTo(ConfigPath.FullName);
-                Config = ArenaDmaConfig.Load();
+                Config = EftDmaConfig.Load();
+                ServiceProvider = BuildServiceProvider();
+                HttpClientFactory = ServiceProvider.GetRequiredService<IHttpClientFactory>();
                 SetHighPerformanceMode();
             }
             catch (Exception ex)
@@ -134,6 +156,8 @@ namespace LoneArenaDmaRadar
         await Task.Run(async () =>
         {
             await loadingWindow.ViewModel.UpdateProgressAsync(15, "Loading, Please Wait...");
+            var updater = CheckForUpdatesAsync(loadingWindow);
+            var tarkovDataManager = TarkovDataManager.ModuleInitAsync();
             var eftMapManager = EftMapManager.ModuleInitAsync();
             var memoryInterface = MemoryInterface.ModuleInitAsync();
             var misc = Task.Run(() =>
@@ -144,9 +168,10 @@ namespace LoneArenaDmaRadar
                     SKPaints.PaintBitmap.ColorFilter = SKPaints.GetDarkModeColorFilter(0.7f);
                     SKPaints.PaintBitmapAlpha.ColorFilter = SKPaints.GetDarkModeColorFilter(0.7f);
                 }
+                RuntimeHelpers.RunClassConstructor(typeof(LocalCache).TypeHandle);
                 RuntimeHelpers.RunClassConstructor(typeof(ColorPickerViewModel).TypeHandle);
             });
-            await Task.WhenAll(eftMapManager, memoryInterface, misc);
+            await Task.WhenAll(updater, tarkovDataManager, eftMapManager, memoryInterface, misc);
             await loadingWindow.ViewModel.UpdateProgressAsync(100, "Loading Completed!");
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         });
@@ -154,6 +179,20 @@ namespace LoneArenaDmaRadar
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             Config.Save();
+        }
+
+        /// <summary>
+        /// Sets up the Dependency Injection container for the application.
+        /// </summary>
+        /// <returns></returns>
+        private static IServiceProvider BuildServiceProvider()
+        {
+            var services = new ServiceCollection();
+            services.AddHttpClient(); // Add default HttpClientFactory
+            TarkovDevGraphQLApi.Configure(services);
+            TarkovDevProfileProvider.Configure(services);
+            EftApiTechProvider.Configure(services);
+            return services.BuildServiceProvider();
         }
 
         /// <summary>
@@ -198,6 +237,40 @@ namespace LoneArenaDmaRadar
             catch { }
             // fallback: assume light if nothing matched
             return false;
+        }
+
+        private static async Task CheckForUpdatesAsync(Window parent)
+        {
+            if (!Config.CheckForUpdates)
+                return;
+            try
+            {
+                var updater = new UpdateManager(
+                    source: new GithubSource("https://github.com/lone-dma/Lone-EFT-DMA-Radar", 
+                        accessToken: null, 
+                        prerelease: false));
+
+                var newVersion = await updater.CheckForUpdatesAsync();
+                if (newVersion is not null)
+                {
+                    var result = MessageBox.Show(
+                        parent,
+                        $"A new version ({newVersion.TargetFullRelease.Version}) is available.\n\nWould you like to update now?",
+                        App.Name,
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        await updater.DownloadUpdatesAsync(newVersion);
+                        updater.ApplyUpdatesAndRestart(newVersion);
+                    }
+                }
+            }
+            catch
+            {
+                // Best effort only
+            }
         }
 
         [LibraryImport("kernel32.dll")]

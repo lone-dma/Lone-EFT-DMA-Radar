@@ -52,6 +52,12 @@ namespace LoneEftDmaRadar
         public EftDmaConfig() { }
 
         /// <summary>
+        /// Check for updates on startup.
+        /// </summary>
+        [JsonPropertyName("checkForUpdates")]
+        public bool CheckForUpdates { get; set; } = true;
+
+        /// <summary>
         /// DMA Config
         /// </summary>
         [JsonPropertyName("dma")]
