@@ -11,7 +11,7 @@
 	<Platforms>x64</Platforms>
 	<Configurations>Debug;Release</Configurations>
 	<ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
-	<ApplicationIcon>..\..\Resources\lone-icon.ico</ApplicationIcon>
+	<ApplicationIcon>..\Resources\lone-icon.ico</ApplicationIcon>
   </PropertyGroup>
 
 	<PropertyGroup>
@@ -48,15 +48,15 @@
 
 
 	<ItemGroup>
-		<Content Include="..\..\Resources\Maps.bin">
+		<Content Include="..\Resources\Maps.bin">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="..\..\Resources\NeoSansStdRegular.otf" />
-		<EmbeddedResource Include="..\..\Resources\DEFAULT_DATA.json" />
-		<Resource Include="..\..\Resources\lone-icon.ico" />
+		<EmbeddedResource Include="..\Resources\NeoSansStdRegular.otf" />
+		<EmbeddedResource Include="..\Resources\DEFAULT_DATA.json" />
+		<Resource Include="..\Resources\lone-icon.ico" />
 	</ItemGroup>
 
 	<ItemGroup>
