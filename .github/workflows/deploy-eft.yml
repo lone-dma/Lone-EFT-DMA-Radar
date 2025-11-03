@@ -59,7 +59,6 @@ jobs:
         run: |
           vpk download github `
             --repoUrl "https://github.com/${{ github.repository }}" `
-            --outputDir "Releases" `
             --token "$env:GITHUB_TOKEN"
 
       - name: Pack with Velopack
@@ -69,7 +68,6 @@ jobs:
             --packVersion "${{ steps.nbgv.outputs.SemVer2 }}" `
             --packDir "out" `
             --mainExe "Lone-EFT-DMA-Radar.exe" `
-            --outputDir "Releases" `
             --packTitle "Lone EFT DMA Radar" `
             --icon "Resources/lone-icon.ico"
 
@@ -79,9 +77,7 @@ jobs:
         run: |
           vpk upload github `
             --repoUrl "https://github.com/${{ github.repository }}" `
-            --outputDir "Releases" `
             --publish `
-            --merge `
             --releaseName "EFT ${{ steps.nbgv.outputs.SemVer2 }}" `
             --tag "v${{ steps.nbgv.outputs.SemVer2 }}" `
             --targetCommitish "${{ github.sha }}" `
