@@ -169,7 +169,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
         {
             try
             {
-                var backupFile = $@"..\{EftDmaConfig.Filename}.bak";
+                var backupFile = Path.Combine(App.ConfigPath.FullName, $"{EftDmaConfig.Filename}.userbak");
                 if (File.Exists(backupFile) &&
                     MessageBox.Show(MainWindow.Instance, "Overwrite backup?", "Backup Config", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                     return;
