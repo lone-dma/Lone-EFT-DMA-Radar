@@ -268,8 +268,9 @@ namespace LoneEftDmaRadar
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                MessageBox.Show(parent, ex.ToString());
                 // Best effort only
             }
         }

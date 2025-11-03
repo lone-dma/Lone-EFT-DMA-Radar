@@ -57,21 +57,13 @@ jobs:
             /p:AssemblyVersion=${{ steps.nbgv.outputs.AssemblyVersion }} `
             -o out
 
-      - name: Download previous release data
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          vpk download github `
-            --repoUrl "https://github.com/${{ github.repository }}" `
-            --outputDir "Releases/EFT" `
-            --token "$env:GITHUB_TOKEN"
-
       - name: Pack EFT
         run: |
           vpk pack `
             --packId github.lonedma.eft `
             --packVersion "${{ steps.nbgv.outputs.SemVer2 }}" `
             --packDir "out" `
+            --delta None
             --mainExe "Lone-EFT-DMA-Radar.exe" `
             --outputDir "Releases/EFT" `
             --packTitle "Lone EFT DMA Radar" `
@@ -87,6 +79,6 @@ jobs:
             --publish `
             --merge `
             --releaseName "EFT ${{ steps.nbgv.outputs.SemVer2 }}" `
-            --tag "v${{ steps.nbgv.outputs.SemVer2 }}" `
+            --tag "eft-${{ steps.nbgv.outputs.SemVer2 }}" `
             --targetCommitish "${{ github.sha }}" `
             --token "$env:GITHUB_TOKEN"
