@@ -49,6 +49,8 @@ using LoneArenaDmaRadar.UI.ColorPicker;
 using LoneArenaDmaRadar.UI.Misc;
 using LoneArenaDmaRadar.UI.Radar.Maps;
 using LoneArenaDmaRadar.UI.Skia;
+using Velopack;
+using Velopack.Sources;
 
 namespace LoneArenaDmaRadar
 {
@@ -134,6 +136,7 @@ namespace LoneArenaDmaRadar
         await Task.Run(async () =>
         {
             await loadingWindow.ViewModel.UpdateProgressAsync(15, "Loading, Please Wait...");
+            var updater = CheckForUpdatesAsync();
             var eftMapManager = EftMapManager.ModuleInitAsync();
             var memoryInterface = MemoryInterface.ModuleInitAsync();
             var misc = Task.Run(() =>
@@ -146,7 +149,7 @@ namespace LoneArenaDmaRadar
                 }
                 RuntimeHelpers.RunClassConstructor(typeof(ColorPickerViewModel).TypeHandle);
             });
-            await Task.WhenAll(eftMapManager, memoryInterface, misc);
+            await Task.WhenAll(updater, eftMapManager, memoryInterface, misc);
             await loadingWindow.ViewModel.UpdateProgressAsync(100, "Loading Completed!");
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         });
@@ -198,6 +201,37 @@ namespace LoneArenaDmaRadar
             catch { }
             // fallback: assume light if nothing matched
             return false;
+        }
+
+        private static async Task CheckForUpdatesAsync()
+        {
+            try
+            {
+                var updater = new UpdateManager(
+                    source: new GithubSource("https://github.com/lone-dma/Lone-EFT-DMA-Radar",
+                        accessToken: null,
+                        prerelease: false));
+
+                var newVersion = await updater.CheckForUpdatesAsync();
+                if (newVersion is not null)
+                {
+                    var result = MessageBox.Show(
+                        $"A new version ({newVersion.TargetFullRelease.Version}) is available.\n\nWould you like to update now?",
+                        App.Name,
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        await updater.DownloadUpdatesAsync(newVersion);
+                        updater.ApplyUpdatesAndRestart(newVersion);
+                    }
+                }
+            }
+            catch
+            {
+                // Best effort only
+            }
         }
 
         [LibraryImport("kernel32.dll")]
