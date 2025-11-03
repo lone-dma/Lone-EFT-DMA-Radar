@@ -79,7 +79,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          vpk upload github \
+          vpk [win] upload github \
             --repoUrl "https://github.com/${{ github.repository }}" \
             --outputDir "Releases/EFT" \
             --publish \
