@@ -57,6 +57,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             RestartRadarCommand = new SimpleCommand(OnRestartRadar);
             OpenHotkeyManagerCommand = new SimpleCommand(OnOpenHotkeyManager);
             OpenColorPickerCommand = new SimpleCommand(OnOpenColorPicker);
+            BackupConfigCommand = new SimpleCommand(OnBackupConfig);
             SaveConfigCommand = new SimpleCommand(OnSaveConfig);
             MonitorDetectResCommand = new SimpleCommand(async () => await OnMonitorDetectResAsync());
             InitializeContainers();
@@ -160,6 +161,25 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             finally
             {
                 ColorPickerIsEnabled = true;
+            }
+        }
+
+        public ICommand BackupConfigCommand { get; }
+        private async void OnBackupConfig()
+        {
+            try
+            {
+                var backupFile = EftDmaConfig.Filename + ".bak";
+                if (File.Exists(backupFile) &&
+                    MessageBox.Show(MainWindow.Instance, "Overwrite backup?", "Backup Config", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                    return;
+
+                await File.WriteAllTextAsync(backupFile, JsonSerializer.Serialize(App.Config, new JsonSerializerOptions { WriteIndented = true }));
+                MessageBox.Show(MainWindow.Instance, $"Backed up to {backupFile}", "Backup Config");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(MainWindow.Instance, $"Error: {ex.Message}", "Backup Config", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
