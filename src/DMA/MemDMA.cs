@@ -52,9 +52,9 @@ namespace LoneEftDmaRadar.DMA
     {
         #region Init
 
-        private const string MEMORY_MAP_FILE = @"..\mmap.txt";
         private const string GAME_PROCESS_NAME = "EscapeFromTarkov.exe";
         internal const uint MAX_READ_SIZE = 0x1000u * 1500u;
+        private static readonly string _mmap = Path.Combine(App.ConfigPath.FullName, "mmap.txt");
         private readonly Vmm _vmm;
         private uint _pid;
         private bool _restartRadar;
@@ -114,7 +114,7 @@ namespace LoneEftDmaRadar.DMA
                 /// Begin Init...
                 if (useMemMap)
                 {
-                    if (!File.Exists(MEMORY_MAP_FILE))
+                    if (!File.Exists(_mmap))
                     {
                         Debug.WriteLine("[DMA] No MemMap, attempting to generate...");
                         _vmm = new Vmm(args: initArgs)
@@ -123,11 +123,11 @@ namespace LoneEftDmaRadar.DMA
                         };
                         _ = _vmm.GetMemoryMap(
                             applyMap: true,
-                            outputFile: MEMORY_MAP_FILE);
+                            outputFile: _mmap);
                     }
                     else
                     {
-                        var mapArgs = new[] { "-memmap", MEMORY_MAP_FILE };
+                        var mapArgs = new[] { "-memmap", _mmap };
                         initArgs = initArgs.Concat(mapArgs).ToArray();
                     }
                 }
