@@ -100,7 +100,6 @@ namespace LoneEftDmaRadar
         {
             try
             {
-                Debug.WriteLine("Testing, 1");
                 VelopackApp.Build().Run();
                 _mutex = new Mutex(true, MUTEX_ID, out bool singleton);
                 if (!singleton)
@@ -268,9 +267,8 @@ namespace LoneEftDmaRadar
                     }
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                MessageBox.Show(parent, ex.ToString());
                 // Best effort only
             }
         }
