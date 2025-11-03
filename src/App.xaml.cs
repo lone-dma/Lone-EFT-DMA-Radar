@@ -267,9 +267,14 @@ namespace LoneEftDmaRadar
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Best effort only
+                MessageBox.Show(
+                    parent,
+                    $"An unhandled exception occurred while checking for updates: {ex}",
+                    App.Name,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
         }
 
