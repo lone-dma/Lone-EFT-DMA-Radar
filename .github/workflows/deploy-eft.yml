@@ -46,7 +46,7 @@ jobs:
 
       - name: Publish EFT
         run: |
-          dotnet publish src/Lone-EFT-DMA-Radar/Lone-EFT-DMA-Radar.csproj `
+          dotnet publish src/Lone-EFT-DMA-Radar.csproj `
             -c Release `
             -r win-x64 `
             --no-self-contained `
