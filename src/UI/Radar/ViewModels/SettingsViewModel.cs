@@ -58,7 +58,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             OpenHotkeyManagerCommand = new SimpleCommand(OnOpenHotkeyManager);
             OpenColorPickerCommand = new SimpleCommand(OnOpenColorPicker);
             BackupConfigCommand = new SimpleCommand(OnBackupConfig);
-            SaveConfigCommand = new SimpleCommand(OnSaveConfig);
+            OpenConfigCommand = new SimpleCommand(OnOpenConfig);
             MonitorDetectResCommand = new SimpleCommand(async () => await OnMonitorDetectResAsync());
             InitializeContainers();
             CameraManager.UpdateViewportRes();
@@ -183,13 +183,12 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             }
         }
 
-        public ICommand SaveConfigCommand { get; }
-        private async void OnSaveConfig()
+        public ICommand OpenConfigCommand { get; }
+        private async void OnOpenConfig()
         {
             try
             {
-                await App.Config.SaveAsync();
-                MessageBox.Show(MainWindow.Instance, $"Config saved to {App.ConfigPath.FullName}", "Save Config");
+                Process.Start(new ProcessStartInfo(App.ConfigPath.FullName) { UseShellExecute = true });
             }
             catch (Exception ex)
             {
