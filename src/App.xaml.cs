@@ -240,8 +240,6 @@ namespace LoneEftDmaRadar
 
         private static async Task CheckForUpdatesAsync(Window parent)
         {
-            if (!Config.CheckForUpdates)
-                return;
             try
             {
                 var updater = new UpdateManager(
