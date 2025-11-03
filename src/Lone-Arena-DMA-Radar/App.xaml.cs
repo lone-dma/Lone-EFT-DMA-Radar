@@ -137,7 +137,7 @@ namespace LoneArenaDmaRadar
         await Task.Run(async () =>
         {
             await loadingWindow.ViewModel.UpdateProgressAsync(15, "Loading, Please Wait...");
-            var updater = CheckForUpdatesAsync();
+            var updater = CheckForUpdatesAsync(loadingWindow);
             var eftMapManager = EftMapManager.ModuleInitAsync();
             var memoryInterface = MemoryInterface.ModuleInitAsync();
             var misc = Task.Run(() =>
@@ -204,7 +204,7 @@ namespace LoneArenaDmaRadar
             return false;
         }
 
-        private static async Task CheckForUpdatesAsync()
+        private static async Task CheckForUpdatesAsync(Window parent)
         {
             try
             {
@@ -217,6 +217,7 @@ namespace LoneArenaDmaRadar
                 if (newVersion is not null)
                 {
                     var result = MessageBox.Show(
+                        parent,
                         $"A new version ({newVersion.TargetFullRelease.Version}) is available.\n\nWould you like to update now?",
                         App.Name,
                         MessageBoxButton.YesNo,
