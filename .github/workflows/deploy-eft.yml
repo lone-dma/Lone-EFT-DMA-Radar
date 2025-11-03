@@ -61,7 +61,7 @@ jobs:
         run: |
           vpk pack `
             --packId github.lonedma.eft `
-            --packVersion "${{ steps.nbgv.outputs.SemVer2 }}" `
+            --packVersion "${{ steps.nbgv.outputs.SemVer2 }}-eft" `
             --packDir "out" `
             --delta None
             --mainExe "Lone-EFT-DMA-Radar.exe" `
