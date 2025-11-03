@@ -83,6 +83,7 @@ namespace LoneArenaDmaRadar
         {
             try
             {
+                VelopackApp.Build().Run();
                 _mutex = new Mutex(true, MUTEX_ID, out bool singleton);
                 if (!singleton)
                     throw new InvalidOperationException("The Application Is Already Running!");
