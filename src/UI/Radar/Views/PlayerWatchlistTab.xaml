@@ -17,7 +17,7 @@
         <DataGrid ItemsSource="{Binding Entries}"
                   SelectedItem="{Binding SelectedEntry, Mode=TwoWay}"
                   AutoGenerateColumns="False"
-                  CanUserAddRows="False"
+                  CanUserAddRows="True"
                   CanUserDeleteRows="True"
                   EnableRowVirtualization="True"
                   EnableColumnVirtualization="True"
