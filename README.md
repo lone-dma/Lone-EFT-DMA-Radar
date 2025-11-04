@@ -14,7 +14,8 @@ This is the original Lone EFT DMA Radar by Lone, with some key differences from 
 This version is designed to be as safe as possible from any future detections, and gives you the information that you need while allowing you to fully experience the game for yourself.
 
 ## 💾 Setup
-See our [Setup Files and Guides](https://github.com/lone-dma/Lone-EFT-DMA-Radar/releases/tag/setup).
+- Download the latest version in [Releases](https://github.com/lone-dma/Lone-EFT-DMA-Radar/releases).
+- See our [Setup Files and Guides](https://github.com/lone-dma/Lone-EFT-DMA-Radar/releases/tag/setup).
 
 ## 💖 Special Thanks
 - @xx0m and @Mambo-Noob
