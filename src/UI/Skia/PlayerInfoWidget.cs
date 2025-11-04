@@ -124,7 +124,7 @@ namespace LoneEftDmaRadar.UI.Skia
             var len = font.MeasureText(header);
             if (len > maxLength) maxLength = len;
 
-            Size = new SKSize(maxLength + pad, filteredPlayers.Count * font.Spacing);
+            Size = new SKSize(maxLength + pad, (1 + filteredPlayers.Count) * font.Spacing); // 1 extra for header
             Draw(canvas); // Background/frame
 
             canvas.DrawText(header,
