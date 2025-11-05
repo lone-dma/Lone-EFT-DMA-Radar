@@ -38,7 +38,7 @@ namespace LoneEftDmaRadar.DMA
             {
                 Memory ??= new MemDMA();
                 Debug.WriteLine("DMA Initialized!");
-            }).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
