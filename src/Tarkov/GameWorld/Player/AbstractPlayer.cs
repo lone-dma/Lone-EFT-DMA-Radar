@@ -903,9 +903,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             canvas.DrawPath(_playerPill, SKPaints.ShapeOutline); // outline
             canvas.DrawPath(_playerPill, paints.Item1);
 
-            var aimlineLength = this == localPlayer || (IsFriendly && App.Config.UI.TeammateAimlines) ? 
+            var aimlineLength = this == localPlayer || (IsFriendly && App.Config.UI.TeammateAimlines) ?
                 App.Config.UI.AimLineLength : 0;
-            if (!IsFriendly && 
+            if (!IsFriendly &&
                 !(IsAI && !App.Config.UI.AIAimlines) &&
                 this.IsFacingTarget(localPlayer, App.Config.UI.MaxDistance)) // Hostile Player, check if aiming at a friendly (High Alert)
                 aimlineLength = 9999;

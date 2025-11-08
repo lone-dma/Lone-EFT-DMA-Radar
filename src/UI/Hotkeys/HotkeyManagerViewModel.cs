@@ -160,7 +160,7 @@ namespace LoneEftDmaRadar.UI.Hotkeys
 
         private void OnRemove()
         {
-            if (SelectedEntry is not HotkeyListBoxEntry entry) 
+            if (SelectedEntry is not HotkeyListBoxEntry entry)
                 return;
             HotkeyEntries.Remove(entry);
             _hotkeys.TryRemove(entry.Hotkey, out _);

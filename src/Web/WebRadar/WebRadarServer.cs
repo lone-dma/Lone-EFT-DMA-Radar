@@ -224,10 +224,10 @@ namespace LoneEftDmaRadar.Web.WebRadar
 
                 // Create New Mapping
                 await upnp.CreatePortMapAsync(new Mapping(
-                    protocol: Protocol.Tcp, 
-                    privatePort: port, 
-                    publicPort: port, 
-                    lifetime: 86400, 
+                    protocol: Protocol.Tcp,
+                    privatePort: port,
+                    publicPort: port,
+                    lifetime: 86400,
                     description: ""));
             }
             catch (Exception ex)

@@ -49,7 +49,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Camera
         public Vector3 Right;
         public Vector3 Up;
 
-        public void Update(ref readonly Matrix4x4 matrix) 
+        public void Update(ref readonly Matrix4x4 matrix)
         {
             /// Transpose necessary fields
             M44 = matrix.M44;

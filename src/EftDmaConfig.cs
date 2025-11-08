@@ -41,8 +41,8 @@ namespace LoneEftDmaRadar
     /// </summary>
     public sealed class EftDmaConfig
     {
-        private static readonly JsonSerializerOptions _jsonOptions = new() 
-        { 
+        private static readonly JsonSerializerOptions _jsonOptions = new()
+        {
             WriteIndented = true
         };
         /// <summary>
@@ -324,10 +324,10 @@ namespace LoneEftDmaRadar
         /// <summary>
         /// Filename of this Config File (not full path).
         /// </summary>
-        [JsonIgnore] 
+        [JsonIgnore]
         internal const string Filename = "Config-EFT.json";
 
-        [JsonIgnore] 
+        [JsonIgnore]
         private static readonly Lock _syncRoot = new();
 
         [JsonIgnore]
@@ -354,7 +354,7 @@ namespace LoneEftDmaRadar
                 if (_configFile.Exists)
                 {
                     config = TryLoad(_tempFile) ??
-                        TryLoad(_configFile) ?? 
+                        TryLoad(_configFile) ??
                         TryLoad(_backupFile);
 
                     if (config is null)
@@ -385,7 +385,7 @@ namespace LoneEftDmaRadar
         {
             try
             {
-                if (!file.Exists) 
+                if (!file.Exists)
                     return null;
                 string json = File.ReadAllText(file.FullName);
                 return JsonSerializer.Deserialize<EftDmaConfig>(json, _jsonOptions);
@@ -448,10 +448,10 @@ namespace LoneEftDmaRadar
             else
             {
                 File.Copy(
-                    sourceFileName: _tempFile.FullName, 
+                    sourceFileName: _tempFile.FullName,
                     destFileName: _backupFile.FullName);
                 File.Move(
-                    sourceFileName: _tempFile.FullName, 
+                    sourceFileName: _tempFile.FullName,
                     destFileName: _configFile.FullName);
             }
         }
@@ -679,7 +679,7 @@ namespace LoneEftDmaRadar
         /// <summary>
         /// True if the ESP Widget is minimized.
         /// </summary>
-        [JsonPropertyName("minimized")] 
+        [JsonPropertyName("minimized")]
         public bool Minimized { get; set; } = false;
 
         /// <summary>

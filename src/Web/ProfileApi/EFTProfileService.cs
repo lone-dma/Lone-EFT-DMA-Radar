@@ -185,7 +185,7 @@ namespace LoneEftDmaRadar.Web.ProfileApi
             {
                 // Put back for retry -> avoid busy looping
                 // Returns immediately so other processing can continue
-                _ = Task.Run(async () => 
+                _ = Task.Run(async () =>
                 {
                     await Task.Delay(TimeSpan.FromSeconds(3), ct);
                     _block.Post(job);

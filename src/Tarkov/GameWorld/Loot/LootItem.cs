@@ -287,14 +287,14 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             point.Offset(7 * App.Config.UI.UIScale, 3 * App.Config.UI.UIScale);
 
             canvas.DrawText(
-                label, 
-                point, 
+                label,
+                point,
                 SKTextAlign.Left,
                 SKFonts.UIRegular,
                 SKPaints.TextOutline); // Draw outline
             canvas.DrawText(
-                label, 
-                point, 
+                label,
+                point,
                 SKTextAlign.Left,
                 SKFonts.UIRegular,
                 paints.Item2);
@@ -396,19 +396,19 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             if (this is QuestItem)
                 return new(SKPaints.QuestHelperPaint, SKPaints.QuestHelperText);
             if (App.Config.QuestHelper.Enabled && IsQuestCondition)
-                return new (SKPaints.PaintQuestItem, SKPaints.TextQuestItem);
+                return new(SKPaints.PaintQuestItem, SKPaints.TextQuestItem);
             if (LootFilter.ShowBackpacks && IsBackpack)
                 return new(SKPaints.PaintBackpacks, SKPaints.TextBackpacks);
             if (LootFilter.ShowMeds && IsMeds)
-                return new (SKPaints.PaintMeds, SKPaints.TextMeds);
+                return new(SKPaints.PaintMeds, SKPaints.TextMeds);
             if (LootFilter.ShowFood && IsFood)
-                return new (SKPaints.PaintFood, SKPaints.TextFood);
+                return new(SKPaints.PaintFood, SKPaints.TextFood);
             string filterColor = null;
             if (this is LootContainer ctr)
             {
                 filterColor = ctr.Loot?.Values?.FirstOrDefault(x => x.Important)?.CustomFilter?.Color;
                 if (filterColor is null && this is LootCorpse)
-                    return new (SKPaints.PaintCorpse, SKPaints.TextCorpse);
+                    return new(SKPaints.PaintCorpse, SKPaints.TextCorpse);
             }
             else
             {
@@ -418,11 +418,11 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             if (!string.IsNullOrEmpty(filterColor))
             {
                 var filterPaints = GetFilterPaints(filterColor);
-                return new (filterPaints.Item1, filterPaints.Item2);
+                return new(filterPaints.Item1, filterPaints.Item2);
             }
             if (IsValuableLoot || this is LootAirdrop)
-                return new (SKPaints.PaintImportantLoot, SKPaints.TextImportantLoot);
-            return new (SKPaints.PaintLoot, SKPaints.TextLoot);
+                return new(SKPaints.PaintImportantLoot, SKPaints.TextImportantLoot);
+            return new(SKPaints.PaintLoot, SKPaints.TextLoot);
         }
 
         #region Custom Loot Paints

@@ -126,11 +126,11 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
         {
             var lootListAddr = Memory.ReadPtr(_lgw + Offsets.ClientLocalGameWorld.LootList);
             using var lootList = MonoList<ulong>.Create(
-                addr: lootListAddr, 
+                addr: lootListAddr,
                 useCache: true);
             // Remove any loot no longer present
             using var lootListHs = lootList.ToPooledSet();
-            foreach (var existing in _loot.Keys) 
+            foreach (var existing in _loot.Keys)
             {
                 if (!lootListHs.Contains(existing))
                 {
@@ -156,7 +156,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
                 round1.PrepareReadPtr(lootBase + ObjectClass.To_NamePtr[0]); // C1
                 round1.Completed += (sender, s1) =>
                 {
-                    if (s1.ReadPtr(lootBase + ObjectClass.MonoBehaviourOffset, out var monoBehaviour) && 
+                    if (s1.ReadPtr(lootBase + ObjectClass.MonoBehaviourOffset, out var monoBehaviour) &&
                         s1.ReadPtr(lootBase + ObjectClass.To_NamePtr[0], out var c1))
                     {
                         round2.PrepareReadPtr(monoBehaviour + MonoBehaviour.ObjectClassOffset); // InteractiveClass

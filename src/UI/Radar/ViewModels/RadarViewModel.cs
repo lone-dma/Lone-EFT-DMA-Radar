@@ -124,7 +124,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             {
                 var players = AllPlayers
                     .Where(x => x is not Tarkov.GameWorld.Player.LocalPlayer
-                        && !x.HasExfild && (LootCorpsesVisible ? x.IsAlive : true)) ?? 
+                        && !x.HasExfild && (LootCorpsesVisible ? x.IsAlive : true)) ??
                         Enumerable.Empty<AbstractPlayer>();
 
                 var loot = Loot ?? Enumerable.Empty<IMouseoverEntity>();
@@ -295,7 +295,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                         }
                         if (App.Config.Containers.Enabled) // Draw Containers
                         {
-                            if (Containers is IEnumerable<StaticLootContainer> containers && 
+                            if (Containers is IEnumerable<StaticLootContainer> containers &&
                                 MainWindow.Instance?.Settings?.ViewModel is SettingsViewModel vm)
                             {
                                 foreach (var container in containers)
@@ -525,7 +525,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
         private static void SetMapName()
         {
             string map = EftMapManager.Map?.Config?.Name;
-            string name = map is null ? 
+            string name = map is null ?
                 "Radar" : $"Radar ({map})";
             if (MainWindow.Instance?.RadarTab is TabItem tab)
             {

@@ -170,7 +170,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 var groupIdPtr = Memory.ReadPtr(Info + Offsets.PlayerInfo.GroupId);
                 string groupId = Memory.ReadUnicodeString(groupIdPtr);
                 return _groups.GetOrAdd(
-                    groupId, 
+                    groupId,
                     _ => Interlocked.Increment(ref _lastGroupNumber));
             }
             catch { return -1; } // will return null if Solo / Don't have a team

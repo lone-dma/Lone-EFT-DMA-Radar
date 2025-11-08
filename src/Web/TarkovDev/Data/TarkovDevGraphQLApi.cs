@@ -262,7 +262,7 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
             };
             var client = App.HttpClientFactory.CreateClient(nameof(TarkovDevGraphQLApi));
             using var response = await client.PostAsJsonAsync(
-                requestUri: "https://api.tarkov.dev/graphql", 
+                requestUri: "https://api.tarkov.dev/graphql",
                 value: query);
             response.EnsureSuccessStatusCode();
             return await JsonSerializer.DeserializeAsync<TarkovDevDataQuery>(await response.Content.ReadAsStreamAsync(), _jsonOptions);
