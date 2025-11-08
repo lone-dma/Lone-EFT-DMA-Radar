@@ -243,7 +243,8 @@ namespace LoneEftDmaRadar
             try
             {
                 var updater = new UpdateManager(
-                    source: new GithubSource("https://github.com/lone-dma/Lone-EFT-DMA-Radar",
+                    source: new GithubSource(
+                        repoUrl: "https://github.com/lone-dma/Lone-EFT-DMA-Radar",
                         accessToken: null,
                         prerelease: false));
                 if (!updater.IsInstalled)
