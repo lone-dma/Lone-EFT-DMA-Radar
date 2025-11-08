@@ -151,8 +151,13 @@ namespace LoneEftDmaRadar.Tarkov
         {
             var data = await TryLoadFromDiskAsync(_tempDataFile) ??
                 await TryLoadFromDiskAsync(_dataFile) ??
-                await TryLoadFromDiskAsync(_bakDataFile) ??
-                throw new InvalidOperationException("No valid data file could be loaded from disk.");
+                await TryLoadFromDiskAsync(_bakDataFile);
+            if (data is null) // Internal soft failover
+            {
+                _dataFile.Delete();
+                await LoadDefaultDataAsync();
+                return;
+            }
             SetData(data);
 
             static async Task<TarkovMarketData> TryLoadFromDiskAsync(FileInfo file)
