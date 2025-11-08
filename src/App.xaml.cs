@@ -257,7 +257,7 @@ namespace LoneEftDmaRadar
                         caption: App.Name,
                         button: MessageBoxButton.YesNo,
                         icon: MessageBoxImage.Question,
-                        defaultResult: MessageBoxResult.OK,
+                        defaultResult: MessageBoxResult.Yes,
                         options: MessageBoxOptions.DefaultDesktopOnly);
 
                     if (result == MessageBoxResult.Yes)
