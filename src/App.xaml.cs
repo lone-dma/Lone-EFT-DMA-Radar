@@ -155,7 +155,6 @@ namespace LoneEftDmaRadar
         private async Task ConfigureProgramAsync(LoadingWindow loadingWindow)
         {
             await loadingWindow.ViewModel.UpdateProgressAsync(15, "Loading, Please Wait...");
-            var updater = CheckForUpdatesAsync(loadingWindow);
             var tarkovDataManager = TarkovDataManager.ModuleInitAsync();
             var eftMapManager = EftMapManager.ModuleInitAsync();
             var memoryInterface = MemoryInterface.ModuleInitAsync();
@@ -170,7 +169,7 @@ namespace LoneEftDmaRadar
                 RuntimeHelpers.RunClassConstructor(typeof(LocalCache).TypeHandle);
                 RuntimeHelpers.RunClassConstructor(typeof(ColorPickerViewModel).TypeHandle);
             });
-            await Task.WhenAll(updater, tarkovDataManager, eftMapManager, memoryInterface, misc);
+            await Task.WhenAll(tarkovDataManager, eftMapManager, memoryInterface, misc);
             await loadingWindow.ViewModel.UpdateProgressAsync(100, "Loading Completed!");
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
@@ -236,45 +235,6 @@ namespace LoneEftDmaRadar
             catch { }
             // fallback: assume light if nothing matched
             return false;
-        }
-
-        private static async Task CheckForUpdatesAsync(Window parent)
-        {
-            try
-            {
-                var updater = new UpdateManager(
-                    source: new GithubSource("https://github.com/lone-dma/Lone-EFT-DMA-Radar", 
-                        accessToken: null, 
-                        prerelease: false));
-                if (!updater.IsInstalled)
-                    return;
-
-                var newVersion = await updater.CheckForUpdatesAsync();
-                if (newVersion is not null)
-                {
-                    var result = MessageBox.Show(
-                        parent,
-                        $"A new version ({newVersion.TargetFullRelease.Version}) is available.\n\nWould you like to update now?",
-                        App.Name,
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Question);
-
-                    if (result == MessageBoxResult.Yes)
-                    {
-                        await updater.DownloadUpdatesAsync(newVersion);
-                        updater.ApplyUpdatesAndRestart(newVersion);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    parent,
-                    $"An unhandled exception occurred while checking for updates: {ex}",
-                    App.Name,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-            }
         }
 
         [LibraryImport("kernel32.dll")]
