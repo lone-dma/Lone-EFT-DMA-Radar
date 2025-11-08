@@ -92,17 +92,18 @@ namespace LoneEftDmaRadar.Tarkov
         /// <returns></returns>
         private static async Task LoadDataAsync()
         {
-            DateTime lastWriteTime = File.GetLastWriteTime(_dataFile.FullName).AddHours(4);
             if (_dataFile.Exists)
             {
+                DateTime lastWriteTime = File.GetLastWriteTime(_dataFile.FullName);
                 await LoadDiskDataAsync();
+                if (lastWriteTime < DateTime.Now.Subtract(TimeSpan.FromHours(4))) // only update every 4h
+                {
+                    _ = Task.Run(LoadRemoteDataAsync); // Run continuations on the thread pool.
+                }
             }
             else
             {
                 await LoadDefaultDataAsync();
-            }
-            if (lastWriteTime < DateTime.Now) // only update every 4h
-            {
                 _ = Task.Run(LoadRemoteDataAsync); // Run continuations on the thread pool.
             }
         }
