@@ -137,10 +137,10 @@ namespace LoneEftDmaRadar.Tarkov
         private static async Task LoadDefaultDataAsync()
         {
             const string resource = "LoneEftDmaRadar.DEFAULT_DATA.json";
-            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource) ??
+            using var dataStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource) ??
                 throw new ArgumentNullException(resource);
-            var data = await JsonSerializer.DeserializeAsync<TarkovMarketData>(stream)
-                ?? throw new InvalidOperationException($"Failed to deserialize {resource}");
+            var data = await JsonSerializer.DeserializeAsync<TarkovMarketData>(dataStream)
+                ?? throw new InvalidOperationException($"Failed to deserialize {nameof(dataStream)}");
             SetData(data);
         }
 
@@ -168,9 +168,9 @@ namespace LoneEftDmaRadar.Tarkov
                 {
                     if (!file.Exists)
                         return null;
-                    string dataJson = await File.ReadAllTextAsync(file.FullName);
-                    return JsonSerializer.Deserialize<TarkovMarketData>(dataJson, _jsonOptions) ??
-                        throw new InvalidOperationException($"Failed to deserialize {nameof(dataJson)}");
+                    using var dataStream = File.OpenRead(file.FullName);
+                    return await JsonSerializer.DeserializeAsync<TarkovMarketData>(dataStream, _jsonOptions) ??
+                        throw new InvalidOperationException($"Failed to deserialize {nameof(dataStream)}");
                 }
                 catch
                 {
