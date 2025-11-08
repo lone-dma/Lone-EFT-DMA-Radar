@@ -58,6 +58,7 @@ using LoneEftDmaRadar.Web.TarkovDev.Profiles;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
 using Velopack;
+using Velopack.Sources;
 
 namespace LoneEftDmaRadar
 {
@@ -154,6 +155,7 @@ namespace LoneEftDmaRadar
         private async Task ConfigureProgramAsync(LoadingWindow loadingWindow)
         {
             await loadingWindow.ViewModel.UpdateProgressAsync(15, "Loading, Please Wait...");
+            _ = Task.Run(CheckForUpdatesAsync); // Run continuations on the thread pool
             var tarkovDataManager = TarkovDataManager.ModuleInitAsync();
             var eftMapManager = EftMapManager.ModuleInitAsync();
             var memoryInterface = MemoryInterface.ModuleInitAsync();
@@ -234,6 +236,47 @@ namespace LoneEftDmaRadar
             catch { }
             // fallback: assume light if nothing matched
             return false;
+        }
+
+        private static async Task CheckForUpdatesAsync()
+        {
+            try
+            {
+                var updater = new UpdateManager(
+                    source: new GithubSource("https://github.com/lone-dma/Lone-EFT-DMA-Radar",
+                        accessToken: null,
+                        prerelease: false));
+                if (!updater.IsInstalled)
+                    return;
+
+                var newVersion = await updater.CheckForUpdatesAsync();
+                if (newVersion is not null)
+                {
+                    var result = MessageBox.Show(
+                        messageBoxText: $"A new version ({newVersion.TargetFullRelease.Version}) is available.\n\nWould you like to update now?",
+                        caption: App.Name,
+                        button: MessageBoxButton.YesNo,
+                        icon: MessageBoxImage.Question,
+                        defaultResult: MessageBoxResult.OK,
+                        options: MessageBoxOptions.DefaultDesktopOnly);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        await updater.DownloadUpdatesAsync(newVersion);
+                        updater.ApplyUpdatesAndRestart(newVersion);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    messageBoxText: $"An unhandled exception occurred while checking for updates: {ex}",
+                    caption: App.Name,
+                    button: MessageBoxButton.OK,
+                    icon: MessageBoxImage.Warning,
+                    defaultResult: MessageBoxResult.OK,
+                    options: MessageBoxOptions.DefaultDesktopOnly);
+            }
         }
 
         [LibraryImport("kernel32.dll")]
