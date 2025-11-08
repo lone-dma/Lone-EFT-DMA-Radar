@@ -59,24 +59,19 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
 {
     internal static class TarkovDevDataJob
     {
-
+        /// <summary>
+        /// Retrieves updated Tarkov data from the Tarkov Dev GraphQL API and formats it into a JSON string.
+        /// </summary>
+        /// <returns>Json string of <see cref="TarkovMarketData"/>.</returns>
         public static async Task<string> GetUpdatedDataAsync()
         {
-            try
+            var data = await TarkovDevGraphQLApi.GetTarkovDataAsync();
+            var result = new TarkovMarketData
             {
-                var data = await TarkovDevGraphQLApi.GetTarkovDataAsync();
-                var result = new TarkovMarketData
-                {
-                    Items = ParseMarketData(data),
-                    Tasks = data.Data.Tasks
-                };
-                return JsonSerializer.Serialize(result);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"{nameof(TarkovDevDataJob)} [FAIL]: {ex}");
-                throw;
-            }
+                Items = ParseMarketData(data),
+                Tasks = data.Data.Tasks
+            };
+            return JsonSerializer.Serialize(result);
         }
 
         private static List<OutgoingItem> ParseMarketData(TarkovDevDataQuery data)
