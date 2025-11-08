@@ -36,8 +36,14 @@ namespace LoneEftDmaRadar.Tarkov
     /// </summary>
     internal static class TarkovDataManager
     {
-        private const string DATA_FILE_NAME = "data.json";
-        private static readonly string _dataFile = Path.Combine(App.ConfigPath.FullName, DATA_FILE_NAME);
+        private static readonly FileInfo _bakDataFile = new(Path.Combine(App.ConfigPath.FullName, "data.json.bak"));
+        private static readonly FileInfo _tempDataFile = new(Path.Combine(App.ConfigPath.FullName, "data.json.tmp"));
+        private static readonly FileInfo _dataFile = new(Path.Combine(App.ConfigPath.FullName, "data.json"));
+        private static readonly JsonSerializerOptions _jsonOptions = new()
+        {
+            PropertyNameCaseInsensitive = true,
+            NumberHandling = JsonNumberHandling.AllowReadingFromString
+        };
 
         /// <summary>
         /// Master items dictionary - mapped via BSGID String.
@@ -67,23 +73,11 @@ namespace LoneEftDmaRadar.Tarkov
         {
             try
             {
-                var data = await GetDataAsync(defaultOnly);
-                AllItems = data.Items.Where(x => !x.Tags?.Contains("Static Container") ?? false)
-                    .DistinctBy(x => x.BsgId, StringComparer.OrdinalIgnoreCase)
-                    .ToDictionary(k => k.BsgId, v => v, StringComparer.OrdinalIgnoreCase)
-                    .ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
-                AllContainers = data.Items.Where(x => x.Tags?.Contains("Static Container") ?? false)
-                    .DistinctBy(x => x.BsgId, StringComparer.OrdinalIgnoreCase)
-                    .ToDictionary(k => k.BsgId, v => v, StringComparer.OrdinalIgnoreCase)
-                    .ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
-                TaskData = data.Tasks
-                    .DistinctBy(x => x.Id)
-                    .ToDictionary(k => k.Id, v => v, StringComparer.OrdinalIgnoreCase)
-                    .ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
+                await LoadDataAsync();
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"ERROR loading {DATA_FILE_NAME}", ex);
+                throw new InvalidOperationException($"ERROR loading Game/Loot Data ({_dataFile.Name})", ex);
             }
         }
 
@@ -92,73 +86,136 @@ namespace LoneEftDmaRadar.Tarkov
         #region Methods
 
         /// <summary>
-        /// Loads Market data via several possible methods (cached,web,embedded resource).
+        /// Loads Game/Loot Data and sets the static dictionaries.
+        /// If updated data is needed, spawns a background task to retrieve it.
         /// </summary>
-        /// <returns>Collection of TarkovMarketItems.</returns>
-        private static async Task<TarkovMarketData> GetDataAsync(bool defaultOnly)
+        /// <returns></returns>
+        private static async Task LoadDataAsync()
         {
-            TarkovMarketData data;
-            string json = null;
-            if (!defaultOnly &&
-                (!File.Exists(_dataFile) ||
-            File.GetLastWriteTime(_dataFile).AddHours(4) < DateTime.Now)) // only update every 4h
+            if (_dataFile.Exists)
             {
-                json = await GetUpdatedDataJsonAsync();
-                if (json is not null)
-                {
-                    await File.WriteAllTextAsync(_dataFile, json);
-                }
+                await LoadDiskDataAsync();
             }
-            var jsonOptions = new JsonSerializerOptions
+            else
             {
-                PropertyNameCaseInsensitive = true,
-                NumberHandling = JsonNumberHandling.AllowReadingFromString
-            };
-            if (json is null && File.Exists(_dataFile))
-            {
-                json = await File.ReadAllTextAsync(_dataFile);
+                await LoadDefaultDataAsync();
             }
-            json ??= await GetDefaultDataAsync();
-            try
+            if (File.GetLastWriteTime(_dataFile.FullName).AddHours(4) < DateTime.Now) // only update every 4h
             {
-                data = JsonSerializer.Deserialize<TarkovMarketData>(json, jsonOptions);
-            }
-            catch (JsonException)
-            {
-                File.Delete(_dataFile); // Delete data if json is corrupt.
-                throw;
-            }
-            ArgumentNullException.ThrowIfNull(data, nameof(data));
-            return data;
-        }
-
-        private static async Task<string> GetDefaultDataAsync()
-        {
-            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LoneEftDmaRadar.DEFAULT_DATA.json"))
-            {
-                var data = new byte[stream!.Length];
-                await stream.ReadExactlyAsync(data);
-                return Encoding.UTF8.GetString(data);
+                _ = Task.Run(LoadRemoteDataAsync); // Run continuations on the thread pool.
             }
         }
 
         /// <summary>
-        /// Contacts the Loot Server for an updated Loot List.
+        /// Sets the input <paramref name="data"/> into the static dictionaries.
         /// </summary>
-        /// <returns>Json string of Loot List.</returns>
-        private static async Task<string> GetUpdatedDataJsonAsync()
+        /// <param name="data">Data to be set.</param>
+        private static void SetData(TarkovMarketData data)
+        {
+            AllItems = data.Items.Where(x => !x.Tags?.Contains("Static Container") ?? false)
+                .DistinctBy(x => x.BsgId, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(k => k.BsgId, v => v, StringComparer.OrdinalIgnoreCase)
+                .ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
+            AllContainers = data.Items.Where(x => x.Tags?.Contains("Static Container") ?? false)
+                .DistinctBy(x => x.BsgId, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(k => k.BsgId, v => v, StringComparer.OrdinalIgnoreCase)
+                .ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
+            TaskData = data.Tasks
+                .DistinctBy(x => x.Id)
+                .ToDictionary(k => k.Id, v => v, StringComparer.OrdinalIgnoreCase)
+                .ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Loads default embedded <see cref="TarkovMarketData"/> and sets the static dictionaries.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
+        private static async Task LoadDefaultDataAsync()
+        {
+            const string resource = "LoneEftDmaRadar.DEFAULT_DATA.json";
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource) ??
+                throw new ArgumentNullException(resource);
+            var data = await JsonSerializer.DeserializeAsync<TarkovMarketData>(stream)
+                ?? throw new InvalidOperationException($"Failed to deserialize {resource}");
+            SetData(data);
+        }
+
+        /// <summary>
+        /// Loads <see cref="TarkovMarketData"/> from disk and sets the static dictionaries.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        private static async Task LoadDiskDataAsync()
+        {
+            var data = await TryLoadFromDiskAsync(_tempDataFile) ??
+                await TryLoadFromDiskAsync(_dataFile) ??
+                await TryLoadFromDiskAsync(_bakDataFile) ??
+                throw new InvalidOperationException("No valid data file could be loaded from disk.");
+            SetData(data);
+
+            static async Task<TarkovMarketData> TryLoadFromDiskAsync(FileInfo file)
+            {
+                try
+                {
+                    if (!file.Exists)
+                        return null;
+                    string dataJson = await File.ReadAllTextAsync(file.FullName);
+                    return JsonSerializer.Deserialize<TarkovMarketData>(dataJson, _jsonOptions) ??
+                        throw new InvalidOperationException($"Failed to deserialize {nameof(dataJson)}");
+                }
+                catch
+                {
+                    return null; // Ignore errors, return null to indicate failure
+                }
+            }
+        }
+
+        /// <summary>
+        /// Loads updated Game/Loot Data from the web and sets the static dictionaries.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        private static async Task LoadRemoteDataAsync()
         {
             try
             {
-                return await TarkovDevDataJob.GetUpdatedDataAsync();
+                string dataJson = await TarkovDevDataJob.GetUpdatedDataAsync();
+                ArgumentNullException.ThrowIfNull(dataJson, nameof(dataJson));
+                await File.WriteAllTextAsync(_tempDataFile.FullName, dataJson);
+                if (_dataFile.Exists)
+                {
+                    File.Replace(
+                        sourceFileName: _tempDataFile.FullName,
+                        destinationFileName: _dataFile.FullName,
+                        destinationBackupFileName: _bakDataFile.FullName,
+                        ignoreMetadataErrors: true);
+                }
+                else
+                {
+                    File.Copy(
+                        sourceFileName: _tempDataFile.FullName,
+                        destFileName: _bakDataFile.FullName,
+                        overwrite: true);
+                    File.Move(
+                        sourceFileName: _tempDataFile.FullName,
+                        destFileName: _dataFile.FullName,
+                        overwrite: true);
+                }
+                var data = JsonSerializer.Deserialize<TarkovMarketData>(dataJson, _jsonOptions) ??
+                    throw new InvalidOperationException($"Failed to deserialize {nameof(dataJson)}");
+                SetData(data);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"WARNING: Failed to retrieve updated Tarkov Market Data. Will use backup source(s).\n\n{ex}",
-                    nameof(TarkovDataManager),
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                return null;
+                MessageBox.Show(
+                    messageBoxText: $"An unhandled exception occurred while retrieving updated Game/Loot Data from the web: {ex}",
+                    caption: App.Name,
+                    button: MessageBoxButton.OK,
+                    icon: MessageBoxImage.Warning,
+                    defaultResult: MessageBoxResult.OK,
+                    options: MessageBoxOptions.DefaultDesktopOnly);
             }
         }
 
