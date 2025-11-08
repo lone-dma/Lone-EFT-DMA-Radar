@@ -385,7 +385,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             var ct = e.CancellationToken;
             try { CameraManager ??= new(); } catch { }
             if (_rgtPlayers?
-                .Where(x => x.IsActive && x.IsAlive) is IEnumerable<AbstractPlayer> players && 
+                .Where(x => x.IsActive && x.IsAlive) is IEnumerable<AbstractPlayer> players &&
                 players.Any())
             {
                 foreach (var player in players)

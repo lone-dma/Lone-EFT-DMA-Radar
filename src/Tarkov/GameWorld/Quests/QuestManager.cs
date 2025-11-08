@@ -147,7 +147,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
                         var qID = Memory.ReadUnicodeString(qIDPtr);
                         masterQuests.Add(qID);
                         _ = _quests.GetOrAdd(
-                            qID, 
+                            qID,
                             id => new QuestEntry(id));
                         if (App.Config.QuestHelper.BlacklistedQuests.ContainsKey(qID))
                             continue;
@@ -265,5 +265,5 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
         }
     }
 
-   
+
 }

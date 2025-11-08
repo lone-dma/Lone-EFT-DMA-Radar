@@ -123,7 +123,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
                     if (TarkovDataManager.AllItems.TryGetValue(id, out var entry))
                     {
                         _ = containerLoot.GetOrAdd(
-                            containedItem, 
+                            containedItem,
                             _ => new LootItem(entry, default));
                     }
                 }

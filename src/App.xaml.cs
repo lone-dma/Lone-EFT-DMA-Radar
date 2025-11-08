@@ -58,7 +58,6 @@ using LoneEftDmaRadar.Web.TarkovDev.Profiles;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
 using Velopack;
-using Velopack.Sources;
 
 namespace LoneEftDmaRadar
 {

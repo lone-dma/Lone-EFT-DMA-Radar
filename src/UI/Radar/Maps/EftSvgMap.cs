@@ -103,7 +103,7 @@ namespace LoneEftDmaRadar.UI.Radar.Maps
         {
             if (_layers.Length == 0) return;
 
-            using var visible = new PooledList<VectorLayer>(capacity : 8);
+            using var visible = new PooledList<VectorLayer>(capacity: 8);
             foreach (var layer in _layers)
             {
                 if (layer.IsHeightInRange(playerHeight))
@@ -131,7 +131,7 @@ namespace LoneEftDmaRadar.UI.Radar.Maps
                            layer != front &&                // Make sure the current layer is not in front
                            !front.CannotDimLowerLayers;     // Don't dim the lower layers if the front layer has dimming disabled upon lower layers
 
-                var paint = dim ? 
+                var paint = dim ?
                     SKPaints.PaintBitmapAlpha : SKPaints.PaintBitmap;
                 canvas.DrawPicture(layer.Picture, paint);
             }
@@ -163,17 +163,17 @@ namespace LoneEftDmaRadar.UI.Radar.Maps
 
             var baseLayer = _layers[0];
 
-            float fullWidth  = baseLayer.RawWidth  * Config.SvgScale;
+            float fullWidth = baseLayer.RawWidth * Config.SvgScale;
             float fullHeight = baseLayer.RawHeight * Config.SvgScale;
 
-            var zoomWidth  = fullWidth  * (0.01f * zoom);
+            var zoomWidth = fullWidth * (0.01f * zoom);
             var zoomHeight = fullHeight * (0.01f * zoom);
 
             var size = control.CanvasSize;
             var bounds = new SKRect(
-                localPlayerMapPos.X - zoomWidth  * 0.5f,
+                localPlayerMapPos.X - zoomWidth * 0.5f,
                 localPlayerMapPos.Y - zoomHeight * 0.5f,
-                localPlayerMapPos.X + zoomWidth  * 0.5f,
+                localPlayerMapPos.X + zoomWidth * 0.5f,
                 localPlayerMapPos.Y + zoomHeight * 0.5f
             ).AspectFill(size);
 
