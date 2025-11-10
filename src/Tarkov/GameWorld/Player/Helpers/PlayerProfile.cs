@@ -123,15 +123,24 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
             {
                 _player.IsFocused = true;
             }
-            else if (Hours is int hrs && hrs < 50) // Low hours played, could be a smurf
+            else if (Hours is int hrs && hrs < 30) // Low hours played, could be a brand new cheater account
             {
                 _player.IsFocused = true;
             }
-            else if (SurvivedRate is float sr && (sr >= 65f || sr < 20f)) // Very high survival rate, or if they excessively KD dropped a really low s/r
+            else if (SurvivedRate is float sr && sr >= 65f) // Very high survival rate
+            {
+                _player.IsFocused = true;
+            }
+            else if (Overall_KD is float kd2 && kd2 >= 10f && SurvivedRate is float sr2 && sr2 < 35f) // Possible KD Dropping
+            {
+                _player.IsFocused = true;
+            }
+            else if (Hours is int hrs2 && hrs2 >= 1000 && SurvivedRate is float sr3 && sr3 < 25f) // Possible KD Dropping
             {
                 _player.IsFocused = true;
             }
         }
+
 
         private void RefreshMemberCategory(Enums.EMemberCategory memberCategory)
         {
