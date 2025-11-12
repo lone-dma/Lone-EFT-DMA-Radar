@@ -62,11 +62,11 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
         /// <summary>
         /// Retrieves updated Tarkov data from the Tarkov Dev GraphQL API and formats it into a JSON string.
         /// </summary>
-        /// <returns>Json string of <see cref="TarkovMarketData"/>.</returns>
+        /// <returns>Json string of <see cref="OutgoingTarkovMarketData"/>.</returns>
         public static async Task<string> GetUpdatedDataAsync()
         {
             var data = await TarkovDevGraphQLApi.GetTarkovDataAsync();
-            var result = new TarkovMarketData
+            var result = new OutgoingTarkovMarketData
             {
                 Items = ParseMarketData(data),
                 Tasks = data.Data.Tasks
@@ -121,7 +121,10 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
         }
 
         #region Outgoing JSON
-        private sealed class TarkovMarketData
+
+        // This section duplicates some types, but this used to be on my web backend =D
+
+        private sealed class OutgoingTarkovMarketData
         {
             [JsonPropertyName("items")]
             public List<OutgoingItem> Items { get; set; }
