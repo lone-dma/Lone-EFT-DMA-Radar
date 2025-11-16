@@ -35,7 +35,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
 {
     public sealed class StaticLootContainer : LootContainer
     {
-        private readonly ulong _interactiveClass;
         public override string Name { get; } = "Container";
         public override string ID { get; }
 
@@ -44,30 +43,13 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         /// </summary>
         public bool Searched { get; private set; }
 
-        public StaticLootContainer(string containerId, ulong interactiveClass, Vector3 position) : base(position)
+        public StaticLootContainer(string containerId, Vector3 position) : base(position)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(containerId, nameof(containerId));
             ID = containerId;
-            _interactiveClass = interactiveClass;
-            RefreshSearchedStatus();
             if (TarkovDataManager.AllContainers.TryGetValue(containerId, out var container))
             {
                 Name = container.ShortName ?? "Container";
-            }
-        }
-
-        /// <summary>
-        /// Refresh the Searched status of this container.
-        /// </summary>
-        public void RefreshSearchedStatus()
-        {
-            try
-            {
-                this.Searched = Memory.ReadValue<ulong>(_interactiveClass + Offsets.LootableContainer.InteractingPlayer) != 0;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error reading Searched status for container {ID}: {ex.Message}");
             }
         }
 

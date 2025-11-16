@@ -156,10 +156,6 @@ Toggle Fullscreen: F11
                                   ToolTip="Toggles the 'Map Setup Helper' to assist with getting Map Bounds/Scaling"
                                   IsChecked="{Binding ShowMapSetupHelper, Mode=TwoWay}"
                                   Margin="0,0,16,8" />
-                        <CheckBox Content="ESP Widget"
-                                  ToolTip="Toggles the ESP 'Widget' that gives you a Mini ESP in the radar window. Can be moved."
-                                  IsChecked="{Binding ESPWidget, Mode=TwoWay}"
-                                  Margin="0,0,16,8" />
                         <CheckBox Content="Player Info Widget"
                                   ToolTip="Toggles the Player Info 'Widget' that gives you information about the players/bosses in your raid. Can be moved."
                                   IsChecked="{Binding PlayerInfoWidget, Mode=TwoWay}"
@@ -220,10 +216,6 @@ Toggle Fullscreen: F11
                                           ToolTip="Selects all container types for display on the map."
                                           IsChecked="{Binding StaticContainersSelectAll, Mode=TwoWay}"
                                           Margin="0,0,16,8" />
-                                <CheckBox Content="Hide Searched"
-                                          ToolTip="Hides containers that have already been searched by a networked entity (usually ONLY yourself)."
-                                          IsChecked="{Binding StaticContainersHideSearched, Mode=TwoWay}"
-                                          Margin="0,0,16,8" />
                             </WrapPanel>
 
                             <TextBlock Text="Tracked Containers"
@@ -252,71 +244,6 @@ Toggle Fullscreen: F11
                     </GroupBox>
 
                 </StackPanel>
-            </GroupBox>
-
-            <!-- Quest Helper -->
-            <GroupBox Header="Quest Helper"
-                      Margin="0,0,0,12">
-                <DockPanel LastChildFill="True"
-                           Margin="0,4,0,0">
-                    <CheckBox Content="Enabled"
-                              ToolTip="Toggles the Quest Helper feature. This will display Items and Zones that you need to pickup/visit for quests that you currently have active."
-                              IsChecked="{Binding QuestHelperEnabled, Mode=TwoWay}"
-                              DockPanel.Dock="Left"
-                              Margin="0,0,8,0" />
-                    <TextBlock Text="Tracked Quests"
-                               VerticalAlignment="Center"
-                               Margin="0,0,4,8" />
-                    <ListBox ItemsSource="{Binding CurrentQuests}"
-                             IsEnabled="{Binding QuestHelperEnabled}"
-                             Height="250"
-                             ToolTip="Active Quest List (populates once you are in raid). Uncheck a quest to untrack it."
-                             ScrollViewer.CanContentScroll="True">
-
-                        <!-- 1) Define the panel *with* virtualization baked in -->
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel VirtualizingStackPanel.IsVirtualizing="True"
-                                                        VirtualizingStackPanel.VirtualizationMode="Recycling"
-                                                        IsItemsHost="True" />
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-
-                        <!-- 2) Your existing template -->
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <CheckBox Content="{Binding Name}"
-                                          IsChecked="{Binding IsEnabled, Mode=TwoWay}" />
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </DockPanel>
-            </GroupBox>
-            
-            <!-- Monitor Info (ESP) -->
-            <GroupBox Header="Monitor Info (ESP)">
-                <WrapPanel VerticalAlignment="Center"
-                           Margin="0,4,0,0">
-                    <TextBlock Text="Width:"
-                               VerticalAlignment="Center"
-                               Margin="0,0,4,8"
-                               ToolTip="The resolution Width of your Game PC Monitor that Tarkov runs on. This must be correctly set for ESP to function properly." />
-                    <TextBox Width="100"
-                             Text="{Binding MonitorWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             Margin="0,0,16,8" />
-                    <TextBlock Text="Height:"
-                               VerticalAlignment="Center"
-                               Margin="0,0,4,8"
-                               ToolTip="The resolution Height of your Game PC Monitor that Tarkov runs on. This must be correctly set for ESP to function properly." />
-                    <TextBox Width="100"
-                             Text="{Binding MonitorHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             Margin="0,0,16,8" />
-                    <Button Content="Auto-Detect"
-                            ToolTip="Automatically detects the resolution of your Game PC Monitor that Tarkov runs on, and sets the Width/Height fields. Game must be running."
-                            Command="{Binding MonitorDetectResCommand}"
-                            MinWidth="80"
-                            Margin="0,0,0,8" />
-                </WrapPanel>
             </GroupBox>
 
         </StackPanel>

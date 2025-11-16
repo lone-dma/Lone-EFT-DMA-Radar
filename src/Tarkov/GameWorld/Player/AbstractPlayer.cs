@@ -37,7 +37,6 @@ using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Radar.ViewModels;
 using LoneEftDmaRadar.UI.Skia;
-using SkiaSharp;
 using VmmSharpEx.Scatter;
 using static LoneEftDmaRadar.Tarkov.Unity.Structures.UnityTransform;
 
@@ -209,25 +208,14 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         public ulong? Corpse { get; private set; }
 
         /// <summary>
-        /// Player's Skeleton Bones.
-        /// Derived types MUST define this.
+        /// Player's Skeleton Root.
         /// </summary>
-        public virtual Skeleton Skeleton => throw new NotImplementedException(nameof(Skeleton));
+        public UnityTransform SkeletonRoot { get; protected set; }
 
         /// <summary>
         /// TRUE if critical memory reads (position/rotation) have failed.
         /// </summary>
         public bool IsError { get; set; }
-
-        /// <summary>
-        /// Player's Gear/Loadout Information and contained items.
-        /// </summary>
-        public GearManager Gear { get; private set; }
-
-        /// <summary>
-        /// Contains information about the item/weapons in Player's hands.
-        /// </summary>
-        public HandsManager Hands { get; private set; }
 
         /// <summary>
         /// True if player is being focused via Right-Click (UI).
@@ -282,16 +270,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// EFT.PlayerBody
         /// </summary>
         public virtual ulong Body { get; }
-
-        /// <summary>
-        /// Inventory Controller field address.
-        /// </summary>
-        public virtual ulong InventoryControllerAddr { get; }
-
-        /// <summary>
-        /// Hands Controller field address.
-        /// </summary>
-        public virtual ulong HandsControllerAddr { get; }
 
         /// <summary>
         /// Corpse field address..
@@ -493,16 +471,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// Executed on each Realtime Loop.
         /// </summary>
         /// <param name="index">Scatter read index dedicated to this player.</param>
-        public virtual void OnRealtimeLoop(VmmScatter scatter, bool espRunning)
+        public virtual void OnRealtimeLoop(VmmScatter scatter)
         {
             scatter.PrepareReadValue<Vector2>(RotationAddress); // Rotation
-            scatter.PrepareReadArray<TrsX>(Skeleton.Root.VerticesAddr, Skeleton.Root.Count); // ESP Vertices
-            //foreach (var tr in Skeleton.Bones)
-            //{
-            //    if (!espRunning && tr.Key is not Bones.HumanBase)
-            //        continue;
-            //    scatter.PrepareReadArray<TrsX>(tr.Value.VerticesAddr, tr.Value.Count); // ESP Vertices
-            //}
+            scatter.PrepareReadArray<TrsX>(SkeletonRoot.VerticesAddr, SkeletonRoot.Count); // ESP Vertices
 
             scatter.Completed += (sender, s) =>
             {
@@ -510,38 +482,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 bool successPos = true;
                 if (s.ReadValue<Vector2>(RotationAddress, out var rotation))
                     successRot = SetRotation(rotation);
-                //foreach (var tr in Skeleton.Bones)
-                //{
-                //    if (!espRunning && tr.Key is not Bones.HumanBase)
-                //        continue;
-                //    if (s.ReadArray<TrsX>(tr.Value.VerticesAddr, tr.Value.Count) is PooledMemory<TrsX> vertices)
-                //    {
-                //        using (vertices)
-                //        {
-                //            try
-                //            {
-                //                try
-                //                {
-                //                    _ = tr.Value.UpdatePosition(vertices.Span);
-                //                }
-                //                catch (Exception ex) // Attempt to re-allocate Transform on error
-                //                {
-                //                    Debug.WriteLine($"ERROR getting Player '{Name}' {tr.Key} Position: {ex}");
-                //                    Skeleton.ResetTransform(tr.Key);
-                //                }
-                //            }
-                //            catch
-                //            {
-                //                successPos = false;
-                //            }
-                //        }
-                //    }
-                //    else
-                //    {
-                //        successPos = false;
-                //    }
-                //}
-                if (s.ReadArray<TrsX>(Skeleton.Root.VerticesAddr, Skeleton.Root.Count) is PooledMemory<TrsX> vertices)
+
+                if (s.ReadArray<TrsX>(SkeletonRoot.VerticesAddr, SkeletonRoot.Count) is PooledMemory<TrsX> vertices)
                 {
                     using (vertices)
                     {
@@ -549,12 +491,13 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                         {
                             try
                             {
-                                _ = Skeleton.Root.UpdatePosition(vertices.Span);
+                                _ = SkeletonRoot.UpdatePosition(vertices.Span);
                             }
                             catch (Exception ex) // Attempt to re-allocate Transform on error
                             {
-                                Debug.WriteLine($"ERROR getting Player '{Name}' {Bones.HumanBase} Position: {ex}");
-                                Skeleton.ResetTransform(Bones.HumanBase);
+                                Debug.WriteLine($"ERROR getting Player '{Name}' SkeletonRoot Position: {ex}");
+                                var transform = new UnityTransform(SkeletonRoot.TransformInternal);
+                                SkeletonRoot = transform;
                             }
                         }
                         catch
@@ -573,40 +516,28 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         /// <param name="round1">Index (round 1)</param>
         /// <param name="round2">Index (round 2)</param>
-        public void OnValidateTransforms(VmmScatter round1, VmmScatter round2, VmmScatter round3)
+        public void OnValidateTransforms(VmmScatter round1, VmmScatter round2)
         {
-            foreach (var tr in Skeleton.Bones)
+            round1.PrepareReadPtr(SkeletonRoot.TransformInternal + UnityTransform.TransformAccess.HierarchyOffset); // Bone Hierarchy
+            round1.Completed += (sender, x1) =>
             {
-                if (tr.Key is not Bones.HumanBase)
-                    continue;
-                round1.PrepareReadPtr(tr.Value.TransformInternal + 0x90); // Bone Hierarchy
-                round1.Completed += (sender, x1) =>
+                if (x1.ReadPtr(SkeletonRoot.TransformInternal + UnityTransform.TransformAccess.HierarchyOffset, out var tra))
                 {
-                    if (x1.ReadPtr(tr.Value.TransformInternal + 0x90, out var traPtr))
+                    round2.PrepareReadPtr(tra + UnityTransform.TransformHierarchy.VerticesOffset); // Vertices Ptr
+                    round2.Completed += (sender, x2) =>
                     {
-                        round2.PrepareReadPtr(traPtr + UnitySDK.TransformInternal.TransformAccess); // TransformAccess Ptr
-                        round2.Completed += (sender, x2) =>
+                        if (x2.ReadPtr(tra + UnityTransform.TransformHierarchy.VerticesOffset, out var verticesPtr))
                         {
-                            if (x2.ReadPtr(traPtr + UnitySDK.TransformInternal.TransformAccess, out var tra))
+                            if (SkeletonRoot.VerticesAddr != verticesPtr) // check if any addr changed
                             {
-                                round3.PrepareReadPtr(tra + UnitySDK.TransformAccess.Vertices); // Vertices Ptr
-                                round3.Completed += (sender, x3) =>
-                                {
-                                    if (x3.ReadPtr(tra + UnitySDK.TransformAccess.Vertices, out var verticesPtr))
-                                    {
-                                        if (tr.Value.VerticesAddr != verticesPtr) // check if any addr changed
-                                        {
-                                            Debug.WriteLine(
-                                                $"WARNING - '{tr.Key}' Transform has changed for Player '{Name}'");
-                                            Skeleton.ResetTransform(tr.Key); // alloc new transform
-                                        }
-                                    }
-                                };
+                                Debug.WriteLine($"WARNING - SkeletonRoot Transform has changed for Player '{Name}'");
+                                var transform = new UnityTransform(SkeletonRoot.TransformInternal);
+                                SkeletonRoot = transform;
                             }
-                        };
-                    }
-                };
-            }
+                        }
+                    };
+                }
+            };
         }
 
         /// <summary>
@@ -628,40 +559,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             catch
             {
                 return false;
-            }
-        }
-
-        /// <summary>
-        /// Refresh Gear if Active Human Player.
-        /// </summary>
-        public void RefreshGear()
-        {
-            try
-            {
-                Gear ??= new GearManager(this, IsPmc);
-                Gear?.Refresh();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[GearManager] ERROR for Player {Name}: {ex}");
-            }
-        }
-
-        /// <summary>
-        /// Refresh item in player's hands.
-        /// </summary>
-        public void RefreshHands()
-        {
-            try
-            {
-                if (IsActive && IsAlive)
-                {
-                    Hands ??= new HandsManager(this);
-                    Hands?.Refresh();
-                }
-            }
-            catch
-            {
             }
         }
 
@@ -854,7 +751,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
 
         #region Interfaces
 
-        public virtual ref readonly Vector3 Position => ref Skeleton.Root.Position;
+        public virtual ref readonly Vector3 Position => ref SkeletonRoot.Position;
         public Vector2 MouseoverPosition { get; set; }
 
         public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
@@ -901,11 +798,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                             lines[0] = "ERROR"; // In case POS stops updating, let us know!
                     }
 
-                    if (Type is not PlayerType.Teammate
-                        && ((Gear?.Loot?.Any(x => x.IsImportant) ?? false) ||
-                            (App.Config.QuestHelper.Enabled && (Gear?.HasQuestItems ?? false))
-                        ))
-                        lines[0] = $"!!{lines[0]}"; // Notify important loot
                     DrawPlayerText(canvas, point, lines);
                 }
             }
@@ -1037,27 +929,11 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             if (IsHostileActive) // Enemy Players, display information
             {
                 lines.Add($"{name}{health} {AccountID}".Trim());
-                var gear = Gear;
-                var hands = Hands?.DisplayString;
-                lines.Add($"Use:{(hands is null ? "--" : hands)}");
                 var faction = PlayerSide.ToString();
                 string g = null;
                 if (GroupID != -1)
                     g = $" G:{GroupID} ";
                 lines.Add($"{faction}{g}");
-                var loot = gear?.Loot;
-                if (loot is not null)
-                {
-                    var playerValue = Utilities.FormatNumberKM(gear?.Value ?? -1);
-                    lines.Add($"Value: {playerValue}");
-                    var iterations = 0;
-                    foreach (var item in loot)
-                    {
-                        if (iterations++ >= 5)
-                            break; // Only show first 5 Items (HV is on top)
-                        lines.Add(item.GetUILabel(App.Config.QuestHelper.Enabled));
-                    }
-                }
             }
             else if (!IsAlive)
             {
@@ -1074,7 +950,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                     lines.Add($"Value: {corpseValue}"); // Player name, value
                     if (corpseLoot.Any())
                         foreach (var item in corpseLoot)
-                            lines.Add(item.GetUILabel(App.Config.QuestHelper.Enabled));
+                            lines.Add(item.GetUILabel());
                     else lines.Add("Empty");
                 }
             }

@@ -101,13 +101,6 @@ namespace LoneEftDmaRadar
         public ContainersConfig Containers { get; private set; } = new();
 
         /// <summary>
-        /// Quest Helper Cfg
-        /// </summary>
-        [JsonPropertyName("questHelperCfg")]
-        [JsonInclude]
-        public QuestHelperConfig QuestHelper { get; private set; } = new();
-
-        /// <summary>
         /// Hotkeys Dictionary for Radar.
         /// </summary>
         [JsonPropertyName("hotkeys")]
@@ -121,13 +114,6 @@ namespace LoneEftDmaRadar
         [JsonConverter(typeof(ColorDictionaryConverter))]
         [JsonInclude]
         public ConcurrentDictionary<ColorPickerOption, string> RadarColors { get; private set; } = new();
-
-        /// <summary>
-        /// Widgets Configuration.
-        /// </summary>
-        [JsonInclude]
-        [JsonPropertyName("espWidget")]
-        public EspWidgetConfig EspWidget { get; private set; } = new();
 
         /// <summary>
         /// Widgets Configuration.
@@ -595,23 +581,6 @@ namespace LoneEftDmaRadar
 
     }
 
-    public sealed class QuestHelperConfig
-    {
-        /// <summary>
-        /// Enables Quest Helper
-        /// </summary>
-        [JsonPropertyName("enabled")]
-        public bool Enabled { get; set; } = true;
-
-        /// <summary>
-        /// Quests that are overridden/disabled.
-        /// </summary>
-        [JsonPropertyName("blacklistedQuests_v4")]
-        [JsonInclude]
-        [JsonConverter(typeof(CaseInsensitiveConcurrentDictionaryConverter<byte>))]
-        public ConcurrentDictionary<string, byte> BlacklistedQuests { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
-    }
-
     public sealed class ContainersConfig
     {
         /// <summary>
@@ -631,12 +600,6 @@ namespace LoneEftDmaRadar
         /// </summary>
         [JsonPropertyName("selectAll")]
         public bool SelectAll { get; set; } = true;
-
-        /// <summary>
-        /// Hide containers searched by LocalPlayer.
-        /// </summary>
-        [JsonPropertyName("hideSearched")]
-        public bool HideSearched { get; set; } = false;
 
         /// <summary>
         /// Selected containers to display.
@@ -666,46 +629,6 @@ namespace LoneEftDmaRadar
         {
             ["default"] = new()
         };
-    }
-
-    public sealed class EspWidgetConfig
-    {
-        /// <summary>
-        /// True if the ESP Widget is enabled.
-        /// </summary>
-        [JsonPropertyName("enabled")]
-        public bool Enabled { get; set; } = true;
-
-        /// <summary>
-        /// True if the ESP Widget is minimized.
-        /// </summary>
-        [JsonPropertyName("minimized")]
-        public bool Minimized { get; set; } = false;
-
-        /// <summary>
-        /// Aimview Location
-        /// </summary>
-        [JsonPropertyName("location")]
-        [JsonConverter(typeof(SKRectJsonConverter))]
-        public SKRect Location { get; set; }
-
-        /// <summary>
-        /// Zoom factor for ESP Widget.
-        /// </summary>
-        [JsonPropertyName("zoom")]
-        public float Zoom { get; set; } = 1f;
-
-        /// <summary>
-        /// Game PC Monitor Resolution Width
-        /// </summary>
-        [JsonPropertyName("monitorWidth")]
-        public int MonitorWidth { get; set; } = 1920;
-
-        /// <summary>
-        /// Game PC Monitor Resolution Height
-        /// </summary>
-        [JsonPropertyName("monitorHeight")]
-        public int MonitorHeight { get; set; } = 1080;
     }
 
     public sealed class InfoWidgetConfig

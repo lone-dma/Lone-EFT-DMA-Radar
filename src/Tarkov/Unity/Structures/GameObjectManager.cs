@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LoneEftDmaRadar.Tarkov.Unity.Structures
+﻿namespace LoneEftDmaRadar.Tarkov.Unity.Structures
 {
     /// <summary>
     /// Unity Game Object Manager. Contains all Game Objects.

@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Misc.Services;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
 using LoneEftDmaRadar.Tarkov.Mono.Collections;
@@ -145,14 +144,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         public override ulong Body { get; }
         /// <summary>
-        /// Inventory Controller field address.
-        /// </summary>
-        public override ulong InventoryControllerAddr { get; }
-        /// <summary>
-        /// Hands Controller field address.
-        /// </summary>
-        public override ulong HandsControllerAddr { get; }
-        /// <summary>
         /// Corpse field address..
         /// </summary>
         public override ulong CorpseAddr { get; }
@@ -161,17 +152,12 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         public override ulong RotationAddress { get; }
         /// <summary>
-        /// Player's Skeleton Bones.
-        /// </summary>
-        public override Skeleton Skeleton { get; }
-        /// <summary>
         /// Player's Current Health Status
         /// </summary>
         public Enums.ETagStatus HealthStatus { get; private set; } = Enums.ETagStatus.Healthy;
 
         internal ObservedPlayer(ulong playerBase) : base(playerBase)
         {
-            Debug.WriteLine(playerBase.ToString("X"));
             var localPlayer = Memory.LocalPlayer;
             ArgumentNullException.ThrowIfNull(localPlayer, nameof(localPlayer));
             ObservedPlayerController = Memory.ReadPtr(this + Offsets.ObservedPlayerView.ObservedPlayerController);
@@ -183,14 +169,14 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 Memory.ReadValue<ulong>(ObservedHealthController + Offsets.ObservedHealthController.Player),
                 nameof(ObservedHealthController));
             Body = Memory.ReadPtr(this + Offsets.ObservedPlayerView.PlayerBody);
-            InventoryControllerAddr = ObservedPlayerController + Offsets.ObservedPlayerController.InventoryController;
-            HandsControllerAddr = ObservedPlayerController + Offsets.ObservedPlayerController.HandsController;
             CorpseAddr = ObservedHealthController + Offsets.ObservedHealthController.PlayerCorpse;
 
             MovementContext = GetMovementContext();
             RotationAddress = ValidateRotationAddr(MovementContext + Offsets.ObservedPlayerStateContext.Rotation);
-            /// Setup Transforms
-            Skeleton = new Skeleton(this, Memory.ReadPtr(this + 0xF0));
+            /// Setup Transform
+            var ti = Memory.ReadPtrChain(this, false, 0xF0, 0x90);
+            SkeletonRoot = new UnityTransform(ti);
+            _ = SkeletonRoot.UpdatePosition();
 
             bool isAI = Memory.ReadValue<bool>(this + Offsets.ObservedPlayerView.IsAI);
             IsHuman = !isAI;

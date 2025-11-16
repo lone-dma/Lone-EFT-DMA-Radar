@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Tarkov.GameWorld.Camera;
 using LoneEftDmaRadar.UI.Hotkeys;
 using LoneEftDmaRadar.UI.Radar.ViewModels;
 
@@ -81,62 +80,22 @@ namespace LoneEftDmaRadar
             zoomOut.HotkeyDelayElapsed += ZoomOut_HotkeyDelayElapsed;
             var toggleLoot = new HotkeyActionController("Toggle Loot");
             toggleLoot.HotkeyStateChanged += ToggleLoot_HotkeyStateChanged;
-            var toggleESPWidget = new HotkeyActionController("Toggle ESP Widget");
-            toggleESPWidget.HotkeyStateChanged += ToggleESPWidget_HotkeyStateChanged;
             var toggleNames = new HotkeyActionController("Toggle Player Names");
             toggleNames.HotkeyStateChanged += ToggleNames_HotkeyStateChanged;
             var toggleInfo = new HotkeyActionController("Toggle Game Info Tab");
             toggleInfo.HotkeyStateChanged += ToggleInfo_HotkeyStateChanged;
-            var toggleQuestHelper = new HotkeyActionController("Toggle Quest Helper");
-            toggleQuestHelper.HotkeyStateChanged += ToggleQuestHelper_HotkeyStateChanged;
             var toggleShowFood = new HotkeyActionController("Toggle Show Food");
             toggleShowFood.HotkeyStateChanged += ToggleShowFood_HotkeyStateChanged;
             var toggleShowMeds = new HotkeyActionController("Toggle Show Meds");
             toggleShowMeds.HotkeyStateChanged += ToggleShowMeds_HotkeyStateChanged;
-            var espWidgZoomIn = new HotkeyActionController("ESP Zoom In");
-            espWidgZoomIn.HotkeyStateChanged += EspZoomIn_HotkeyStateChanged;
-            var espWidgZoomOut = new HotkeyActionController("ESP Zoom Out");
-            espWidgZoomOut.HotkeyStateChanged += EspZoomOut_HotkeyStateChanged;
             // Add to Static Collection:
             HotkeyAction.RegisterController(zoomIn);
             HotkeyAction.RegisterController(zoomOut);
             HotkeyAction.RegisterController(toggleLoot);
-            HotkeyAction.RegisterController(toggleESPWidget);
             HotkeyAction.RegisterController(toggleNames);
             HotkeyAction.RegisterController(toggleInfo);
-            HotkeyAction.RegisterController(toggleQuestHelper);
             HotkeyAction.RegisterController(toggleShowFood);
             HotkeyAction.RegisterController(toggleShowMeds);
-            HotkeyAction.RegisterController(espWidgZoomIn);
-            HotkeyAction.RegisterController(espWidgZoomOut);
-        }
-
-        private void EspZoomOut_HotkeyStateChanged(object sender, HotkeyEventArgs e)
-        {
-            if (e.State)
-            {
-                var zooms = ViewMatrix.ZoomLevels.Span;
-                // find the current zoom's index (-1 if somehow not found)
-                int idx = zooms.IndexOf(App.Config.EspWidget.Zoom);
-                // step backward one, wrapping to last when we go below 0
-                idx = (idx - 1 + ViewMatrix.ZoomLevels.Length) % ViewMatrix.ZoomLevels.Length;
-                // apply it
-                App.Config.EspWidget.Zoom = zooms[idx];
-            }
-        }
-
-        private void EspZoomIn_HotkeyStateChanged(object sender, HotkeyEventArgs e)
-        {
-            if (e.State)
-            {
-                var zooms = ViewMatrix.ZoomLevels.Span;
-                // find the current zoom's index (-1 if somehow not found)
-                int idx = zooms.IndexOf(App.Config.EspWidget.Zoom);
-                // step forward one, wrapping back to 0 when we pass the end
-                idx = (idx + 1) % ViewMatrix.ZoomLevels.Length;
-                // apply it
-                App.Config.EspWidget.Zoom = zooms[idx];
-            }
         }
 
         private void ToggleShowMeds_HotkeyStateChanged(object sender, HotkeyEventArgs e)
@@ -155,12 +114,6 @@ namespace LoneEftDmaRadar
             }
         }
 
-        private void ToggleQuestHelper_HotkeyStateChanged(object sender, HotkeyEventArgs e)
-        {
-            if (e.State)
-                App.Config.QuestHelper.Enabled = !App.Config.QuestHelper.Enabled;
-        }
-
         private void ToggleInfo_HotkeyStateChanged(object sender, HotkeyEventArgs e)
         {
             if (e.State && _parent.Settings?.ViewModel is SettingsViewModel vm)
@@ -171,12 +124,6 @@ namespace LoneEftDmaRadar
         {
             if (e.State && _parent.Settings?.ViewModel is SettingsViewModel vm)
                 vm.HideNames = !vm.HideNames;
-        }
-
-        private void ToggleESPWidget_HotkeyStateChanged(object sender, HotkeyEventArgs e)
-        {
-            if (e.State && _parent.Settings?.ViewModel is SettingsViewModel vm)
-                vm.ESPWidget = !vm.ESPWidget;
         }
 
         private void ToggleLoot_HotkeyStateChanged(object sender, HotkeyEventArgs e)

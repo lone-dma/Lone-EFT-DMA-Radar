@@ -59,7 +59,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// Give this function it's own unique Index.
         /// </summary>
         /// <param name="index">Scatter read index to read off of.</param>
-        public override void OnRealtimeLoop(VmmScatter scatter, bool espRunning)
+        public override void OnRealtimeLoop(VmmScatter scatter)
         {
             ulong posAddr = _btrView + Offsets.BTRView._targetPosition;
             scatter.PrepareReadValue<Vector3>(posAddr);

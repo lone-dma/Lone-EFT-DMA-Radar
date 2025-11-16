@@ -28,7 +28,6 @@ SOFTWARE.
 
 using LoneEftDmaRadar.Tarkov.Mono.Collections;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
-using VmmSharpEx.Scatter;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
 {
@@ -115,45 +114,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             catch (Exception ex)
             {
                 Debug.WriteLine($"[Wishlist] ERROR Refreshing: {ex}");
-            }
-        }
-
-        /// <summary>
-        /// Additional realtime reads for LocalPlayer.
-        /// </summary>
-        /// <param name="index"></param>
-        public override void OnRealtimeLoop(VmmScatter scatter, bool espRunning)
-        {
-            scatter.PrepareReadPtr(HandsControllerAddr);
-            scatter.Completed += (sender, s) =>
-            {
-                if (s.ReadPtr(HandsControllerAddr, out var handsController))
-                    LocalPlayer.HandsController = handsController;
-            };
-            base.OnRealtimeLoop(scatter, espRunning);
-        }
-
-        /// <summary>
-        /// Get View Angles for LocalPlayer.
-        /// </summary>
-        /// <returns>View Angles (Vector2).</returns>
-        public Vector2 GetViewAngles() =>
-            Memory.ReadValue<Vector2>(RotationAddress, false);
-
-        /// <summary>
-        /// Checks if LocalPlayer is Aiming (ADS).
-        /// </summary>
-        /// <returns>True if aiming (ADS), otherwise False.</returns>
-        public bool CheckIfADS()
-        {
-            try
-            {
-                return Memory.ReadValue<bool>(PWA + Offsets.ProceduralWeaponAnimation._isAiming, false);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"CheckIfADS() ERROR: {ex}");
-                return false;
             }
         }
     }

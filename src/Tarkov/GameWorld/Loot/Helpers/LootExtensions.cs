@@ -38,7 +38,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
         public static IEnumerable<LootItem> OrderLoot(this IEnumerable<LootItem> loot)
         {
             return loot
-                .OrderByDescending(x => x.IsImportant || (App.Config.QuestHelper.Enabled && x.IsQuestCondition))
+                .OrderByDescending(x => x.IsImportant)
                 .ThenByDescending(x => x.Price);
         }
     }

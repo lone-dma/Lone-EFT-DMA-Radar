@@ -52,8 +52,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
             TransformInternal = transformInternal;
             _useCache = useCache;
 
-            var taPtr = Memory.ReadPtr(transformInternal + UnitySDK.TransformInternal.TransformAccess, useCache);
-            var ta = Memory.ReadValue<TransformAccess>(taPtr, useCache);
+            var ta = Memory.ReadValue<TransformAccess>(transformInternal, useCache);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(ta.Index, 128000, nameof(ta.Index)); // Sanity check since this is used to size vertices reads
             _index = ta.Index;
             ta.Hierarchy.ThrowIfInvalidVirtualAddress(nameof(ta.Hierarchy));
@@ -299,22 +298,27 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
 
         #region Structures
         [StructLayout(LayoutKind.Explicit)]
-        private readonly ref struct TransformAccess
+        public readonly ref struct TransformAccess
         {
-            [FieldOffset(0x90)]
-            public readonly ulong Hierarchy;
-            [FieldOffset(0x98)]
+            [FieldOffset((int)IndexOffset)]
             public readonly int Index;
+            [FieldOffset((int)HierarchyOffset)]
+            public readonly ulong Hierarchy;
+
+            public const uint IndexOffset = 0x88;
+            public const uint HierarchyOffset = 0x90;
         }
 
         [StructLayout(LayoutKind.Explicit)]
         public readonly ref struct TransformHierarchy
         {
-            [FieldOffset(0x28)]
+            [FieldOffset((int)VerticesOffset)]
             public readonly ulong Vertices;
-            [FieldOffset(0x30)]
+            [FieldOffset((int)IndicesOffset)]
             public readonly ulong Indices;
 
+            public const uint VerticesOffset = 0x28;
+            public const uint IndicesOffset = 0x30;
             public const uint RootPositionOffset = 0xB0;
         }
 
@@ -339,6 +343,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
         /// </summary>
         private int[] ReadIndices()
         {
+            Debug.WriteLine(Count);
             var indices = new int[Count];
             Memory.ReadSpan(IndicesAddr, indices.AsSpan(), _useCache);
             return indices;

@@ -26,11 +26,8 @@ SOFTWARE.
  *
 */
 
-using Collections.Pooled;
 using LoneEftDmaRadar.Tarkov;
-using LoneEftDmaRadar.Tarkov.GameWorld.Camera;
 using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
-using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
 using LoneEftDmaRadar.UI.ColorPicker;
 using LoneEftDmaRadar.UI.Data;
 using LoneEftDmaRadar.UI.Hotkeys;
@@ -59,39 +56,14 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             OpenColorPickerCommand = new SimpleCommand(OnOpenColorPicker);
             BackupConfigCommand = new SimpleCommand(OnBackupConfig);
             OpenConfigCommand = new SimpleCommand(OnOpenConfig);
-            MonitorDetectResCommand = new SimpleCommand(async () => await OnMonitorDetectResAsync());
             InitializeContainers();
-            CameraManager.UpdateViewportRes();
             SetScaleValues(UIScale);
-            parent.IsVisibleChanged += Parent_IsVisibleChanged;
         }
 
         private void OnAboutUrl()
         {
             const string url = "https://lone-dma.org/";
             Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-        }
-
-        private void Parent_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (e.NewValue is bool visible && visible &&
-                Memory.QuestManager?.Quests is IReadOnlyDictionary<string, QuestEntry> quests)
-            {
-                using var currentQuests = CurrentQuests.ToPooledList(); // snapshot
-                using var currentIds = new PooledSet<string>(currentQuests.Select(q => q.Id), StringComparer.OrdinalIgnoreCase);
-                using var desiredIds = new PooledSet<string>(quests.Keys, StringComparer.OrdinalIgnoreCase);
-
-                // remove stale
-                foreach (var q in currentQuests.Where(q => !desiredIds.Contains(q.Id)))
-                    CurrentQuests.Remove(q);
-
-                // add missing
-                foreach (var key in desiredIds.Except(currentIds))
-                {
-                    if (quests.TryGetValue(key, out var newQuest))
-                        CurrentQuests.Add(newQuest);
-                }
-            }
         }
 
         #region General Settings
@@ -238,7 +210,6 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
         private static void SetScaleValues(float newScale)
         {
             // Update Widgets
-            MainWindow.Instance?.Radar?.ViewModel?.ESPWidget?.SetScaleFactor(newScale);
             MainWindow.Instance?.Radar?.ViewModel?.InfoWidget?.SetScaleFactor(newScale);
 
             #region UpdatePaints
@@ -280,7 +251,6 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             // Fonts
             SKFonts.UIRegular.Size = 12f * newScale;
             SKFonts.UILarge.Size = 48f * newScale;
-            SKFonts.EspWidgetFont.Size = 9f * newScale;
             SKFonts.InfoWidgetFont.Size = 12f * newScale;
             // SKWidgetControl
             AbstractSKWidget.SetScaleFactorInternal(newScale);
@@ -317,19 +287,6 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                         vm.IsVisible = value;
                     }
                     OnPropertyChanged(nameof(ShowMapSetupHelper));
-                }
-            }
-        }
-
-        public bool ESPWidget
-        {
-            get => App.Config.EspWidget.Enabled;
-            set
-            {
-                if (App.Config.EspWidget.Enabled != value)
-                {
-                    App.Config.EspWidget.Enabled = value;
-                    OnPropertyChanged(nameof(ESPWidget));
                 }
             }
         }
@@ -486,19 +443,6 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             }
         }
 
-        public bool StaticContainersHideSearched
-        {
-            get => App.Config.Containers.HideSearched;
-            set
-            {
-                if (App.Config.Containers.HideSearched != value)
-                {
-                    App.Config.Containers.HideSearched = value;
-                    OnPropertyChanged(nameof(StaticContainersHideSearched));
-                }
-            }
-        }
-
         private void InitializeContainers()
         {
             var entries = TarkovDataManager.AllContainers.Values
@@ -516,84 +460,5 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
 
         #endregion
 
-        #region Quest Helper
-
-        public bool QuestHelperEnabled
-        {
-            get => App.Config.QuestHelper.Enabled;
-            set
-            {
-                if (App.Config.QuestHelper.Enabled != value)
-                {
-                    App.Config.QuestHelper.Enabled = value;
-                    OnPropertyChanged(nameof(QuestHelperEnabled));
-                }
-            }
-        }
-
-        public ObservableCollection<QuestEntry> CurrentQuests { get; } = new();
-
-        #endregion
-
-        #region Monitor Info
-
-        public string MonitorWidth
-        {
-            get => App.Config.EspWidget.MonitorWidth.ToString();
-            set
-            {
-                if (App.Config.EspWidget.MonitorWidth.ToString() != value)
-                {
-                    if (int.TryParse(value, out var w))
-                    {
-                        App.Config.EspWidget.MonitorWidth = w;
-                        CameraManager.UpdateViewportRes();
-                        OnPropertyChanged(nameof(MonitorWidth));
-                    }
-                }
-            }
-        }
-
-        public string MonitorHeight
-        {
-            get => App.Config.EspWidget.MonitorHeight.ToString();
-            set
-            {
-                if (App.Config.EspWidget.MonitorHeight.ToString() != value)
-                {
-                    if (int.TryParse(value, out var h))
-                    {
-                        App.Config.EspWidget.MonitorHeight = h;
-                        CameraManager.UpdateViewportRes();
-                        OnPropertyChanged(nameof(MonitorHeight));
-                    }
-                }
-            }
-        }
-
-        public ICommand MonitorDetectResCommand { get; }
-
-        private async Task OnMonitorDetectResAsync()
-        {
-            try
-            {
-                if (!Memory.Ready)
-                {
-                    MessageBox.Show(MainWindow.Instance, "Game not running!", "Detect Res", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                var res = await Task.Run(() => Memory.GetMonitorRes());
-                MonitorWidth = res.Width.ToString();
-                MonitorHeight = res.Height.ToString();
-                MessageBox.Show(MainWindow.Instance, $"Detected {res.Width}×{res.Height}", "Detect Res");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(MainWindow.Instance, $"Error: {ex.Message}", "Detect Res", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        #endregion
     }
 }

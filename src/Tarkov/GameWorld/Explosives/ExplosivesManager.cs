@@ -49,7 +49,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives
         {
             GetGrenades(ct);
             GetTripwires(ct);
-            GetMortarProjectiles(ct);
             var explosives = _explosives.Values;
             if (explosives.Count == 0)
             {
@@ -126,36 +125,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives
             catch (Exception ex)
             {
                 Debug.WriteLine($"Sync Objects Error: {ex}");
-            }
-        }
-
-        private void GetMortarProjectiles(CancellationToken ct)
-        {
-            try
-            {
-                var clientShellingController = Memory.ReadValue<VmmPointer>(_localGameWorld + Offsets.ClientLocalGameWorld.ClientShellingController);
-                if (!clientShellingController.IsValid)
-                    return;
-                var activeProjectilesPtr = Memory.ReadPtr(clientShellingController + Offsets.ClientShellingController.ActiveClientProjectiles);
-                using var activeProjectiles = MonoDictionary<int, ulong>.Create(activeProjectilesPtr, true);
-                foreach (var activeProjectile in activeProjectiles)
-                {
-                    ct.ThrowIfCancellationRequested();
-                    try
-                    {
-                        _ = _explosives.GetOrAdd(
-                            activeProjectile.Value,
-                            addr => new MortarProjectile(addr, _explosives));
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"Error Processing Mortar Projectile @ 0x{activeProjectile.Value.ToString("X")}: {ex}");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Mortar Projectiles Error: {ex}");
             }
         }
 
