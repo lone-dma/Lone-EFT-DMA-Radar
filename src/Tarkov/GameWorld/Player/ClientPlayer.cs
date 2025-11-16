@@ -106,48 +106,16 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             CharacterController = Memory.ReadPtr(this + Offsets.Player._characterController);
             Info = Memory.ReadPtr(Profile + Offsets.Profile.Info);
             PWA = Memory.ReadPtr(this + Offsets.Player.ProceduralWeaponAnimation);
-            Body = Memory.ReadPtr(this + Offsets.Player._playerBody);
+            //Body = Memory.ReadPtr(this + Offsets.Player._playerBody);
             InventoryControllerAddr = this + Offsets.Player._inventoryController;
             HandsControllerAddr = this + Offsets.Player._handsController;
             CorpseAddr = this + Offsets.Player.Corpse;
 
-            AccountID = GetAccountID();
             GroupID = GetGroupNumber();
             MovementContext = GetMovementContext();
             RotationAddress = ValidateRotationAddr(MovementContext + Offsets.MovementContext._rotation);
             /// Setup Transforms
-            Skeleton = new Skeleton(this, GetTransformInternalChain);
-            /// Determine Player Type
-            PlayerSide = (Enums.EPlayerSide)Memory.ReadValue<int>(Info + Offsets.PlayerInfo.Side); // Usec,Bear,Scav,etc.
-            if (!Enum.IsDefined(PlayerSide)) // Make sure PlayerSide is valid
-                throw new ArgumentOutOfRangeException(nameof(PlayerSide));
-            if (this is LocalPlayer) // Handled in derived class
-                return;
-
-            bool isAI = Memory.ReadValue<int>(Info + Offsets.PlayerInfo.RegistrationDate) == 0;
-            if (IsScav)
-            {
-                if (isAI)
-                {
-                    IsHuman = false;
-                    Name = "AI";
-                    Type = PlayerType.AIScav;
-                }
-                else
-                {
-                    IsHuman = true;
-                    Name = "PScav";
-                    Type = PlayerType.PScav;
-                }
-            }
-            else if (IsPmc)
-            {
-                IsHuman = true;
-                Name = "PMC";
-                Type = PlayerType.PMC;
-            }
-            else
-                throw new NotImplementedException(nameof(PlayerSide));
+            Skeleton = new Skeleton(this, Memory.ReadPtr(this + 0x9C8));
         }
 
         /// <summary>

@@ -56,24 +56,24 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
         /// </summary>
         public IReadOnlyDictionary<Bones, UnityTransform> Bones => _bones;
 
-        public Skeleton(AbstractPlayer player, Action<Bones, Span<uint>> getTransformChainFunc)
+        public Skeleton(AbstractPlayer player, ulong transformInternal)
         {
             _player = player;
-            Span<uint> tiOffsets = stackalloc uint[AbstractPlayer.TransformInternalChainCount];
-            getTransformChainFunc(Unity.Structures.Bones.HumanBase, tiOffsets);
-            var tiRoot = Memory.ReadPtrChain(player.Base, true, tiOffsets);
-            Root = new UnityTransform(tiRoot);
+            //Span<uint> tiOffsets = stackalloc uint[AbstractPlayer.TransformInternalChainCount];
+            //getTransformChainFunc(Unity.Structures.Bones.HumanBase, tiOffsets);
+            Root = new UnityTransform(transformInternal);
             _ = Root.UpdatePosition();
-            var bones = new Dictionary<Bones, UnityTransform>(AllSkeletonBones.Length + 1)
-            {
-                [Unity.Structures.Bones.HumanBase] = Root
-            };
-            foreach (var bone in AllSkeletonBones.Span)
-            {
-                getTransformChainFunc(bone, tiOffsets);
-                var tiBone = Memory.ReadPtrChain(player.Base, true, tiOffsets);
-                bones[bone] = new UnityTransform(tiBone);
-            }
+            var bones = new Dictionary<Bones, UnityTransform>(AllSkeletonBones.Length + 1);
+            bones[Unity.Structures.Bones.HumanBase] = Root;
+            //{
+            //    [Unity.Structures.Bones.HumanBase] = Root
+            //};
+            //foreach (var bone in AllSkeletonBones.Span)
+            //{
+            //    getTransformChainFunc(bone, tiOffsets);
+            //    var tiBone = Memory.ReadPtrChain(player.Base, true, tiOffsets);
+            //    bones[bone] = new UnityTransform(tiBone);
+            //}
             _bones = bones;
         }
 

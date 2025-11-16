@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Misc.Services;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
 using LoneEftDmaRadar.Tarkov.Mono.Collections;
@@ -170,6 +171,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
 
         internal ObservedPlayer(ulong playerBase) : base(playerBase)
         {
+            Debug.WriteLine(playerBase.ToString("X"));
             var localPlayer = Memory.LocalPlayer;
             ArgumentNullException.ThrowIfNull(localPlayer, nameof(localPlayer));
             ObservedPlayerController = Memory.ReadPtr(this + Offsets.ObservedPlayerView.ObservedPlayerController);
@@ -186,9 +188,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             CorpseAddr = ObservedHealthController + Offsets.ObservedHealthController.PlayerCorpse;
 
             MovementContext = GetMovementContext();
-            RotationAddress = ValidateRotationAddr(MovementContext + Offsets.ObservedMovementController.Rotation);
+            RotationAddress = ValidateRotationAddr(MovementContext + Offsets.ObservedPlayerStateContext.Rotation);
             /// Setup Transforms
-            Skeleton = new Skeleton(this, GetTransformInternalChain);
+            Skeleton = new Skeleton(this, Memory.ReadPtr(this + 0xF0));
 
             bool isAI = Memory.ReadValue<bool>(this + Offsets.ObservedPlayerView.IsAI);
             IsHuman = !isAI;
@@ -294,7 +296,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         private ulong GetMovementContext()
         {
-            var movementController = Memory.ReadPtrChain(ObservedPlayerController, true, Offsets.ObservedPlayerController.MovementController);
+            var movementController = Memory.ReadPtrChain(ObservedPlayerController, true, Offsets.ObservedPlayerController.MovementController, Offsets.ObservedMovementController.ObservedPlayerStateContext);
             return movementController;
         }
 

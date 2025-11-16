@@ -60,7 +60,6 @@ namespace LoneEftDmaRadar.DMA
         private bool _restartRadar;
 
         public string MapID => Game?.MapID;
-        public ulong MonoBase { get; private set; }
         public ulong UnityBase { get; private set; }
         public bool Starting { get; private set; }
         public bool Ready { get; private set; }
@@ -88,7 +87,6 @@ namespace LoneEftDmaRadar.DMA
 
         static MemDMA()
         {
-            RuntimeHelpers.RunClassConstructor(typeof(MonoLib).TypeHandle);
             RuntimeHelpers.RunClassConstructor(typeof(CameraManager).TypeHandle);
             RuntimeHelpers.RunClassConstructor(typeof(InputManager).TypeHandle);
         }
@@ -279,7 +277,6 @@ namespace LoneEftDmaRadar.DMA
             this.Starting = default;
             this.Ready = default;
             UnityBase = default;
-            MonoBase = default;
             _pid = default;
         }
 
@@ -307,10 +304,7 @@ namespace LoneEftDmaRadar.DMA
         {
             var unityBase = _vmm.ProcessGetModuleBase(_pid, "UnityPlayer.dll");
             unityBase.ThrowIfInvalidVirtualAddress(nameof(unityBase));
-            var monoBase = _vmm.ProcessGetModuleBase(_pid, "mono-2.0-bdwgc.dll");
-            monoBase.ThrowIfInvalidVirtualAddress(nameof(monoBase));
             UnityBase = unityBase;
-            MonoBase = monoBase;
         }
 
         #endregion
@@ -606,12 +600,13 @@ namespace LoneEftDmaRadar.DMA
         {
             try
             {
-                var gfx = ReadPtr(UnityBase + UnitySDK.ModuleBase.GfxDevice, false);
-                var res = ReadValue<Rectangle>(gfx + UnitySDK.GfxDeviceClient.Viewport, false);
-                if (res.Width <= 0 || res.Width > 10000 ||
-                    res.Height <= 0 || res.Height > 5000)
-                    throw new ArgumentOutOfRangeException(nameof(res));
-                return res;
+                //var gfx = ReadPtr(UnityBase + UnitySDK.ModuleBase.GfxDevice, false);
+                //var res = ReadValue<Rectangle>(gfx + UnitySDK.GfxDeviceClient.Viewport, false);
+                //if (res.Width <= 0 || res.Width > 10000 ||
+                //    res.Height <= 0 || res.Height > 5000)
+                //    throw new ArgumentOutOfRangeException(nameof(res));
+                //return res;
+                return default; // TODO: Fix this later
             }
             catch (Exception ex)
             {
