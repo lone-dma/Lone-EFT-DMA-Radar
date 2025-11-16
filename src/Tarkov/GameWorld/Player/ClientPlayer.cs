@@ -79,7 +79,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             Profile = Memory.ReadPtr(this + Offsets.Player.Profile);
             Info = Memory.ReadPtr(Profile + Offsets.Profile.Info);
             CorpseAddr = this + Offsets.Player.Corpse;
-            PlayerSide = Enums.EPlayerSide.Savage;
+            PlayerSide = (Enums.EPlayerSide)Memory.ReadValue<int>(Info + Offsets.PlayerInfo.Side);
             if (!Enum.IsDefined<Enums.EPlayerSide>(PlayerSide))
                 throw new ArgumentOutOfRangeException(nameof(PlayerSide));
 
