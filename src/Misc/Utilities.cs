@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.DMA;
 using System.Security.Cryptography;
 
 namespace LoneEftDmaRadar.Misc
@@ -58,6 +59,27 @@ namespace LoneEftDmaRadar.Misc
                 return (num / 1000D).ToString("0") + "K";
 
             return num.ToString();
+        }
+
+        public static void DumpClassNames(ulong thisClass, uint maxOffset)
+        {
+            var sb = new StringBuilder();
+            for (uint offset = 0x10; offset < maxOffset; offset += 0x8)
+            {
+                try
+                {
+                    var childClass = Memory.ReadValue<ulong>(thisClass + offset);
+                    if (childClass.IsValidVirtualAddress())
+                    {
+                        var namePtr = Memory.ReadPtrChain(childClass, true, 0x0, 0x10);
+                        var name = Memory.ReadUtf8String(namePtr, 128, true);
+                        sb.AppendLine($"[{offset:X}] {name}");
+                    }
+                }
+                catch { }
+            }
+            Debug.WriteLine(sb.ToString());
+            Environment.Exit(0);
         }
     }
 }

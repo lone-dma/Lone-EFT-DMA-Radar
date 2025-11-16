@@ -12,7 +12,7 @@ namespace SDK
     {
         public readonly partial struct GameWorld
         {
-            public const uint Location = 0x90; // String
+            public const uint Location = 0xA8; // String
         }
 
         public readonly partial struct ClientLocalGameWorld
@@ -21,11 +21,11 @@ namespace SDK
             public const uint ExfilController = 0x30; // -.\uE731
             public const uint BtrController = 0x50; // -.\uF07E
             public const uint ClientShellingController = 0x80; // -.\uE742
-            public const uint LootList = 0x118; // System.Collections.Generic.List<\uE311>
-            public const uint RegisteredPlayers = 0x140; // System.Collections.Generic.List<IPlayer>
-            public const uint MainPlayer = 0x1A8; // EFT.Player
-            public const uint SynchronizableObjectLogicProcessor = 0x1D8; // -.\uEBD9
-            public const uint Grenades = 0x200; // -.\uE3D7<Int32, Throwable>
+            public const uint LootList = 0x140; // System.Collections.Generic.List<\uE311>
+            public const uint RegisteredPlayers = 0x168; // System.Collections.Generic.List<IPlayer>
+            public const uint MainPlayer = 0x1D0; // EFT.Player
+            public const uint SynchronizableObjectLogicProcessor = 0x208; // -.\uEBD9
+            public const uint Grenades = 0x230; // -.\uE3D7<Int32, Throwable>
         }
 
         public readonly partial struct TransitController
@@ -120,39 +120,44 @@ namespace SDK
         public readonly partial struct Player
         {
             public const uint _characterController = 0x40; // -.ICharacterController
-            public const uint MovementContext = 0x58; // EFT.MovementContext
+            public const uint MovementContext = 0x60; // EFT.MovementContext
             public const uint _playerBody = 0xC0; // EFT.PlayerBody
-            public const uint ProceduralWeaponAnimation = 0x1E0; // EFT.Animations.ProceduralWeaponAnimation
+            public const uint ProceduralWeaponAnimation = 0x370; // EFT.Animations.ProceduralWeaponAnimation
             public const uint Corpse = 0x3E0; // EFT.Interactive.Corpse
             public const uint Location = 0x5E0; // String
-            public const uint Profile = 0x618; // EFT.Profile
-            public const uint _inventoryController = 0x678; // -.Player.PlayerInventoryController
-            public const uint _handsController = 0x680; // -.Player.AbstractHandsController
+            public const uint Profile = 0x8C0; // EFT.Profile
+            public const uint _inventoryController = 0x938; // -.Player.PlayerInventoryController
+            public const uint _handsController = 0x7E8; // -.Player.AbstractHandsController
         }
 
         public readonly partial struct ObservedPlayerView
         {
-            public const uint GroupID = 0x20; // String
-            public const uint AccountId = 0x58; // String
-            public const uint PlayerBody = 0x68; // EFT.PlayerBody
-            public const uint ObservedPlayerController = 0x88; // -.\uED46
-            public const uint Voice = 0x98; // String
-            public const uint Side = 0x100; // System.Int32
-            public const uint IsAI = 0x111; // Boolean
+            public const uint GroupID = 0x68; // String
+            public const uint AccountId = 0x78; // String
+            public const uint PlayerBody = 0x88; // EFT.PlayerBody
+            public const uint ObservedPlayerController = 0xB0; // -.\uED46
+            public const uint Voice = 0xC8; // String
+            public const uint Side = 0x20; // System.Int32
+            public const uint IsAI = 0x118; // Boolean
         }
 
         public readonly partial struct ObservedPlayerController
         {
-            public const uint Player = 0x10; // EFT.NextObservedPlayer.ObservedPlayerView
-            public static readonly uint[] MovementController = new uint[] { 0xC8, 0x10 }; // -.\uED66, -.\uED68
-            public const uint HandsController = 0xD8; // -.\uED50
-            public const uint HealthController = 0xF0; // -.\uE446
-            public const uint InventoryController = 0x118; // -.\uED5B
+            public const uint Player = 0x18; // EFT.NextObservedPlayer.ObservedPlayerView
+            public const uint MovementController = 0xD0; // -.\uED4F
+            public const uint HandsController = 0xE0; // -.\uED50
+            public const uint HealthController = 0xF8; // -.\uE446
+            public const uint InventoryController = 0x120; // -.\uED5B
         }
 
         public readonly partial struct ObservedMovementController
         {
-            public const uint Rotation = 0x90; // UnityEngine.Vector2
+            public const uint ObservedPlayerStateContext = 0x98;
+        }
+
+        public readonly partial struct ObservedPlayerStateContext
+        {
+            public const uint Rotation = 0x20; // UnityEngine.Vector2
         }
 
         public readonly partial struct ObservedHandsController
@@ -162,7 +167,7 @@ namespace SDK
 
         public readonly partial struct ObservedHealthController
         {
-            public const uint Player = 0x10; // EFT.NextObservedPlayer.ObservedPlayerView
+            public const uint Player = 0x18; // EFT.NextObservedPlayer.ObservedPlayerView
             public const uint PlayerCorpse = 0x18; // EFT.Interactive.ObservedCorpse
             public const uint HealthStatus = 0xD8; // System.Int32
         }
@@ -182,7 +187,7 @@ namespace SDK
         {
             public const uint Id = 0x10; // String
             public const uint AccountId = 0x18; // String
-            public const uint Info = 0x40; // -.\uE9AD
+            public const uint Info = 0x48; // -.\uE9AD
             public const uint QuestsData = 0x88; // System.Collections.Generic.List<\uF286>
             public const uint WishlistManager = 0xD0; // -.\uE8D9
         }
@@ -196,8 +201,8 @@ namespace SDK
         {
             public const uint EntryPoint = 0x18; // String
             public const uint GroupId = 0x28; // String
-            public const uint Side = 0x88; // [HUMAN] Int32
-            public const uint RegistrationDate = 0x8C; // Int32
+            public const uint Side = 0x48; // [HUMAN] Int32
+            public const uint RegistrationDate = 0x4c; // Int32
         }
 
         public readonly partial struct QuestData
@@ -251,8 +256,8 @@ namespace SDK
 
         public readonly partial struct MovementContext
         {
-            public const uint Player = 0x10; // EFT.Player
-            public const uint _rotation = 0x27C; // UnityEngine.Vector2
+            public const uint Player = 0x18; // EFT.Player
+            public const uint _rotation = 0x38C; // UnityEngine.Vector2
         }
 
         public readonly partial struct InventoryController

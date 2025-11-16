@@ -65,8 +65,9 @@ namespace LoneEftDmaRadar.Tarkov.Unity
         {
             try
             {
+                return; // TODO : fix later
                 unityBase.ThrowIfInvalidVirtualAddress(nameof(unityBase));
-                _inputManager = Memory.ReadPtr(unityBase + UnitySDK.ModuleBase.InputManager, false);
+                //_inputManager = Memory.ReadPtr(unityBase + UnitySDK.ModuleBase.InputManager, false);
                 _thread = new()
                 {
                     Name = nameof(InputManager),
@@ -85,17 +86,17 @@ namespace LoneEftDmaRadar.Tarkov.Unity
 
         private void InputManager_PerformWork(object sender, WorkerThreadArgs e)
         {
-            var hotkeys = HotkeyManagerViewModel.Hotkeys.AsEnumerable();
-            if (hotkeys.Any())
-            {
-                var currentKeyState = Memory.ReadPtr(_inputManager + UnitySDK.UnityInputManager.CurrentKeyState);
-                using var scatter = Memory.CreateScatter(VmmSharpEx.Options.VmmFlags.NOCACHE);
-                foreach (var kvp in hotkeys)
-                {
-                    ProcessHotkey(kvp.Key, kvp.Value, currentKeyState, scatter);
-                }
-                scatter.Execute();
-            }
+            //var hotkeys = HotkeyManagerViewModel.Hotkeys.AsEnumerable();
+            //if (hotkeys.Any())
+            //{
+            //    var currentKeyState = Memory.ReadPtr(_inputManager + UnitySDK.UnityInputManager.CurrentKeyState);
+            //    using var scatter = Memory.CreateScatter(VmmSharpEx.Options.VmmFlags.NOCACHE);
+            //    foreach (var kvp in hotkeys)
+            //    {
+            //        ProcessHotkey(kvp.Key, kvp.Value, currentKeyState, scatter);
+            //    }
+            //    scatter.Execute();
+            //}
         }
 
         /// <summary>

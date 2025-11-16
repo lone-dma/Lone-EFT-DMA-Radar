@@ -37,6 +37,7 @@ using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Radar.ViewModels;
 using LoneEftDmaRadar.UI.Skia;
+using SkiaSharp;
 using VmmSharpEx.Scatter;
 using static LoneEftDmaRadar.Tarkov.Unity.Structures.UnityTransform;
 
@@ -495,12 +496,13 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         public virtual void OnRealtimeLoop(VmmScatter scatter, bool espRunning)
         {
             scatter.PrepareReadValue<Vector2>(RotationAddress); // Rotation
-            foreach (var tr in Skeleton.Bones)
-            {
-                if (!espRunning && tr.Key is not Bones.HumanBase)
-                    continue;
-                scatter.PrepareReadArray<TrsX>(tr.Value.VerticesAddr, tr.Value.Count); // ESP Vertices
-            }
+            scatter.PrepareReadArray<TrsX>(Skeleton.Root.VerticesAddr, Skeleton.Root.Count); // ESP Vertices
+            //foreach (var tr in Skeleton.Bones)
+            //{
+            //    if (!espRunning && tr.Key is not Bones.HumanBase)
+            //        continue;
+            //    scatter.PrepareReadArray<TrsX>(tr.Value.VerticesAddr, tr.Value.Count); // ESP Vertices
+            //}
 
             scatter.Completed += (sender, s) =>
             {
@@ -508,35 +510,57 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 bool successPos = true;
                 if (s.ReadValue<Vector2>(RotationAddress, out var rotation))
                     successRot = SetRotation(rotation);
-                foreach (var tr in Skeleton.Bones)
+                //foreach (var tr in Skeleton.Bones)
+                //{
+                //    if (!espRunning && tr.Key is not Bones.HumanBase)
+                //        continue;
+                //    if (s.ReadArray<TrsX>(tr.Value.VerticesAddr, tr.Value.Count) is PooledMemory<TrsX> vertices)
+                //    {
+                //        using (vertices)
+                //        {
+                //            try
+                //            {
+                //                try
+                //                {
+                //                    _ = tr.Value.UpdatePosition(vertices.Span);
+                //                }
+                //                catch (Exception ex) // Attempt to re-allocate Transform on error
+                //                {
+                //                    Debug.WriteLine($"ERROR getting Player '{Name}' {tr.Key} Position: {ex}");
+                //                    Skeleton.ResetTransform(tr.Key);
+                //                }
+                //            }
+                //            catch
+                //            {
+                //                successPos = false;
+                //            }
+                //        }
+                //    }
+                //    else
+                //    {
+                //        successPos = false;
+                //    }
+                //}
+                if (s.ReadArray<TrsX>(Skeleton.Root.VerticesAddr, Skeleton.Root.Count) is PooledMemory<TrsX> vertices)
                 {
-                    if (!espRunning && tr.Key is not Bones.HumanBase)
-                        continue;
-                    if (s.ReadArray<TrsX>(tr.Value.VerticesAddr, tr.Value.Count) is PooledMemory<TrsX> vertices)
+                    using (vertices)
                     {
-                        using (vertices)
+                        try
                         {
                             try
                             {
-                                try
-                                {
-                                    _ = tr.Value.UpdatePosition(vertices.Span);
-                                }
-                                catch (Exception ex) // Attempt to re-allocate Transform on error
-                                {
-                                    Debug.WriteLine($"ERROR getting Player '{Name}' {tr.Key} Position: {ex}");
-                                    Skeleton.ResetTransform(tr.Key);
-                                }
+                                _ = Skeleton.Root.UpdatePosition(vertices.Span);
                             }
-                            catch
+                            catch (Exception ex) // Attempt to re-allocate Transform on error
                             {
-                                successPos = false;
+                                Debug.WriteLine($"ERROR getting Player '{Name}' {Bones.HumanBase} Position: {ex}");
+                                Skeleton.ResetTransform(Bones.HumanBase);
                             }
                         }
-                    }
-                    else
-                    {
-                        successPos = false;
+                        catch
+                        {
+                            successPos = false;
+                        }
                     }
                 }
 
