@@ -53,7 +53,8 @@ namespace LoneEftDmaRadar.Tarkov
             ["lighthouse"] = "Lighthouse",
             ["tarkovstreets"] = "Streets",
             ["Sandbox"] = "Ground Zero",
-            ["Sandbox_high"] = "Ground Zero"
+            ["Sandbox_high"] = "Ground Zero",
+            ["Sandbox_start"] = "Ground Zero"
         }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>

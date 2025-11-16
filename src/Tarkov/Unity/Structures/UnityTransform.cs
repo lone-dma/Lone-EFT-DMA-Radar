@@ -52,7 +52,8 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
             TransformInternal = transformInternal;
             _useCache = useCache;
 
-            var ta = Memory.ReadValue<TransformAccess>(transformInternal + UnitySDK.TransformInternal.TransformAccess, useCache);
+            var taPtr = Memory.ReadPtr(transformInternal + UnitySDK.TransformInternal.TransformAccess, useCache);
+            var ta = Memory.ReadValue<TransformAccess>(taPtr, useCache);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(ta.Index, 128000, nameof(ta.Index)); // Sanity check since this is used to size vertices reads
             _index = ta.Index;
             ta.Hierarchy.ThrowIfInvalidVirtualAddress(nameof(ta.Hierarchy));
@@ -297,25 +298,27 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
         #endregion
 
         #region Structures
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        [StructLayout(LayoutKind.Explicit)]
         private readonly ref struct TransformAccess
         {
+            [FieldOffset(0x90)]
             public readonly ulong Hierarchy;
+            [FieldOffset(0x98)]
             public readonly int Index;
         }
 
-        [StructLayout(LayoutKind.Explicit, Pack = 1)]
+        [StructLayout(LayoutKind.Explicit)]
         public readonly ref struct TransformHierarchy
         {
-            [FieldOffset(0x18)]
+            [FieldOffset(0x28)]
             public readonly ulong Vertices;
-            [FieldOffset(0x20)]
+            [FieldOffset(0x30)]
             public readonly ulong Indices;
 
-            public const uint RootPositionOffset = 0x90;
+            public const uint RootPositionOffset = 0xB0;
         }
 
-        [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 48)]
+        [StructLayout(LayoutKind.Explicit, Pack = 8, Size = 48)]
         public readonly struct TrsX
         {
             [FieldOffset(0x0)]

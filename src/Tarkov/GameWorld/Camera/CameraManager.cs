@@ -78,8 +78,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Camera
 
         private static void MemDMA_ProcessStarting(object sender, EventArgs e)
         {
-            _opticCameraManagerField = MonoLib.MonoClass.Find("Assembly-CSharp", ClassNames.OpticCameraManagerContainer.ClassName, out _).GetStaticFieldData();
-            _opticCameraManagerField.ThrowIfInvalidVirtualAddress(nameof(_opticCameraManagerField));
+            // TODO
+            //_opticCameraManagerField = MonoLib.MonoClass.Find("Assembly-CSharp", ClassNames.OpticCameraManagerContainer.ClassName, out _).GetStaticFieldData();
+            //_opticCameraManagerField.ThrowIfInvalidVirtualAddress(nameof(_opticCameraManagerField));
         }
 
         private static void MemDMA_ProcessStopped(object sender, EventArgs e)
@@ -128,35 +129,35 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Camera
         {
             IsADS = localPlayer?.CheckIfADS() ?? false;
             IsScoped = IsADS && CheckIfScoped(localPlayer);
-            ulong vmAddr = IsADS && IsScoped
-                ? OpticCamera + UnitySDK.Camera.ViewMatrix
-                : FPSCamera + UnitySDK.Camera.ViewMatrix;
-            scatter.PrepareReadValue<Matrix4x4>(vmAddr); // View Matrix
-            scatter.Completed += (sender, s) =>
-            {
-                if (s.ReadValue<Matrix4x4>(vmAddr, out var vm))
-                {
-                    float zoom = App.Config.EspWidget.Zoom;
-                    if (zoom > 1f)
-                    {
-                        var zoomMat = Matrix4x4.CreateScale(zoom, zoom, 1f);
-                        vm *= zoomMat; // Apply Zoom
-                    }
-                    _viewMatrix.Update(ref vm);
-                }
-            };
-            if (IsScoped)
-            {
-                scatter.PrepareReadValue<float>(FPSCamera + UnitySDK.Camera.FOV); // FOV
-                scatter.PrepareReadValue<float>(FPSCamera + UnitySDK.Camera.AspectRatio); // Aspect
-                scatter.Completed += (sender, s) =>
-                {
-                    if (s.ReadValue<float>(FPSCamera + UnitySDK.Camera.FOV, out var fov))
-                        _fov = fov;
-                    if (s.ReadValue<float>(FPSCamera + UnitySDK.Camera.AspectRatio, out var aspect))
-                        _aspect = aspect;
-                };
-            }
+            //ulong vmAddr = IsADS && IsScoped
+            //    ? OpticCamera + UnitySDK.Camera.ViewMatrix
+            //    : FPSCamera + UnitySDK.Camera.ViewMatrix;
+            //scatter.PrepareReadValue<Matrix4x4>(vmAddr); // View Matrix
+            //scatter.Completed += (sender, s) =>
+            //{
+            //    if (s.ReadValue<Matrix4x4>(vmAddr, out var vm))
+            //    {
+            //        float zoom = App.Config.EspWidget.Zoom;
+            //        if (zoom > 1f)
+            //        {
+            //            var zoomMat = Matrix4x4.CreateScale(zoom, zoom, 1f);
+            //            vm *= zoomMat; // Apply Zoom
+            //        }
+            //        _viewMatrix.Update(ref vm);
+            //    }
+            //};
+            //if (IsScoped)
+            //{
+            //    scatter.PrepareReadValue<float>(FPSCamera + UnitySDK.Camera.FOV); // FOV
+            //    scatter.PrepareReadValue<float>(FPSCamera + UnitySDK.Camera.AspectRatio); // Aspect
+            //    scatter.Completed += (sender, s) =>
+            //    {
+            //        if (s.ReadValue<float>(FPSCamera + UnitySDK.Camera.FOV, out var fov))
+            //            _fov = fov;
+            //        if (s.ReadValue<float>(FPSCamera + UnitySDK.Camera.AspectRatio, out var aspect))
+            //            _aspect = aspect;
+            //    };
+            //}
         }
 
         [StructLayout(LayoutKind.Explicit, Pack = 1)]

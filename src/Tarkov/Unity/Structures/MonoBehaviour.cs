@@ -36,7 +36,9 @@
         public static ulong GetComponent(ulong behaviour, string className)
         {
             var go = Memory.ReadPtr(behaviour + GameObjectOffset);
-            return Structures.GameObject.GetComponent(go, className);
+            //return Structures.GameObject.GetComponent(go, className); // TODO
+
+            return 0;
         }
     }
 }

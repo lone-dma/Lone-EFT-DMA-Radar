@@ -61,6 +61,7 @@ namespace LoneEftDmaRadar.UI.Skia
 
         public override void Draw(SKCanvas canvas)
         {
+            return; // TODO: Disable ESP for now
             base.Draw(canvas);
             if (Minimized)
                 return;

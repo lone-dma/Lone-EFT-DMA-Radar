@@ -35,6 +35,8 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
 using LoneEftDmaRadar.Tarkov.Mono;
+using LoneEftDmaRadar.Tarkov.Unity;
+using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using VmmSharpEx.Options;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld
@@ -117,6 +119,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 };
                 _t4.PerformWork += FastWorker_PerformWork;
                 var rgtPlayersAddr = Memory.ReadPtr(localGameWorld + Offsets.ClientLocalGameWorld.RegisteredPlayers, false);
+                Debug.WriteLine(rgtPlayersAddr.ToString("X"));
                 _rgtPlayers = new RegisteredPlayers(rgtPlayersAddr, this);
                 ArgumentOutOfRangeException.ThrowIfLessThan(_rgtPlayers.GetPlayerCount(), 1, nameof(_rgtPlayers));
                 QuestManager = new(_rgtPlayers.LocalPlayer.Profile);
@@ -182,7 +185,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             try
             {
                 /// Get LocalGameWorld
-                var localGameWorld = Memory.ReadPtr(MonoLib.GameWorldField, false); // Game world >> Local Game World
+                var gomPtr = Memory.ReadPtr(Memory.UnityBase + UnitySDK.ModuleBase.GameObjectManager);
+                var gom = Memory.ReadValue<GameObjectManager>(gomPtr, false);
+                var localGameWorld = Memory.ReadPtrChain(gom.GetObjectFromList("GameWorld"), false, 0x48, 0x18, 0x40);
                 /// Get Selected Map
                 var mapPtr = Memory.ReadValue<ulong>(localGameWorld + Offsets.GameWorld.Location, false);
                 if (mapPtr == 0x0) // Offline Mode
@@ -255,9 +260,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         {
             try
             {
-                var localGameWorld = Memory.ReadPtr(MonoLib.GameWorldField, false);
-                ArgumentOutOfRangeException.ThrowIfNotEqual(localGameWorld, this, nameof(localGameWorld));
-                var mainPlayer = Memory.ReadPtr(localGameWorld + Offsets.ClientLocalGameWorld.MainPlayer, false);
+                // TODO
+                var mainPlayer = Memory.ReadPtr(this + Offsets.ClientLocalGameWorld.MainPlayer, false);
                 ArgumentOutOfRangeException.ThrowIfNotEqual(mainPlayer, _rgtPlayers.LocalPlayer, nameof(mainPlayer));
                 return _rgtPlayers.GetPlayerCount() > 0;
             }
