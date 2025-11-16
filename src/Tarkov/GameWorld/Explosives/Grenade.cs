@@ -26,8 +26,8 @@ SOFTWARE.
  *
 */
 
+using Collections.Pooled;
 using LoneEftDmaRadar.DMA;
-using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
@@ -43,11 +43,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives
     public sealed class Grenade : IExplosiveItem, IWorldEntity, IMapEntity
     {
         public static implicit operator ulong(Grenade x) => x.Addr;
-        private static readonly uint[] _toPosChain =
-            ObjectClass.To_GameObject.Concat(new uint[] { GameObject.ComponentsOffset, 0x8, 0x38 }).ToArray();
+        private static readonly uint[] _toTransformChain = [0x10, 0x48, 0x48, 0x8, 0x40, 0x10];
         private readonly ConcurrentDictionary<ulong, IExplosiveItem> _parent;
         private readonly bool _isSmoke;
-        private readonly ulong _posAddr;
+        private readonly UnityTransform _transform;
 
         /// <summary>
         /// Base Address of Grenade Object.
@@ -65,7 +64,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives
                 _isSmoke = true;
                 return;
             }
-            _posAddr = Memory.ReadPtrChain(baseAddr, false, _toPosChain) + 0x90;
+            var ti = Memory.ReadPtrChain(baseAddr, false, _toTransformChain);
+            _transform = new UnityTransform(ti);
         }
 
         /// <summary>
@@ -78,25 +78,29 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives
                 // Smokes never leave the list, don't remove
                 return;
             }
-            scatter.PrepareReadValue<Vector3>(_posAddr);
             scatter.PrepareReadValue<bool>(this + Offsets.Grenade.IsDestroyed);
+            scatter.PrepareReadArray<UnityTransform.TrsX>(_transform.VerticesAddr, _transform.Count);
             scatter.Completed += (sender, x1) =>
             {
-                if (x1.ReadValue(_posAddr, out Vector3 pos) && pos.IsNormal())
+                if (x1.ReadValue<bool>(this + Offsets.Grenade.IsDestroyed, out bool destroyed) && destroyed)
                 {
-                    _position = pos;
+                    // Remove from parent collection
+                    _ = _parent.TryRemove(Addr, out _);
+                    return;
                 }
-                if (x1.ReadValue(this + Offsets.Grenade.IsDestroyed, out bool isDestroyed) && isDestroyed)
+                if (x1.ReadArray<UnityTransform.TrsX>(_transform.VerticesAddr, _transform.Count) is PooledMemory<UnityTransform.TrsX> vertices)
                 {
-                    _parent.TryRemove(this, out _);
+                    using (vertices)
+                    {
+                        _ = _transform.UpdatePosition(vertices.Span);
+                    }
                 }
             };
         }
 
         #region Interfaces
 
-        private Vector3 _position;
-        public ref readonly Vector3 Position => ref _position;
+        public ref readonly Vector3 Position => ref _transform.Position;
 
         public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {

@@ -29,13 +29,10 @@ SOFTWARE.
 using Collections.Pooled;
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.GameWorld;
-using LoneEftDmaRadar.Tarkov.GameWorld.Camera;
 using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
 using LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
-using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
-using LoneEftDmaRadar.Tarkov.Mono;
 using LoneEftDmaRadar.Tarkov.Unity;
 using System.Drawing;
 using VmmSharpEx;
@@ -82,12 +79,10 @@ namespace LoneEftDmaRadar.DMA
         public IReadOnlyCollection<IExitPoint> Exits => Game?.Exits;
         public LocalPlayer LocalPlayer => Game?.LocalPlayer;
         public LootManager Loot => Game?.Loot;
-        public QuestManager QuestManager => Game?.QuestManager;
         public LocalGameWorld Game { get; private set; }
 
         static MemDMA()
         {
-            RuntimeHelpers.RunClassConstructor(typeof(CameraManager).TypeHandle);
             RuntimeHelpers.RunClassConstructor(typeof(InputManager).TypeHandle);
         }
 

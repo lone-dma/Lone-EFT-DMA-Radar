@@ -26,21 +26,12 @@ SOFTWARE.
  *
 */
 
-using Collections.Pooled;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
-using LoneEftDmaRadar.Tarkov.Mono.Collections;
-using System.Collections.Frozen;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
 {
     public sealed class LootCorpse : LootContainer
     {
-        private static readonly FrozenSet<string> _skipSlots = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "SecuredContainer", "Dogtag", "Compass", "Eyewear", "ArmBand"
-        }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
-        private readonly ulong _corpse;
-        private DateTimeOffset _last = DateTimeOffset.MinValue;
         /// <summary>
         /// Corpse container's associated player object (if any).
         /// </summary>
@@ -53,84 +44,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         /// <summary>
         /// Constructor.
         /// </summary>
-        public LootCorpse(ulong corpseAddr, Vector3 position) : base(position)
+        public LootCorpse(Vector3 position) : base(position)
         {
-            _corpse = corpseAddr;
-        }
-
-        /// <summary>
-        /// Refresh the loot on this corpse. Only slots are shown not bag contents.
-        /// </summary>
-        /// <param name="deadPlayers"></param>
-        public void Refresh(IReadOnlyList<AbstractPlayer> deadPlayers)
-        {
-            var now = DateTimeOffset.UtcNow;
-            if (now - _last < TimeSpan.FromSeconds(5))
-                return;
-            Player ??= deadPlayers?.FirstOrDefault(x => x.Corpse == _corpse);
-            using var scannedItems = new PooledSet<ulong>(capacity: 12);
-            GetCorpseLoot(_corpse, scannedItems, Loot, Player?.IsPmc ?? true);
-            foreach (var existingItem in Loot.Keys) // Remove old loot
-            {
-                if (!scannedItems.Contains(existingItem))
-                    Loot.TryRemove(existingItem, out _);
-            }
-            Player?.LootObject ??= this;
-            _last = now;
-        }
-
-        /// <summary>
-        /// Gets all loot on a corpse.
-        /// </summary>
-        private static void GetCorpseLoot(ulong lootInteractiveClass, ISet<ulong> scannedItems, ConcurrentDictionary<ulong, LootItem> containerLoot, bool isPMC)
-        {
-            try
-            {
-                var itemBase = Memory.ReadPtr(lootInteractiveClass + Offsets.InteractiveLootItem.Item);
-                var slots = Memory.ReadPtr(itemBase + Offsets.LootItemMod.Slots);
-                GetItemsInSlots(slots, scannedItems, containerLoot, isPMC);
-            }
-            catch { }
-        }
-
-        /// <summary>
-        /// Recurse slots for gear.
-        /// </summary>
-        private static void GetItemsInSlots(ulong slotsPtr, ISet<ulong> scannedItems, ConcurrentDictionary<ulong, LootItem> containerLoot, bool isPMC)
-        {
-            using var slotDict = new PooledDictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);
-            using var slots = MonoArray<ulong>.Create(slotsPtr, true);
-
-            foreach (var slot in slots)
-            {
-                var namePtr = Memory.ReadPtr(slot + Offsets.Slot.ID);
-                var name = Memory.ReadUnicodeString(namePtr);
-                if (!_skipSlots.Contains(name))
-                    slotDict.TryAdd(name, slot);
-            }
-
-            foreach (var slot in slotDict)
-            {
-                try
-                {
-                    if (isPMC && slot.Key == "Scabbard")
-                        continue;
-                    var containedItem = Memory.ReadPtr(slot.Value + Offsets.Slot.ContainedItem);
-                    scannedItems.Add(containedItem);
-                    var inventorytemplate = Memory.ReadPtr(containedItem + Offsets.LootItem.Template);
-                    var mongoId = Memory.ReadValue<MongoID>(inventorytemplate + Offsets.ItemTemplate._id);
-                    var id = mongoId.ReadString();
-                    if (TarkovDataManager.AllItems.TryGetValue(id, out var entry))
-                    {
-                        _ = containerLoot.GetOrAdd(
-                            containedItem,
-                            _ => new LootItem(entry, default));
-                    }
-                }
-                catch
-                {
-                }
-            }
         }
     }
 }

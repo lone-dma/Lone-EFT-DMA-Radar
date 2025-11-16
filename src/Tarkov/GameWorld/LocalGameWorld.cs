@@ -28,13 +28,10 @@ SOFTWARE.
 
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Misc.Workers;
-using LoneEftDmaRadar.Tarkov.GameWorld.Camera;
 using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
 using LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
-using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
-using LoneEftDmaRadar.Tarkov.Mono;
 using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using VmmSharpEx.Options;
@@ -62,7 +59,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         private readonly WorkerThread _t1;
         private readonly WorkerThread _t2;
         private readonly WorkerThread _t3;
-        private readonly WorkerThread _t4;
 
         /// <summary>
         /// Map ID of Current Map.
@@ -75,8 +71,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         public IReadOnlyCollection<IExitPoint> Exits => _exfilManager;
         public LocalPlayer LocalPlayer => _rgtPlayers?.LocalPlayer;
         public LootManager Loot { get; }
-        public QuestManager QuestManager { get; }
-        public CameraManager CameraManager { get; private set; }
 
         private LocalGameWorld() { }
 
@@ -112,17 +106,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                     SleepMode = WorkerThreadSleepMode.DynamicSleep
                 };
                 _t3.PerformWork += ExplosivesWorker_PerformWork;
-                _t4 = new WorkerThread()
-                {
-                    Name = "Fast Worker",
-                    SleepDuration = TimeSpan.FromMilliseconds(100)
-                };
-                _t4.PerformWork += FastWorker_PerformWork;
                 var rgtPlayersAddr = Memory.ReadPtr(localGameWorld + Offsets.ClientLocalGameWorld.RegisteredPlayers, false);
-                Debug.WriteLine(rgtPlayersAddr.ToString("X"));
                 _rgtPlayers = new RegisteredPlayers(rgtPlayersAddr, this);
                 ArgumentOutOfRangeException.ThrowIfLessThan(_rgtPlayers.GetPlayerCount(), 1, nameof(_rgtPlayers));
-                QuestManager = new(_rgtPlayers.LocalPlayer.Profile);
                 Loot = new(localGameWorld);
                 _exfilManager = new(localGameWorld, _rgtPlayers.LocalPlayer.IsPmc);
                 _explosivesManager = new(localGameWorld);
@@ -142,7 +128,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             _t1.Start();
             _t2.Start();
             _t3.Start();
-            _t4.Start();
         }
 
         /// <summary>
@@ -280,7 +265,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         /// </summary>
         private void RealtimeWorker_PerformWork(object sender, WorkerThreadArgs e)
         {
-            bool espRunning = App.Config.EspWidget.Enabled; // Save resources if ESP is not running
             var players = _rgtPlayers.Where(x => x.IsActive && x.IsAlive);
             var localPlayer = LocalPlayer;
             if (!players.Any()) // No players - Throttle
@@ -290,13 +274,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             }
 
             using var scatter = Memory.CreateScatter(VmmFlags.NOCACHE);
-            if (espRunning && CameraManager is CameraManager cm)
-            {
-                cm.OnRealtimeLoop(scatter, localPlayer);
-            }
             foreach (var player in players)
             {
-                player.OnRealtimeLoop(scatter, espRunning);
+                player.OnRealtimeLoop(scatter);
             }
             scatter.Execute();
         }
@@ -319,25 +299,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             //Loot.Refresh(ct);
             //if (App.Config.Loot.ShowWishlist)
             //    Memory.LocalPlayer?.RefreshWishlist(ct);
-            //RefreshGear(ct); // Update gear periodically
-            //if (App.Config.QuestHelper.Enabled)
-            //    QuestManager.Refresh(ct);
-        }
-
-        /// <summary>
-        /// Refresh Gear Manager
-        /// </summary>
-        private void RefreshGear(CancellationToken ct)
-        {
-            if (_rgtPlayers?
-                .Where(x => x.IsHostileActive) is IEnumerable<AbstractPlayer> players && players.Any())
-            {
-                foreach (var player in players)
-                {
-                    ct.ThrowIfCancellationRequested();
-                    player.RefreshGear();
-                }
-            }
+            // TODO : Fix exfils, loot, and wishlist
         }
 
         public void ValidatePlayerTransforms()
@@ -351,10 +313,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                     using var map = Memory.CreateScatterMap();
                     var round1 = map.AddRound();
                     var round2 = map.AddRound();
-                    var round3 = map.AddRound();
                     foreach (var player in players)
                     {
-                        player.OnValidateTransforms(round1, round2, round3);
+                        player.OnValidateTransforms(round1, round2);
                     }
                     map.Execute(); // execute scatter read
                 }
@@ -375,30 +336,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         private void ExplosivesWorker_PerformWork(object sender, WorkerThreadArgs e)
         {
             _explosivesManager.Refresh(e.CancellationToken);
-        }
-
-        #endregion
-
-        #region Fast Thread T4
-
-        /// <summary>
-        /// Managed Worker Thread that does Hands Manager / DMA Toolkit updates.
-        /// No long operations on this thread.
-        /// </summary>
-        private void FastWorker_PerformWork(object sender, WorkerThreadArgs e)
-        {
-            var ct = e.CancellationToken;
-            //try { CameraManager ??= new(); } catch { }
-            if (_rgtPlayers?
-                .Where(x => x.IsActive && x.IsAlive) is IEnumerable<AbstractPlayer> players &&
-                players.Any())
-            {
-                foreach (var player in players)
-                {
-                    ct.ThrowIfCancellationRequested();
-                    //player.RefreshHands();
-                }
-            }
         }
 
         #endregion
@@ -437,7 +374,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 _t1?.Dispose();
                 _t2?.Dispose();
                 _t3?.Dispose();
-                _t4?.Dispose();
             }
         }
 

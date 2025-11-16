@@ -31,7 +31,6 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.Mono.Collections;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.UI.Loot;
-using LoneEftDmaRadar.UI.Radar.ViewModels;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
 {
@@ -75,7 +74,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
                     var filter = LootFilter.Create();
                     FilteredLoot = _loot.Values?
                         .Where(x => filter(x))
-                        .OrderByDescending(x => x.Important || (App.Config.QuestHelper.Enabled && x.IsQuestCondition))
+                        .OrderByDescending(x => x.Important)
                         .ThenByDescending(x => x?.Price ?? 0)
                         .ToList();
                 }
@@ -96,14 +95,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
             {
                 GetLoot(ct);
                 RefreshFilter();
-                if (MainWindow.Instance?.Settings?.ViewModel is SettingsViewModel vm &&
-                    vm.StaticContainersHideSearched)
-                {
-                    foreach (var container in StaticContainers)
-                    {
-                        container.RefreshSearchedStatus();
-                    }
-                }
             }
             catch (OperationCanceledException)
             {
@@ -216,11 +207,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
                 };
             }
             map.Execute(); // execute scatter read
-            // Post Scatter Read - Refresh Corpses
-            foreach (var corpse in _loot.Values.OfType<LootCorpse>())
-            {
-                corpse.Refresh(deadPlayers);
-            }
         }
 
         /// <summary>
@@ -242,10 +228,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
                 var pos = new UnityTransform(p.TransformInternal, true).UpdatePosition();
                 if (isCorpse)
                 {
-                    var corpse = new LootCorpse(interactiveClass, pos);
+                    var corpse = new LootCorpse(pos);
                     _ = _loot.TryAdd(p.ItemBase, corpse);
                 }
-                else if (isContainer)
+                if (isContainer)
                 {
                     try
                     {
@@ -260,7 +246,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
                             var ownerItemTemplate = Memory.ReadPtr(ownerItemBase + Offsets.LootItem.Template);
                             var ownerItemMongoId = Memory.ReadValue<MongoID>(ownerItemTemplate + Offsets.ItemTemplate._id);
                             var ownerItemId = ownerItemMongoId.ReadString();
-                            _ = _loot.TryAdd(p.ItemBase, new StaticLootContainer(ownerItemId, interactiveClass, pos));
+                            _ = _loot.TryAdd(p.ItemBase, new StaticLootContainer(ownerItemId, pos));
                         }
                     }
                     catch
@@ -269,37 +255,16 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
                 }
                 else if (isLooseLoot)
                 {
-                    var item = Memory.ReadPtr(interactiveClass +
-                                              Offsets.InteractiveLootItem.Item); //EFT.InventoryLogic.Item
+                    var item = Memory.ReadPtr(interactiveClass + Offsets.InteractiveLootItem.Item); //EFT.InventoryLogic.Item
                     var itemTemplate = Memory.ReadPtr(item + Offsets.LootItem.Template); //EFT.InventoryLogic.ItemTemplate
                     var isQuestItem = Memory.ReadValue<bool>(itemTemplate + Offsets.ItemTemplate.QuestItem);
 
                     //If NOT a quest item. Quest items are like the quest related things you need to find like the pocket watch or Jaeger's Letter etc. We want to ignore these quest items.
                     var mongoId = Memory.ReadValue<MongoID>(itemTemplate + Offsets.ItemTemplate._id);
                     var id = mongoId.ReadString();
-                    if (isQuestItem)
+                    if (!isQuestItem && TarkovDataManager.AllItems.TryGetValue(id, out var entry))
                     {
-                        QuestItem questItem;
-                        if (TarkovDataManager.AllItems.TryGetValue(id, out var entry))
-                        {
-                            questItem = new QuestItem(entry, pos);
-                        }
-                        else
-                        {
-                            var shortNamePtr = Memory.ReadPtr(itemTemplate + Offsets.ItemTemplate.ShortName);
-                            var shortName = Memory.ReadUnicodeString(shortNamePtr)?.Trim();
-                            if (string.IsNullOrEmpty(shortName))
-                                shortName = "Item";
-                            questItem = new QuestItem(id, $"Q_{shortName}", pos);
-                        }
-                        _ = _loot.TryAdd(p.ItemBase, questItem);
-                    }
-                    else // Regular Loose Loot Item
-                    {
-                        if (TarkovDataManager.AllItems.TryGetValue(id, out var entry))
-                        {
-                            _ = _loot.TryAdd(p.ItemBase, new LootItem(entry, pos));
-                        }
+                        _ = _loot.TryAdd(p.ItemBase, new LootItem(entry, pos));
                     }
                 }
             }

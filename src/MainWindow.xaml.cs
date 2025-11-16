@@ -74,11 +74,6 @@ namespace LoneEftDmaRadar
             {
                 App.Config.UI.WindowSize = new Size(this.Width, this.Height);
                 App.Config.UI.WindowMaximized = this.WindowState == WindowState.Maximized;
-                if (Radar?.ViewModel?.ESPWidget is EspWidget espWidget)
-                {
-                    App.Config.EspWidget.Location = espWidget.ClientRectangle;
-                    App.Config.EspWidget.Minimized = espWidget.Minimized;
-                }
                 if (Radar?.ViewModel?.InfoWidget is PlayerInfoWidget infoWidget)
                 {
                     App.Config.InfoWidget.Location = infoWidget.Rectangle;

@@ -32,7 +32,6 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
 using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
-using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
 using LoneEftDmaRadar.UI.Loot;
 using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Radar.Views;
@@ -130,13 +129,12 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                 var loot = Loot ?? Enumerable.Empty<IMouseoverEntity>();
                 var containers = Containers ?? Enumerable.Empty<IMouseoverEntity>();
                 var exits = Exits ?? Enumerable.Empty<IMouseoverEntity>();
-                var questZones = Memory.QuestManager?.LocationConditions?.Values ?? Enumerable.Empty<IMouseoverEntity>();
 
                 if (FilterIsSet && !(MainWindow.Instance?.Radar?.Overlay?.ViewModel?.HideCorpses ?? false)) // Item Search
                     players = players.Where(x =>
                         x.LootObject is null || !loot.Contains(x.LootObject)); // Don't show both corpse objects
 
-                var result = loot.Concat(containers).Concat(players).Concat(exits).Concat(questZones);
+                var result = loot.Concat(containers).Concat(players).Concat(exits);
                 return result.Any() ? result : null;
             }
         }
@@ -163,10 +161,6 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
         /// </summary>
         public SKGLElement Radar => _parent.Radar;
         /// <summary>
-        /// ESP Widget Viewport.
-        /// </summary>
-        public EspWidget ESPWidget { get; private set; }
-        /// <summary>
         /// Player Info Widget Viewport.
         /// </summary>
         public PlayerInfoWidget InfoWidget { get; private set; }
@@ -192,12 +186,6 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                 while (Radar.GRContext is null)
                     await Task.Delay(10);
                 Radar.GRContext.SetResourceCacheLimit(512 * 1024 * 1024); // 512 MB
-                if (App.Config.EspWidget.Location == default)
-                {
-                    var size = Radar.CanvasSize;
-                    var cr = new SKRect(0, 0, size.Width, size.Height);
-                    App.Config.EspWidget.Location = new SKRect(cr.Left, cr.Bottom - 200, cr.Left + 200, cr.Bottom);
-                }
 
                 if (App.Config.InfoWidget.Location == default)
                 {
@@ -206,8 +194,6 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                     App.Config.InfoWidget.Location = new SKRect(cr.Right - 1, cr.Top, cr.Right, cr.Top + 1);
                 }
 
-                ESPWidget = new EspWidget(Radar, App.Config.EspWidget.Location, App.Config.EspWidget.Minimized,
-                    App.Config.UI.UIScale);
                 InfoWidget = new PlayerInfoWidget(Radar, App.Config.InfoWidget.Location,
                     App.Config.InfoWidget.Minimized, App.Config.UI.UIScale);
                 Radar.PaintSurface += Radar_PaintSurface;
@@ -302,29 +288,9 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                                 {
                                     if (vm.ContainerIsTracked(container.ID ?? "NULL"))
                                     {
-                                        if (App.Config.Containers.HideSearched && container.Searched)
-                                            continue;
                                         container.Draw(canvas, mapParams, localPlayer);
                                     }
                                 }
-                            }
-                        }
-                    }
-
-                    if (App.Config.QuestHelper.Enabled)
-                    {
-                        if (Loot?.OfType<QuestItem>() is IEnumerable<QuestItem> questItems)
-                        {
-                            foreach (var item in questItems)
-                            {
-                                item.Draw(canvas, mapParams, localPlayer);
-                            }
-                        }
-                        if (Memory.QuestManager?.LocationConditions?.Values is IEnumerable<QuestLocation> questLocations)
-                        {
-                            foreach (var loc in questLocations)
-                            {
-                                loc.Draw(canvas, mapParams, localPlayer);
                             }
                         }
                     }
@@ -400,10 +366,6 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                         InfoWidget?.Draw(canvas, localPlayer, allPlayers);
                     }
                     closestToMouse?.DrawMouseover(canvas, mapParams, localPlayer); // Mouseover Item
-                    if (App.Config.EspWidget.Enabled) // ESP Widget
-                    {
-                        ESPWidget?.Draw(canvas);
-                    }
                 }
                 else // LocalPlayer is *not* in a Raid -> Display Reason
                 {
@@ -702,7 +664,6 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                         break;
 
                     case IExitPoint exit:
-                    case QuestLocation quest:
                         _mouseOverItem = closest;
                         MouseoverGroup = null;
                         break;

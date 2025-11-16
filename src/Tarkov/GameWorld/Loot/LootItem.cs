@@ -221,25 +221,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         }
 
         /// <summary>
-        /// True if a condition for a quest.
-        /// </summary>
-        public bool IsQuestCondition
-        {
-            get
-            {
-                if (Blacklisted)
-                    return false;
-                if (IsCurrency) // Don't show currencies
-                    return false;
-                if (this is LootContainer container)
-                {
-                    return container.Loot.Values.Any(x => x.IsQuestCondition);
-                }
-                return Memory.QuestManager?.ItemConditions?.ContainsKey(ID) ?? false;
-            }
-        }
-
-        /// <summary>
         /// True if this item contains the specified Search Predicate.
         /// </summary>
         /// <param name="predicate"></param>
@@ -259,7 +240,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
 
         public virtual void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
-            var label = GetUILabel(App.Config.QuestHelper.Enabled);
+            var label = GetUILabel();
             var paints = GetPaints();
             var heightDiff = Position.Y - localPlayer.Position.Y;
             var point = Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);
@@ -329,13 +310,13 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
 
                     if (corpseLoot?.Any() == true)
                         foreach (var item in corpseLoot)
-                            lines.Add(item.GetUILabel(App.Config.QuestHelper.Enabled));
+                            lines.Add(item.GetUILabel());
                     else lines.Add("Empty");
                 }
                 else if (loot is not null && loot.Count() > 1) // draw regular container loot
                 {
                     foreach (var item in loot)
-                        lines.Add(item.GetUILabel(App.Config.QuestHelper.Enabled));
+                        lines.Add(item.GetUILabel());
                 }
                 else
                 {
@@ -349,18 +330,15 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         /// <summary>
         /// Gets a UI Friendly Label.
         /// </summary>
-        /// <param name="showPrice">Show price in label.</param>
-        /// <param name="showImportant">Show Important !! in label.</param>
-        /// <param name="showQuest">Show Quest tag in label.</param>
         /// <returns>Item Label string cleaned up for UI usage.</returns>
-        public string GetUILabel(bool showQuest = false)
+        public string GetUILabel()
         {
             var label = "";
             if (this is LootContainer container)
             {
                 var important = container.Loot.Values.Any(x => x.IsImportant);
                 var loot = container.FilteredLoot;
-                if (this is not LootCorpse && loot.Count() == 1)
+                if (loot.Count() == 1)
                 {
                     var firstItem = loot.First();
                     label = firstItem.ShortName;
@@ -380,8 +358,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
                 else if (Price > 0)
                     label += $"[{Utilities.FormatNumberKM(Price)}] ";
                 label += ShortName;
-                if (showQuest && IsQuestCondition)
-                    label += " (Quest)";
             }
 
             if (string.IsNullOrEmpty(label))
@@ -393,10 +369,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         {
             if (IsWishlisted)
                 return new(SKPaints.PaintWishlistItem, SKPaints.TextWishlistItem);
-            if (this is QuestItem)
-                return new(SKPaints.QuestHelperPaint, SKPaints.QuestHelperText);
-            if (App.Config.QuestHelper.Enabled && IsQuestCondition)
-                return new(SKPaints.PaintQuestItem, SKPaints.TextQuestItem);
             if (LootFilter.ShowBackpacks && IsBackpack)
                 return new(SKPaints.PaintBackpacks, SKPaints.TextBackpacks);
             if (LootFilter.ShowMeds && IsMeds)
@@ -407,8 +379,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             if (this is LootContainer ctr)
             {
                 filterColor = ctr.Loot?.Values?.FirstOrDefault(x => x.Important)?.CustomFilter?.Color;
-                if (filterColor is null && this is LootCorpse)
-                    return new(SKPaints.PaintCorpse, SKPaints.TextCorpse);
             }
             else
             {

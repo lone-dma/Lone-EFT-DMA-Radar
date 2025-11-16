@@ -26,10 +26,8 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
 using LoneEftDmaRadar.Tarkov.Mono.Collections;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
-using static SDK.Offsets;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
 {
@@ -43,10 +41,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// ICharacterController
         /// </summary>
         public ulong CharacterController { get; }
-        /// <summary>
-        /// Procedural Weapon Animation
-        /// </summary>
-        public ulong PWA { get; }
         /// <summary>
         /// PlayerInfo Address (GClass1044)
         /// </summary>
@@ -80,14 +74,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         public override ulong Body { get; }
         /// <summary>
-        /// Inventory Controller field address.
-        /// </summary>
-        public override ulong InventoryControllerAddr { get; }
-        /// <summary>
-        /// Hands Controller field address.
-        /// </summary>
-        public override ulong HandsControllerAddr { get; }
-        /// <summary>
         /// Corpse field address..
         /// </summary>
         public override ulong CorpseAddr { get; }
@@ -95,27 +81,23 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// Player Rotation Field Address (view angles).
         /// </summary>
         public override ulong RotationAddress { get; }
-        /// <summary>
-        /// Player's Skeleton Bones.
-        /// </summary>
-        public override Skeleton Skeleton { get; }
 
         internal ClientPlayer(ulong playerBase) : base(playerBase)
         {
             Profile = Memory.ReadPtr(this + Offsets.Player.Profile);
             CharacterController = Memory.ReadPtr(this + Offsets.Player._characterController);
             Info = Memory.ReadPtr(Profile + Offsets.Profile.Info);
-            PWA = Memory.ReadPtr(this + Offsets.Player.ProceduralWeaponAnimation);
             //Body = Memory.ReadPtr(this + Offsets.Player._playerBody);
-            InventoryControllerAddr = this + Offsets.Player._inventoryController;
-            HandsControllerAddr = this + Offsets.Player._handsController;
             CorpseAddr = this + Offsets.Player.Corpse;
 
             GroupID = GetGroupNumber();
             MovementContext = GetMovementContext();
             RotationAddress = ValidateRotationAddr(MovementContext + Offsets.MovementContext._rotation);
-            /// Setup Transforms
-            Skeleton = new Skeleton(this, Memory.ReadPtr(this + 0x9C8));
+            /// Setup Transform
+            var ti = Memory.ReadPtrChain(this, false, 0x9C8, 0x90);
+            Debug.WriteLine(ti.ToString("X"));
+            SkeletonRoot = new UnityTransform(ti);
+            _ = SkeletonRoot.UpdatePosition();
         }
 
         /// <summary>
@@ -166,8 +148,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         {
             ArgumentOutOfRangeException.ThrowIfNotEqual(offsets.Length, AbstractPlayer.TransformInternalChainCount, nameof(offsets));
             offsets[0] = Offsets.Player._playerBody;
-            offsets[1] = PlayerBody.SkeletonRootJoint;
-            offsets[2] = DizSkinningSkeleton._values;
+            offsets[1] = Offsets.PlayerBody.SkeletonRootJoint;
+            offsets[2] = Offsets.DizSkinningSkeleton._values;
             offsets[3] = MonoList<byte>.ArrOffset;
             offsets[4] = MonoList<byte>.ArrStartOffset + (uint)bone * 0x8;
             offsets[5] = 0x10;

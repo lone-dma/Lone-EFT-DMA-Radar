@@ -57,15 +57,15 @@ namespace LoneEftDmaRadar.UI.Skia
             }
 
             static string MakeRow(string c1, string c2, string c3, string c4,
-                                  string c5, string c6, string c7, string c8, string c9)
+                                  string c5, string c6, string c7)
             {
                 // known widths
                 const int W1 = 21, W2 = 5, W3 = 6, W4 = 6, W5 = 6,
-                          W6 = 6, W7 = 4, W8 = 7, W9 = 16;
+                          W6 = 6, W7 = 4;
 
-                const int len = W1 + W2 + W3 + W4 + W5 + W6 + W7 + W8 + W9;
+                const int len = W1 + W2 + W3 + W4 + W5 + W6 + W7;
 
-                return string.Create(len, (c1, c2, c3, c4, c5, c6, c7, c8, c9), static (span, cols) =>
+                return string.Create(len, (c1, c2, c3, c4, c5, c6, c7), static (span, cols) =>
                 {
                     int pos = 0;
                     WriteAligned(span, ref pos, cols.c1, W1);
@@ -75,8 +75,6 @@ namespace LoneEftDmaRadar.UI.Skia
                     WriteAligned(span, ref pos, cols.c5, W5);
                     WriteAligned(span, ref pos, cols.c6, W6);
                     WriteAligned(span, ref pos, cols.c7, W7);
-                    WriteAligned(span, ref pos, cols.c8, W8);
-                    WriteAligned(span, ref pos, cols.c9, W9);
                 });
             }
 
@@ -117,9 +115,7 @@ namespace LoneEftDmaRadar.UI.Skia
                 "Hours",            // c4
                 "Raids",            // c5
                 "S/R%",             // c6
-                "Grp",              // c7
-                "Value",            // c8
-                "In Hands");       // c9
+                "Grp");             // c7
 
             var len = font.MeasureText(header);
             if (len > maxLength) maxLength = len;
@@ -138,7 +134,6 @@ namespace LoneEftDmaRadar.UI.Skia
             {
                 string name = (App.Config.UI.HideNames && player.IsHuman) ? "<Hidden>" : player.Name;
                 char faction = player.PlayerSide.ToString()[0];
-                string inHands = player.Hands?.DisplayString ?? "--";
 
                 // Defaults
                 string edition = null;
@@ -171,7 +166,6 @@ namespace LoneEftDmaRadar.UI.Skia
 
                 string grp = player.GroupID != -1 ? player.GroupID.ToString() : "--";
                 string facLvlName = $"{faction}{level ?? "0"}:{name}";
-                string value = Utilities.FormatNumberKM(player.Gear?.Value ?? 0);
 
                 string line = MakeRow(
                     facLvlName,
@@ -180,9 +174,7 @@ namespace LoneEftDmaRadar.UI.Skia
                     hours ?? "--",
                     raidCount ?? "--",
                     survivePercent ?? "--",
-                    grp,
-                    value,
-                    inHands);
+                    grp);
 
                 canvas.DrawText(line,
                     drawPt,
