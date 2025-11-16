@@ -216,9 +216,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             try
             {
                 ThrowIfRaidEnded();
-                if (MapID.Equals("tarkovstreets", StringComparison.OrdinalIgnoreCase) ||
-                    MapID.Equals("woods", StringComparison.OrdinalIgnoreCase))
-                    TryAllocateBTR();
+                //if (MapID.Equals("tarkovstreets", StringComparison.OrdinalIgnoreCase) ||
+                //    MapID.Equals("woods", StringComparison.OrdinalIgnoreCase))
+                //    TryAllocateBTR();
                 _rgtPlayers.Refresh(); // Check for new players, add to list, etc.
             }
             catch (OperationCanceledException ex) // Raid Ended
@@ -314,14 +314,14 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             var ct = e.CancellationToken;
             ValidatePlayerTransforms(); // Check for transform anomalies
             // Refresh exfils
-            _exfilManager.Refresh();
+            //_exfilManager.Refresh();
             // Refresh Loot
-            Loot.Refresh(ct);
-            if (App.Config.Loot.ShowWishlist)
-                Memory.LocalPlayer?.RefreshWishlist(ct);
-            RefreshGear(ct); // Update gear periodically
-            if (App.Config.QuestHelper.Enabled)
-                QuestManager.Refresh(ct);
+            //Loot.Refresh(ct);
+            //if (App.Config.Loot.ShowWishlist)
+            //    Memory.LocalPlayer?.RefreshWishlist(ct);
+            //RefreshGear(ct); // Update gear periodically
+            //if (App.Config.QuestHelper.Enabled)
+            //    QuestManager.Refresh(ct);
         }
 
         /// <summary>
@@ -351,9 +351,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                     using var map = Memory.CreateScatterMap();
                     var round1 = map.AddRound();
                     var round2 = map.AddRound();
+                    var round3 = map.AddRound();
                     foreach (var player in players)
                     {
-                        player.OnValidateTransforms(round1, round2);
+                        player.OnValidateTransforms(round1, round2, round3);
                     }
                     map.Execute(); // execute scatter read
                 }
@@ -387,7 +388,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         private void FastWorker_PerformWork(object sender, WorkerThreadArgs e)
         {
             var ct = e.CancellationToken;
-            try { CameraManager ??= new(); } catch { }
+            //try { CameraManager ??= new(); } catch { }
             if (_rgtPlayers?
                 .Where(x => x.IsActive && x.IsAlive) is IEnumerable<AbstractPlayer> players &&
                 players.Any())
@@ -395,7 +396,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 foreach (var player in players)
                 {
                     ct.ThrowIfCancellationRequested();
-                    player.RefreshHands();
+                    //player.RefreshHands();
                 }
             }
         }

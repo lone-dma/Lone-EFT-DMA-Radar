@@ -138,7 +138,7 @@ namespace SDK
             public const uint ObservedPlayerController = 0xB0; // -.\uED46
             public const uint Voice = 0xC8; // String
             public const uint Side = 0x20; // System.Int32
-            public const uint IsAI = 0x118; // Boolean
+            public const uint IsAI = 0x58; // Boolean
         }
 
         public readonly partial struct ObservedPlayerController

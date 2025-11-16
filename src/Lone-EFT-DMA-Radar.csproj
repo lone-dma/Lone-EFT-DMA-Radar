@@ -39,11 +39,11 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-	  <DebugType>full</DebugType>
+	  <DebugType>none</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-	  <DebugType>full</DebugType>
+	  <DebugType>none</DebugType>
 	</PropertyGroup>
 
 

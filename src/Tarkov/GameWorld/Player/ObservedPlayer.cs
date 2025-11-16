@@ -196,7 +196,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             IsHuman = !isAI;
             Profile = new PlayerProfile(this, GetAccountID());
             // Get Group ID
-            GroupID = GetGroupNumber();
+            GroupID = isAI ? -1 : GetGroupNumber();
             /// Determine Player Type
             PlayerSide = (Enums.EPlayerSide)Memory.ReadValue<int>(this + Offsets.ObservedPlayerView.Side); // Usec,Bear,Scav,etc.
             if (!Enum.IsDefined(PlayerSide)) // Make sure PlayerSide is valid

@@ -573,26 +573,35 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         /// <param name="round1">Index (round 1)</param>
         /// <param name="round2">Index (round 2)</param>
-        public void OnValidateTransforms(VmmScatter round1, VmmScatter round2)
+        public void OnValidateTransforms(VmmScatter round1, VmmScatter round2, VmmScatter round3)
         {
             foreach (var tr in Skeleton.Bones)
             {
-                round1.PrepareReadPtr(tr.Value.TransformInternal + UnitySDK.TransformInternal.TransformAccess); // Bone Hierarchy
+                if (tr.Key is not Bones.HumanBase)
+                    continue;
+                round1.PrepareReadPtr(tr.Value.TransformInternal + 0x90); // Bone Hierarchy
                 round1.Completed += (sender, x1) =>
                 {
-                    if (x1.ReadPtr(tr.Value.TransformInternal + UnitySDK.TransformInternal.TransformAccess, out var tra))
+                    if (x1.ReadPtr(tr.Value.TransformInternal + 0x90, out var traPtr))
                     {
-                        round2.PrepareReadPtr(tra + UnitySDK.TransformAccess.Vertices); // Vertices Ptr
+                        round2.PrepareReadPtr(traPtr + UnitySDK.TransformInternal.TransformAccess); // TransformAccess Ptr
                         round2.Completed += (sender, x2) =>
                         {
-                            if (x2.ReadPtr(tra + UnitySDK.TransformAccess.Vertices, out var verticesPtr))
+                            if (x2.ReadPtr(traPtr + UnitySDK.TransformInternal.TransformAccess, out var tra))
                             {
-                                if (tr.Value.VerticesAddr != verticesPtr) // check if any addr changed
+                                round3.PrepareReadPtr(tra + UnitySDK.TransformAccess.Vertices); // Vertices Ptr
+                                round3.Completed += (sender, x3) =>
                                 {
-                                    Debug.WriteLine(
-                                        $"WARNING - '{tr.Key}' Transform has changed for Player '{Name}'");
-                                    Skeleton.ResetTransform(tr.Key); // alloc new transform
-                                }
+                                    if (x3.ReadPtr(tra + UnitySDK.TransformAccess.Vertices, out var verticesPtr))
+                                    {
+                                        if (tr.Value.VerticesAddr != verticesPtr) // check if any addr changed
+                                        {
+                                            Debug.WriteLine(
+                                                $"WARNING - '{tr.Key}' Transform has changed for Player '{Name}'");
+                                            Skeleton.ResetTransform(tr.Key); // alloc new transform
+                                        }
+                                    }
+                                };
                             }
                         };
                     }
