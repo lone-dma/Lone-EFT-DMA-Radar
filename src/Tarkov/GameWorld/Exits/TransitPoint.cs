@@ -38,9 +38,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
     {
         public static implicit operator ulong(TransitPoint x) => x._addr;
         private static readonly uint[] _transformInternalChain =
-{
-            ObjectClass.MonoBehaviourOffset, MonoBehaviour.GameObjectOffset, GameObject.ComponentsOffset, 0x8
-        };
+        [
+            0x10, 0x48, 0x48, 0x8, 0x40, 0x10
+        ];
 
         public TransitPoint(ulong baseAddr)
         {
