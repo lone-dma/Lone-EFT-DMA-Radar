@@ -170,21 +170,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             try
             {
                 /// Get LocalGameWorld
-                var gomPtr = Memory.ReadPtr(Memory.UnityBase + UnitySDK.ModuleBase.GameObjectManager);
-                var gom = Memory.ReadValue<GameObjectManager>(gomPtr, false);
-                var localGameWorld = Memory.ReadPtrChain(gom.GetObjectFromList("GameWorld"), false, 0x48, 0x18, 0x40);
-                /// Get Selected Map
-                var mapPtr = Memory.ReadValue<ulong>(localGameWorld + Offsets.GameWorld.Location, false);
-                if (mapPtr == 0x0) // Offline Mode
-                {
-                    var localPlayer = Memory.ReadPtr(localGameWorld + Offsets.ClientLocalGameWorld.MainPlayer, false);
-                    mapPtr = Memory.ReadPtr(localPlayer + Offsets.Player.Location, false);
-                }
-
-                var map = Memory.ReadUnicodeString(mapPtr, 128, false);
-                Debug.WriteLine("Detected Map " + map);
-                if (!StaticGameData.MapNames.ContainsKey(map)) // Also makes sure we're not in the hideout
-                    throw new ArgumentException("Invalid Map ID!");
+                var gom = GameObjectManager.Get(Memory.UnityBase);
+                var localGameWorld = gom.GetGameWorld(out string map);
                 return new LocalGameWorld(localGameWorld, map);
             }
             catch (Exception ex)
