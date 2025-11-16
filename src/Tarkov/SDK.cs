@@ -117,7 +117,7 @@ namespace SDK
 
         public readonly partial struct ObservedPlayerView
         {
-            public const uint GroupID = 0x68; // String
+            public const uint GroupID = 0x30; // String
             public const uint AccountId = 0x78; // String
             public const uint PlayerBody = 0x88; // EFT.PlayerBody
             public const uint ObservedPlayerController = 0xB0; // -.\uED46
@@ -175,7 +175,7 @@ namespace SDK
         public readonly partial struct MovementContext
         {
             public const uint Player = 0x18; // EFT.Player
-            public const uint _rotation = 0x38C; // UnityEngine.Vector2
+            public const uint _rotation = 0xC4; // UnityEngine.Vector2
         }
 
         public readonly partial struct InteractiveLootItem
