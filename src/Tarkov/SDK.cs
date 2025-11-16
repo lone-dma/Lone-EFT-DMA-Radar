@@ -156,8 +156,8 @@ namespace SDK
 
         public readonly partial struct PlayerInfo
         {
-            public const uint EntryPoint = 0x18; // String
-            public const uint GroupId = 0x28; // String
+            public const uint EntryPoint = 0x28; // String
+            public const uint GroupId = 0x50; // String
             public const uint Side = 0x48; // [HUMAN] Int32
             public const uint RegistrationDate = 0x4C; // Int32
         }
