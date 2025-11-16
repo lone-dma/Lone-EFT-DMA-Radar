@@ -267,11 +267,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         public virtual ulong MovementContext { get; }
 
         /// <summary>
-        /// EFT.PlayerBody
-        /// </summary>
-        public virtual ulong Body { get; }
-
-        /// <summary>
         /// Corpse field address..
         /// </summary>
         public virtual ulong CorpseAddr { get; }
@@ -561,19 +556,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 return false;
             }
         }
-
-        /// <summary>
-        /// All implementations are 6 elements long, so this is fine for now. If the chain ever updates we'll need to tweak this.
-        /// </summary>
-        internal const int TransformInternalChainCount = 6;
-        /// <summary>
-        /// Get the Transform Internal Chain for this Player.
-        /// </summary>
-        /// <param name="bone">Bone to lookup.</param>
-        /// <param name="offsets">Buffer to receive offsets.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual void GetTransformInternalChain(Bones bone, scoped Span<uint> offsets) =>
-            throw new NotImplementedException();
 
         #endregion
 

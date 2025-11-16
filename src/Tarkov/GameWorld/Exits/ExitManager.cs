@@ -78,6 +78,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
             /// Transits
             var transitController = Memory.ReadPtr(_localGameWorld + Offsets.ClientLocalGameWorld.TransitController, false);
             var transitsPtr = Memory.ReadPtr(transitController + Offsets.TransitController.TransitPoints, false);
+            Debug.WriteLine(transitsPtr.ToString("X"));
             using var transits = MonoDictionary<ulong, ulong>.Create(transitsPtr, false);
             foreach (var dTransit in transits)
             {

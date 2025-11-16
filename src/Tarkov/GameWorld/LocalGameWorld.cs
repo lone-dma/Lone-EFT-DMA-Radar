@@ -188,9 +188,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             try
             {
                 ThrowIfRaidEnded();
-                //if (MapID.Equals("tarkovstreets", StringComparison.OrdinalIgnoreCase) ||
-                //    MapID.Equals("woods", StringComparison.OrdinalIgnoreCase))
-                //    TryAllocateBTR();
+                if (MapID.Equals("tarkovstreets", StringComparison.OrdinalIgnoreCase) ||
+                    MapID.Equals("woods", StringComparison.OrdinalIgnoreCase))
+                    TryAllocateBTR();
                 _rgtPlayers.Refresh(); // Check for new players, add to list, etc.
             }
             catch (OperationCanceledException ex) // Raid Ended
@@ -281,7 +281,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             var ct = e.CancellationToken;
             ValidatePlayerTransforms(); // Check for transform anomalies
             // Refresh exfils
-            //_exfilManager.Refresh();
+            _exfilManager.Refresh();
             // Refresh Loot
             //Loot.Refresh(ct);
             //if (App.Config.Loot.ShowWishlist)
@@ -342,9 +342,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 var btrOperator = Memory.ReadPtr(btrTurretView + Offsets.BTRTurretView.AttachedBot);
                 _rgtPlayers.TryAllocateBTR(btrView, btrOperator);
             }
-            catch
+            catch (Exception ex)
             {
-                //Debug.WriteLine($"ERROR Allocating BTR: {ex}");
+                Debug.WriteLine($"ERROR Allocating BTR: {ex}");
             }
         }
 

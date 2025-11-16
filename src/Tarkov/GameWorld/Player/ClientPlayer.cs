@@ -38,10 +38,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         public ulong Profile { get; }
         /// <summary>
-        /// ICharacterController
-        /// </summary>
-        public ulong CharacterController { get; }
-        /// <summary>
         /// PlayerInfo Address (GClass1044)
         /// </summary>
         public ulong Info { get; }
@@ -70,10 +66,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         public override ulong MovementContext { get; }
         /// <summary>
-        /// EFT.PlayerBody
-        /// </summary>
-        public override ulong Body { get; }
-        /// <summary>
         /// Corpse field address..
         /// </summary>
         public override ulong CorpseAddr { get; }
@@ -85,29 +77,19 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         internal ClientPlayer(ulong playerBase) : base(playerBase)
         {
             Profile = Memory.ReadPtr(this + Offsets.Player.Profile);
-            CharacterController = Memory.ReadPtr(this + Offsets.Player._characterController);
             Info = Memory.ReadPtr(Profile + Offsets.Profile.Info);
-            //Body = Memory.ReadPtr(this + Offsets.Player._playerBody);
             CorpseAddr = this + Offsets.Player.Corpse;
+            PlayerSide = Enums.EPlayerSide.Savage;
+            if (!Enum.IsDefined<Enums.EPlayerSide>(PlayerSide))
+                throw new ArgumentOutOfRangeException(nameof(PlayerSide));
 
             GroupID = GetGroupNumber();
             MovementContext = GetMovementContext();
             RotationAddress = ValidateRotationAddr(MovementContext + Offsets.MovementContext._rotation);
             /// Setup Transform
-            var ti = Memory.ReadPtrChain(this, false, 0x9C8, 0x90);
-            Debug.WriteLine(ti.ToString("X"));
+            var ti = Memory.ReadPtrChain(this, false, _transformInternalChain);
             SkeletonRoot = new UnityTransform(ti);
             _ = SkeletonRoot.UpdatePosition();
-        }
-
-        /// <summary>
-        /// Get Player's Account ID.
-        /// </summary>
-        /// <returns>Account ID Numeric String.</returns>
-        private string GetAccountID()
-        {
-            var idPTR = Memory.ReadPtr(Profile + Offsets.Profile.AccountId);
-            return Memory.ReadUnicodeString(idPTR);
         }
 
         /// <summary>
@@ -138,21 +120,14 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             return movementContext;
         }
 
-        /// <summary>
-        /// Get the Transform Internal Chain for this Player.
-        /// </summary>
-        /// <param name="bone">Bone to lookup.</param>
-        /// <param name="offsets">Buffer to receive offsets.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected override void GetTransformInternalChain(Bones bone, Span<uint> offsets)
-        {
-            ArgumentOutOfRangeException.ThrowIfNotEqual(offsets.Length, AbstractPlayer.TransformInternalChainCount, nameof(offsets));
-            offsets[0] = Offsets.Player._playerBody;
-            offsets[1] = Offsets.PlayerBody.SkeletonRootJoint;
-            offsets[2] = Offsets.DizSkinningSkeleton._values;
-            offsets[3] = MonoList<byte>.ArrOffset;
-            offsets[4] = MonoList<byte>.ArrStartOffset + (uint)bone * 0x8;
-            offsets[5] = 0x10;
-        }
+        private static readonly uint[] _transformInternalChain = 
+        [ 
+            Offsets.Player._playerBody, 
+            Offsets.PlayerBody.SkeletonRootJoint, 
+            Offsets.DizSkinningSkeleton._values, 
+            MonoList<byte>.ArrOffset, 
+            MonoList<byte>.ArrStartOffset + (uint)Bones.HumanBase * 0x8, 
+            0x10
+        ];
     }
 }

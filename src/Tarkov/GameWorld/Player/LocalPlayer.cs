@@ -58,6 +58,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             set { }
         }
         /// <summary>
+        /// Player's Faction.
+        /// </summary>
+        public override Enums.EPlayerSide PlayerSide { get; protected set; } = Enums.EPlayerSide.Usec;
+        /// <summary>
         /// Player is Human-Controlled.
         /// </summary>
         public override bool IsHuman { get; }
