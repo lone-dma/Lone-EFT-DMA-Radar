@@ -343,7 +343,6 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
         /// </summary>
         private int[] ReadIndices()
         {
-            Debug.WriteLine(Count);
             var indices = new int[Count];
             Memory.ReadSpan(IndicesAddr, indices.AsSpan(), _useCache);
             return indices;

@@ -21,7 +21,7 @@ namespace SDK
 
         public readonly partial struct TransitController
         {
-            public const uint TransitPoints = 0x18; // System.Collections.Generic.Dictionary<Int32, TransitPoint>
+            public const uint TransitPoints = 0x80; // System.Collections.Generic.Dictionary<Int32, TransitPoint>
         }
 
         public readonly partial struct TransitPoint
@@ -31,9 +31,9 @@ namespace SDK
 
         public readonly partial struct TransitParameters
         {
-            public const uint name = 0x10; // String
-            public const uint description = 0x18; // String
-            public const uint location = 0x30; // String
+            public const uint name = 0x18; // String
+            public const uint description = 0x20; // String
+            public const uint location = 0x40; // String
         }
 
         public readonly partial struct SynchronizableObject
@@ -70,9 +70,9 @@ namespace SDK
 
         public readonly partial struct ExfilController
         {
-            public const uint ExfiltrationPointArray = 0x28; // EFT.Interactive.ExfiltrationPoint[]
-            public const uint ScavExfiltrationPointArray = 0x30; // EFT.Interactive.ScavExfiltrationPoint[]
-            public const uint SecretExfiltrationPointArray = 0x38; // EFT.Interactive.SecretExfiltrations.SecretExfiltrationPoint[]
+            public const uint ExfiltrationPointArray = 0x20; // EFT.Interactive.ExfiltrationPoint[]
+            public const uint ScavExfiltrationPointArray = 0x28; // EFT.Interactive.ScavExfiltrationPoint[]
+            public const uint SecretExfiltrationPointArray = 0x30; // EFT.Interactive.SecretExfiltrations.SecretExfiltrationPoint[]
         }
 
         public readonly partial struct Exfil
@@ -99,9 +99,8 @@ namespace SDK
 
         public readonly partial struct Player
         {
-            public const uint _characterController = 0x40; // -.ICharacterController
             public const uint MovementContext = 0x60; // EFT.MovementContext
-            public const uint _playerBody = 0xC0; // EFT.PlayerBody
+            public const uint _playerBody = 0x158; // EFT.PlayerBody
             public const uint Corpse = 0x3E0; // EFT.Interactive.Corpse
             public const uint Location = 0x5E0; // String
             public const uint Profile = 0x8C0; // EFT.Profile

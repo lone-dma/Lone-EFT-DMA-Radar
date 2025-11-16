@@ -140,10 +140,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         public override ulong MovementContext { get; }
         /// <summary>
-        /// EFT.PlayerBody
-        /// </summary>
-        public override ulong Body { get; }
-        /// <summary>
         /// Corpse field address..
         /// </summary>
         public override ulong CorpseAddr { get; }
@@ -168,13 +164,12 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             ArgumentOutOfRangeException.ThrowIfNotEqual(this,
                 Memory.ReadValue<ulong>(ObservedHealthController + Offsets.ObservedHealthController.Player),
                 nameof(ObservedHealthController));
-            Body = Memory.ReadPtr(this + Offsets.ObservedPlayerView.PlayerBody);
             CorpseAddr = ObservedHealthController + Offsets.ObservedHealthController.PlayerCorpse;
 
             MovementContext = GetMovementContext();
             RotationAddress = ValidateRotationAddr(MovementContext + Offsets.ObservedPlayerStateContext.Rotation);
             /// Setup Transform
-            var ti = Memory.ReadPtrChain(this, false, 0xF0, 0x90);
+            var ti = Memory.ReadPtrChain(this, false, _transformInternalChain);
             SkeletonRoot = new UnityTransform(ti);
             _ = SkeletonRoot.UpdatePosition();
 
@@ -324,21 +319,14 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             }
         }
 
-        /// <summary>
-        /// Get the Transform Internal Chain for this Player.
-        /// </summary>
-        /// <param name="bone">Bone to lookup.</param>
-        /// <param name="offsets">Buffer to receive offsets.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected override void GetTransformInternalChain(Bones bone, Span<uint> offsets)
-        {
-            ArgumentOutOfRangeException.ThrowIfNotEqual(offsets.Length, AbstractPlayer.TransformInternalChainCount, nameof(offsets));
-            offsets[0] = Offsets.ObservedPlayerView.PlayerBody;
-            offsets[1] = Offsets.PlayerBody.SkeletonRootJoint;
-            offsets[2] = Offsets.DizSkinningSkeleton._values;
-            offsets[3] = MonoList<byte>.ArrOffset;
-            offsets[4] = MonoList<byte>.ArrStartOffset + (uint)bone * 0x8;
-            offsets[5] = 0x10;
-        }
+        private static readonly uint[] _transformInternalChain =
+        [
+            Offsets.ObservedPlayerView.PlayerBody,
+            Offsets.PlayerBody.SkeletonRootJoint,
+            Offsets.DizSkinningSkeleton._values,
+            MonoList<byte>.ArrOffset,
+            MonoList<byte>.ArrStartOffset + (uint)Bones.HumanBase * 0x8,
+            0x10
+        ];
     }
 }

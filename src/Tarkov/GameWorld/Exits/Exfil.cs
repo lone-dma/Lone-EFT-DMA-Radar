@@ -39,9 +39,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
     {
         public static implicit operator ulong(Exfil x) => x._addr;
         private static readonly uint[] _transformInternalChain =
-{
-            ObjectClass.MonoBehaviourOffset, MonoBehaviour.GameObjectOffset, GameObject.ComponentsOffset, 0x8
-        };
+        [
+            0x10, 0x48, 0x48, 0x8, 0x40, 0x10
+        ];
 
         private readonly bool _isPMC;
         private HashSet<string> PmcEntries { get; } = new(StringComparer.OrdinalIgnoreCase);
