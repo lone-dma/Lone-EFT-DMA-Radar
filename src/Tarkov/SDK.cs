@@ -1,13 +1,5 @@
 namespace SDK
 {
-    public readonly partial struct ClassNames
-    {
-        public readonly partial struct OpticCameraManagerContainer
-        {
-            public const string ClassName = @"\uF124";
-        }
-    }
-
     public readonly partial struct Offsets
     {
         public readonly partial struct GameWorld
@@ -146,8 +138,8 @@ namespace SDK
         public readonly partial struct ObservedHealthController
         {
             public const uint Player = 0x18; // EFT.NextObservedPlayer.ObservedPlayerView
-            public const uint PlayerCorpse = 0x18; // EFT.Interactive.ObservedCorpse
-            public const uint HealthStatus = 0xD8; // System.Int32
+            public const uint PlayerCorpse = 0x20; // EFT.Interactive.ObservedCorpse
+            public const uint HealthStatus = 0x10; // System.Int32
         }
 
         public readonly partial struct Profile
@@ -155,7 +147,6 @@ namespace SDK
             public const uint Id = 0x10; // String
             public const uint AccountId = 0x18; // String
             public const uint Info = 0x48; // -.\uE9AD
-            public const uint QuestsData = 0x98; // System.Collections.Generic.List<\uF286>
             public const uint WishlistManager = 0x108; // -.\uE8D9
         }
 
@@ -180,7 +171,7 @@ namespace SDK
 
         public readonly partial struct InteractiveLootItem
         {
-            public const uint Item = 0xB8; // EFT.InventoryLogic.Item
+            public const uint Item = 0xF0; // EFT.InventoryLogic.Item
         }
 
         public readonly partial struct DizSkinningSkeleton
