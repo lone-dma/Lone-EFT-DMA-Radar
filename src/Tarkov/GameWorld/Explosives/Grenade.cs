@@ -43,7 +43,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives
     public sealed class Grenade : IExplosiveItem, IWorldEntity, IMapEntity
     {
         public static implicit operator ulong(Grenade x) => x.Addr;
-        private static readonly uint[] _toTransformChain = [0x10, 0x58, 0x58, 0x8, 0x50, 0x20];
+        private static readonly uint[] _toTransformChain = [0x10, 0x58, 0x58, 0x8, 0x50, 0x10];
         private readonly ConcurrentDictionary<ulong, IExplosiveItem> _parent;
         private readonly bool _isSmoke;
         private readonly UnityTransform _transform;

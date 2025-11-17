@@ -40,7 +40,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
         public static implicit operator ulong(Exfil x) => x._addr;
         private static readonly uint[] _transformInternalChain =
         [
-            0x10, 0x58, 0x58, 0x8, 0x50, 0x20
+            0x10, 0x58, 0x58, 0x8, 0x50, 0x10
         ];
 
         private readonly bool _isPMC;
