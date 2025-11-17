@@ -37,10 +37,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
     public sealed class TransitPoint : IExitPoint, IWorldEntity, IMapEntity, IMouseoverEntity
     {
         public static implicit operator ulong(TransitPoint x) => x._addr;
-        private static readonly uint[] _transformInternalChain =
-        [
-            0x10, 0x48, 0x48, 0x8, 0x40, 0x10
-        ];
 
         public TransitPoint(ulong baseAddr)
         {
@@ -57,7 +53,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
             {
                 Name = "Transit";
             }
-            var transformInternal = Memory.ReadPtrChain(baseAddr, false, _transformInternalChain);
+            var transformInternal = Memory.ReadPtrChain(baseAddr, false, UnitySDK.ShuffledOffsets.TransformChain);
             try
             {
                 _position = new UnityTransform(transformInternal).UpdatePosition();

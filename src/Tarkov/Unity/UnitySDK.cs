@@ -30,13 +30,40 @@ namespace LoneEftDmaRadar.Tarkov.Unity
 {
     public readonly struct UnitySDK
     {
-        public readonly struct ModuleBase
+        public readonly struct ShuffledOffsets
         {
-            public const uint GameObjectManager = 0x1A1EF48; // to eft_dma_radar.GameObjectManager
-        }
-        public readonly struct UnityInputManager
-        {
-            //public const uint CurrentKeyState = 0x60; // 0x50 + 0x8
+            public const uint GameObjectManager = 0x1A1FFC8;
+
+            public const uint GameObject_ObjectClassOffset = 0x50;
+            public const uint GameObject_ComponentsOffset = 0x58;
+            public const uint GameObject_NameOffset = 0x88;
+
+            public const uint MonoBehaviour_ObjectClassOffset = 0x50;
+            public const uint MonoBehaviour_GameObjectOffset = 0x58;
+
+            public const uint TransformAccess_IndexOffset = 0x98;
+            public const uint TransformAccess_HierarchyOffset = 0x90;
+
+            public const uint Hierarchy_VerticesOffset = 0x60;
+            public const uint Hierarchy_IndicesOffset = 0x30;
+            public const uint Hierarchy_RootPositionOffset = 0xB0;
+
+            public static readonly uint[] GameWorldChain =
+            [
+                0x58, 
+                0x18, 
+                0x50
+            ];
+
+            public static readonly uint[] TransformChain = 
+            [
+                0x10, 
+                0x58, 
+                0x58, 
+                0x8, 
+                0x50, 
+                0x10
+            ];
         }
     }
 }

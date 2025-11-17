@@ -23,7 +23,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
         {
             try
             {
-                var gomPtr = Memory.ReadPtr(unityBase + UnitySDK.ModuleBase.GameObjectManager, false);
+                var gomPtr = Memory.ReadPtr(unityBase + UnitySDK.ShuffledOffsets.GameObjectManager, false);
                 return Memory.ReadValue<GameObjectManager>(gomPtr, false);
             }
             catch (Exception ex)
@@ -44,7 +44,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
             {
                 while (currentObject.ThisObject != 0x0 && currentObject.ThisObject != lastObject.ThisObject)
                 {
-                    var objectNamePtr = Memory.ReadPtr(currentObject.ThisObject + GameObject.NameOffset);
+                    var objectNamePtr = Memory.ReadPtr(currentObject.ThisObject + UnitySDK.ShuffledOffsets.GameObject_NameOffset);
                     var objectNameStr = Memory.ReadUtf8String(objectNamePtr, 64);
                     if (objectNameStr.Equals(objectName, StringComparison.OrdinalIgnoreCase))
                         return currentObject.ThisObject;
@@ -65,13 +65,13 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
             {
                 while (currentObject.ThisObject != 0x0 && currentObject.ThisObject != lastObject.ThisObject)
                 {
-                    var objectNamePtr = Memory.ReadPtr(currentObject.ThisObject + GameObject.NameOffset);
+                    var objectNamePtr = Memory.ReadPtr(currentObject.ThisObject + UnitySDK.ShuffledOffsets.GameObject_NameOffset);
                     var objectNameStr = Memory.ReadUtf8String(objectNamePtr, 64);
                     if (objectNameStr.Equals("GameWorld", StringComparison.OrdinalIgnoreCase))
                     {
                         try
                         {
-                            var localGameWorld = Memory.ReadPtrChain(currentObject.ThisObject, false, 0x48, 0x18, 0x40);
+                            var localGameWorld = Memory.ReadPtrChain(currentObject.ThisObject, false, UnitySDK.ShuffledOffsets.GameWorldChain);
                             /// Get Selected Map
                             var mapPtr = Memory.ReadValue<ulong>(localGameWorld + Offsets.GameWorld.Location, false);
                             if (mapPtr == 0x0) // Offline Mode
