@@ -59,49 +59,53 @@ namespace LoneEftDmaRadar.Tarkov.WinAPI
 
             foreach (var pid in pids)
             {
-                if (!_vmm.Map_GetModuleFromName(pid, "win32ksgd.sys", out var win32kModule))
+                try
                 {
-                    if (!_vmm.Map_GetModuleFromName(pid, "win32k.sys", out win32kModule))
-                        throw new InvalidOperationException("Failed to get win32kModule");
-                }
-                ulong win32kBase = win32kModule.vaBase;
-                ulong win32kSize = win32kModule.cbImageSize;
+                    if (!_vmm.Map_GetModuleFromName(pid, "win32ksgd.sys", out var win32kModule))
+                    {
+                        if (!_vmm.Map_GetModuleFromName(pid, "win32k.sys", out win32kModule))
+                            throw new InvalidOperationException("Failed to get win32kModule");
+                    }
+                    ulong win32kBase = win32kModule.vaBase;
+                    ulong win32kSize = win32kModule.cbImageSize;
 
-                ulong gSessionPtr = _vmm.FindSignature(pid, "48 8B 05 ?? ?? ?? ?? 48 8B 04 C8", win32kBase, win32kBase + win32kSize);
-                if (gSessionPtr == 0)
-                {
-                    gSessionPtr = _vmm.FindSignature(pid, "48 8B 05 ?? ?? ?? ?? FF C9", win32kBase, win32kBase + win32kSize);
-                    gSessionPtr.ThrowIfInvalidVirtualAddress(nameof(gSessionPtr));
-                }
-                int relative = Read<int>(pid, gSessionPtr + 3);
-                ulong gSessionGlobalSlots = gSessionPtr + 7 + (ulong)relative;
-                ulong userSessionState = 0;
-                for (int i = 0; i < 4; i++)
-                {
-                    userSessionState = Read<ulong>(pid, Read<ulong>(pid, Read<ulong>(pid, gSessionGlobalSlots) + (ulong)(8 * i)));
-                    if (userSessionState > 0x7FFFFFFFFFFF)
+                    ulong gSessionPtr = _vmm.FindSignature(pid, "48 8B 05 ?? ?? ?? ?? 48 8B 04 C8", win32kBase, win32kBase + win32kSize);
+                    if (gSessionPtr == 0)
+                    {
+                        gSessionPtr = _vmm.FindSignature(pid, "48 8B 05 ?? ?? ?? ?? FF C9", win32kBase, win32kBase + win32kSize);
+                        gSessionPtr.ThrowIfInvalidVirtualAddress(nameof(gSessionPtr));
+                    }
+                    int relative = Read<int>(pid, gSessionPtr + 3);
+                    ulong gSessionGlobalSlots = gSessionPtr + 7 + (ulong)relative;
+                    ulong userSessionState = 0;
+                    for (int i = 0; i < 4; i++)
+                    {
+                        userSessionState = Read<ulong>(pid, Read<ulong>(pid, Read<ulong>(pid, gSessionGlobalSlots) + (ulong)(8 * i)));
+                        if (userSessionState > 0x7FFFFFFFFFFF)
+                            break;
+                    }
+
+                    if (!_vmm.Map_GetModuleFromName(pid, "win32kbase.sys", out var win32kbaseModule))
+                        throw new InvalidOperationException("failed to get module win32kbase info");
+                    ulong win32kbaseBase = win32kbaseModule.vaBase;
+                    ulong win32kbaseSize = win32kbaseModule.cbImageSize;
+
+                    ulong ptr = _vmm.FindSignature(pid, "48 8D 90 ?? ?? ?? ?? E8 ?? ?? ?? ?? 0F 57 C0", win32kbaseBase, win32kbaseBase + win32kbaseSize);
+                    uint sessionOffset = 0;
+                    if (ptr != 0)
+                    {
+                        sessionOffset = Read<uint>(pid, ptr + 3);
+                        gafAsyncKeyStateExport = userSessionState + sessionOffset;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("failed to find offset for gafAyncKeyStateExport");
+                    }
+
+                    if (gafAsyncKeyStateExport > 0x7FFFFFFFFFFF)
                         break;
                 }
-
-                if (!_vmm.Map_GetModuleFromName(pid, "win32kbase.sys", out var win32kbaseModule))
-                    throw new InvalidOperationException("failed to get module win32kbase info");
-                ulong win32kbaseBase = win32kbaseModule.vaBase;
-                ulong win32kbaseSize = win32kbaseModule.cbImageSize;
-
-                ulong ptr = _vmm.FindSignature(pid, "48 8D 90 ?? ?? ?? ?? E8 ?? ?? ?? ?? 0F 57 C0", win32kbaseBase, win32kbaseBase + win32kbaseSize);
-                uint sessionOffset = 0;
-                if (ptr != 0)
-                {
-                    sessionOffset = Read<uint>(pid, ptr + 3);
-                    gafAsyncKeyStateExport = userSessionState + sessionOffset;
-                }
-                else
-                {
-                    throw new InvalidOperationException("failed to find offset for gafAyncKeyStateExport");
-                }
-
-                if (gafAsyncKeyStateExport > 0x7FFFFFFFFFFF)
-                    break;
+                catch { }
             }
             if (gafAsyncKeyStateExport <= 0x7FFFFFFFFFFF)
                 throw new InvalidOperationException("Invalid gafAsyncKeyStateExport");
