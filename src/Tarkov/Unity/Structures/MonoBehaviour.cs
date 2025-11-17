@@ -3,12 +3,9 @@
     [StructLayout(LayoutKind.Explicit)]
     public readonly struct MonoBehaviour // Behaviour : Component : EditorExtension : Object
     {
-        public const uint ObjectClassOffset = 0x40;
-        public const uint GameObjectOffset = 0x48;
-
-        [FieldOffset((int)ObjectClassOffset)]
+        [FieldOffset((int)UnitySDK.ShuffledOffsets.MonoBehaviour_ObjectClassOffset)]
         public readonly ulong ObjectClass; // m_Object
-        [FieldOffset((int)GameObjectOffset)]
+        [FieldOffset((int)UnitySDK.ShuffledOffsets.MonoBehaviour_GameObjectOffset)]
         public readonly ulong GameObject; // m_GameObject
 
         /// <summary>
@@ -26,7 +23,7 @@
         /// <returns>Child class component.</returns>
         public static ulong GetComponent(ulong behaviour, string className)
         {
-            var go = Memory.ReadPtr(behaviour + GameObjectOffset);
+            var go = Memory.ReadPtr(behaviour + UnitySDK.ShuffledOffsets.MonoBehaviour_GameObjectOffset);
             //return Structures.GameObject.GetComponent(go, className);
 
             return 0;

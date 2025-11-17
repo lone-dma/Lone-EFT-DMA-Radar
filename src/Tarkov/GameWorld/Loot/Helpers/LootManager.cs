@@ -29,6 +29,7 @@ SOFTWARE.
 using Collections.Pooled;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.Mono.Collections;
+using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.UI.Loot;
 
@@ -148,23 +149,23 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
                     if (s1.ReadPtr(lootBase + ObjectClass.MonoBehaviourOffset, out var monoBehaviour) &&
                         s1.ReadPtr(lootBase + ObjectClass.To_NamePtr[0], out var c1))
                     {
-                        round2.PrepareReadPtr(monoBehaviour + MonoBehaviour.ObjectClassOffset); // InteractiveClass
-                        round2.PrepareReadPtr(monoBehaviour + MonoBehaviour.GameObjectOffset); // GameObject
+                        round2.PrepareReadPtr(monoBehaviour + UnitySDK.ShuffledOffsets.MonoBehaviour_ObjectClassOffset); // InteractiveClass
+                        round2.PrepareReadPtr(monoBehaviour + UnitySDK.ShuffledOffsets.MonoBehaviour_GameObjectOffset); // GameObject
                         round2.PrepareReadPtr(c1 + ObjectClass.To_NamePtr[1]); // C2
                         round2.Completed += (sender, s2) =>
                         {
-                            if (s2.ReadPtr(monoBehaviour + MonoBehaviour.ObjectClassOffset, out var interactiveClass) &&
-                                s2.ReadPtr(monoBehaviour + MonoBehaviour.GameObjectOffset, out var gameObject) &&
+                            if (s2.ReadPtr(monoBehaviour + UnitySDK.ShuffledOffsets.MonoBehaviour_ObjectClassOffset, out var interactiveClass) &&
+                                s2.ReadPtr(monoBehaviour + UnitySDK.ShuffledOffsets.MonoBehaviour_GameObjectOffset, out var gameObject) &&
                                 s2.ReadPtr(c1 + ObjectClass.To_NamePtr[1], out var classNamePtr))
                             {
                                 round3.PrepareRead(classNamePtr, 64); // ClassName
-                                round3.PrepareReadPtr(gameObject + GameObject.ComponentsOffset); // Components
-                                round3.PrepareReadPtr(gameObject + GameObject.NameOffset); // PGameObjectName
+                                round3.PrepareReadPtr(gameObject + UnitySDK.ShuffledOffsets.GameObject_ComponentsOffset); // Components
+                                round3.PrepareReadPtr(gameObject + UnitySDK.ShuffledOffsets.GameObject_NameOffset); // PGameObjectName
                                 round3.Completed += (sender, s3) =>
                                 {
                                     if (s3.ReadString(classNamePtr, 64, Encoding.UTF8) is string className &&
-                                        s3.ReadPtr(gameObject + GameObject.ComponentsOffset, out var components)
-                                        && s3.ReadPtr(gameObject + GameObject.NameOffset, out var pGameObjectName))
+                                        s3.ReadPtr(gameObject + UnitySDK.ShuffledOffsets.GameObject_ComponentsOffset, out var components)
+                                        && s3.ReadPtr(gameObject + UnitySDK.ShuffledOffsets.GameObject_NameOffset, out var pGameObjectName))
                                     {
                                         round4.PrepareRead(pGameObjectName, 64); // ObjectName
                                         round4.PrepareReadPtr(components + 0x8); // T1
