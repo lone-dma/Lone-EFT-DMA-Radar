@@ -32,7 +32,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity
     {
         public readonly struct ModuleBase
         {
-            public const uint GameObjectManager = 0x1A1EF48; // to eft_dma_radar.GameObjectManager
+            public const uint GameObjectManager = 0x1A1FFC8; // to eft_dma_radar.GameObjectManager
         }
         public readonly struct UnityInputManager
         {

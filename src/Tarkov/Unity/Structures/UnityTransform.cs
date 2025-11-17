@@ -305,7 +305,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
             [FieldOffset((int)HierarchyOffset)]
             public readonly ulong Hierarchy;
 
-            public const uint IndexOffset = 0x88;
+            public const uint IndexOffset = 0x98;
             public const uint HierarchyOffset = 0x90;
         }
 
@@ -317,7 +317,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
             [FieldOffset((int)IndicesOffset)]
             public readonly ulong Indices;
 
-            public const uint VerticesOffset = 0x28;
+            public const uint VerticesOffset = 0x60;
             public const uint IndicesOffset = 0x30;
             public const uint RootPositionOffset = 0xB0;
         }

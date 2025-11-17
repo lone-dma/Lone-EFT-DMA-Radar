@@ -71,7 +71,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
                     {
                         try
                         {
-                            var localGameWorld = Memory.ReadPtrChain(currentObject.ThisObject, false, 0x48, 0x18, 0x40);
+                            var localGameWorld = Memory.ReadPtrChain(currentObject.ThisObject, false, 0x58, 0x18, 0x50);
                             /// Get Selected Map
                             var mapPtr = Memory.ReadValue<ulong>(localGameWorld + Offsets.GameWorld.Location, false);
                             if (mapPtr == 0x0) // Offline Mode

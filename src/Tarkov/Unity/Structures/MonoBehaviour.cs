@@ -3,8 +3,8 @@
     [StructLayout(LayoutKind.Explicit)]
     public readonly struct MonoBehaviour // Behaviour : Component : EditorExtension : Object
     {
-        public const uint ObjectClassOffset = 0x40;
-        public const uint GameObjectOffset = 0x48;
+        public const uint ObjectClassOffset = 0x50;
+        public const uint GameObjectOffset = 0x58;
 
         [FieldOffset((int)ObjectClassOffset)]
         public readonly ulong ObjectClass; // m_Object

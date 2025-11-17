@@ -5,9 +5,9 @@
     public readonly struct GameObject // EditorExtension : Object
     {
         // 1.0 shifted +0x18
-        public const uint ObjectClassOffset = 0x40;
-        public const uint ComponentsOffset = 0x48;
-        public const uint NameOffset = 0x78;
+        public const uint ObjectClassOffset = 0x50;
+        public const uint ComponentsOffset = 0x58;
+        public const uint NameOffset = 0x88;
 
         [FieldOffset((int)ObjectClassOffset)]
         public readonly ulong ObjectClass; // m_Object
