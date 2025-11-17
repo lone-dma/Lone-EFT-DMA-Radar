@@ -75,16 +75,16 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
                     list.Add(exfil);
                 }
             }
-            /// Transits
-            var transitController = Memory.ReadPtr(_localGameWorld + Offsets.ClientLocalGameWorld.TransitController, false);
-            var transitsPtr = Memory.ReadPtr(transitController + Offsets.TransitController.TransitPoints, false);
-            Debug.WriteLine(transitsPtr.ToString("X"));
-            using var transits = MonoDictionary<ulong, ulong>.Create(transitsPtr, false);
-            foreach (var dTransit in transits)
-            {
-                var transit = new TransitPoint(dTransit.Value);
-                list.Add(transit);
-            }
+            ///// Transits
+            //var transitController = Memory.ReadPtr(_localGameWorld + Offsets.ClientLocalGameWorld.TransitController, false);
+            //var transitsPtr = Memory.ReadPtr(transitController + Offsets.TransitController.TransitPoints, false);
+            //using var transits = MonoDictionary<ulong, ulong>.Create(transitsPtr, false);
+            //foreach (var dTransit in transits)
+            //{
+            //    var transit = new TransitPoint(dTransit.Value);
+            //    list.Add(transit);
+            //}
+            // TODO: Transits
 
             _exits = list; // update readonly ref
         }

@@ -232,7 +232,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         {
             try
             {
-                // TODO
                 var mainPlayer = Memory.ReadPtr(this + Offsets.ClientLocalGameWorld.MainPlayer, false);
                 ArgumentOutOfRangeException.ThrowIfNotEqual(mainPlayer, _rgtPlayers.LocalPlayer, nameof(mainPlayer));
                 return _rgtPlayers.GetPlayerCount() > 0;
@@ -283,10 +282,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             // Refresh exfils
             _exfilManager.Refresh();
             // Refresh Loot
-            //Loot.Refresh(ct);
+            Loot.Refresh(ct);
             //if (App.Config.Loot.ShowWishlist)
             //    Memory.LocalPlayer?.RefreshWishlist(ct);
-            // TODO : Fix exfils, loot, and wishlist
+            // TODO: Wishlist
         }
 
         public void ValidatePlayerTransforms()

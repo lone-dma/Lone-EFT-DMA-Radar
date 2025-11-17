@@ -65,7 +65,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity
         {
             try
             {
-                return; // TODO : fix later
+                return; // TODO : InputManager
                 unityBase.ThrowIfInvalidVirtualAddress(nameof(unityBase));
                 //_inputManager = Memory.ReadPtr(unityBase + UnitySDK.ModuleBase.InputManager, false);
                 _thread = new()
