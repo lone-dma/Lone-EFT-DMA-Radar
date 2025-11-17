@@ -29,6 +29,7 @@ SOFTWARE.
 using LoneEftDmaRadar.DMA;
 using LoneEftDmaRadar.Misc.JSON;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
+using LoneEftDmaRadar.Tarkov.WinAPI;
 using LoneEftDmaRadar.UI.ColorPicker;
 using LoneEftDmaRadar.UI.Data;
 using LoneEftDmaRadar.UI.Loot;
@@ -103,9 +104,9 @@ namespace LoneEftDmaRadar
         /// <summary>
         /// Hotkeys Dictionary for Radar.
         /// </summary>
-        [JsonPropertyName("hotkeys")]
+        [JsonPropertyName("hotkeys_v2")]
         [JsonInclude]
-        public ConcurrentDictionary<UnityKeyCode, string> Hotkeys { get; private set; } = new(); // Default entries
+        public ConcurrentDictionary<WindowsVirtualKeyCode, string> Hotkeys { get; private set; } = new(); // Default entries
 
         /// <summary>
         /// All defined Radar Colors.

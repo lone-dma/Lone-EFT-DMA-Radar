@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Tarkov.Unity.Structures;
+using LoneEftDmaRadar.Tarkov.WinAPI;
 using LoneEftDmaRadar.UI.Misc;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
@@ -37,17 +37,17 @@ namespace LoneEftDmaRadar.UI.Hotkeys
     {
         #region Static config loader
 
-        // all possible UnityKeyCodes
-        private static readonly IReadOnlyList<UnityKeyCode> _allKeys =
-            Enum.GetValues<UnityKeyCode>()
-                .Cast<UnityKeyCode>()
+        // all possible WindowsVirtualKeyCodes
+        private static readonly IReadOnlyList<WindowsVirtualKeyCode> _allKeys =
+            Enum.GetValues<WindowsVirtualKeyCode>()
+                .Cast<WindowsVirtualKeyCode>()
                 .ToList();
 
-        private static readonly ConcurrentDictionary<UnityKeyCode, HotkeyAction> _hotkeys = new();
+        private static readonly ConcurrentDictionary<WindowsVirtualKeyCode, HotkeyAction> _hotkeys = new();
         /// <summary>
         /// The live set of hotkeys (key → action)
         /// </summary>
-        internal static IReadOnlyDictionary<UnityKeyCode, HotkeyAction> Hotkeys => _hotkeys;
+        internal static IReadOnlyDictionary<WindowsVirtualKeyCode, HotkeyAction> Hotkeys => _hotkeys;
 
         static HotkeyManagerViewModel()
         {
