@@ -57,6 +57,7 @@ namespace LoneEftDmaRadar.Tarkov.WinAPI
             var pids = _vmm.PidGetAllFromName("csrss.exe");
             ulong gafAsyncKeyStateExport = 0;
 
+            var exceptions = new List<Exception>();
             foreach (var pid in pids)
             {
                 try
@@ -105,10 +106,13 @@ namespace LoneEftDmaRadar.Tarkov.WinAPI
                     if (gafAsyncKeyStateExport > 0x7FFFFFFFFFFF)
                         break;
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
             }
             if (gafAsyncKeyStateExport <= 0x7FFFFFFFFFFF)
-                throw new InvalidOperationException("Invalid gafAsyncKeyStateExport");
+                throw new AggregateException("Invalid gafAsyncKeyStateExport", exceptions);
 
             _gafAsyncKeyStateExport = gafAsyncKeyStateExport;
             _thread = new() 
