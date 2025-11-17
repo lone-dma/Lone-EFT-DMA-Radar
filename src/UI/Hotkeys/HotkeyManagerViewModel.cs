@@ -26,10 +26,10 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Tarkov.WinAPI;
 using LoneEftDmaRadar.UI.Misc;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using VmmSharpEx.Extensions.Input;
 
 namespace LoneEftDmaRadar.UI.Hotkeys
 {
@@ -38,16 +38,16 @@ namespace LoneEftDmaRadar.UI.Hotkeys
         #region Static config loader
 
         // all possible WindowsVirtualKeyCodes
-        private static readonly IReadOnlyList<WindowsVirtualKeyCode> _allKeys =
-            Enum.GetValues<WindowsVirtualKeyCode>()
-                .Cast<WindowsVirtualKeyCode>()
+        private static readonly IReadOnlyList<Win32VirtualKey> _allKeys =
+            Enum.GetValues<Win32VirtualKey>()
+                .Cast<Win32VirtualKey>()
                 .ToList();
 
-        private static readonly ConcurrentDictionary<WindowsVirtualKeyCode, HotkeyAction> _hotkeys = new();
+        private static readonly ConcurrentDictionary<Win32VirtualKey, HotkeyAction> _hotkeys = new();
         /// <summary>
         /// The live set of hotkeys (key → action)
         /// </summary>
-        internal static IReadOnlyDictionary<WindowsVirtualKeyCode, HotkeyAction> Hotkeys => _hotkeys;
+        internal static IReadOnlyDictionary<Win32VirtualKey, HotkeyAction> Hotkeys => _hotkeys;
 
         static HotkeyManagerViewModel()
         {

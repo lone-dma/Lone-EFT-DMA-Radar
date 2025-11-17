@@ -120,13 +120,13 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             return movementContext;
         }
 
-        private static readonly uint[] _transformInternalChain = 
-        [ 
-            Offsets.Player._playerBody, 
-            Offsets.PlayerBody.SkeletonRootJoint, 
-            Offsets.DizSkinningSkeleton._values, 
-            MonoList<byte>.ArrOffset, 
-            MonoList<byte>.ArrStartOffset + (uint)Bones.HumanBase * 0x8, 
+        private static readonly uint[] _transformInternalChain =
+        [
+            Offsets.Player._playerBody,
+            Offsets.PlayerBody.SkeletonRootJoint,
+            Offsets.DizSkinningSkeleton._values,
+            MonoList<byte>.ArrOffset,
+            MonoList<byte>.ArrStartOffset + (uint)Bones.HumanBase * 0x8,
             0x10
         ];
     }

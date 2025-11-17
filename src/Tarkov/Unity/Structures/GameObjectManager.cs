@@ -1,6 +1,4 @@
-﻿using System.Security.AccessControl;
-
-namespace LoneEftDmaRadar.Tarkov.Unity.Structures
+﻿namespace LoneEftDmaRadar.Tarkov.Unity.Structures
 {
     /// <summary>
     /// Unity Game Object Manager. Contains all Game Objects.

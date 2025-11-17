@@ -26,30 +26,44 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.Misc.Workers;
+using LoneEftDmaRadar.UI.Hotkeys;
+using VmmSharpEx;
 using VmmSharpEx.Extensions.Input;
 
-namespace LoneEftDmaRadar.UI.Hotkeys
+namespace LoneEftDmaRadar.DMA
 {
-    /// <summary>
-    /// Combo Box Wrapper for WindowsVirtualKeyCode Enums for Hotkey Manager.
-    /// </summary>
-    public sealed class ComboHotkeyValue
+    public sealed class InputManager
     {
-        /// <summary>
-        /// Full name of the Key.
-        /// </summary>
-        public string Key { get; }
-        /// <summary>
-        /// Key enum value.
-        /// </summary>
-        public Win32VirtualKey Code { get; }
+        private readonly VmmInputManager _input;
+        private readonly WorkerThread _thread;
 
-        public ComboHotkeyValue(Win32VirtualKey keyCode)
+        public InputManager(Vmm vmm)
         {
-            Key = keyCode.ToString();
-            Code = keyCode;
+            _input = new VmmInputManager(vmm);
+            _thread = new()
+            {
+                Name = nameof(InputManager),
+                SleepDuration = TimeSpan.FromMilliseconds(12),
+                SleepMode = WorkerThreadSleepMode.DynamicSleep
+            };
+            _thread.PerformWork += InputManager_PerformWork;
+            _thread.Start();
         }
 
-        public override string ToString() => Key;
+        private void InputManager_PerformWork(object sender, WorkerThreadArgs e)
+        {
+            var hotkeys = HotkeyManagerViewModel.Hotkeys.AsEnumerable();
+            if (hotkeys.Any())
+            {
+                _input.UpdateKeys();
+                foreach (var kvp in hotkeys)
+                {
+                    bool isKeyDown = _input.IsKeyDown(kvp.Key);
+                    kvp.Value.Execute(isKeyDown);
+                }
+            }
+        }
     }
+
 }
