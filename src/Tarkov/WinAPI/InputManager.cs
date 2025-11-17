@@ -34,11 +34,8 @@ Thanks to Metick for the original implementation!
 using LoneEftDmaRadar.DMA;
 using LoneEftDmaRadar.Misc.Workers;
 using LoneEftDmaRadar.UI.Hotkeys;
-using System;
 using VmmSharpEx;
 using VmmSharpEx.Extensions;
-using VmmSharpEx.Scatter;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace LoneEftDmaRadar.Tarkov.WinAPI
 {
