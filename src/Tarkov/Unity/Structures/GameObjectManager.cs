@@ -22,12 +22,28 @@
             try
             {
                 var gomPtr = Memory.ReadPtr(unityBase + UnitySDK.ShuffledOffsets.GameObjectManager, false);
+                //var dump = new byte[128];
+                //Memory.ReadSpan(gomPtr - 64, dump, false);
+                //DumpBytes(dump);
+                //Environment.Exit(0);
                 return Memory.ReadValue<GameObjectManager>(gomPtr, false);
             }
             catch (Exception ex)
             {
                 throw new Exception("ERROR Loading Game Object Manager", ex);
             }
+        }
+
+        private static void DumpBytes(byte[] bytes)
+        {
+            var sb = new StringBuilder();
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                sb.Append($"{bytes[i]:X2} ");
+                if ((i + 1) % 16 == 0)
+                    sb.AppendLine();
+            }
+            Debug.WriteLine($"Bytes:\n" + sb.ToString());
         }
 
         /// <summary>
