@@ -129,8 +129,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
                 }
             }
             // Proceed to get new loot
-            using var deadPlayers = Memory.Players?
-                .Where(x => x.Corpse is not null)?.ToPooledList();
             using var map = Memory.CreateScatterMap();
             var round1 = map.AddRound();
             var round2 = map.AddRound();
@@ -157,23 +155,22 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
                         {
                             if (s2.ReadPtr(monoBehaviour + MonoBehaviour.ObjectClassOffset, out var interactiveClass) &&
                                 s2.ReadPtr(monoBehaviour + MonoBehaviour.GameObjectOffset, out var gameObject) &&
-                                s2.ReadPtr(c1 + ObjectClass.To_NamePtr[1], out var c2))
+                                s2.ReadPtr(c1 + ObjectClass.To_NamePtr[1], out var classNamePtr))
                             {
-                                round3.PrepareReadPtr(c2 + ObjectClass.To_NamePtr[2]); // ClassNamePtr
+                                round3.PrepareRead(classNamePtr, 64); // ClassName
                                 round3.PrepareReadPtr(gameObject + GameObject.ComponentsOffset); // Components
                                 round3.PrepareReadPtr(gameObject + GameObject.NameOffset); // PGameObjectName
                                 round3.Completed += (sender, s3) =>
                                 {
-                                    if (s3.ReadPtr(c2 + ObjectClass.To_NamePtr[2], out var classNamePtr) &&
+                                    if (s3.ReadString(classNamePtr, 64, Encoding.UTF8) is string className &&
                                         s3.ReadPtr(gameObject + GameObject.ComponentsOffset, out var components)
                                         && s3.ReadPtr(gameObject + GameObject.NameOffset, out var pGameObjectName))
                                     {
-                                        round4.PrepareRead(classNamePtr, 64); // ClassName
                                         round4.PrepareRead(pGameObjectName, 64); // ObjectName
                                         round4.PrepareReadPtr(components + 0x8); // T1
                                         round4.Completed += (sender, s4) =>
                                         {
-                                            if (s4.ReadString(classNamePtr, 64, Encoding.UTF8) is string className &&
+                                            if (
                                                 s4.ReadString(pGameObjectName, 64, Encoding.UTF8) is string objectName &&
                                                 s4.ReadPtr(components + 0x8, out var transformInternal))
                                             {
@@ -184,7 +181,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
                                                     {
                                                         var @params = new LootIndexParams
                                                         {
-                                                            DeadPlayers = deadPlayers,
                                                             ItemBase = lootBase,
                                                             InteractiveClass = interactiveClass,
                                                             ObjectName = objectName,
@@ -272,8 +268,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
 
         private readonly struct LootIndexParams
         {
-            public IReadOnlyList<AbstractPlayer> DeadPlayers { get; init; }
-
             public ulong ItemBase { get; init; }
             public ulong InteractiveClass { get; init; }
             public string ObjectName { get; init; }

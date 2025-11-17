@@ -587,28 +587,6 @@ namespace LoneEftDmaRadar.DMA
             throw new OperationCanceledException("Process is not running!");
         }
 
-        /// <summary>
-        /// Get the Monitor Resolution from the Game Monitor.
-        /// </summary>
-        /// <returns>Monitor Resolution Result</returns>
-        public Rectangle GetMonitorRes()
-        {
-            try
-            {
-                //var gfx = ReadPtr(UnityBase + UnitySDK.ModuleBase.GfxDevice, false);
-                //var res = ReadValue<Rectangle>(gfx + UnitySDK.GfxDeviceClient.Viewport, false);
-                //if (res.Width <= 0 || res.Width > 10000 ||
-                //    res.Height <= 0 || res.Height > 5000)
-                //    throw new ArgumentOutOfRangeException(nameof(res));
-                //return res;
-                return default; // TODO: Fix this later
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException("ERROR Getting Game Monitor Res", ex);
-            }
-        }
-
         #endregion
 
         #region Memory Macros

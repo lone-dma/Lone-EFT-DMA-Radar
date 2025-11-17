@@ -1,24 +1,15 @@
 ﻿namespace LoneEftDmaRadar.Tarkov.Unity.Structures
 {
-    [StructLayout(LayoutKind.Explicit, Pack = 1)]
+    [StructLayout(LayoutKind.Explicit)]
     public readonly struct MonoBehaviour // Behaviour : Component : EditorExtension : Object
     {
-        public const uint InstanceIDOffset = 0x8;
-        public const uint ObjectClassOffset = 0x28;
-        public const uint GameObjectOffset = 0x30;
-        public const uint EnabledOffset = 0x38;
-        public const uint IsAddedOffset = 0x39;
+        public const uint ObjectClassOffset = 0x40;
+        public const uint GameObjectOffset = 0x48;
 
-        [FieldOffset((int)InstanceIDOffset)]
-        public readonly int InstanceID; // m_InstanceID
         [FieldOffset((int)ObjectClassOffset)]
         public readonly ulong ObjectClass; // m_Object
         [FieldOffset((int)GameObjectOffset)]
         public readonly ulong GameObject; // m_GameObject
-        [FieldOffset((int)EnabledOffset)]
-        public readonly bool Enabled; // m_Enabled
-        [FieldOffset((int)IsAddedOffset)]
-        public readonly bool IsAdded; // m_IsAdded
 
         /// <summary>
         /// Return the game object of this MonoBehaviour.
@@ -36,7 +27,7 @@
         public static ulong GetComponent(ulong behaviour, string className)
         {
             var go = Memory.ReadPtr(behaviour + GameObjectOffset);
-            //return Structures.GameObject.GetComponent(go, className); // TODO
+            //return Structures.GameObject.GetComponent(go, className);
 
             return 0;
         }

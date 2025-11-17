@@ -81,7 +81,7 @@ namespace LoneEftDmaRadar.UI.Loot
             }
             else // Loot Search
             {
-                using var names = search!.Split(',').Select(a => a.Trim()).ToPooledList();
+                var names = search!.Split(',').Select(a => a.Trim()).ToList(); // Pooled wasnt working well here
                 Predicate<LootItem> p = x => // Search Predicate
                 {
                     return names.Any(a => x.Name.Contains(a, StringComparison.OrdinalIgnoreCase));
