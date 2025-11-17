@@ -27,11 +27,12 @@ SOFTWARE.
 */
 
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
+using LoneEftDmaRadar.Tarkov.WinAPI;
 
 namespace LoneEftDmaRadar.UI.Hotkeys
 {
     /// <summary>
-    /// Combo Box Wrapper for UnityKeyCode Enums for Hotkey Manager.
+    /// Combo Box Wrapper for WindowsVirtualKeyCode Enums for Hotkey Manager.
     /// </summary>
     public sealed class ComboHotkeyValue
     {
@@ -42,9 +43,9 @@ namespace LoneEftDmaRadar.UI.Hotkeys
         /// <summary>
         /// Key enum value.
         /// </summary>
-        public UnityKeyCode Code { get; }
+        public WindowsVirtualKeyCode Code { get; }
 
-        public ComboHotkeyValue(UnityKeyCode keyCode)
+        public ComboHotkeyValue(WindowsVirtualKeyCode keyCode)
         {
             Key = keyCode.ToString();
             Code = keyCode;

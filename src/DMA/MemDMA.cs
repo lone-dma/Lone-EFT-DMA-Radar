@@ -33,7 +33,7 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
 using LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
-using LoneEftDmaRadar.Tarkov.Unity;
+using LoneEftDmaRadar.Tarkov.WinAPI;
 using System.Drawing;
 using VmmSharpEx;
 using VmmSharpEx.Options;
@@ -53,6 +53,7 @@ namespace LoneEftDmaRadar.DMA
         internal const uint MAX_READ_SIZE = 0x1000u * 1500u;
         private static readonly string _mmap = Path.Combine(App.ConfigPath.FullName, "mmap.txt");
         private readonly Vmm _vmm;
+        private readonly InputManager _input;
         private uint _pid;
         private bool _restartRadar;
 
@@ -80,11 +81,6 @@ namespace LoneEftDmaRadar.DMA
         public LocalPlayer LocalPlayer => Game?.LocalPlayer;
         public LootManager Loot => Game?.Loot;
         public LocalGameWorld Game { get; private set; }
-
-        static MemDMA()
-        {
-            RuntimeHelpers.RunClassConstructor(typeof(InputManager).TypeHandle);
-        }
 
         internal MemDMA()
         {
@@ -130,6 +126,20 @@ namespace LoneEftDmaRadar.DMA
                 };
                 _vmm.RegisterAutoRefresh(RefreshOption.MemoryPartial, TimeSpan.FromMilliseconds(300));
                 _vmm.RegisterAutoRefresh(RefreshOption.TlbPartial, TimeSpan.FromSeconds(2));
+                try
+                {
+                    _input = new(_vmm);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        messageBoxText: $"Failed to initialize InputManager (win32): {ex}",
+                        caption: App.Name,
+                        button: MessageBoxButton.OK,
+                        icon: MessageBoxImage.Warning,
+                        defaultResult: MessageBoxResult.OK,
+                        options: MessageBoxOptions.DefaultDesktopOnly);
+                }
                 ProcessStopped += MemDMA_ProcessStopped;
                 RaidStopped += MemDMA_RaidStopped;
                 // Start Memory Thread after successful startup

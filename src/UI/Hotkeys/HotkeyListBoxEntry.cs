@@ -27,6 +27,7 @@ SOFTWARE.
 */
 
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
+using LoneEftDmaRadar.Tarkov.WinAPI;
 
 namespace LoneEftDmaRadar.UI.Hotkeys
 {
@@ -39,13 +40,13 @@ namespace LoneEftDmaRadar.UI.Hotkeys
         /// <summary>
         /// Hotkey Key Value.
         /// </summary>
-        public UnityKeyCode Hotkey { get; }
+        public WindowsVirtualKeyCode Hotkey { get; }
         /// <summary>
         /// Hotkey Action Object that contains state/delegate.
         /// </summary>
         public HotkeyAction Action { get; }
 
-        public HotkeyListBoxEntry(UnityKeyCode hotkey, HotkeyAction action)
+        public HotkeyListBoxEntry(WindowsVirtualKeyCode hotkey, HotkeyAction action)
         {
             Hotkey = hotkey;
             Action = action;
