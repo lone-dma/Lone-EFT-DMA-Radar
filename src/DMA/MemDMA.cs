@@ -131,7 +131,7 @@ namespace LoneEftDmaRadar.DMA
                 catch (Exception ex)
                 {
                     MessageBox.Show(
-                        messageBoxText: $"WARNING: Failed to initialize InputManager (win32). Please note, this only works on Windows 11. Startup will continue without hotkeys.\n{ex}",
+                        messageBoxText: $"WARNING: Failed to initialize InputManager (win32). Please note, this only works on Windows 11 (Game PC). Startup will continue without hotkeys.\n{ex}",
                         caption: App.Name,
                         button: MessageBoxButton.OK,
                         icon: MessageBoxImage.Warning,
