@@ -771,11 +771,16 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                                 level = $"L{levelResult}:";
                         }
                         lines.Add($"{level}{name}{health}");
-                        lines.Add($"H: {height:n0} D: {dist:n0}");
+                        var roundedDist = (int)Math.Round(dist);
+                        var roundedHeight = (int)Math.Round(height);
+                        lines.Add(roundedHeight != 0 ? $"{roundedDist}M ({roundedHeight})" : $"{roundedDist}M");
                     }
                     else // just height, distance
                     {
-                        lines.Add($"{height:n0},{dist:n0}");
+                        var roundedDist = (int)Math.Round(dist);
+                        var roundedHeight = (int)Math.Round(height);
+                        var distanceLine = roundedHeight != 0 ? $"{roundedDist}M ({roundedHeight})" : $"{roundedDist}M";
+                        lines.Add(distanceLine);
                         if (IsError)
                             lines[0] = "ERROR"; // In case POS stops updating, let us know!
                     }
