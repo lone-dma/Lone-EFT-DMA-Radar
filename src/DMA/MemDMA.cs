@@ -33,8 +33,6 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
 using LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
-using LoneEftDmaRadar.Tarkov.WinAPI;
-using System.Drawing;
 using VmmSharpEx;
 using VmmSharpEx.Options;
 using VmmSharpEx.Refresh;

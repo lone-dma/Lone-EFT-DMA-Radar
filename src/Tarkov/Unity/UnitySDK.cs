@@ -50,18 +50,18 @@ namespace LoneEftDmaRadar.Tarkov.Unity
 
             public static readonly uint[] GameWorldChain =
             [
-                0x58, 
-                0x18, 
+                0x58,
+                0x18,
                 0x50
             ];
 
-            public static readonly uint[] TransformChain = 
+            public static readonly uint[] TransformChain =
             [
-                0x10, 
-                0x58, 
-                0x58, 
-                0x8, 
-                0x50, 
+                0x10,
+                0x58,
+                0x58,
+                0x8,
+                0x50,
                 0x10
             ];
         }
