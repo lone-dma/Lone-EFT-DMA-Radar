@@ -32,27 +32,27 @@ namespace LoneEftDmaRadar.Tarkov.Unity
     {
         public readonly struct ShuffledOffsets
         {
-            public const uint GameObjectManager = 0x1A1FFC8;
+            public const uint GameObjectManager = 0x1A1F2F8;
 
             public const uint GameObject_ObjectClassOffset = 0x50;
             public const uint GameObject_ComponentsOffset = 0x58;
-            public const uint GameObject_NameOffset = 0x88;
+            public const uint GameObject_NameOffset = 0x78;
 
             public const uint MonoBehaviour_ObjectClassOffset = 0x50;
             public const uint MonoBehaviour_GameObjectOffset = 0x58;
 
-            public const uint TransformAccess_IndexOffset = 0x98;
-            public const uint TransformAccess_HierarchyOffset = 0x90;
+            public const uint TransformAccess_IndexOffset = 0x80;
+            public const uint TransformAccess_HierarchyOffset = 0x78;
 
-            public const uint Hierarchy_VerticesOffset = 0x60;
-            public const uint Hierarchy_IndicesOffset = 0x30;
+            public const uint Hierarchy_VerticesOffset = 0x80;
+            public const uint Hierarchy_IndicesOffset = 0x50;
             public const uint Hierarchy_RootPositionOffset = 0xB0;
 
             public static readonly uint[] GameWorldChain =
             [
-                0x58,
+                0x48,
                 0x18,
-                0x50
+                0x28
             ];
 
             public static readonly uint[] TransformChain =

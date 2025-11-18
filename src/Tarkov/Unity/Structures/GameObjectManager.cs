@@ -81,6 +81,7 @@
                 {
                     var objectNamePtr = Memory.ReadPtr(currentObject.ThisObject + UnitySDK.ShuffledOffsets.GameObject_NameOffset);
                     var objectNameStr = Memory.ReadUtf8String(objectNamePtr, 64);
+                    //Debug.WriteLine("GOM Object: " + objectNameStr);
                     if (objectNameStr.Equals("GameWorld", StringComparison.OrdinalIgnoreCase))
                     {
                         try

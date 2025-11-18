@@ -42,6 +42,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
 
         public ExitManager(ulong localGameWorld, bool isPMC)
         {
+            return; // TODO : Exfils
             _localGameWorld = localGameWorld;
             _isPMC = isPMC;
         }
