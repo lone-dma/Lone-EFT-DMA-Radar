@@ -36,91 +36,26 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
     /// </summary>
     public sealed class ExitManager : IReadOnlyCollection<IExitPoint>
     {
-        private readonly ulong _localGameWorld;
-        private readonly bool _isPMC;
         private IReadOnlyList<IExitPoint> _exits;
 
-        public ExitManager(ulong localGameWorld, bool isPMC)
-        {
-            return; // TODO : Exfils
-            _localGameWorld = localGameWorld;
-            _isPMC = isPMC;
-        }
-
-        /// <summary>
-        /// Initialize ExfilManager.
-        /// </summary>
-        private void Init()
+        public ExitManager(string mapId, bool isPMC)
         {
             var list = new List<IExitPoint>();
-            var exfilController = Memory.ReadPtr(_localGameWorld + Offsets.ClientLocalGameWorld.ExfilController, false);
-            /// Regular Exfils
-            var exfilArrOffset = _isPMC ?
-                Offsets.ExfilController.ExfiltrationPointArray : Offsets.ExfilController.ScavExfiltrationPointArray;
-            var exfilPoints = Memory.ReadPtr(exfilController + exfilArrOffset, false);
-            using var exfils = MonoArray<ulong>.Create(exfilPoints, false);
-            ArgumentOutOfRangeException.ThrowIfZero(exfils.Count, nameof(exfils));
-            foreach (var exfilAddr in exfils)
+            if (TarkovDataManager.MapData.TryGetValue(mapId, out var map))
             {
-                var exfil = new Exfil(exfilAddr, _isPMC);
-                list.Add(exfil);
-            }
-            /// Secret Exfils
-            var secretExfilPoints = Memory.ReadValue<ulong>(exfilController + Offsets.ExfilController.SecretExfiltrationPointArray, false);
-            if (secretExfilPoints.IsValidVirtualAddress())
-            {
-                using var secretExfils = MonoArray<ulong>.Create(secretExfilPoints, false);
-                foreach (var secretExfil in secretExfils)
+                foreach (var exfil in map.Extracts.Where(x =>
+                    x.IsShared || x.IsPmc == isPMC))
                 {
-                    var exfil = new SecretExfil(secretExfil);
-                    list.Add(exfil);
+                    Debug.WriteLine(exfil.Name);
+                    list.Add(new Exfil(exfil));
+                }
+                foreach (var transit in map.Transits)
+                {
+                    list.Add(new TransitPoint(transit));
                 }
             }
-            ///// Transits
-            //var transitController = Memory.ReadPtr(_localGameWorld + Offsets.ClientLocalGameWorld.TransitController, false);
-            //var transitsPtr = Memory.ReadPtr(transitController + Offsets.TransitController.TransitPoints, false);
-            //using var transits = MonoDictionary<ulong, ulong>.Create(transitsPtr, false);
-            //foreach (var dTransit in transits)
-            //{
-            //    var transit = new TransitPoint(dTransit.Value);
-            //    list.Add(transit);
-            //}
-            // TODO: Transits
 
-            _exits = list; // update readonly ref
-        }
-
-        /// <summary>
-        /// Updates exfil statuses.
-        /// </summary>
-        public void Refresh()
-        {
-            try
-            {
-                if (_exits is null) // Initialize
-                    Init();
-                ArgumentNullException.ThrowIfNull(_exits, nameof(_exits));
-                using var scatter = Memory.CreateScatter();
-                foreach (var entry in _exits)
-                {
-                    if (entry is Exfil exfil)
-                    {
-                        scatter.PrepareReadValue<int>(exfil + Offsets.Exfil._status);
-                        scatter.Completed += (sender, index) =>
-                        {
-                            if (index.ReadValue<int>(exfil + Offsets.Exfil._status, out var status))
-                            {
-                                exfil.Update((Enums.EExfiltrationStatus)status);
-                            }
-                        };
-                    }
-                }
-                scatter.Execute();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[ExitManager] Refresh Error: {ex}");
-            }
+            _exits = list;
         }
 
         #region IReadOnlyCollection

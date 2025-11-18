@@ -109,7 +109,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 _rgtPlayers = new RegisteredPlayers(rgtPlayersAddr, this);
                 ArgumentOutOfRangeException.ThrowIfLessThan(_rgtPlayers.GetPlayerCount(), 1, nameof(_rgtPlayers));
                 Loot = new(localGameWorld);
-                //_exfilManager = new(localGameWorld, _rgtPlayers.LocalPlayer.IsPmc); // TODO Exfils
+                _exfilManager = new(mapID, _rgtPlayers.LocalPlayer.IsPmc);
                 _explosivesManager = new(localGameWorld);
             }
             catch
@@ -278,13 +278,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         {
             var ct = e.CancellationToken;
             ValidatePlayerTransforms(); // Check for transform anomalies
-            // Refresh exfils
-            //_exfilManager.Refresh(); // TODO Exfils
             // Refresh Loot
             Loot.Refresh(ct);
-            //if (App.Config.Loot.ShowWishlist)
-            //    Memory.LocalPlayer?.RefreshWishlist(ct);
-            // TODO: Wishlist
         }
 
         public void ValidatePlayerTransforms()
