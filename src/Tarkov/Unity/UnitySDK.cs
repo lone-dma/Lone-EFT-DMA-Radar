@@ -26,43 +26,44 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.Tarkov.Unity.Structures;
+
 namespace LoneEftDmaRadar.Tarkov.Unity
 {
     public readonly struct UnitySDK
     {
-        public readonly struct ShuffledOffsets
+        public readonly struct UnityOffsets
         {
             public const uint GameObjectManager = 0x1A1F2F8;
 
-            public const uint GameObject_ObjectClassOffset = 0x50;
-            public const uint GameObject_ComponentsOffset = 0x58;
+            public const uint GameObject_ObjectClassOffset = 0x80;
+            public const uint GameObject_ComponentsOffset = 0x48;
             public const uint GameObject_NameOffset = 0x78;
 
-            public const uint MonoBehaviour_ObjectClassOffset = 0x50;
-            public const uint MonoBehaviour_GameObjectOffset = 0x58;
+            public const uint MonoBehaviour_ObjectClassOffset = 0x28;
+            public const uint MonoBehaviour_GameObjectOffset = 0x48;
 
             public const uint TransformAccess_IndexOffset = 0x80;
             public const uint TransformAccess_HierarchyOffset = 0x78;
 
             public const uint Hierarchy_VerticesOffset = 0x80;
             public const uint Hierarchy_IndicesOffset = 0x50;
-            public const uint Hierarchy_RootPositionOffset = 0xB0;
 
             public static readonly uint[] GameWorldChain =
             [
-                0x48,
-                0x18,
-                0x28
+                GameObject_ComponentsOffset,        // 0x48
+                0x18,                               // ??
+                MonoBehaviour_ObjectClassOffset     // 0x28
             ];
 
             public static readonly uint[] TransformChain =
             [
-                0x10,
-                0x58,
-                0x58,
-                0x8,
-                0x50,
-                0x10
+                ObjectClass.MonoBehaviourOffset,    // 0x10
+                MonoBehaviour_GameObjectOffset,     // 0x48
+                GameObject_ComponentsOffset,        // 0x48
+                0x8,                                // ?? 
+                MonoBehaviour_ObjectClassOffset,    // 0x28
+                0x10                                // Transform Internal
             ];
         }
     }

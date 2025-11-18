@@ -175,7 +175,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector3 GetRootPosition()
         {
-            Vector3 rootPos = Memory.ReadValue<TrsX>(_hierarchyAddr + UnitySDK.ShuffledOffsets.Hierarchy_RootPositionOffset, _useCache).t;
+            Vector3 rootPos = Memory.ReadValue<TrsX>(_hierarchyAddr + UnitySDK.UnityOffsets.Hierarchy_RootPositionOffset, _useCache).t;
             rootPos.ThrowIfAbnormal(nameof(rootPos));
             return rootPos;
         }
@@ -301,18 +301,18 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
         [StructLayout(LayoutKind.Explicit)]
         public readonly ref struct TransformAccess
         {
-            [FieldOffset((int)UnitySDK.ShuffledOffsets.TransformAccess_IndexOffset)]
+            [FieldOffset((int)UnitySDK.UnityOffsets.TransformAccess_IndexOffset)]
             public readonly int Index;
-            [FieldOffset((int)UnitySDK.ShuffledOffsets.TransformAccess_HierarchyOffset)]
+            [FieldOffset((int)UnitySDK.UnityOffsets.TransformAccess_HierarchyOffset)]
             public readonly ulong Hierarchy;
         }
 
         [StructLayout(LayoutKind.Explicit)]
         public readonly ref struct TransformHierarchy
         {
-            [FieldOffset((int)UnitySDK.ShuffledOffsets.Hierarchy_VerticesOffset)]
+            [FieldOffset((int)UnitySDK.UnityOffsets.Hierarchy_VerticesOffset)]
             public readonly ulong Vertices;
-            [FieldOffset((int)UnitySDK.ShuffledOffsets.Hierarchy_IndicesOffset)]
+            [FieldOffset((int)UnitySDK.UnityOffsets.Hierarchy_IndicesOffset)]
             public readonly ulong Indices;
         }
 

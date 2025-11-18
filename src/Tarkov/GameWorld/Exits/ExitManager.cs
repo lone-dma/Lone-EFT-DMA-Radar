@@ -33,17 +33,18 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
     /// </summary>
     public sealed class ExitManager : IReadOnlyCollection<IExitPoint>
     {
-        private IReadOnlyList<IExitPoint> _exits;
+        private readonly IReadOnlyList<IExitPoint> _exits;
 
         public ExitManager(string mapId, bool isPMC)
         {
             var list = new List<IExitPoint>();
             if (TarkovDataManager.MapData.TryGetValue(mapId, out var map))
             {
-                foreach (var exfil in map.Extracts.Where(x =>
-                    x.IsShared || x.IsPmc == isPMC))
+                var filteredExfils = isPMC ?
+                    map.Extracts.Where(x => x.IsShared || x.IsPmc) :
+                    map.Extracts.Where(x => !x.IsPmc);
+                foreach (var exfil in filteredExfils)
                 {
-                    Debug.WriteLine(exfil.Name);
                     list.Add(new Exfil(exfil));
                 }
                 foreach (var transit in map.Transits)
