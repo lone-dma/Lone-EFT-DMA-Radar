@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using Collections.Pooled;
 using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
 
 namespace LoneEftDmaRadar.UI.Loot

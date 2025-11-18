@@ -8,7 +8,7 @@
     {
         public const uint MonoBehaviourOffset = 0x10;
 
-        public static uint[] To_GameObject { get; } = new[] { MonoBehaviourOffset, MonoBehaviour.GameObjectOffset };
+        public static uint[] To_GameObject { get; } = new[] { MonoBehaviourOffset, UnitySDK.ShuffledOffsets.MonoBehaviour_GameObjectOffset };
         public static uint[] To_NamePtr { get; } = new uint[] { 0x0, 0x10 };
 
         /// <summary>

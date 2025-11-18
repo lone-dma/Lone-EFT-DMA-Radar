@@ -4,14 +4,9 @@
     [StructLayout(LayoutKind.Explicit, Pack = 1)]
     public readonly struct GameObject // EditorExtension : Object
     {
-        // 1.0 shifted +0x18
-        public const uint ObjectClassOffset = 0x40;
-        public const uint ComponentsOffset = 0x48;
-        public const uint NameOffset = 0x78;
-
-        [FieldOffset((int)ObjectClassOffset)]
+        [FieldOffset((int)UnitySDK.ShuffledOffsets.GameObject_ObjectClassOffset)]
         public readonly ulong ObjectClass; // m_Object
-        [FieldOffset((int)NameOffset)]
+        [FieldOffset((int)UnitySDK.ShuffledOffsets.GameObject_NameOffset)]
         public readonly ulong Name; // m_Name, String
 
         /// <summary>

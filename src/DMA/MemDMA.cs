@@ -33,9 +33,8 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
 using LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
-using LoneEftDmaRadar.Tarkov.WinAPI;
-using System.Drawing;
 using VmmSharpEx;
+using VmmSharpEx.Extensions;
 using VmmSharpEx.Options;
 using VmmSharpEx.Refresh;
 using VmmSharpEx.Scatter;
@@ -133,7 +132,7 @@ namespace LoneEftDmaRadar.DMA
                 catch (Exception ex)
                 {
                     MessageBox.Show(
-                        messageBoxText: $"Failed to initialize InputManager (win32): {ex}",
+                        messageBoxText: $"WARNING: Failed to initialize InputManager (win32). Please note, this only works on Windows 11 (Game PC). Startup will continue without hotkeys.\n\n{ex}",
                         caption: App.Name,
                         button: MessageBoxButton.OK,
                         icon: MessageBoxImage.Warning,
@@ -570,6 +569,15 @@ namespace LoneEftDmaRadar.DMA
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public VmmScatter CreateScatter(VmmFlags flags = VmmFlags.NONE) =>
             _vmm.CreateScatter(_pid, flags);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ulong FindSignature(string signature)
+        {
+
+            if (!_vmm.Map_GetModuleFromName(_pid, "UnityPlayer.dll", out var info))
+                throw new VmmException("Failed to get process information.");
+            return _vmm.FindSignature(_pid, signature, info.vaBase, info.vaBase + info.cbImageSize);
+        }
 
         /// <summary>
         /// Throws a special exception if no longer in game.

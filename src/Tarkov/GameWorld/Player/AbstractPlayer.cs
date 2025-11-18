@@ -513,15 +513,15 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// <param name="round2">Index (round 2)</param>
         public void OnValidateTransforms(VmmScatter round1, VmmScatter round2)
         {
-            round1.PrepareReadPtr(SkeletonRoot.TransformInternal + UnityTransform.TransformAccess.HierarchyOffset); // Bone Hierarchy
+            round1.PrepareReadPtr(SkeletonRoot.TransformInternal + UnitySDK.ShuffledOffsets.TransformAccess_HierarchyOffset); // Bone Hierarchy
             round1.Completed += (sender, x1) =>
             {
-                if (x1.ReadPtr(SkeletonRoot.TransformInternal + UnityTransform.TransformAccess.HierarchyOffset, out var tra))
+                if (x1.ReadPtr(SkeletonRoot.TransformInternal + UnitySDK.ShuffledOffsets.TransformAccess_HierarchyOffset, out var tra))
                 {
-                    round2.PrepareReadPtr(tra + UnityTransform.TransformHierarchy.VerticesOffset); // Vertices Ptr
+                    round2.PrepareReadPtr(tra + UnitySDK.ShuffledOffsets.Hierarchy_VerticesOffset); // Vertices Ptr
                     round2.Completed += (sender, x2) =>
                     {
-                        if (x2.ReadPtr(tra + UnityTransform.TransformHierarchy.VerticesOffset, out var verticesPtr))
+                        if (x2.ReadPtr(tra + UnitySDK.ShuffledOffsets.Hierarchy_VerticesOffset, out var verticesPtr))
                         {
                             if (SkeletonRoot.VerticesAddr != verticesPtr) // check if any addr changed
                             {

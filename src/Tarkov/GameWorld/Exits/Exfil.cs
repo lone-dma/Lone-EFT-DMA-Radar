@@ -38,10 +38,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
     public class Exfil : IExitPoint, IWorldEntity, IMapEntity, IMouseoverEntity
     {
         public static implicit operator ulong(Exfil x) => x._addr;
-        private static readonly uint[] _transformInternalChain =
-        [
-            0x10, 0x48, 0x48, 0x8, 0x40, 0x10
-        ];
 
         private readonly bool _isPMC;
         private HashSet<string> PmcEntries { get; } = new(StringComparer.OrdinalIgnoreCase);
@@ -51,7 +47,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
         {
             _addr = baseAddr;
             _isPMC = isPMC;
-            var transformInternal = Memory.ReadPtrChain(baseAddr, false, _transformInternalChain);
+            var transformInternal = Memory.ReadPtrChain(baseAddr, false, UnitySDK.ShuffledOffsets.TransformChain);
             var namePtr = Memory.ReadPtrChain(baseAddr, true, Offsets.Exfil.Settings, Offsets.ExfilSettings.Name);
             Name = Memory.ReadUnicodeString(namePtr)?.Trim();
             if (string.IsNullOrEmpty(Name))
