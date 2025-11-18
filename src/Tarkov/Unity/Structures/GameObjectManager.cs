@@ -21,7 +21,7 @@
         {
             try
             {
-                var gomPtr = Memory.ReadPtr(unityBase + UnitySDK.ShuffledOffsets.GameObjectManager, false);
+                var gomPtr = Memory.ReadPtr(unityBase + UnitySDK.UnityOffsets.GameObjectManager, false);
                 //var dump = new byte[128];
                 //Memory.ReadSpan(gomPtr - 64, dump, false);
                 //DumpBytes(dump);
@@ -58,7 +58,7 @@
             {
                 while (currentObject.ThisObject != 0x0 && currentObject.ThisObject != lastObject.ThisObject)
                 {
-                    var objectNamePtr = Memory.ReadPtr(currentObject.ThisObject + UnitySDK.ShuffledOffsets.GameObject_NameOffset);
+                    var objectNamePtr = Memory.ReadPtr(currentObject.ThisObject + UnitySDK.UnityOffsets.GameObject_NameOffset);
                     var objectNameStr = Memory.ReadUtf8String(objectNamePtr, 64);
                     if (objectNameStr.Equals(objectName, StringComparison.OrdinalIgnoreCase))
                         return currentObject.ThisObject;
@@ -79,14 +79,14 @@
             {
                 while (currentObject.ThisObject != 0x0 && currentObject.ThisObject != lastObject.ThisObject)
                 {
-                    var objectNamePtr = Memory.ReadPtr(currentObject.ThisObject + UnitySDK.ShuffledOffsets.GameObject_NameOffset);
+                    var objectNamePtr = Memory.ReadPtr(currentObject.ThisObject + UnitySDK.UnityOffsets.GameObject_NameOffset);
                     var objectNameStr = Memory.ReadUtf8String(objectNamePtr, 64);
                     //Debug.WriteLine("GOM Object: " + objectNameStr);
                     if (objectNameStr.Equals("GameWorld", StringComparison.OrdinalIgnoreCase))
                     {
                         try
                         {
-                            var localGameWorld = Memory.ReadPtrChain(currentObject.ThisObject, false, UnitySDK.ShuffledOffsets.GameWorldChain);
+                            var localGameWorld = Memory.ReadPtrChain(currentObject.ThisObject, false, UnitySDK.UnityOffsets.GameWorldChain);
                             /// Get Selected Map
                             var mapPtr = Memory.ReadValue<ulong>(localGameWorld + Offsets.GameWorld.Location, false);
                             if (mapPtr == 0x0) // Offline Mode
