@@ -175,9 +175,10 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector3 GetRootPosition()
         {
-            Vector3 rootPos = Memory.ReadValue<TrsX>(_hierarchyAddr + UnitySDK.UnityOffsets.Hierarchy_RootPositionOffset, _useCache).t;
-            rootPos.ThrowIfAbnormal(nameof(rootPos));
-            return rootPos;
+            throw new NotImplementedException();
+            //Vector3 rootPos = Memory.ReadValue<TrsX>(_hierarchyAddr + UnitySDK.UnityOffsets.Hierarchy_RootPositionOffset, _useCache).t;
+            //rootPos.ThrowIfAbnormal(nameof(rootPos));
+            //return rootPos;
         }
 
         /// <summary>
