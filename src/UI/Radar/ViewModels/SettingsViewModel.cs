@@ -245,9 +245,6 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             SKPaints.PaintExplosives.StrokeWidth = 3 * newScale;
             SKPaints.PaintExfilOpen.StrokeWidth = 1 * newScale;
             SKPaints.PaintExfilTransit.StrokeWidth = 1 * newScale;
-            SKPaints.PaintExfilPending.StrokeWidth = 1 * newScale;
-            SKPaints.PaintExfilClosed.StrokeWidth = 1 * newScale;
-            SKPaints.PaintExfilInactive.StrokeWidth = 1 * newScale;
             // Fonts
             SKFonts.UIRegular.Size = 12f * newScale;
             SKFonts.UILarge.Size = 48f * newScale;
@@ -402,19 +399,6 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
         #endregion
 
         #region Loot
-
-        public bool LootWishlist
-        {
-            get => App.Config.Loot.ShowWishlist;
-            set
-            {
-                if (App.Config.Loot.ShowWishlist != value)
-                {
-                    App.Config.Loot.ShowWishlist = value;
-                    OnPropertyChanged(nameof(LootWishlist));
-                }
-            }
-        }
 
         public bool ShowStaticContainers
         {

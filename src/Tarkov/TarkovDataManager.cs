@@ -34,7 +34,7 @@ namespace LoneEftDmaRadar.Tarkov
     /// <summary>
     /// Manages Tarkov Dynamic Data (Items, Quests, etc).
     /// </summary>
-    internal static class TarkovDataManager
+    public static class TarkovDataManager
     {
         private static readonly FileInfo _bakDataFile = new(Path.Combine(App.ConfigPath.FullName, "data.json.bak"));
         private static readonly FileInfo _tempDataFile = new(Path.Combine(App.ConfigPath.FullName, "data.json.tmp"));
@@ -56,9 +56,9 @@ namespace LoneEftDmaRadar.Tarkov
         public static FrozenDictionary<string, TarkovMarketItem> AllContainers { get; private set; }
 
         /// <summary>
-        /// Quest Data for Tarkov.
+        /// Maps Data for Tarkov.
         /// </summary>
-        public static FrozenDictionary<string, TaskElement> TaskData { get; private set; }
+        public static FrozenDictionary<string, MapElement> MapData { get; private set; }
 
         #region Startup
 
@@ -122,10 +122,7 @@ namespace LoneEftDmaRadar.Tarkov
                 .DistinctBy(x => x.BsgId, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(k => k.BsgId, v => v, StringComparer.OrdinalIgnoreCase)
                 .ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
-            TaskData = data.Tasks
-                .DistinctBy(x => x.Id)
-                .ToDictionary(k => k.Id, v => v, StringComparer.OrdinalIgnoreCase)
-                .ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
+            MapData = data.Maps?.ToFrozenDictionary(x => x.NameId, StringComparer.OrdinalIgnoreCase) ?? new Dictionary<string, MapElement>().ToFrozenDictionary();
         }
 
         /// <summary>
@@ -233,123 +230,66 @@ namespace LoneEftDmaRadar.Tarkov
         public sealed class TarkovMarketData
         {
             [JsonPropertyName("items")]
-            public List<TarkovMarketItem> Items { get; set; }
-            [JsonPropertyName("tasks")]
-            public List<TaskElement> Tasks { get; set; }
+            public List<TarkovMarketItem> Items { get; set; } = new();
+
+            [JsonPropertyName("maps")]
+            public List<MapElement> Maps { get; set; } = new();
         }
 
-        public partial class TaskElement
-        {
-            [JsonPropertyName("id")]
-            public string Id { get; set; }
 
+        public class PositionElement
+        {
+            [JsonPropertyName("x")]
+            public float X { get; set; }
+
+            [JsonPropertyName("y")]
+            public float Y { get; set; }
+
+            [JsonPropertyName("z")]
+            public float Z { get; set; }
+
+            public Vector3 AsVector3() => new(X, Y, Z);
+        }
+
+        public partial class MapElement
+        {
             [JsonPropertyName("name")]
             public string Name { get; set; }
 
-            [JsonPropertyName("objectives")]
-            public List<ObjectiveElement> Objectives { get; set; }
+            [JsonPropertyName("nameId")]
+            public string NameId { get; set; }
 
-            public partial class ObjectiveElement
-            {
-                [JsonPropertyName("id")]
-                public string Id { get; set; }
+            [JsonPropertyName("extracts")]
+            public List<ExtractElement> Extracts { get; set; } = new();
 
-                [JsonPropertyName("type")]
-                public string Type { get; set; }
+            [JsonPropertyName("transits")]
+            public List<TransitElement> Transits { get; set; } = new();
+        }
 
-                [JsonPropertyName("description")]
-                public string Description { get; set; }
+        public partial class ExtractElement
+        {
+            [JsonPropertyName("name")]
+            public string Name { get; set; }
 
-                [JsonPropertyName("requiredKeys")]
-                public List<List<MarkerItemClass>> RequiredKeys { get; set; }
+            [JsonPropertyName("faction")]
+            public string Faction { get; set; }
 
-                [JsonPropertyName("maps")]
-                public List<BasicDataElement> Maps { get; set; }
+            [JsonPropertyName("position")]
+            public PositionElement Position { get; set; }
 
-                [JsonPropertyName("zones")]
-                public List<ZoneElement> Zones { get; set; }
+            [JsonIgnore]
+            public bool IsPmc => Faction?.Equals("pmc", StringComparison.OrdinalIgnoreCase) ?? false;
+            [JsonIgnore]
+            public bool IsShared => Faction?.Equals("shared", StringComparison.OrdinalIgnoreCase) ?? false;
+        }
 
-                [JsonPropertyName("count")]
-                public int Count { get; set; }
+        public partial class TransitElement
+        {
+            [JsonPropertyName("description")]
+            public string Description { get; set; }
 
-                [JsonPropertyName("foundInRaid")]
-                public bool FoundInRaid { get; set; }
-
-                [JsonPropertyName("item")]
-                public MarkerItemClass Item { get; set; }
-
-                [JsonPropertyName("questItem")]
-                public ObjectiveQuestItem QuestItem { get; set; }
-
-                [JsonPropertyName("markerItem")]
-                public MarkerItemClass MarkerItem { get; set; }
-
-                public class MarkerItemClass
-                {
-                    [JsonPropertyName("id")]
-                    public string Id { get; set; }
-
-                    [JsonPropertyName("name")]
-                    public string Name { get; set; }
-
-                    [JsonPropertyName("shortName")]
-                    public string ShortName { get; set; }
-                }
-
-                public class ObjectiveQuestItem
-                {
-                    [JsonPropertyName("id")]
-                    public string Id { get; set; }
-
-                    [JsonPropertyName("name")]
-                    public string Name { get; set; }
-
-                    [JsonPropertyName("shortName")]
-                    public string ShortName { get; set; }
-
-                    [JsonPropertyName("normalizedName")]
-                    public string NormalizedName { get; set; }
-
-                    [JsonPropertyName("description")]
-                    public string Description { get; set; }
-                }
-
-                public class ZoneElement
-                {
-                    [JsonPropertyName("id")]
-                    public string Id { get; set; }
-
-                    [JsonPropertyName("position")]
-                    public PositionElement Position { get; set; }
-
-                    [JsonPropertyName("map")]
-                    public BasicDataElement Map { get; set; }
-                }
-
-                public class BasicDataElement
-                {
-                    [JsonPropertyName("id")]
-                    public string Id { get; set; }
-
-                    [JsonPropertyName("normalizedName")]
-                    public string NormalizedName { get; set; }
-
-                    [JsonPropertyName("name")]
-                    public string Name { get; set; }
-                }
-
-                public class PositionElement
-                {
-                    [JsonPropertyName("y")]
-                    public float Y { get; set; }
-
-                    [JsonPropertyName("x")]
-                    public float X { get; set; }
-
-                    [JsonPropertyName("z")]
-                    public float Z { get; set; }
-                }
-            }
+            [JsonPropertyName("position")]
+            public PositionElement Position { get; set; }
         }
 
         #endregion

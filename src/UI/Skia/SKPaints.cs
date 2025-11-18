@@ -463,30 +463,6 @@ namespace LoneEftDmaRadar.UI.Skia
             IsAntialias = true,
         };
 
-        public static SKPaint PaintExfilPending { get; } = new()
-        {
-            Color = SKColors.Yellow,
-            StrokeWidth = 0.25f,
-            Style = SKPaintStyle.Fill,
-            IsAntialias = true,
-        };
-
-        public static SKPaint PaintExfilClosed { get; } = new()
-        {
-            Color = SKColors.Red,
-            StrokeWidth = 0.25f,
-            Style = SKPaintStyle.Fill,
-            IsAntialias = true,
-        };
-
-        public static SKPaint PaintExfilInactive { get; } = new()
-        {
-            Color = SKColors.Gray,
-            StrokeWidth = 0.25f,
-            Style = SKPaintStyle.Fill,
-            IsAntialias = true,
-        };
-
         public static SKPaint TextOutline { get; } = new()
         {
             IsAntialias = true,

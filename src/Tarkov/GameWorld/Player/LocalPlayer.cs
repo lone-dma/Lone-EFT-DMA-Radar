@@ -79,42 +79,5 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 ProfileId = Memory.ReadUnicodeString(profileIdPtr);
             }
         }
-
-        /// <summary>
-        /// Set the Player's WishList.
-        /// </summary>
-        public void RefreshWishlist(CancellationToken ct)
-        {
-            try
-            {
-                var wishlistManager = Memory.ReadPtr(Profile + Offsets.Profile.WishlistManager);
-                var itemsPtr = Memory.ReadPtr(wishlistManager + Offsets.WishlistManager.Items);
-                using var items = MonoDictionary<MongoID, int>.Create(itemsPtr, true);
-                var wishlist = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                foreach (var item in items)
-                {
-                    ct.ThrowIfCancellationRequested();
-                    try
-                    {
-                        string id = item.Key.ReadString();
-                        if (string.IsNullOrWhiteSpace(id))
-                            continue;
-                        wishlist.Add(id);
-                    }
-                    catch { }
-                }
-                foreach (var existing in _wishlistItems)
-                {
-                    ct.ThrowIfCancellationRequested();
-                    if (!wishlist.Contains(existing))
-                        _wishlistItems.Remove(existing);
-                }
-            }
-            catch (OperationCanceledException) { throw; }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[Wishlist] ERROR Refreshing: {ex}");
-            }
-        }
     }
 }

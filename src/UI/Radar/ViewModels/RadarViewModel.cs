@@ -317,8 +317,6 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                     {
                         foreach (var exit in exits)
                         {
-                            if (exit is Exfil exfil && !localPlayer.IsPmc && exfil.Status is Exfil.EStatus.Closed)
-                                continue;
                             exit.Draw(canvas, mapParams, localPlayer);
                         }
                     }
