@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Tarkov.Mono.Collections;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Player

@@ -569,7 +569,7 @@ namespace LoneEftDmaRadar.DMA
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public VmmScatter CreateScatter(VmmFlags flags = VmmFlags.NONE) =>
             _vmm.CreateScatter(_pid, flags);
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong FindSignature(string signature)
         {
