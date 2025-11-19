@@ -135,6 +135,8 @@ namespace LoneEftDmaRadar.UI.Skia
                 if (WorldToScreen(in player.Position, out var screen))
                 {
                     float distance = Vector3.Distance(localPlayer.Position, player.Position);
+                    if (distance > App.Config.UI.MaxDistance)
+                        continue;
 
                     float radius = maxRadius - MathF.Log(distance + 1f) * scaleFactor;
                     radius = Math.Clamp(radius, minRadius, maxRadius);
