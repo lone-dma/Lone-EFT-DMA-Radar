@@ -98,7 +98,7 @@ Toggle Fullscreen: F11
                                     Margin="0,0,16,8">
                             <TextBlock Text="Max Distance"
                                        VerticalAlignment="Center"
-                                       ToolTip="Sets the 'Maximum Distance' for the Radar and many of its features. This will affect Hostile Aimlines, and ESP. In most cases you don't need to set this over 500." />
+                                       ToolTip="Sets the 'Maximum Distance' for the Radar and many of its features. This will affect Hostile Aimlines, and Aimview. In most cases you don't need to set this over 500." />
                             <Slider x:Name="MaxDistSlider"
                                     Width="150"
                                     Margin="8,0"
@@ -155,6 +155,10 @@ Toggle Fullscreen: F11
                         <CheckBox Content="Show Map Setup Helper"
                                   ToolTip="Toggles the 'Map Setup Helper' to assist with getting Map Bounds/Scaling"
                                   IsChecked="{Binding ShowMapSetupHelper, Mode=TwoWay}"
+                                  Margin="0,0,16,8" />
+                        <CheckBox Content="Aimview Widget"
+                                  ToolTip="Toggles the Aimview 'Widget' that gives you a Pseudo ESP in the radar window. Can be moved."
+                                  IsChecked="{Binding AimviewWidget, Mode=TwoWay}"
                                   Margin="0,0,16,8" />
                         <CheckBox Content="Player Info Widget"
                                   ToolTip="Toggles the Player Info 'Widget' that gives you information about the players/bosses in your raid. Can be moved."

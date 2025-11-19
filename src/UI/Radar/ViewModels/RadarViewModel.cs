@@ -161,6 +161,10 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
         /// </summary>
         public SKGLElement Radar => _parent.Radar;
         /// <summary>
+        /// Aimview Widget Viewport.
+        /// </summary>
+        public AimviewWidget AimviewWidget { get; private set; }
+        /// <summary>
         /// Player Info Widget Viewport.
         /// </summary>
         public PlayerInfoWidget InfoWidget { get; private set; }
@@ -187,6 +191,13 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                     await Task.Delay(10);
                 Radar.GRContext.SetResourceCacheLimit(512 * 1024 * 1024); // 512 MB
 
+                if (App.Config.AimviewWidget.Location == default)
+                {
+                    var size = Radar.CanvasSize;
+                    var cr = new SKRect(0, 0, size.Width, size.Height);
+                    App.Config.AimviewWidget.Location = new SKRect(cr.Left, cr.Bottom - 200, cr.Left + 200, cr.Bottom);
+                }
+
                 if (App.Config.InfoWidget.Location == default)
                 {
                     var size = Radar.CanvasSize;
@@ -194,6 +205,8 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                     App.Config.InfoWidget.Location = new SKRect(cr.Right - 1, cr.Top, cr.Right, cr.Top + 1);
                 }
 
+                AimviewWidget = new AimviewWidget(Radar, App.Config.AimviewWidget.Location, App.Config.AimviewWidget.Minimized,
+                    App.Config.UI.UIScale);
                 InfoWidget = new PlayerInfoWidget(Radar, App.Config.InfoWidget.Location,
                     App.Config.InfoWidget.Minimized, App.Config.UI.UIScale);
                 Radar.PaintSurface += Radar_PaintSurface;
@@ -364,6 +377,10 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                         InfoWidget?.Draw(canvas, localPlayer, allPlayers);
                     }
                     closestToMouse?.DrawMouseover(canvas, mapParams, localPlayer); // Mouseover Item
+                    if (App.Config.AimviewWidget.Enabled) // Aimview Widget
+                    {
+                        AimviewWidget?.Draw(canvas);
+                    }
                 }
                 else // LocalPlayer is *not* in a Raid -> Display Reason
                 {

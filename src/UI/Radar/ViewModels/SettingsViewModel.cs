@@ -245,6 +245,15 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             SKPaints.PaintExplosives.StrokeWidth = 3 * newScale;
             SKPaints.PaintExfilOpen.StrokeWidth = 1 * newScale;
             SKPaints.PaintExfilTransit.StrokeWidth = 1 * newScale;
+            // Aimview
+            SKPaints.PaintAimviewWidgetLocalPlayer.StrokeWidth = 1 * newScale;
+            SKPaints.PaintAimviewWidgetTeammate.StrokeWidth = 1 * newScale;
+            SKPaints.PaintAimviewWidgetPMC.StrokeWidth = 1 * newScale;
+            SKPaints.PaintAimviewWidgetScav.StrokeWidth = 1 * newScale;
+            SKPaints.PaintAimviewWidgetBoss.StrokeWidth = 1 * newScale;
+            SKPaints.PaintAimviewWidgetPScav.StrokeWidth = 1 * newScale;
+            SKPaints.PaintAimviewWidgetFocused.StrokeWidth = 1 * newScale;
+            SKPaints.PaintAimviewWidgetWatchlist.StrokeWidth = 1 * newScale;
             // Fonts
             SKFonts.UIRegular.Size = 12f * newScale;
             SKFonts.UILarge.Size = 48f * newScale;
@@ -284,6 +293,19 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                         vm.IsVisible = value;
                     }
                     OnPropertyChanged(nameof(ShowMapSetupHelper));
+                }
+            }
+        }
+
+        public bool AimviewWidget
+        {
+            get => App.Config.AimviewWidget.Enabled;
+            set
+            {
+                if (App.Config.AimviewWidget.Enabled != value)
+                {
+                    App.Config.AimviewWidget.Enabled = value;
+                    OnPropertyChanged(nameof(AimviewWidget));
                 }
             }
         }
