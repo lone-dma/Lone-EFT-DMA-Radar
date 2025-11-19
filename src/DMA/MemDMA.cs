@@ -59,8 +59,7 @@ namespace LoneEftDmaRadar.DMA
 
         public string MapID => Game?.MapID;
         public ulong UnityBase { get; private set; }
-        private GameObjectManager? _gom;
-        public GameObjectManager GOM => _gom ?? throw new ArgumentNullException(nameof(GOM), "GOM is not initialized.");
+        public ulong GOM { get; private set; }
         public bool Starting { get; private set; }
         public bool Ready { get; private set; }
         public bool InRaid => Game?.InRaid ?? false;
@@ -284,7 +283,7 @@ namespace LoneEftDmaRadar.DMA
             this.Starting = default;
             this.Ready = default;
             UnityBase = default;
-            _gom = null;
+            GOM = default;
             _pid = default;
         }
 
@@ -312,7 +311,7 @@ namespace LoneEftDmaRadar.DMA
         {
             var unityBase = _vmm.ProcessGetModuleBase(_pid, "UnityPlayer.dll");
             unityBase.ThrowIfInvalidVirtualAddress(nameof(unityBase));
-            _gom = GameObjectManager.Get(unityBase);
+            GOM = GameObjectManager.GetAddr(unityBase);
             UnityBase = unityBase;
         }
 

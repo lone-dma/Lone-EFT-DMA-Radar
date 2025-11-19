@@ -14,13 +14,13 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
         [FieldOffset(0x28)]
         public readonly ulong ActiveNodes; // 0x28
 
-
         /// <summary>
-        /// Returns the Game Object Manager for the current UnityPlayer.
+        /// Looks up the Address of the Game Object Manager.
         /// </summary>
-        /// <param name="unityBase">UnityPlayer Base Addr</param>
-        /// <returns>Game Object Manager</returns>
-        public static GameObjectManager Get(ulong unityBase)
+        /// <param name="unityBase">UnityPlayer.dll module base address.</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static ulong GetAddr(ulong unityBase)
         {
             try
             {
@@ -32,22 +32,38 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
                     uint rel = Memory.ReadValueEnsure<uint>(gomSig + 3);
                     var gomPtr = Memory.ReadValueEnsure<VmmPointer>(gomSig + 7 + rel);
                     gomPtr.ThrowIfInvalid();
-                    var gom = Memory.ReadValueEnsure<GameObjectManager>(gomPtr);
+                    _ = Memory.ReadValueEnsure<GameObjectManager>(gomPtr); // Just for extra validation -> discard
                     Debug.WriteLine("GOM Located via Signature.");
-                    return gom;
+                    return gomPtr;
                 }
                 catch
                 {
                     var gomPtr = Memory.ReadValueEnsure<VmmPointer>(unityBase + UnitySDK.UnityOffsets.GameObjectManager);
                     gomPtr.ThrowIfInvalid();
-                    var gom = Memory.ReadValueEnsure<GameObjectManager>(gomPtr);
+                    _ = Memory.ReadValueEnsure<GameObjectManager>(gomPtr); // Just for extra validation -> discard
                     Debug.WriteLine("GOM Located via Hardcoded Offset.");
-                    return gom;
+                    return gomPtr;
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception("ERROR Loading Game Object Manager", ex);
+                throw new InvalidOperationException("ERROR Locating Game Object Manager Address", ex);
+            }
+        }
+
+        /// <summary>
+        /// Returns the Game Object Manager for the current UnityPlayer.
+        /// </summary>
+        /// <returns>Game Object Manager</returns>
+        public static GameObjectManager Get()
+        {
+            try
+            {
+                return Memory.ReadValueEnsure<GameObjectManager>(Memory.GOM);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("ERROR Reading Game Object Manager", ex);
             }
         }
 
