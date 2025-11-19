@@ -148,23 +148,25 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
                     if (s1.ReadPtr(lootBase + ObjectClass.MonoBehaviourOffset, out var monoBehaviour) &&
                         s1.ReadPtr(lootBase + ObjectClass.To_NamePtr[0], out var c1))
                     {
-                        round2.PrepareReadPtr(monoBehaviour + UnitySDK.ShuffledOffsets.MonoBehaviour_ObjectClassOffset); // InteractiveClass
-                        round2.PrepareReadPtr(monoBehaviour + UnitySDK.ShuffledOffsets.MonoBehaviour_GameObjectOffset); // GameObject
+                        round2.PrepareReadPtr(monoBehaviour + UnitySDK.UnityOffsets.MonoBehaviour_ObjectClassOffset); // InteractiveClass
+                        round2.PrepareReadPtr(monoBehaviour + UnitySDK.UnityOffsets.MonoBehaviour_GameObjectOffset); // GameObject
                         round2.PrepareReadPtr(c1 + ObjectClass.To_NamePtr[1]); // C2
                         round2.Completed += (sender, s2) =>
                         {
-                            if (s2.ReadPtr(monoBehaviour + UnitySDK.ShuffledOffsets.MonoBehaviour_ObjectClassOffset, out var interactiveClass) &&
-                                s2.ReadPtr(monoBehaviour + UnitySDK.ShuffledOffsets.MonoBehaviour_GameObjectOffset, out var gameObject) &&
+                            if (s2.ReadPtr(monoBehaviour + UnitySDK.UnityOffsets.MonoBehaviour_ObjectClassOffset, out var interactiveClass) &&
+                                s2.ReadPtr(monoBehaviour + UnitySDK.UnityOffsets.MonoBehaviour_GameObjectOffset, out var gameObject) &&
                                 s2.ReadPtr(c1 + ObjectClass.To_NamePtr[1], out var classNamePtr))
                             {
+                                Debug.WriteLine(gameObject.Value.ToString("X"));
+
                                 round3.PrepareRead(classNamePtr, 64); // ClassName
-                                round3.PrepareReadPtr(gameObject + UnitySDK.ShuffledOffsets.GameObject_ComponentsOffset); // Components
-                                round3.PrepareReadPtr(gameObject + UnitySDK.ShuffledOffsets.GameObject_NameOffset); // PGameObjectName
+                                round3.PrepareReadPtr(gameObject + UnitySDK.UnityOffsets.GameObject_ComponentsOffset); // Components
+                                round3.PrepareReadPtr(gameObject + UnitySDK.UnityOffsets.GameObject_NameOffset); // PGameObjectName
                                 round3.Completed += (sender, s3) =>
                                 {
                                     if (s3.ReadString(classNamePtr, 64, Encoding.UTF8) is string className &&
-                                        s3.ReadPtr(gameObject + UnitySDK.ShuffledOffsets.GameObject_ComponentsOffset, out var components)
-                                        && s3.ReadPtr(gameObject + UnitySDK.ShuffledOffsets.GameObject_NameOffset, out var pGameObjectName))
+                                        s3.ReadPtr(gameObject + UnitySDK.UnityOffsets.GameObject_ComponentsOffset, out var components)
+                                        && s3.ReadPtr(gameObject + UnitySDK.UnityOffsets.GameObject_NameOffset, out var pGameObjectName))
                                     {
                                         round4.PrepareRead(pGameObjectName, 64); // ObjectName
                                         round4.PrepareReadPtr(components + 0x8); // T1
@@ -214,6 +216,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
             var isLooseLoot = p.ClassName.Equals("ObservedLootItem", StringComparison.OrdinalIgnoreCase);
             var isContainer = p.ClassName.Equals("LootableContainer", StringComparison.OrdinalIgnoreCase);
             var interactiveClass = p.InteractiveClass;
+
             if (p.ObjectName.Contains("script", StringComparison.OrdinalIgnoreCase))
             {
                 // skip these
@@ -255,12 +258,15 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
                     var itemTemplate = Memory.ReadPtr(item + Offsets.LootItem.Template); //EFT.InventoryLogic.ItemTemplate
                     var isQuestItem = Memory.ReadValue<bool>(itemTemplate + Offsets.ItemTemplate.QuestItem);
 
-                    //If NOT a quest item. Quest items are like the quest related things you need to find like the pocket watch or Jaeger's Letter etc. We want to ignore these quest items.
-                    var mongoId = Memory.ReadValue<MongoID>(itemTemplate + Offsets.ItemTemplate._id);
-                    var id = mongoId.ReadString();
-                    if (!isQuestItem && TarkovDataManager.AllItems.TryGetValue(id, out var entry))
+                    if (!isQuestItem)
                     {
-                        _ = _loot.TryAdd(p.ItemBase, new LootItem(entry, pos));
+                        //If NOT a quest item. Quest items are like the quest related things you need to find like the pocket watch or Jaeger's Letter etc. We want to ignore these quest items.
+                        var mongoId = Memory.ReadValue<MongoID>(itemTemplate + Offsets.ItemTemplate._id);
+                        var id = mongoId.ReadString();
+                        if (TarkovDataManager.AllItems.TryGetValue(id, out var entry))
+                        {
+                            _ = _loot.TryAdd(p.ItemBase, new LootItem(entry, pos));
+                        }
                     }
                 }
             }
