@@ -80,6 +80,8 @@ namespace LoneEftDmaRadar
             zoomOut.HotkeyDelayElapsed += ZoomOut_HotkeyDelayElapsed;
             var toggleLoot = new HotkeyActionController("Toggle Loot");
             toggleLoot.HotkeyStateChanged += ToggleLoot_HotkeyStateChanged;
+            var toggleAimviewWidget = new HotkeyActionController("Toggle Aimview Widget");
+            toggleAimviewWidget.HotkeyStateChanged += ToggleAimviewWidget_HotkeyStateChanged;
             var toggleNames = new HotkeyActionController("Toggle Player Names");
             toggleNames.HotkeyStateChanged += ToggleNames_HotkeyStateChanged;
             var toggleInfo = new HotkeyActionController("Toggle Game Info Tab");
@@ -92,10 +94,17 @@ namespace LoneEftDmaRadar
             HotkeyAction.RegisterController(zoomIn);
             HotkeyAction.RegisterController(zoomOut);
             HotkeyAction.RegisterController(toggleLoot);
+            HotkeyAction.RegisterController(toggleAimviewWidget);
             HotkeyAction.RegisterController(toggleNames);
             HotkeyAction.RegisterController(toggleInfo);
             HotkeyAction.RegisterController(toggleShowFood);
             HotkeyAction.RegisterController(toggleShowMeds);
+        }
+
+        private void ToggleAimviewWidget_HotkeyStateChanged(object sender, HotkeyEventArgs e)
+        {
+            if (e.State && _parent.Settings?.ViewModel is SettingsViewModel vm)
+                vm.AimviewWidget = !vm.AimviewWidget;
         }
 
         private void ToggleShowMeds_HotkeyStateChanged(object sender, HotkeyEventArgs e)
