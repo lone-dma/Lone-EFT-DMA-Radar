@@ -108,11 +108,9 @@ namespace LoneEftDmaRadar
                         Process.GetProcessesByName(thisProc.ProcessName)
                         .Where(p => p.Id != thisProc.Id))
                     {
-                        proc.Kill();
-                        if (!proc.WaitForExit(TimeSpan.FromSeconds(3)))
-                            throw new InvalidOperationException("The Application Is Already Running!");
+                        proc.Kill(); // Kill any zombies
                     }
-                    _mutex = new Mutex(true, MUTEX_ID, out _);
+                    Environment.FailFast("Another instance is already running. Please restart the application.");
                 }
                 Config = EftDmaConfig.Load();
                 ServiceProvider = BuildServiceProvider();
