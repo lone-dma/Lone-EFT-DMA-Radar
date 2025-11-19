@@ -770,9 +770,18 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                                 ? null
                                 : $" ({observed.HealthStatus})"; // Only display abnormal health status
                             if (observed.Profile?.Level is int levelResult)
-                                level = $"L{levelResult}:";
+                                level = $"{levelResult}:";
                         }
-                        lines.Add($"{level}{name}{health}");
+                        // Show faction only for PMC (USEC/BEAR), not for SCAV
+                        if (IsPmc)
+                        {
+                            char faction = PlayerSide.ToString()[0]; // Get faction letter (U/B)
+                            lines.Add($"[{faction}] {name}{health}");
+                        }
+                        else
+                        {
+                            lines.Add($"{name}{health}");
+                        }
                         lines.Add(roundedHeight != 0 ? $"{roundedDist}M ({roundedHeight})" : $"{roundedDist}M");
                     }
                     else // just height, distance
