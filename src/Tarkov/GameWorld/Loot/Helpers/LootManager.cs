@@ -141,24 +141,22 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
                 {
                     continue; // Already processed this loot item once before
                 }
-                round1.PrepareReadPtr(lootBase + ObjectClass.MonoBehaviourOffset); // MonoBehaviour
+                round1.PrepareReadPtr(lootBase + ObjectClass.MonoBehaviourOffset); // UnityComponent
                 round1.PrepareReadPtr(lootBase + ObjectClass.To_NamePtr[0]); // C1
                 round1.Completed += (sender, s1) =>
                 {
                     if (s1.ReadPtr(lootBase + ObjectClass.MonoBehaviourOffset, out var monoBehaviour) &&
                         s1.ReadPtr(lootBase + ObjectClass.To_NamePtr[0], out var c1))
                     {
-                        round2.PrepareReadPtr(monoBehaviour + UnitySDK.UnityOffsets.MonoBehaviour_ObjectClassOffset); // InteractiveClass
-                        round2.PrepareReadPtr(monoBehaviour + UnitySDK.UnityOffsets.MonoBehaviour_GameObjectOffset); // GameObject
+                        round2.PrepareReadPtr(monoBehaviour + UnitySDK.UnityOffsets.Component_ObjectClassOffset); // InteractiveClass
+                        round2.PrepareReadPtr(monoBehaviour + UnitySDK.UnityOffsets.Component_GameObjectOffset); // GameObject
                         round2.PrepareReadPtr(c1 + ObjectClass.To_NamePtr[1]); // C2
                         round2.Completed += (sender, s2) =>
                         {
-                            if (s2.ReadPtr(monoBehaviour + UnitySDK.UnityOffsets.MonoBehaviour_ObjectClassOffset, out var interactiveClass) &&
-                                s2.ReadPtr(monoBehaviour + UnitySDK.UnityOffsets.MonoBehaviour_GameObjectOffset, out var gameObject) &&
+                            if (s2.ReadPtr(monoBehaviour + UnitySDK.UnityOffsets.Component_ObjectClassOffset, out var interactiveClass) &&
+                                s2.ReadPtr(monoBehaviour + UnitySDK.UnityOffsets.Component_GameObjectOffset, out var gameObject) &&
                                 s2.ReadPtr(c1 + ObjectClass.To_NamePtr[1], out var classNamePtr))
                             {
-                                Debug.WriteLine(gameObject.Value.ToString("X"));
-
                                 round3.PrepareRead(classNamePtr, 64); // ClassName
                                 round3.PrepareReadPtr(gameObject + UnitySDK.UnityOffsets.GameObject_ComponentsOffset); // Components
                                 round3.PrepareReadPtr(gameObject + UnitySDK.UnityOffsets.GameObject_NameOffset); // PGameObjectName

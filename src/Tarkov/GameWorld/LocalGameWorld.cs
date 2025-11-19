@@ -32,7 +32,6 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
 using LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
-using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using VmmSharpEx.Options;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld
@@ -169,8 +168,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             try
             {
                 /// Get LocalGameWorld
-                var gom = GameObjectManager.Get(Memory.UnityBase);
-                var localGameWorld = gom.GetGameWorld(out string map);
+                var localGameWorld = Memory.GOM.GetGameWorld(out string map);
                 return new LocalGameWorld(localGameWorld, map);
             }
             catch (Exception ex)
