@@ -250,8 +250,6 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             SKFonts.UIRegular.Size = 12f * newScale;
             SKFonts.UILarge.Size = 48f * newScale;
             SKFonts.InfoWidgetFont.Size = 12f * newScale;
-            // SKWidgetControl
-            AbstractSKWidget.SetScaleFactorInternal(newScale);
             // Loot Paints
             LootItem.ScaleLootPaints(newScale);
 
