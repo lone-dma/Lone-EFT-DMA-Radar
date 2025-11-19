@@ -59,17 +59,24 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
 {
     internal static class TarkovDevDataJob
     {
+        private static readonly JsonSerializerOptions _jsonOptions = new()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
         /// <summary>
         /// Retrieves updated Tarkov data from the Tarkov Dev GraphQL API and formats it into a JSON string.
         /// </summary>
         /// <returns>Json string of <see cref="OutgoingTarkovMarketData"/>.</returns>
         public static async Task<string> GetUpdatedDataAsync()
         {
-            var data = await TarkovDevGraphQLApi.GetTarkovDataAsync();
+            var json = await TarkovDevGraphQLApi.GetTarkovDataAsync();
+            var data = JsonSerializer.Deserialize<TarkovDevDataQuery>(json, _jsonOptions) ??
+                throw new InvalidOperationException("Failed to deserialize Tarkov data.");
             var result = new OutgoingTarkovMarketData
             {
                 Items = ParseMarketData(data),
-                Tasks = data.Data.Tasks
+                Maps = data.Data.Maps
             };
             return JsonSerializer.Serialize(result);
         }
@@ -89,19 +96,6 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
                     TraderPrice = item.HighestVendorPrice,
                     FleaPrice = item.OptimalFleaPrice,
                     Slots = slots
-                });
-            }
-            foreach (var questItem in data.Data.QuestItems)
-            {
-                outgoingItems.Add(new OutgoingItem
-                {
-                    ID = questItem.Id,
-                    ShortName = $"Q_{questItem.ShortName}",
-                    Name = $"Q_{questItem.ShortName}",
-                    Categories = new() { "Quest Item" },
-                    TraderPrice = -1,
-                    FleaPrice = -1,
-                    Slots = 1
                 });
             }
             foreach (var container in data.Data.LootContainers)
@@ -128,8 +122,9 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
         {
             [JsonPropertyName("items")]
             public List<OutgoingItem> Items { get; set; }
-            [JsonPropertyName("tasks")]
-            public List<TaskElement> Tasks { get; set; }
+
+            [JsonPropertyName("maps")]
+            public List<object> Maps { get; set; }
         }
 
         private sealed class OutgoingItem

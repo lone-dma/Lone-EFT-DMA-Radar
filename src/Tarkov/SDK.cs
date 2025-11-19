@@ -9,31 +9,12 @@ namespace SDK
 
         public readonly partial struct ClientLocalGameWorld
         {
-            public const uint TransitController = 0x20; // -.\uE868
-            public const uint ExfilController = 0x30; // -.\uE731
             public const uint BtrController = 0x50; // -.\uF07E
             public const uint LootList = 0x140; // System.Collections.Generic.List<\uE311>
             public const uint RegisteredPlayers = 0x168; // System.Collections.Generic.List<IPlayer>
             public const uint MainPlayer = 0x1D0; // EFT.Player
             public const uint SynchronizableObjectLogicProcessor = 0x208; // -.\uEBD9
             public const uint Grenades = 0x230; // -.\uE3D7<Int32, Throwable>
-        }
-
-        public readonly partial struct TransitController
-        {
-            public const uint TransitPoints = 0x80; // System.Collections.Generic.Dictionary<Int32, TransitPoint>
-        }
-
-        public readonly partial struct TransitPoint
-        {
-            public const uint parameters = 0x20; // -.\uE6CC.Location.TransitParameters
-        }
-
-        public readonly partial struct TransitParameters
-        {
-            public const uint name = 0x18; // String
-            public const uint description = 0x20; // String
-            public const uint location = 0x40; // String
         }
 
         public readonly partial struct SynchronizableObject
@@ -66,30 +47,6 @@ namespace SDK
         public readonly partial struct BTRTurretView
         {
             public const uint AttachedBot = 0x60; // System.ValueTuple<ObservedPlayerView, Boolean>
-        }
-
-        public readonly partial struct ExfilController
-        {
-            public const uint ExfiltrationPointArray = 0x20; // EFT.Interactive.ExfiltrationPoint[]
-            public const uint ScavExfiltrationPointArray = 0x28; // EFT.Interactive.ScavExfiltrationPoint[]
-            public const uint SecretExfiltrationPointArray = 0x30; // EFT.Interactive.SecretExfiltrations.SecretExfiltrationPoint[]
-        }
-
-        public readonly partial struct Exfil
-        {
-            public const uint Settings = 0x98; // EFT.Interactive.ExitTriggerSettings
-            public const uint EligibleEntryPoints = 0xC0; // System.String[]
-            public const uint _status = 0x58; // System.Byte
-        }
-
-        public readonly partial struct ScavExfil
-        {
-            public const uint EligibleIds = 0xF8; // System.Collections.Generic.List<String>
-        }
-
-        public readonly partial struct ExfilSettings
-        {
-            public const uint Name = 0x18; // String
         }
 
         public readonly partial struct Grenade
@@ -146,12 +103,6 @@ namespace SDK
             public const uint Id = 0x10; // String
             public const uint AccountId = 0x18; // String
             public const uint Info = 0x48; // -.\uE9AD
-            public const uint WishlistManager = 0x108; // -.\uE8D9
-        }
-
-        public readonly partial struct WishlistManager
-        {
-            public const uint Items = 0x30; // System.Collections.Generic.Dictionary<EFT.MongoID,EFT.EWishlistGroup> _wishlistItems
         }
 
         public readonly partial struct PlayerInfo

@@ -67,17 +67,14 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
 
         public class TarkovDevData
         {
-            [JsonPropertyName("questItems")]
-            public List<QuestItemElement> QuestItems { get; set; }
-
             [JsonPropertyName("lootContainers")]
             public List<BasicDataElement> LootContainers { get; set; }
 
-            [JsonPropertyName("tasks")]
-            public List<TaskElement> Tasks { get; set; }
-
             [JsonPropertyName("items")]
             public List<ItemElement> Items { get; set; }
+
+            [JsonPropertyName("maps")]
+            public List<object> Maps { get; set; }
         }
         public class WarningMessage
         {
@@ -176,114 +173,4 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
         public string Name { get; set; }
     }
 
-    public class QuestItemElement
-    {
-        [JsonPropertyName("id")]
-        public string Id { get; set; }
-
-        [JsonPropertyName("shortName")]
-        public string ShortName { get; set; }
-    }
-
-    public partial class TaskElement
-    {
-        [JsonPropertyName("id")]
-        public string Id { get; set; }
-
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
-
-        [JsonPropertyName("objectives")]
-        public List<ObjectiveElement> Objectives { get; set; }
-
-        public partial class ObjectiveElement
-        {
-            [JsonPropertyName("id")]
-            public string Id { get; set; }
-
-            [JsonPropertyName("type")]
-            public string Type { get; set; }
-
-            [JsonPropertyName("description")]
-            public string Description { get; set; }
-
-            [JsonPropertyName("requiredKeys")]
-            public List<List<MarkerItemClass>> RequiredKeys { get; set; }
-
-            [JsonPropertyName("maps")]
-            public List<BasicDataElement> Maps { get; set; }
-
-            [JsonPropertyName("zones")]
-            public List<ZoneElement> Zones { get; set; }
-
-            [JsonPropertyName("count")]
-            public int Count { get; set; }
-
-            [JsonPropertyName("foundInRaid")]
-            public bool FoundInRaid { get; set; }
-
-            [JsonPropertyName("item")]
-            public MarkerItemClass Item { get; set; }
-
-            [JsonPropertyName("questItem")]
-            public ObjectiveQuestItem QuestItem { get; set; }
-
-            [JsonPropertyName("markerItem")]
-            public MarkerItemClass MarkerItem { get; set; }
-
-            public class MarkerItemClass
-            {
-                [JsonPropertyName("id")]
-                public string Id { get; set; }
-
-                [JsonPropertyName("name")]
-                public string Name { get; set; }
-
-                [JsonPropertyName("shortName")]
-                public string ShortName { get; set; }
-            }
-
-            public class ObjectiveQuestItem
-            {
-                [JsonPropertyName("id")]
-                public string Id { get; set; }
-
-                [JsonPropertyName("name")]
-                public string Name { get; set; }
-
-                [JsonPropertyName("shortName")]
-                public string ShortName { get; set; }
-
-                [JsonPropertyName("normalizedName")]
-                public string NormalizedName { get; set; }
-
-                [JsonPropertyName("description")]
-                public string Description { get; set; }
-            }
-
-            public class ZoneElement
-            {
-                [JsonPropertyName("id")]
-                public string Id { get; set; }
-
-                [JsonPropertyName("position")]
-                public PositionElement Position { get; set; }
-
-                [JsonPropertyName("map")]
-                public BasicDataElement Map { get; set; }
-            }
-
-            public class PositionElement
-            {
-                [JsonPropertyName("y")]
-                public float Y { get; set; }
-
-                [JsonPropertyName("x")]
-                public float X { get; set; }
-
-                [JsonPropertyName("z")]
-                public float Z { get; set; }
-            }
-        }
-    }
 }

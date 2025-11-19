@@ -28,7 +28,6 @@ SOFTWARE.
 
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.Unity;
-using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Skia;
 
@@ -36,36 +35,13 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
 {
     public sealed class TransitPoint : IExitPoint, IWorldEntity, IMapEntity, IMouseoverEntity
     {
-        public static implicit operator ulong(TransitPoint x) => x._addr;
-
-        public TransitPoint(ulong baseAddr)
+        public TransitPoint(TarkovDataManager.TransitElement transit)
         {
-            _addr = baseAddr;
-
-            var parameters = Memory.ReadPtr(baseAddr + Offsets.TransitPoint.parameters, false);
-            var locationPtr = Memory.ReadPtr(parameters + Offsets.TransitParameters.location, false);
-            var location = Memory.ReadUnicodeString(locationPtr, 128, false);
-            if (StaticGameData.MapNames.TryGetValue(location, out string destinationMapName))
-            {
-                Name = $"Transit to {destinationMapName}";
-            }
-            else
-            {
-                Name = "Transit";
-            }
-            var transformInternal = Memory.ReadPtrChain(baseAddr, false, UnitySDK.ShuffledOffsets.TransformChain);
-            try
-            {
-                _position = new UnityTransform(transformInternal).UpdatePosition();
-            }
-            catch (ArgumentOutOfRangeException) // Fixes a bug on interchange
-            {
-                _position = new(0, -100, 0);
-            }
+            Description = transit.Description;
+            _position = transit.Position.AsVector3();
         }
 
-        private readonly ulong _addr;
-        public string Name { get; }
+        public string Description { get; }
 
         #region Interfaces
 
@@ -76,7 +52,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
         public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
             var heightDiff = Position.Y - localPlayer.Position.Y;
-            var paint = GetPaint();
+            var paint = SKPaints.PaintExfilTransit;
             var point = Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);
             MouseoverPosition = new Vector2(point.X, point.Y);
             SKPaints.ShapeOutline.StrokeWidth = 2f;
@@ -100,17 +76,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
             }
         }
 
-        private static SKPaint GetPaint()
-        {
-            var localPlayer = Memory.LocalPlayer;
-            if (!(localPlayer?.IsPmc ?? false))
-                return SKPaints.PaintExfilInactive;
-            return SKPaints.PaintExfilTransit;
-        }
-
         public void DrawMouseover(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
-            Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams).DrawMouseoverText(canvas, Name);
+            Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams).DrawMouseoverText(canvas, Description);
         }
 
         #endregion

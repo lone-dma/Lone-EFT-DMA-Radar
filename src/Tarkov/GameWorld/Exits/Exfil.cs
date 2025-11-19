@@ -27,9 +27,7 @@ SOFTWARE.
 */
 
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
-using LoneEftDmaRadar.Tarkov.Mono.Collections;
 using LoneEftDmaRadar.Tarkov.Unity;
-using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Skia;
 
@@ -37,84 +35,13 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
 {
     public class Exfil : IExitPoint, IWorldEntity, IMapEntity, IMouseoverEntity
     {
-        public static implicit operator ulong(Exfil x) => x._addr;
-
-        private readonly bool _isPMC;
-        private HashSet<string> PmcEntries { get; } = new(StringComparer.OrdinalIgnoreCase);
-        private HashSet<string> ScavIds { get; } = new(StringComparer.OrdinalIgnoreCase);
-
-        public Exfil(ulong baseAddr, bool isPMC)
+        public Exfil(TarkovDataManager.ExtractElement extract)
         {
-            _addr = baseAddr;
-            _isPMC = isPMC;
-            var transformInternal = Memory.ReadPtrChain(baseAddr, false, UnitySDK.ShuffledOffsets.TransformChain);
-            var namePtr = Memory.ReadPtrChain(baseAddr, true, Offsets.Exfil.Settings, Offsets.ExfilSettings.Name);
-            Name = Memory.ReadUnicodeString(namePtr)?.Trim();
-            if (string.IsNullOrEmpty(Name))
-                Name = "default";
-            // Lookup real map name (if possible)
-            if (StaticGameData.ExfilNames.TryGetValue(Memory.MapID, out var mapExfils)
-                && mapExfils.TryGetValue(Name, out var exfilName))
-                Name = exfilName;
-            _position = new UnityTransform(transformInternal).UpdatePosition();
+            Name = extract.Name;
+            _position = extract.Position.AsVector3();
         }
 
-        private readonly ulong _addr;
         public string Name { get; }
-        public virtual EStatus Status { get; private set; } = EStatus.Closed;
-
-        /// <summary>
-        /// Update Exfil Information/Status.
-        /// </summary>
-        public virtual void Update(Enums.EExfiltrationStatus status)
-        {
-            /// Update Status
-            switch (status)
-            {
-                case Enums.EExfiltrationStatus.NotPresent:
-                    Status = EStatus.Closed;
-                    break;
-                case Enums.EExfiltrationStatus.UncompleteRequirements:
-                    Status = EStatus.Pending;
-                    break;
-                case Enums.EExfiltrationStatus.Countdown:
-                    Status = EStatus.Open;
-                    break;
-                case Enums.EExfiltrationStatus.RegularMode:
-                    Status = EStatus.Open;
-                    break;
-                case Enums.EExfiltrationStatus.Pending:
-                    Status = EStatus.Pending;
-                    break;
-                case Enums.EExfiltrationStatus.AwaitsManualActivation:
-                    Status = EStatus.Pending;
-                    break;
-                case Enums.EExfiltrationStatus.Hidden:
-                    Status = EStatus.Pending;
-                    break;
-            }
-            /// Update Entry Points
-            if (_isPMC)
-            {
-                var entriesArrPtr = Memory.ReadPtr(_addr + Offsets.Exfil.EligibleEntryPoints);
-                using var entriesArr = MonoArray<ulong>.Create(entriesArrPtr, true);
-                foreach (var entryNamePtr in entriesArr)
-                {
-                    var entryName = Memory.ReadUnicodeString(entryNamePtr);
-                    PmcEntries.Add(entryName);
-                }
-            }
-            else // Scav Exfils
-            {
-                var eligibleIdsPtr = Memory.ReadPtr(_addr + Offsets.ScavExfil.EligibleIds);
-                using var idsArr = MonoList<ulong>.Create(eligibleIdsPtr, true);
-                foreach (var idPtr in idsArr)
-                {
-                    var idName = Memory.ReadUnicodeString(idPtr);
-                    ScavIds.Add(idName);
-                }
-            }
-        }
 
         #region Interfaces
 
@@ -125,7 +52,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
         public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
             var heightDiff = Position.Y - localPlayer.Position.Y;
-            var paint = GetPaint();
+            var paint = SKPaints.PaintExfilOpen;
             var point = Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);
             MouseoverPosition = new Vector2(point.X, point.Y);
             SKPaints.ShapeOutline.StrokeWidth = 2f;
@@ -149,33 +76,11 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
             }
         }
 
-        public virtual SKPaint GetPaint()
-        {
-            var localPlayer = Memory.LocalPlayer;
-            if (localPlayer is not null && localPlayer.IsPmc &&
-                !PmcEntries.Contains(localPlayer.EntryPoint ?? "NULL"))
-                return SKPaints.PaintExfilInactive;
-            if (localPlayer is not null && localPlayer.IsScav &&
-                !ScavIds.Contains(localPlayer.ProfileId))
-                return SKPaints.PaintExfilInactive;
-            switch (Status)
-            {
-                case EStatus.Open:
-                    return SKPaints.PaintExfilOpen;
-                case EStatus.Pending:
-                    return SKPaints.PaintExfilPending;
-                case EStatus.Closed:
-                    return SKPaints.PaintExfilClosed;
-                default:
-                    return SKPaints.PaintExfilClosed;
-            }
-        }
-
         public void DrawMouseover(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
             var exfilName = Name;
             exfilName ??= "unknown";
-            Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams).DrawMouseoverText(canvas, $"{exfilName} ({Status.ToString()})");
+            Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams).DrawMouseoverText(canvas, exfilName);
         }
 
         #endregion

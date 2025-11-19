@@ -245,9 +245,17 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             SKPaints.PaintExplosives.StrokeWidth = 3 * newScale;
             SKPaints.PaintExfilOpen.StrokeWidth = 1 * newScale;
             SKPaints.PaintExfilTransit.StrokeWidth = 1 * newScale;
-            SKPaints.PaintExfilPending.StrokeWidth = 1 * newScale;
-            SKPaints.PaintExfilClosed.StrokeWidth = 1 * newScale;
-            SKPaints.PaintExfilInactive.StrokeWidth = 1 * newScale;
+            // Aimview
+            SKPaints.PaintAimviewWidgetLocalPlayer.StrokeWidth = 1f * newScale;
+            SKPaints.PaintAimviewWidgetTeammate.StrokeWidth = 1f * newScale;
+            SKPaints.PaintAimviewWidgetPMC.StrokeWidth = 1f * newScale;
+            SKPaints.PaintAimviewWidgetScav.StrokeWidth = 1f * newScale;
+            SKPaints.PaintAimviewWidgetBoss.StrokeWidth = 1f * newScale;
+            SKPaints.PaintAimviewWidgetRaider.StrokeWidth = 1f * newScale;
+            SKPaints.PaintAimviewWidgetPScav.StrokeWidth = 1f * newScale;
+            SKPaints.PaintAimviewWidgetStreamer.StrokeWidth = 1f * newScale;
+            SKPaints.PaintAimviewWidgetWatchlist.StrokeWidth = 1f * newScale;
+            SKPaints.PaintAimviewWidgetFocused.StrokeWidth = 1f * newScale;
             // Fonts
             SKFonts.UIRegular.Size = 12f * newScale;
             SKFonts.UILarge.Size = 48f * newScale;
@@ -287,6 +295,19 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                         vm.IsVisible = value;
                     }
                     OnPropertyChanged(nameof(ShowMapSetupHelper));
+                }
+            }
+        }
+
+        public bool AimviewWidget
+        {
+            get => App.Config.AimviewWidget.Enabled;
+            set
+            {
+                if (App.Config.AimviewWidget.Enabled != value)
+                {
+                    App.Config.AimviewWidget.Enabled = value;
+                    OnPropertyChanged(nameof(AimviewWidget));
                 }
             }
         }
@@ -402,19 +423,6 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
         #endregion
 
         #region Loot
-
-        public bool LootWishlist
-        {
-            get => App.Config.Loot.ShowWishlist;
-            set
-            {
-                if (App.Config.Loot.ShowWishlist != value)
-                {
-                    App.Config.Loot.ShowWishlist = value;
-                    OnPropertyChanged(nameof(LootWishlist));
-                }
-            }
-        }
 
         public bool ShowStaticContainers
         {
