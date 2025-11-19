@@ -246,14 +246,16 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             SKPaints.PaintExfilOpen.StrokeWidth = 1 * newScale;
             SKPaints.PaintExfilTransit.StrokeWidth = 1 * newScale;
             // Aimview
-            SKPaints.PaintAimviewWidgetLocalPlayer.StrokeWidth = 1 * newScale;
-            SKPaints.PaintAimviewWidgetTeammate.StrokeWidth = 1 * newScale;
-            SKPaints.PaintAimviewWidgetPMC.StrokeWidth = 1 * newScale;
-            SKPaints.PaintAimviewWidgetScav.StrokeWidth = 1 * newScale;
-            SKPaints.PaintAimviewWidgetBoss.StrokeWidth = 1 * newScale;
-            SKPaints.PaintAimviewWidgetPScav.StrokeWidth = 1 * newScale;
-            SKPaints.PaintAimviewWidgetFocused.StrokeWidth = 1 * newScale;
-            SKPaints.PaintAimviewWidgetWatchlist.StrokeWidth = 1 * newScale;
+            SKPaints.PaintAimviewWidgetLocalPlayer.StrokeWidth = 1f * newScale;
+            SKPaints.PaintAimviewWidgetTeammate.StrokeWidth = 1f * newScale;
+            SKPaints.PaintAimviewWidgetPMC.StrokeWidth = 1f * newScale;
+            SKPaints.PaintAimviewWidgetScav.StrokeWidth = 1f * newScale;
+            SKPaints.PaintAimviewWidgetBoss.StrokeWidth = 1f * newScale;
+            SKPaints.PaintAimviewWidgetRaider.StrokeWidth = 1f * newScale;
+            SKPaints.PaintAimviewWidgetPScav.StrokeWidth = 1f * newScale;
+            SKPaints.PaintAimviewWidgetStreamer.StrokeWidth = 1f * newScale;
+            SKPaints.PaintAimviewWidgetWatchlist.StrokeWidth = 1f * newScale;
+            SKPaints.PaintAimviewWidgetFocused.StrokeWidth = 1f * newScale;
             // Fonts
             SKFonts.UIRegular.Size = 12f * newScale;
             SKFonts.UILarge.Size = 48f * newScale;

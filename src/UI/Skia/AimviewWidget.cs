@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
 using SkiaSharp.Views.WPF;
@@ -35,9 +34,6 @@ namespace LoneEftDmaRadar.UI.Skia
 {
     public sealed class AimviewWidget : AbstractSKWidget
     {
-        // Constants
-        private const float LOOT_RENDER_DISTANCE = 10f;
-        private const float CONTAINER_RENDER_DISTANCE = 10f;
         // Fields
         private Vector3 _forward, _right, _up, _camPos;
         private SKBitmap _bitmap;
@@ -56,8 +52,6 @@ namespace LoneEftDmaRadar.UI.Skia
         private static LocalPlayer LocalPlayer => Memory.LocalPlayer;
         private static IReadOnlyCollection<AbstractPlayer> AllPlayers => Memory.Players;
         private static bool InRaid => Memory.InRaid;
-        private static IEnumerable<LootItem> Loot => Memory.Loot?.FilteredLoot;
-        private static IEnumerable<StaticLootContainer> Containers => Memory.Loot?.StaticContainers;
 
         public override void Draw(SKCanvas canvas)
         {
@@ -85,7 +79,7 @@ namespace LoneEftDmaRadar.UI.Skia
                 // Precompute scale factors once per frame
                 UpdateMatrix(localPlayer);
 
-                DrawPlayers();
+                DrawPlayers(localPlayer);
                 DrawCrosshair();
             }
             catch (Exception ex)
@@ -124,7 +118,7 @@ namespace LoneEftDmaRadar.UI.Skia
             _camPos = lp.Position;
         }
 
-        private void DrawPlayers()
+        private void DrawPlayers(LocalPlayer localPlayer)
         {
             var players = AllPlayers?
                 .Where(p => p.IsActive && p.IsAlive && p is not Tarkov.GameWorld.Player.LocalPlayer);
@@ -132,11 +126,20 @@ namespace LoneEftDmaRadar.UI.Skia
             if (players is null)
                 return;
 
+            float minRadius = 1.5f * App.Config.UI.UIScale;
+            float maxRadius = 12f * App.Config.UI.UIScale;
+            const float scaleFactor = 2.0f;
+
             foreach (var player in players)
             {
                 if (WorldToScreen(in player.Position, out var screen))
                 {
-                    _canvas.DrawCircle(screen.X, screen.Y, 3f, GetPaint(player));
+                    float distance = Vector3.Distance(localPlayer.Position, player.Position);
+
+                    float radius = maxRadius - MathF.Log(distance + 1f) * scaleFactor;
+                    radius = Math.Clamp(radius, minRadius, maxRadius);
+
+                    _canvas.DrawCircle(screen.X, screen.Y, radius, GetPaint(player));
                 }
             }
         }
@@ -149,16 +152,6 @@ namespace LoneEftDmaRadar.UI.Skia
 
             _canvas.DrawLine(bounds.Left, centerY, bounds.Right, centerY, SKPaints.PaintAimviewWidgetCrosshair);
             _canvas.DrawLine(centerX, bounds.Top, centerX, bounds.Bottom, SKPaints.PaintAimviewWidgetCrosshair);
-        }
-
-        private void DrawBoxAndLabel(SKPoint center, float half, string label, SKPaint boxPaint, SKPaint textPaint)
-        {
-            // NOTE: Original code used inverted Y values (top/bottom). Adjusted to conventional rect (top < bottom).
-            var rect = new SKRect(center.X - half, center.Y - half, center.X + half, center.Y + half);
-            var textPt = new SKPoint(center.X, center.Y + 12.5f * ScaleFactor);
-
-            _canvas.DrawRect(rect, boxPaint);
-            _canvas.DrawText(label, textPt, SKTextAlign.Left, SKFonts.EspWidgetFont, textPaint);
         }
 
         private void EnsureSurface(SKSize size)
@@ -206,7 +199,6 @@ namespace LoneEftDmaRadar.UI.Skia
             SKPaints.PaintAimviewWidgetRaider.StrokeWidth = std;
             SKPaints.PaintAimviewWidgetPScav.StrokeWidth = std;
             SKPaints.PaintAimviewWidgetFocused.StrokeWidth = std;
-            SKPaints.PaintAimviewWidgetLoot.StrokeWidth = 0.75f * newScale;
         }
 
         public override void Dispose()

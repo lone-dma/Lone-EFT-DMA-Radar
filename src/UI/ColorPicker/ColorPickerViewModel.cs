@@ -220,8 +220,6 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                         case ColorPickerOption.RegularLoot:
                             SKPaints.PaintLoot.Color = skColor;
                             SKPaints.TextLoot.Color = skColor;
-                            SKPaints.PaintAimviewWidgetLoot.Color = skColor;
-                            SKPaints.TextESPWidgetLoot.Color = skColor;
                             break;
                         case ColorPickerOption.ValuableLoot:
                             SKPaints.PaintImportantLoot.Color = skColor;
