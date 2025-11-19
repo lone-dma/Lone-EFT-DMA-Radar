@@ -416,6 +416,11 @@ namespace LoneEftDmaRadar.UI.Skia
             Style = SKPaintStyle.Fill
         };
 
+        protected virtual SKFont Font { get; } = new(CustomFonts.NeoSansStdRegular, 9f)
+        {
+            Subpixel = true
+        };
+
         private static SKPaint ButtonBackgroundPaint { get; } = new()
         {
             Color = SKColors.LightGray,
@@ -437,17 +442,6 @@ namespace LoneEftDmaRadar.UI.Skia
             IsStroke = false,
             IsAntialias = true
         };
-
-        private static SKFont Font { get; } = new(CustomFonts.NeoSansStdRegular, 9f)
-        {
-            Subpixel = true
-        };
-
-        internal static void SetScaleFactorInternal(float scale)
-        {
-            if (scale > 0 && scale.IsNormalOrZero())
-                Font.Size = 9f * scale;
-        }
 
         public virtual void Dispose()
         {
