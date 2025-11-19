@@ -1,4 +1,7 @@
-﻿namespace LoneEftDmaRadar.Tarkov.Unity.Structures
+﻿using LoneEftDmaRadar.DMA;
+using VmmSharpEx;
+
+namespace LoneEftDmaRadar.Tarkov.Unity.Structures
 {
     /// <summary>
     /// Unity Game Object Manager. Contains all Game Objects.
@@ -21,29 +24,32 @@
         {
             try
             {
-                var gomPtr = Memory.ReadPtr(unityBase + UnitySDK.UnityOffsets.GameObjectManager, false);
-                //var dump = new byte[128];
-                //Memory.ReadSpan(gomPtr - 64, dump, false);
-                //DumpBytes(dump);
-                //Environment.Exit(0);
-                return Memory.ReadValue<GameObjectManager>(gomPtr, false);
+                try
+                {
+                    const string signature = "48 89 05 ?? ?? ?? ?? 48 83 C4 ?? C3 33 C9";
+                    ulong gomSig = Memory.FindSignature(signature);
+                    gomSig.ThrowIfInvalidVirtualAddress(nameof(gomSig));
+                    uint rel = Memory.ReadValueEnsure<uint>(gomSig + 3);
+                    ulong addr = gomSig + 7 + rel;
+                    var gomPtr = Memory.ReadValueEnsure<VmmPointer>(addr);
+                    gomPtr.ThrowIfInvalid();
+                    var gom = Memory.ReadValueEnsure<GameObjectManager>(gomPtr);
+                    Debug.WriteLine("GOM Located via Signature.");
+                    return gom;
+                }
+                catch
+                {
+                    var gomPtr = Memory.ReadValueEnsure<VmmPointer>(unityBase + UnitySDK.UnityOffsets.GameObjectManager);
+                    gomPtr.ThrowIfInvalid();
+                    var gom = Memory.ReadValueEnsure<GameObjectManager>(gomPtr);
+                    Debug.WriteLine("GOM Located via Hardcoded Offset.");
+                    return gom;
+                }
             }
             catch (Exception ex)
             {
                 throw new Exception("ERROR Loading Game Object Manager", ex);
             }
-        }
-
-        private static void DumpBytes(byte[] bytes)
-        {
-            var sb = new StringBuilder();
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                sb.Append($"{bytes[i]:X2} ");
-                if ((i + 1) % 16 == 0)
-                    sb.AppendLine();
-            }
-            Debug.WriteLine($"Bytes:\n" + sb.ToString());
         }
 
         /// <summary>
@@ -97,6 +103,7 @@
 
                             map = Memory.ReadUnicodeString(mapPtr, 128, false);
                             Debug.WriteLine("Detected Map " + map);
+                            //Debug.WriteLine(currentObject.ThisObject.ToString("X"));
                             if (!StaticGameData.MapNames.ContainsKey(map)) // Also makes sure we're not in the hideout
                                 throw new ArgumentException("Invalid Map ID!");
                             return localGameWorld;
