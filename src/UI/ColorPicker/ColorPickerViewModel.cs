@@ -162,46 +162,56 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                         case ColorPickerOption.LocalPlayer:
                             SKPaints.PaintLocalPlayer.Color = skColor;
                             SKPaints.TextLocalPlayer.Color = skColor;
+                            SKPaints.PaintAimviewWidgetLocalPlayer.Color = skColor;
                             break;
                         case ColorPickerOption.FriendlyPlayer:
                             SKPaints.PaintTeammate.Color = skColor;
                             SKPaints.TextTeammate.Color = skColor;
+                            SKPaints.PaintAimviewWidgetTeammate.Color = skColor;
                             break;
                         case ColorPickerOption.PMCPlayer:
                             SKPaints.PaintPMC.Color = skColor;
                             SKPaints.TextPMC.Color = skColor;
+                            SKPaints.PaintAimviewWidgetPMC.Color = skColor;
                             SKPaints.TextPlayersOverlayPMC.Color = skColor.AdjustBrightness(0.5f);
                             break;
                         case ColorPickerOption.WatchlistPlayer:
                             SKPaints.PaintWatchlist.Color = skColor;
                             SKPaints.TextWatchlist.Color = skColor;
+                            SKPaints.PaintAimviewWidgetWatchlist.Color = skColor;
                             SKPaints.TextPlayersOverlaySpecial.Color = skColor.AdjustBrightness(0.5f);
                             break;
                         case ColorPickerOption.StreamerPlayer:
                             SKPaints.PaintStreamer.Color = skColor;
                             SKPaints.TextStreamer.Color = skColor;
+                            SKPaints.PaintAimviewWidgetStreamer.Color = skColor;
                             SKPaints.TextPlayersOverlayStreamer.Color = skColor.AdjustBrightness(0.5f);
                             break;
                         case ColorPickerOption.HumanScavPlayer:
                             SKPaints.PaintPScav.Color = skColor;
                             SKPaints.TextPScav.Color = skColor;
+                            SKPaints.PaintAimviewWidgetPScav.Color = skColor;
                             SKPaints.TextPlayersOverlayPScav.Color = skColor.AdjustBrightness(0.5f);
                             break;
                         case ColorPickerOption.ScavPlayer:
                             SKPaints.PaintScav.Color = skColor;
                             SKPaints.TextScav.Color = skColor;
+                            SKPaints.PaintAimviewWidgetScav.Color = skColor;
                             break;
                         case ColorPickerOption.RaiderPlayer:
                             SKPaints.PaintRaider.Color = skColor;
                             SKPaints.TextRaider.Color = skColor;
+                            SKPaints.PaintAimviewWidgetRaider.Color = skColor;
                             break;
                         case ColorPickerOption.BossPlayer:
                             SKPaints.PaintBoss.Color = skColor;
                             SKPaints.TextBoss.Color = skColor;
+                            SKPaints.PaintAimviewWidgetBoss.Color = skColor;
                             break;
                         case ColorPickerOption.FocusedPlayer:
                             SKPaints.PaintFocused.Color = skColor;
                             SKPaints.TextFocused.Color = skColor;
+                            SKPaints.PaintAimviewWidgetFocused.Color = skColor;
                             SKPaints.TextPlayersOverlayFocused.Color = skColor.AdjustBrightness(0.5f);
                             break;
                         case ColorPickerOption.DeathMarker:
