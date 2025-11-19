@@ -117,7 +117,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
                     currentObject = Memory.ReadValue<LinkedListObject>(currentObject.NextObjectLink); // Read next object
                 }
             }
-            return 0x0;
+            throw new InvalidOperationException("GameWorld not found.");
         }
     }
 }
