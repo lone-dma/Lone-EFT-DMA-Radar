@@ -9,10 +9,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         public static ulong GetGameWorld(this GameObjectManager gom, out string map)
         {
             Debug.WriteLine("Searching for GameWorld...");
-            var currentObject = Memory.ReadValue<LinkedListObject>(gom.ActiveNodes);
+            var firstObject = Memory.ReadValue<LinkedListObject>(gom.ActiveNodes);
             var lastObject = Memory.ReadValue<LinkedListObject>(gom.LastActiveNode);
-            currentObject.ThisObject.ThrowIfInvalidVirtualAddress(nameof(currentObject));
-            currentObject.NextObjectLink.ThrowIfInvalidVirtualAddress(nameof(currentObject));
+            firstObject.ThisObject.ThrowIfInvalidVirtualAddress(nameof(firstObject));
+            firstObject.NextObjectLink.ThrowIfInvalidVirtualAddress(nameof(firstObject));
             lastObject.ThisObject.ThrowIfInvalidVirtualAddress(nameof(lastObject));
             lastObject.PreviousObjectLink.ThrowIfInvalidVirtualAddress(nameof(lastObject));
 
@@ -20,8 +20,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             Task<GameWorldResult> winner = null;
             var tasks = new List<Task<GameWorldResult>>()
             {
-                Task.Run(() => ReadForward(currentObject, lastObject, cts.Token)),
-                Task.Run(() => ReadBackward(lastObject, currentObject, cts.Token))
+                Task.Run(() => ReadForward(firstObject, lastObject, cts.Token)),
+                Task.Run(() => ReadBackward(lastObject, firstObject, cts.Token))
             };
             while (tasks.Count > 0)
             {
