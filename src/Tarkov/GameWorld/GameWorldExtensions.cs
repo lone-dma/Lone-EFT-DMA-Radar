@@ -20,8 +20,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             Task<GameWorldResult> winner = null;
             var tasks = new List<Task<GameWorldResult>>()
             {
-                Task.Run(() => ReadForwardAsync(currentObject, lastObject, cts.Token)),
-                Task.Run(() => ReadBackwardAsync(lastObject, currentObject, cts.Token))
+                Task.Run(() => ReadForward(currentObject, lastObject, cts.Token)),
+                Task.Run(() => ReadBackward(lastObject, currentObject, cts.Token))
             };
             while (tasks.Count > 0)
             {
@@ -41,7 +41,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             return winner.Result.GameWorld;
         }
 
-        private static async Task<GameWorldResult> ReadForwardAsync(LinkedListObject currentObject, LinkedListObject lastObject, CancellationToken ct)
+        private static GameWorldResult ReadForward(LinkedListObject currentObject, LinkedListObject lastObject, CancellationToken ct)
         {
             while (currentObject.ThisObject != lastObject.ThisObject)
             {
@@ -57,7 +57,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             throw new InvalidOperationException("GameWorld not found.");
         }
 
-        private static async Task<GameWorldResult> ReadBackwardAsync(LinkedListObject currentObject, LinkedListObject lastObject, CancellationToken ct)
+        private static GameWorldResult ReadBackward(LinkedListObject currentObject, LinkedListObject lastObject, CancellationToken ct)
         {
             while (currentObject.ThisObject != lastObject.ThisObject)
             {
