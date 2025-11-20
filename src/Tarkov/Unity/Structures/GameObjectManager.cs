@@ -32,7 +32,6 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
                     uint rel = Memory.ReadValueEnsure<uint>(gomSig + 3);
                     var gomPtr = Memory.ReadValueEnsure<VmmPointer>(gomSig + 7 + rel);
                     gomPtr.ThrowIfInvalid();
-                    _ = Memory.ReadValueEnsure<GameObjectManager>(gomPtr); // Just for extra validation -> discard
                     Debug.WriteLine("GOM Located via Signature.");
                     return gomPtr;
                 }
@@ -40,7 +39,6 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
                 {
                     var gomPtr = Memory.ReadValueEnsure<VmmPointer>(unityBase + UnitySDK.UnityOffsets.GameObjectManager);
                     gomPtr.ThrowIfInvalid();
-                    _ = Memory.ReadValueEnsure<GameObjectManager>(gomPtr); // Just for extra validation -> discard
                     Debug.WriteLine("GOM Located via Hardcoded Offset.");
                     return gomPtr;
                 }
