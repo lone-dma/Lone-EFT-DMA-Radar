@@ -87,53 +87,5 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
             }
             return 0x0;
         }
-
-        public ulong GetGameWorld(out string map)
-        {
-            map = default;
-            var currentObject = Memory.ReadValue<LinkedListObject>(ActiveNodes);
-            var lastObject = Memory.ReadValue<LinkedListObject>(LastActiveNode);
-            currentObject.ThisObject.ThrowIfInvalidVirtualAddress(nameof(currentObject));
-            currentObject.NextObjectLink.ThrowIfInvalidVirtualAddress(nameof(currentObject));
-            lastObject.ThisObject.ThrowIfInvalidVirtualAddress(nameof(lastObject));
-
-            while (currentObject.ThisObject != lastObject.ThisObject)
-            {
-                try
-                {
-                    currentObject.ThisObject.ThrowIfInvalidVirtualAddress(nameof(currentObject));
-                    var objectNamePtr = Memory.ReadPtr(currentObject.ThisObject + UnitySDK.UnityOffsets.GameObject_NameOffset);
-                    var objectNameStr = Memory.ReadUtf8String(objectNamePtr, 64);
-                    if (objectNameStr.Equals("GameWorld", StringComparison.OrdinalIgnoreCase))
-                    {
-                        try
-                        {
-                            var localGameWorld = Memory.ReadPtrChain(currentObject.ThisObject, true, UnitySDK.UnityOffsets.GameWorldChain);
-                            /// Get Selected Map
-                            var mapPtr = Memory.ReadValue<ulong>(localGameWorld + Offsets.GameWorld.Location);
-                            if (mapPtr == 0x0) // Offline Mode
-                            {
-                                var localPlayer = Memory.ReadPtr(localGameWorld + Offsets.ClientLocalGameWorld.MainPlayer);
-                                mapPtr = Memory.ReadPtr(localPlayer + Offsets.Player.Location);
-                            }
-
-                            map = Memory.ReadUnicodeString(mapPtr, 128);
-                            Debug.WriteLine("Detected Map " + map);
-                            if (!StaticGameData.MapNames.ContainsKey(map)) // Also makes sure we're not in the hideout
-                                throw new ArgumentException("Invalid Map ID!");
-                            return localGameWorld;
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine($"Invalid GameWorld Instance: {ex}");
-                        }
-                    }
-                }
-                catch { }
-
-                currentObject = Memory.ReadValue<LinkedListObject>(currentObject.NextObjectLink); // Read next object
-            }
-            throw new InvalidOperationException("GameWorld not found.");
-        }
     }
 }

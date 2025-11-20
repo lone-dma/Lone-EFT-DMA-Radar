@@ -104,7 +104,7 @@ namespace LoneEftDmaRadar
                 {
                     _mutex.Dispose();
                     var thisProc = Process.GetCurrentProcess();
-                    foreach (var proc in 
+                    foreach (var proc in
                         Process.GetProcessesByName(thisProc.ProcessName)
                         .Where(p => p.Id != thisProc.Id))
                     {
