@@ -69,7 +69,7 @@ namespace SDK
             public const uint AccountId = 0xB0; // String
             public const uint PlayerBody = 0xC8; // EFT.PlayerBody
             public const uint ObservedPlayerController = 0x20; // -.\uED46
-            public const uint Voice = 0xC8; // String
+            public const uint Voice = 0x38; // String
             public const uint Side = 0x8C; // System.Int32
             public const uint IsAI = 0x98; // Boolean
         }
