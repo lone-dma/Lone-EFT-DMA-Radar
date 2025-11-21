@@ -23,37 +23,7 @@ jobs:
     runs-on: windows-latest
     environment: production
 
-    steps:
-      - name: Send Discord Webhook
-        shell: pwsh
-        env:
-          WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          REPO: ${{ github.repository }}
-          JOB_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-        run: |
-          $payload = @{
-            username = "GitHub Actions"
-            embeds = @(
-              @{
-                title = "$env:REPO"
-                description = "🚀 Build started"
-                color = 5814783
-                fields = @(
-                  @{
-                    name  = "Commit"
-                    value = $env:COMMIT_MESSAGE
-                  },
-                  @{
-                    name  = "Job Link"
-                    value = $env:JOB_URL
-                  }
-                )
-              }
-            )
-          } | ConvertTo-Json -Depth 5
-          Invoke-RestMethod -Uri $env:WEBHOOK -Method Post -ContentType "application/json" -Body $payload
-          
+    steps: 
       - name: Checkout
         uses: actions/checkout@v5
         with:
