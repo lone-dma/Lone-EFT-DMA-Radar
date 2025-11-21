@@ -10,7 +10,7 @@ namespace SDK
         public readonly partial struct ClientLocalGameWorld
         {
             public const uint BtrController = 0x50; // -.\uF07E
-            public const uint LootList = 0x198; // System.Collections.Generic.List<\uE311>
+            public const uint LootList = 0x178; // System.Collections.Generic.List<\uE311>
             public const uint RegisteredPlayers = 0x190; // System.Collections.Generic.List<IPlayer>
             public const uint MainPlayer = 0x1E0; // EFT.Player
             public const uint SynchronizableObjectLogicProcessor = 0x218; // -.\uEBD9
@@ -56,9 +56,9 @@ namespace SDK
 
         public readonly partial struct Player
         {
-            public const uint MovementContext = 0xC68; // EFT.MovementContext
+            public const uint MovementContext = 0x60; // EFT.MovementContext
             public const uint _playerBody = 0x190; // EFT.PlayerBody
-            public const uint Corpse = 0x670; // EFT.Interactive.Corpse
+            public const uint Corpse = 0x640; // EFT.Interactive.Corpse
             public const uint Location = 0x860; // String
             public const uint Profile = 0x8D8; // EFT.Profile
         }
@@ -68,7 +68,7 @@ namespace SDK
             public const uint GroupID = 0x78; // String
             public const uint AccountId = 0xB0; // String
             public const uint PlayerBody = 0xC8; // EFT.PlayerBody
-            public const uint ObservedPlayerController = 0xD0; // -.\uED46
+            public const uint ObservedPlayerController = 0x20; // -.\uED46
             public const uint Voice = 0xC8; // String
             public const uint Side = 0x8C; // System.Int32
             public const uint IsAI = 0x98; // Boolean
@@ -107,7 +107,6 @@ namespace SDK
 
         public readonly partial struct PlayerInfo
         {
-            public const uint EntryPoint = 0x28; // String
             public const uint GroupId = 0x50; // String
             public const uint Side = 0x48; // [HUMAN] Int32
             public const uint RegistrationDate = 0x4C; // Int32

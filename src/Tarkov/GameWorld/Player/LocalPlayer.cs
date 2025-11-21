@@ -40,15 +40,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         private static readonly HashSet<string> _wishlistItems = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
-        /// Spawn Point.
-        /// </summary>
-        public string EntryPoint { get; }
-        /// <summary>
-        /// Profile ID (if Player Scav).
-        /// Used for Exfils.
-        /// </summary>
-        public string ProfileId { get; }
-        /// <summary>
         /// Player name.
         /// </summary>
         public override string Name
@@ -67,16 +58,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             if (!(classType == "LocalPlayer" || classType == "ClientPlayer"))
                 throw new ArgumentOutOfRangeException(nameof(classType));
             IsHuman = true;
-            if (IsPmc)
-            {
-                var entryPtr = Memory.ReadPtr(Info + Offsets.PlayerInfo.EntryPoint);
-                EntryPoint = Memory.ReadUnicodeString(entryPtr);
-            }
-            else if (IsScav)
-            {
-                var profileIdPtr = Memory.ReadPtr(Profile + Offsets.Profile.Id);
-                ProfileId = Memory.ReadUnicodeString(profileIdPtr);
-            }
         }
     }
 }
