@@ -111,7 +111,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
         /// <summary>
         /// True if corpses are visible as loot.
         /// </summary>
-        public static bool LootCorpsesVisible => (MainWindow.Instance?.Settings?.ViewModel?.ShowLoot ?? false) && !(MainWindow.Instance?.Radar?.Overlay?.ViewModel?.HideCorpses ?? false) && !SearchFilterIsSet;
+        public static bool LootCorpsesVisible => App.Config.Loot.Enabled && !App.Config.Loot.HideCorpses && !SearchFilterIsSet;
 
         /// <summary>
         /// Contains all 'mouse-overable' items.
