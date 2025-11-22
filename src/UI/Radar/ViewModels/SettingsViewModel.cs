@@ -69,10 +69,8 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
         #region General Settings
 
         public ICommand RestartRadarCommand { get; }
-        private void OnRestartRadar()
-        {
-            Memory.RestartRadar = true;
-        }
+        private void OnRestartRadar() =>
+            Memory.RestartRadar();
 
         private bool _hotkeyManagerIsEnabled = true;
         public bool HotkeyManagerIsEnabled
