@@ -29,8 +29,8 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
                     const string signature = "48 89 05 ?? ?? ?? ?? 48 83 C4 ?? C3 33 C9";
                     ulong gomSig = Memory.FindSignature(signature);
                     gomSig.ThrowIfInvalidVirtualAddress(nameof(gomSig));
-                    uint rel = Memory.ReadValueEnsure<uint>(gomSig + 3);
-                    var gomPtr = Memory.ReadValueEnsure<VmmPointer>(gomSig + 7 + rel);
+                    int rva = Memory.ReadValueEnsure<int>(gomSig + 3);
+                    var gomPtr = Memory.ReadValueEnsure<VmmPointer>(gomSig.AddRVA(7, rva));
                     gomPtr.ThrowIfInvalid();
                     Debug.WriteLine("GOM Located via Signature.");
                     return gomPtr;
