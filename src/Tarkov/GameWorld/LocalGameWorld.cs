@@ -145,6 +145,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                     Debug.WriteLine("Raid has started!");
                     return instance;
                 }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"ERROR Instantiating Game Instance: {ex}");
