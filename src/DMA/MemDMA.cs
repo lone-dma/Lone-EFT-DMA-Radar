@@ -68,19 +68,16 @@ namespace LoneEftDmaRadar.DMA
         private readonly Lock _restartSync = new();
         private CancellationTokenSource _cts = new();
         /// <summary>
-        /// Set to TRUE to signal the Radar to restart the raid/game loop.
+        /// Signal the Radar to restart the raid/game loop.
         /// </summary>
-        public bool RestartRadar
+        public void RestartRadar()
         {
-            set
+            lock (_restartSync)
             {
-                lock (_restartSync)
-                {
-                    _cts.Cancel();
-                    _cts.Dispose();
-                    _cts = new();
-                    Restart = _cts.Token;
-                }
+                _cts.Cancel();
+                _cts.Dispose();
+                _cts = new();
+                Restart = _cts.Token;
             }
         }
         /// <summary>

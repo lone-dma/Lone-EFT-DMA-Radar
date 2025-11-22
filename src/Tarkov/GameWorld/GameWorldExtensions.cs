@@ -6,6 +6,14 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
 {
     public static class GameWorldExtensions
     {
+        /// <summary>
+        /// Get the GameWorld instance from the GameObjectManager.
+        /// </summary>
+        /// <param name="gom"></param>
+        /// <param name="ct">Restart radar cancellation token.</param>
+        /// <param name="map">Map for the located gameworld, otherwise null.</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         public static ulong GetGameWorld(this GameObjectManager gom, CancellationToken ct, out string map)
         {
             ct.ThrowIfCancellationRequested();
