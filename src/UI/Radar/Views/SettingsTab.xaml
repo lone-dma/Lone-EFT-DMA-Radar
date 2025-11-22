@@ -39,7 +39,7 @@ Toggle Fullscreen: F11
                     <!-- buttons -->
                     <WrapPanel Margin="0,0,0,12">
                         <Button Content="Restart Radar"
-                                ToolTip="Restarts the Radar for the current raid instance."
+                                ToolTip="Restarts the Radar for the current raid instance. Can be useful if stuck on 'waiting for raid start' or the raid is not functioning properly."
                                 Command="{Binding RestartRadarCommand}"
                                 MinWidth="100"
                                 Height="35"

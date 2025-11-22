@@ -55,7 +55,6 @@ namespace LoneEftDmaRadar.DMA
         private readonly Vmm _vmm;
         private readonly InputManager _input;
         private uint _pid;
-        private bool _restartRadar;
 
         public string MapID => Game?.MapID;
         public ulong UnityBase { get; private set; }
@@ -64,17 +63,32 @@ namespace LoneEftDmaRadar.DMA
         public bool Ready { get; private set; }
         public bool InRaid => Game?.InRaid ?? false;
 
+        #region Restart Radar
+
+        private readonly Lock _restartSync = new();
+        private CancellationTokenSource _cts = new();
         /// <summary>
-        /// Set to TRUE to restart the Radar on the next game loop cycle.
+        /// Set to TRUE to signal the Radar to restart the raid/game loop.
         /// </summary>
         public bool RestartRadar
         {
             set
             {
-                if (InRaid)
-                    _restartRadar = value;
+                lock (_restartSync)
+                {
+                    _cts.Cancel();
+                    _cts.Dispose();
+                    _cts = new();
+                    Restart = _cts.Token;
+                }
             }
         }
+        /// <summary>
+        /// Cancellation Token that is triggered when the Radar should restart the raid/game loop.
+        /// </summary>
+        public CancellationToken Restart { get; private set; }
+
+        #endregion
 
         public IReadOnlyCollection<AbstractPlayer> Players => Game?.Players;
         public IReadOnlyCollection<IExplosiveItem> Explosives => Game?.Explosives;
@@ -85,6 +99,7 @@ namespace LoneEftDmaRadar.DMA
 
         internal MemDMA()
         {
+            Restart = _cts.Token;
             FpgaAlgo fpgaAlgo = App.Config.DMA.FpgaAlgo;
             bool useMemMap = App.Config.DMA.MemMapEnabled;
             Debug.WriteLine("Initializing DMA...");
@@ -237,24 +252,25 @@ namespace LoneEftDmaRadar.DMA
             {
                 try
                 {
-                    using (var game = Game = LocalGameWorld.CreateGameInstance())
+                    var ct = Restart;
+                    using (var game = Game = LocalGameWorld.CreateGameInstance(ct))
                     {
                         OnRaidStarted();
                         game.Start();
                         while (game.InRaid)
                         {
-                            if (_restartRadar)
-                            {
-                                Debug.WriteLine("Restarting Radar per User Request.");
-                                _restartRadar = false;
-                                break;
-                            }
+                            ct.ThrowIfCancellationRequested();
                             game.Refresh();
                             Thread.Sleep(133);
                         }
                     }
                 }
-                catch (OperationCanceledException ex) // Process Closed
+                catch (OperationCanceledException ex) // Restart Radar
+                {
+                    Debug.WriteLine(ex.Message);
+                    continue;
+                }
+                catch (ProcessNotRunningException ex) // Process Closed
                 {
                     Debug.WriteLine(ex.Message);
                     break;
@@ -279,7 +295,6 @@ namespace LoneEftDmaRadar.DMA
         /// <param name="e"></param>
         private void MemDMA_ProcessStopped(object sender, EventArgs e)
         {
-            _restartRadar = default;
             this.Starting = default;
             this.Ready = default;
             UnityBase = default;
@@ -586,7 +601,7 @@ namespace LoneEftDmaRadar.DMA
         /// <summary>
         /// Throws a special exception if no longer in game.
         /// </summary>
-        /// <exception cref="OperationCanceledException"></exception>
+        /// <exception cref="ProcessNotRunningException"></exception>
         public void ThrowIfProcessNotRunning()
         {
             _vmm.ForceFullRefresh();
@@ -606,7 +621,15 @@ namespace LoneEftDmaRadar.DMA
                 }
             }
 
-            throw new OperationCanceledException("Process is not running!");
+            throw new ProcessNotRunningException();
+        }
+
+        private sealed class ProcessNotRunningException : Exception
+        {
+            public ProcessNotRunningException()
+                : base("Process is not running!")
+            {
+            }
         }
 
         #endregion
