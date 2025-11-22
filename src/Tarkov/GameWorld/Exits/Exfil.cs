@@ -52,7 +52,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
         public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
             var heightDiff = Position.Y - localPlayer.Position.Y;
-            var paint = SKPaints.PaintExfilOpen;
+            var paint = SKPaints.PaintExfil;
             var point = Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);
             MouseoverPosition = new Vector2(point.X, point.Y);
             SKPaints.ShapeOutline.StrokeWidth = 2f;
@@ -84,12 +84,5 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
         }
 
         #endregion
-
-        public enum EStatus
-        {
-            Open,
-            Pending,
-            Closed
-        }
     }
 }
