@@ -9,7 +9,7 @@ namespace SDK
 
         public readonly partial struct ClientLocalGameWorld
         {
-            public const uint BtrController = 0x50; // -.\uF07E
+            public const uint BtrController = 0x20; // -.\uF07E
             public const uint LootList = 0x178; // System.Collections.Generic.List<\uE311>
             public const uint RegisteredPlayers = 0x190; // System.Collections.Generic.List<IPlayer>
             public const uint MainPlayer = 0x1E0; // EFT.Player
@@ -185,7 +185,10 @@ namespace SDK
             Birdeye = 16384,
             Knight = 32768,
             BigPipe = 65536,
+            BlackDivision = 131072,
+            VSRF = 262144
         }
+
 
         [Flags]
         public enum EMemberCategory
@@ -204,85 +207,6 @@ namespace SDK
             Unheard = 1024,
         }
 
-        public enum WildSpawnType
-        {
-            marksman = 0,
-            assault = 1,
-            bossTest = 2,
-            bossBully = 3,
-            followerTest = 4,
-            followerBully = 5,
-            bossKilla = 6,
-            bossKojaniy = 7,
-            followerKojaniy = 8,
-            pmcBot = 9,
-            cursedAssault = 10,
-            bossGluhar = 11,
-            followerGluharAssault = 12,
-            followerGluharSecurity = 13,
-            followerGluharScout = 14,
-            followerGluharSnipe = 15,
-            followerSanitar = 16,
-            bossSanitar = 17,
-            test = 18,
-            assaultGroup = 19,
-            sectantWarrior = 20,
-            sectantPriest = 21,
-            bossTagilla = 22,
-            followerTagilla = 23,
-            exUsec = 24,
-            gifter = 25,
-            bossKnight = 26,
-            followerBigPipe = 27,
-            followerBirdEye = 28,
-            bossZryachiy = 29,
-            followerZryachiy = 30,
-            bossBoar = 32,
-            followerBoar = 33,
-            arenaFighter = 34,
-            arenaFighterEvent = 35,
-            bossBoarSniper = 36,
-            crazyAssaultEvent = 37,
-            peacefullZryachiyEvent = 38,
-            sectactPriestEvent = 39,
-            ravangeZryachiyEvent = 40,
-            followerBoarClose1 = 41,
-            followerBoarClose2 = 42,
-            bossKolontay = 43,
-            followerKolontayAssault = 44,
-            followerKolontaySecurity = 45,
-            shooterBTR = 46,
-            bossPartisan = 47,
-            spiritWinter = 48,
-            spiritSpring = 49,
-            peacemaker = 50,
-            pmcBEAR = 51,
-            pmcUSEC = 52,
-            skier = 53,
-            sectantPredvestnik = 57,
-            sectantPrizrak = 58,
-            sectantOni = 59,
-            infectedAssault = 60,
-            infectedPmc = 61,
-            infectedCivil = 62,
-            infectedLaborant = 63,
-            infectedTagilla = 64,
-            bossTagillaAgro = 65,
-            bossKillaAgro = 66,
-            tagillaHelperAgro = 67,
-        }
-
-        public enum EExfiltrationStatus
-        {
-            NotPresent = 1,
-            UncompleteRequirements = 2,
-            Countdown = 3,
-            RegularMode = 4,
-            Pending = 5,
-            AwaitsManualActivation = 6,
-            Hidden = 7,
-        }
-
         public enum SynchronizableObjectType
         {
             AirDrop = 0,
@@ -298,20 +222,6 @@ namespace SDK
             Exploding = 3,
             Exploded = 4,
             Inert = 5,
-        }
-
-        public enum EQuestStatus
-        {
-            Locked = 0,
-            AvailableForStart = 1,
-            Started = 2,
-            AvailableForFinish = 3,
-            Success = 4,
-            Fail = 5,
-            FailRestartable = 6,
-            MarkedAsFailed = 7,
-            Expired = 8,
-            AvailableAfter = 9,
         }
     }
 }
