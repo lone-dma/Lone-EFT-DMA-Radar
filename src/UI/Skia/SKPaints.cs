@@ -447,9 +447,9 @@ namespace LoneEftDmaRadar.UI.Skia
             IsAntialias = true,
         };
 
-        public static SKPaint PaintExfilOpen { get; } = new()
+        public static SKPaint PaintExfil { get; } = new()
         {
-            Color = SKColors.LimeGreen,
+            Color = SKColors.Yellow,
             StrokeWidth = 0.25f,
             Style = SKPaintStyle.Fill,
             IsAntialias = true,
