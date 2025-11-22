@@ -44,7 +44,11 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// <summary>
         /// Player name.
         /// </summary>
-        public override string Name { get; set; }
+        public override string Name
+        {
+            get => "AI";
+            set { }
+        }
         /// <summary>
         /// Account UUID for Human Controlled Players.
         /// </summary>

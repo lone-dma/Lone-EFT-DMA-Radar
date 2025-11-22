@@ -287,7 +287,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         {
             var ct = e.CancellationToken;
             ValidatePlayerTransforms(); // Check for transform anomalies
-            // Refresh Loot
+            // Sync FilteredLoot
             Loot.Refresh(ct);
         }
 
