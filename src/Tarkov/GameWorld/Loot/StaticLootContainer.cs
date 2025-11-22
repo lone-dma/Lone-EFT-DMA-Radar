@@ -30,11 +30,13 @@ using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Skia;
+using LoneEftDmaRadar.Web.TarkovDev.Data;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
 {
-    public sealed class StaticLootContainer : LootContainer
+    public sealed class StaticLootContainer : LootItem
     {
+        private static readonly TarkovMarketItem _default = new();
         public override string Name { get; } = "Container";
         public override string ID { get; }
 
@@ -43,7 +45,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         /// </summary>
         public bool Searched { get; private set; }
 
-        public StaticLootContainer(string containerId, Vector3 position) : base(position)
+        public StaticLootContainer(string containerId, Vector3 position) : base(_default, position)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(containerId, nameof(containerId));
             ID = containerId;
@@ -55,29 +57,30 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
 
         public override void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
-            if (!Position.WithinDistance(localPlayer.Position, App.Config.Containers.DrawDistance))
-                return;
-            var heightDiff = Position.Y - localPlayer.Position.Y;
-            var point = Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);
-            MouseoverPosition = new Vector2(point.X, point.Y);
-            SKPaints.ShapeOutline.StrokeWidth = 2f;
-            if (heightDiff > 1.45) // loot is above player
+            if (Position.WithinDistance(localPlayer.Position, App.Config.Containers.DrawDistance))
             {
-                using var path = point.GetUpArrow(4);
-                canvas.DrawPath(path, SKPaints.ShapeOutline);
-                canvas.DrawPath(path, SKPaints.PaintContainerLoot);
-            }
-            else if (heightDiff < -1.45) // loot is below player
-            {
-                using var path = point.GetDownArrow(4);
-                canvas.DrawPath(path, SKPaints.ShapeOutline);
-                canvas.DrawPath(path, SKPaints.PaintContainerLoot);
-            }
-            else // loot is level with player
-            {
-                var size = 4 * App.Config.UI.UIScale;
-                canvas.DrawCircle(point, size, SKPaints.ShapeOutline);
-                canvas.DrawCircle(point, size, SKPaints.PaintContainerLoot);
+                var heightDiff = Position.Y - localPlayer.Position.Y;
+                var point = Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);
+                MouseoverPosition = new Vector2(point.X, point.Y);
+                SKPaints.ShapeOutline.StrokeWidth = 2f;
+                if (heightDiff > 1.45) // loot is above player
+                {
+                    using var path = point.GetUpArrow(4);
+                    canvas.DrawPath(path, SKPaints.ShapeOutline);
+                    canvas.DrawPath(path, SKPaints.PaintContainerLoot);
+                }
+                else if (heightDiff < -1.45) // loot is below player
+                {
+                    using var path = point.GetDownArrow(4);
+                    canvas.DrawPath(path, SKPaints.ShapeOutline);
+                    canvas.DrawPath(path, SKPaints.PaintContainerLoot);
+                }
+                else // loot is level with player
+                {
+                    var size = 4 * App.Config.UI.UIScale;
+                    canvas.DrawCircle(point, size, SKPaints.ShapeOutline);
+                    canvas.DrawCircle(point, size, SKPaints.PaintContainerLoot);
+                }
             }
         }
 

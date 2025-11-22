@@ -31,7 +31,7 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
 namespace LoneEftDmaRadar.UI.Loot
 {
     /// <summary>
-    /// Enumerable Loot Filter Class.
+    /// Enumerable FilteredLoot Filter Class.
     /// </summary>
     internal static class LootFilter
     {
@@ -41,9 +41,9 @@ namespace LoneEftDmaRadar.UI.Loot
         public static bool ShowBackpacks;
 
         /// <summary>
-        /// Creates a loot filter based on current Loot Filter settings.
+        /// Creates a loot filter based on current FilteredLoot Filter settings.
         /// </summary>
-        /// <returns>Loot Filter Predicate.</returns>
+        /// <returns>FilteredLoot Filter Predicate.</returns>
         public static Predicate<LootItem> Create()
         {
             var search = SearchString?.Trim();
@@ -59,26 +59,10 @@ namespace LoneEftDmaRadar.UI.Loot
                 };
                 return item =>
                 {
-                    if (item is LootAirdrop)
-                    {
-                        return true;
-                    }
-                    if (item is LootCorpse)
-                    {
-                        return true;
-                    }
-                    if (p(item))
-                    {
-                        if (item is LootContainer container)
-                        {
-                            container.SetFilter(p);
-                        }
-                        return true;
-                    }
-                    return false;
+                    return p(item);
                 };
             }
-            else // Loot Search
+            else // FilteredLoot Search
             {
                 var names = search!.Split(',').Select(a => a.Trim()).ToList(); // Pooled wasnt working well here
                 Predicate<LootItem> p = x => // Search Predicate
@@ -87,19 +71,7 @@ namespace LoneEftDmaRadar.UI.Loot
                 };
                 return item =>
                 {
-                    if (item is LootAirdrop)
-                    {
-                        return true;
-                    }
-                    if (item.ContainsSearchPredicate(p))
-                    {
-                        if (item is LootContainer container)
-                        {
-                            container.SetFilter(p);
-                        }
-                        return true;
-                    }
-                    return false;
+                    return item.ContainsSearchPredicate(p);
                 };
             }
         }

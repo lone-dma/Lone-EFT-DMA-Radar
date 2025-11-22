@@ -87,7 +87,7 @@ namespace LoneEftDmaRadar
         public WebRadarConfig WebRadar { get; private set; } = new();
 
         /// <summary>
-        /// Loot Config
+        /// FilteredLoot Config
         /// </summary>
         [JsonPropertyName("loot")]
         [JsonInclude]
@@ -306,7 +306,7 @@ namespace LoneEftDmaRadar
         };
 
         /// <summary>
-        /// Loot Filters Config.
+        /// FilteredLoot Filters Config.
         /// </summary>
         [JsonInclude]
         [JsonPropertyName("lootFilters")]
@@ -569,13 +569,13 @@ namespace LoneEftDmaRadar
         public int MinValueValuable { get; set; } = 200000;
 
         /// <summary>
-        /// Show Loot by "Price per Slot".
+        /// Show FilteredLoot by "Price per Slot".
         /// </summary>
         [JsonPropertyName("pricePerSlot")]
         public bool PricePerSlot { get; set; }
 
         /// <summary>
-        /// Loot Price Mode.
+        /// FilteredLoot Price Mode.
         /// </summary>
         [JsonPropertyName("priceMode")]
         public LootPriceMode PriceMode { get; set; } = LootPriceMode.FleaMarket;
@@ -618,7 +618,7 @@ namespace LoneEftDmaRadar
     }
 
     /// <summary>
-    /// Loot Filter Config.
+    /// FilteredLoot Filter Config.
     /// </summary>
     public sealed class LootFilterConfig
     {

@@ -39,7 +39,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives
         /// </summary>
         ulong Addr { get; }
         /// <summary>
-        /// Refresh the state of the explosive item.
+        /// Sync the state of the explosive item.
         /// </summary>
         void OnRefresh(VmmScatter scatter);
     }

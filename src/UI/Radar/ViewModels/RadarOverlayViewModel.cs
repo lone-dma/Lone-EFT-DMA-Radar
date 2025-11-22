@@ -98,7 +98,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             }
         }
 
-        // ─── Loot settings ─────────────────────────────────────────────────────
+        // ─── FilteredLoot settings ─────────────────────────────────────────────────────
         public int RegularValue
         {
             get => App.Config.Loot.MinValue;

@@ -282,7 +282,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         }
 
         /// <summary>
-        /// Refresh Player Information.
+        /// Sync Player Information.
         /// </summary>
         public override void OnRegRefresh(VmmScatter scatter, ISet<ulong> registered, bool? isActiveParam = null)
         {

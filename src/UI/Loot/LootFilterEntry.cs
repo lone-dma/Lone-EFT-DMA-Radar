@@ -31,7 +31,7 @@ using LoneEftDmaRadar.Tarkov;
 namespace LoneEftDmaRadar.UI.Loot
 {
     /// <summary>
-    /// JSON Wrapper for Important Loot, now with INotifyPropertyChanged.
+    /// JSON Wrapper for Important FilteredLoot, now with INotifyPropertyChanged.
     /// </summary>
     public sealed class LootFilterEntry : INotifyPropertyChanged
     {
@@ -65,7 +65,7 @@ namespace LoneEftDmaRadar.UI.Loot
 
         private LootFilterEntryType _type = LootFilterEntryType.ImportantLoot;
         /// <summary>
-        /// Entry Type (0 = Important Loot, 1 = Blacklisted Loot)
+        /// Entry Type (0 = Important FilteredLoot, 1 = Blacklisted FilteredLoot)
         /// </summary>
         [JsonPropertyName("type")]
         public LootFilterEntryType Type

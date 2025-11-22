@@ -86,7 +86,7 @@ namespace LoneEftDmaRadar.Tarkov
         #region Methods
 
         /// <summary>
-        /// Loads Game/Loot Data and sets the static dictionaries.
+        /// Loads Game/FilteredLoot Data and sets the static dictionaries.
         /// If updated data is needed, spawns a background task to retrieve it.
         /// </summary>
         /// <returns></returns>
@@ -177,7 +177,7 @@ namespace LoneEftDmaRadar.Tarkov
         }
 
         /// <summary>
-        /// Loads updated Game/Loot Data from the web and sets the static dictionaries.
+        /// Loads updated Game/FilteredLoot Data from the web and sets the static dictionaries.
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
