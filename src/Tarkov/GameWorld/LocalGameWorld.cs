@@ -105,7 +105,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                     SleepMode = WorkerThreadSleepMode.DynamicSleep
                 };
                 _t3.PerformWork += ExplosivesWorker_PerformWork;
-                var rgtPlayersAddr = Memory.ReadPtr(localGameWorld + Offsets.ClientLocalGameWorld.RegisteredPlayers, false);
+                var rgtPlayersAddr = Memory.ReadPtr(localGameWorld + Offsets.GameWorld.RegisteredPlayers, false);
                 _rgtPlayers = new RegisteredPlayers(rgtPlayersAddr, this);
                 ArgumentOutOfRangeException.ThrowIfLessThan(_rgtPlayers.GetPlayerCount(), 1, nameof(_rgtPlayers));
                 Loot = new(localGameWorld);
@@ -240,7 +240,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         {
             try
             {
-                var mainPlayer = Memory.ReadPtr(this + Offsets.ClientLocalGameWorld.MainPlayer, false);
+                var mainPlayer = Memory.ReadPtr(this + Offsets.GameWorld.MainPlayer, false);
                 ArgumentOutOfRangeException.ThrowIfNotEqual(mainPlayer, _rgtPlayers.LocalPlayer, nameof(mainPlayer));
                 return _rgtPlayers.GetPlayerCount() > 0;
             }
@@ -338,10 +338,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         {
             try
             {
-                var btrController = Memory.ReadPtr(this + Offsets.ClientLocalGameWorld.BtrController);
+                var btrController = Memory.ReadPtr(this + Offsets.GameWorld.BtrController);
                 var btrView = Memory.ReadPtr(btrController + Offsets.BtrController.BtrView);
                 var btrTurretView = Memory.ReadPtr(btrView + Offsets.BTRView.turret);
-                var btrOperator = Memory.ReadPtr(btrTurretView + Offsets.BTRTurretView.AttachedBot);
+                var btrOperator = Memory.ReadPtr(btrTurretView + Offsets.BTRTurretView._bot);
                 _rgtPlayers.TryAllocateBTR(btrView, btrOperator);
             }
             catch (Exception ex)

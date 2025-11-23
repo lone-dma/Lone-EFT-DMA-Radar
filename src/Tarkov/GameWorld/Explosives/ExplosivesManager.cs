@@ -32,7 +32,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives
 {
     public sealed class ExplosivesManager : IReadOnlyCollection<IExplosiveItem>
     {
-        private static readonly uint[] _toSyncObjects = new[] { Offsets.ClientLocalGameWorld.SynchronizableObjectLogicProcessor, Offsets.SynchronizableObjectLogicProcessor.SynchronizableObjects };
+        private static readonly uint[] _toSyncObjects = new[] { Offsets.GameWorld.SynchronizableObjectLogicProcessor, Offsets.SynchronizableObjectLogicProcessor._activeSynchronizableObjects };
         private readonly ulong _localGameWorld;
         private readonly ConcurrentDictionary<ulong, IExplosiveItem> _explosives = new();
 
@@ -73,7 +73,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives
         {
             try
             {
-                var grenades = Memory.ReadPtr(_localGameWorld + Offsets.ClientLocalGameWorld.Grenades);
+                var grenades = Memory.ReadPtr(_localGameWorld + Offsets.GameWorld.Grenades);
                 var grenadesListPtr = Memory.ReadPtr(grenades + 0x18);
                 using var grenadesList = MonoList<ulong>.Create(grenadesListPtr, false);
                 foreach (var grenade in grenadesList)

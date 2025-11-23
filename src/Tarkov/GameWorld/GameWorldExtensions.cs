@@ -98,10 +98,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                     {
                         var localGameWorld = Memory.ReadPtrChain(currentObject.ThisObject, true, UnitySDK.UnityOffsets.GameWorldChain);
                         /// Get Selected Map
-                        var mapPtr = Memory.ReadValue<ulong>(localGameWorld + Offsets.GameWorld.Location);
+                        var mapPtr = Memory.ReadValue<ulong>(localGameWorld + Offsets.GameWorld.LocationId);
                         if (mapPtr == 0x0) // Offline Mode
                         {
-                            var localPlayer = Memory.ReadPtr(localGameWorld + Offsets.ClientLocalGameWorld.MainPlayer);
+                            var localPlayer = Memory.ReadPtr(localGameWorld + Offsets.GameWorld.MainPlayer);
                             mapPtr = Memory.ReadPtr(localPlayer + Offsets.Player.Location);
                         }
 

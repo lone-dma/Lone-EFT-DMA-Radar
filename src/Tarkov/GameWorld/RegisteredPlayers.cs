@@ -53,7 +53,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         {
             Base = baseAddr;
             _game = game;
-            var mainPlayer = Memory.ReadPtr(_game + Offsets.ClientLocalGameWorld.MainPlayer, false);
+            var mainPlayer = Memory.ReadPtr(_game + Offsets.GameWorld.MainPlayer, false);
             var localPlayer = new LocalPlayer(mainPlayer);
             _players[localPlayer] = LocalPlayer = localPlayer;
         }

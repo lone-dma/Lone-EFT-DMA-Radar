@@ -77,11 +77,11 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives
                 // Smokes never leave the list, don't remove
                 return;
             }
-            scatter.PrepareReadValue<bool>(this + Offsets.Grenade.IsDestroyed);
+            scatter.PrepareReadValue<bool>(this + Offsets.Throwable._isDestroyed);
             scatter.PrepareReadArray<UnityTransform.TrsX>(_transform.VerticesAddr, _transform.Count);
             scatter.Completed += (sender, x1) =>
             {
-                if (x1.ReadValue<bool>(this + Offsets.Grenade.IsDestroyed, out bool destroyed) && destroyed)
+                if (x1.ReadValue<bool>(this + Offsets.Throwable._isDestroyed, out bool destroyed) && destroyed)
                 {
                     // Remove from parent collection
                     _ = _parent.TryRemove(Addr, out _);
