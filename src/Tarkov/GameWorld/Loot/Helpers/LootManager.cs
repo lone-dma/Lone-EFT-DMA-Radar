@@ -116,7 +116,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
         /// </summary>
         private void GetLoot(CancellationToken ct)
         {
-            var lootListAddr = Memory.ReadPtr(_lgw + Offsets.ClientLocalGameWorld.LootList);
+            var lootListAddr = Memory.ReadPtr(_lgw + Offsets.GameWorld.LootList);
             using var lootList = MonoList<ulong>.Create(
                 addr: lootListAddr,
                 useCache: true);
@@ -260,7 +260,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
                 }
                 else if (isLooseLoot)
                 {
-                    var item = Memory.ReadPtr(interactiveClass + Offsets.InteractiveLootItem.Item); //EFT.InventoryLogic.Item
+                    var item = Memory.ReadPtr(interactiveClass + Offsets.InteractiveLootItem._item); //EFT.InventoryLogic.Item
                     var itemTemplate = Memory.ReadPtr(item + Offsets.LootItem.Template); //EFT.InventoryLogic.ItemTemplate
                     var isQuestItem = Memory.ReadValue<bool>(itemTemplate + Offsets.ItemTemplate.QuestItem);
 

@@ -162,9 +162,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 nameof(ObservedPlayerController));
             ObservedHealthController = Memory.ReadPtr(ObservedPlayerController + Offsets.ObservedPlayerController.HealthController);
             ArgumentOutOfRangeException.ThrowIfNotEqual(this,
-                Memory.ReadValue<ulong>(ObservedHealthController + Offsets.ObservedHealthController.Player),
+                Memory.ReadValue<ulong>(ObservedHealthController + Offsets.ObservedHealthController._player),
                 nameof(ObservedHealthController));
-            CorpseAddr = ObservedHealthController + Offsets.ObservedHealthController.PlayerCorpse;
+            CorpseAddr = ObservedHealthController + Offsets.ObservedHealthController._playerCorpse;
 
             MovementContext = GetMovementContext();
             RotationAddress = ValidateRotationAddr(MovementContext + Offsets.ObservedPlayerStateContext.Rotation);
@@ -277,7 +277,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         private ulong GetMovementContext()
         {
-            var movementController = Memory.ReadPtrChain(ObservedPlayerController, true, Offsets.ObservedPlayerController.MovementController, Offsets.ObservedMovementController.ObservedPlayerStateContext);
+            var movementController = Memory.ReadPtrChain(ObservedPlayerController, true, Offsets.ObservedPlayerController.MovementController, Offsets.ObservedPlayerMovementController.ObservedPlayerStateContext);
             return movementController;
         }
 
