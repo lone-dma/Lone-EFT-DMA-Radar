@@ -338,6 +338,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         {
             try
             {
+                if (_rgtPlayers.Any(p => p is BtrPlayer))
+                    return;
                 var btrController = Memory.ReadPtr(this + Offsets.GameWorld.BtrController);
                 var btrView = Memory.ReadPtr(btrController + Offsets.BtrController.BtrView);
                 var btrTurretView = Memory.ReadPtr(btrView + Offsets.BTRView.turret);
