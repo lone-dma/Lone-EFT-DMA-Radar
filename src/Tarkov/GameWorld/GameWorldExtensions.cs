@@ -31,7 +31,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 Task<GameWorldResult> winner = null;
                 var tasks = new List<Task<GameWorldResult>>()
                 {
-                    Task.Run(() => ReadShallow(firstObject, lastObject, cts.Token, ct)),
+                    Task.Run(() => ReadShallow(cts.Token, ct)),
                     Task.Run(() => ReadForward(firstObject, lastObject, cts.Token, ct)),
                     Task.Run(() => ReadBackward(lastObject, firstObject, cts.Token, ct))
                 };
@@ -58,23 +58,24 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             }
         }
 
-        private static GameWorldResult ReadShallow(LinkedListObject currentObject, LinkedListObject lastObject, CancellationToken ct1, CancellationToken ct2)
+        private static GameWorldResult ReadShallow(CancellationToken ct1, CancellationToken ct2)
         {
-            var original = currentObject;
-            const int depth = 10000;
+            const int maxDepth = 10000;
             while (true)
             {
                 ct1.ThrowIfCancellationRequested();
                 ct2.ThrowIfCancellationRequested();
                 try
                 {
-                    currentObject = original;
+                    // This implementation is completely self-contained to keep memory state fresh on re-loops
+                    var gom = GameObjectManager.Get();
+                    var currentObject = Memory.ReadValue<LinkedListObject>(gom.ActiveNodes);
                     int iterations = 0;
-                    while (currentObject.ThisObject != lastObject.ThisObject)
+                    while (currentObject.ThisObject.IsValidVirtualAddress())
                     {
                         ct1.ThrowIfCancellationRequested();
                         ct2.ThrowIfCancellationRequested();
-                        if (iterations++ >= depth)
+                        if (iterations++ >= maxDepth)
                             break;
                         if (ParseGameWorld(ref currentObject) is GameWorldResult result)
                         {
