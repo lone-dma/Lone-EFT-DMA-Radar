@@ -18,7 +18,7 @@ This version is designed to be as safe as possible from any future detections, a
 - See our [Setup Files and Guides](https://github.com/lone-dma/Lone-EFT-DMA-Radar/releases/tag/setup).
 
 ## 💸 Donations
-If you find this software useful, _please_ consider donating! Every little bit helps :) [See here for Donations Info](https://github.com/lone-dma)
+If you find this software useful, _please_ consider donating! Every little bit helps :) [See here for Donations Info](https://github.com/lone-dma#-support-the-project)
  
 ## 💖 Special Thanks
 - @xx0m and @Mambo-Noob
