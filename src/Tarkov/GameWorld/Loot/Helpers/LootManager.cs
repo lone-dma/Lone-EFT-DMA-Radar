@@ -27,8 +27,8 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using LoneEftDmaRadar.Tarkov.Mono.Collections;
 using LoneEftDmaRadar.Tarkov.Unity;
+using LoneEftDmaRadar.Tarkov.Unity.Collections;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.UI.Loot;
 
@@ -117,7 +117,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
         private void GetLoot(CancellationToken ct)
         {
             var lootListAddr = Memory.ReadPtr(_lgw + Offsets.GameWorld.LootList);
-            using var lootList = MonoList<ulong>.Create(
+            using var lootList = UnityList<ulong>.Create(
                 addr: lootListAddr,
                 useCache: true);
             // Remove any loot no longer present
