@@ -91,7 +91,7 @@ namespace LoneEftDmaRadar.Web.WebRadar
                         app.UseRouting();
                         app.UseEndpoints(endpoints =>
                         {
-                            endpoints.MapHub<RadarServerHub>("/hub/006d97cd-1ceb-4bc2-8cb1-3b8329ee3fdb");
+                            endpoints.MapHub<RadarServerHub>("/");
                         });
                     })
                     .UseUrls($"http://{FormatIPForURL(ip)}:{port}");
