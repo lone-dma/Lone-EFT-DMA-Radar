@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.DMA;
 using System.Runtime;
 
 namespace LoneEftDmaRadar.Misc
@@ -37,8 +36,8 @@ namespace LoneEftDmaRadar.Misc
 
         static ResourceJanitor()
         {
-            MemDMA.RaidStarted += MemDMA_RaidStarted;
-            MemDMA.RaidStopped += MemDMA_RaidStopped;
+            Memory.RaidStarted += MemDMA_RaidStarted;
+            Memory.RaidStopped += MemDMA_RaidStopped;
             _ = Task.Run(WorkerRoutineAsync);
         }
 

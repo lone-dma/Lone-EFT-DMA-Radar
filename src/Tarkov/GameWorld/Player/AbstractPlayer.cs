@@ -27,7 +27,6 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using LoneEftDmaRadar.DMA;
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
@@ -56,7 +55,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
 
         static AbstractPlayer()
         {
-            MemDMA.RaidStopped += MemDMA_RaidStopped;
+            Memory.RaidStopped += MemDMA_RaidStopped;
         }
 
         private static void MemDMA_RaidStopped(object sender, EventArgs e)

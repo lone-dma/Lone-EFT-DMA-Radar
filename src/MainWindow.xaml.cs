@@ -84,8 +84,6 @@ namespace LoneEftDmaRadar
                     App.Config.InfoWidget.Location = infoWidget.Rectangle;
                     App.Config.InfoWidget.Minimized = infoWidget.Minimized;
                 }
-
-                Memory.Dispose(); // Close FPGA
             }
             finally
             {
