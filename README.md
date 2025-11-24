@@ -17,6 +17,9 @@ This version is designed to be as safe as possible from any future detections, a
 - Download the latest version in [Releases](https://github.com/lone-dma/Lone-EFT-DMA-Radar/releases).
 - See our [Setup Files and Guides](https://github.com/lone-dma/Lone-EFT-DMA-Radar/releases/tag/setup).
 
+## 💸 Donations
+If you find this software useful, _please_ consider donating! Every little bit helps :) [See here for Donations Info](https://github.com/lone-dma)
+ 
 ## 💖 Special Thanks
 - @xx0m and @Mambo-Noob
   - For keeping the DER Community running, and doing an awesome job keeping the other eft-dma-radar fork maintained. Thank you!
