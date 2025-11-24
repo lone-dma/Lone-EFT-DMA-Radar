@@ -25,3 +25,5 @@ If you find this software useful, _please_ consider donating! Every little bit h
   - For keeping the DER Community running, and doing an awesome job keeping the other eft-dma-radar fork maintained. Thank you!
 - Marazm
   - For your hard work on maps, and your willingness to contribute them to the open domain. Thank you!
+- Keegi
+  - For your helpful insights on Unity/IL2CPP Reversing. Thank you!
