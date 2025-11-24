@@ -27,7 +27,6 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using LoneEftDmaRadar.DMA;
 
 namespace LoneEftDmaRadar.Tarkov.Unity.Collections
 {
@@ -54,7 +53,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Collections
         /// <returns></returns>
         public static UnityHashSet<T> Create(ulong addr, bool useCache = true)
         {
-            var count = MemoryInterface.Memory.ReadValue<int>(addr + CountOffset, useCache);
+            var count = LoneEftDmaRadar.DMA.Memory.ReadValue<int>(addr + CountOffset, useCache);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
             var hs = new UnityHashSet<T>(count);
             try
@@ -63,8 +62,8 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Collections
                 {
                     return hs;
                 }
-                var hashSetBase = MemoryInterface.Memory.ReadPtr(addr + ArrOffset, useCache) + ArrStartOffset;
-                MemoryInterface.Memory.ReadSpan(hashSetBase, hs.Span, useCache);
+                var hashSetBase = LoneEftDmaRadar.DMA.Memory.ReadPtr(addr + ArrOffset, useCache) + ArrStartOffset;
+                LoneEftDmaRadar.DMA.Memory.ReadSpan(hashSetBase, hs.Span, useCache);
                 return hs;
             }
             catch

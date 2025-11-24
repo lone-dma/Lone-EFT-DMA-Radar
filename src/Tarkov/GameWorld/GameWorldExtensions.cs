@@ -1,5 +1,4 @@
-﻿using LoneEftDmaRadar.DMA;
-using LoneEftDmaRadar.Tarkov.Unity;
+﻿using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld

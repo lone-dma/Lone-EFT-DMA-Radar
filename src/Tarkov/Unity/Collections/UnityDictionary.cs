@@ -27,7 +27,6 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using LoneEftDmaRadar.DMA;
 
 namespace LoneEftDmaRadar.Tarkov.Unity.Collections
 {
@@ -56,7 +55,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Collections
         /// <returns></returns>
         public static UnityDictionary<TKey, TValue> Create(ulong addr, bool useCache = true)
         {
-            var count = MemoryInterface.Memory.ReadValue<int>(addr + CountOffset, useCache);
+            var count = LoneEftDmaRadar.DMA.Memory.ReadValue<int>(addr + CountOffset, useCache);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
             var dict = new UnityDictionary<TKey, TValue>(count);
             try
@@ -65,8 +64,8 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Collections
                 {
                     return dict;
                 }
-                var dictBase = MemoryInterface.Memory.ReadPtr(addr + EntriesOffset, useCache) + EntriesStartOffset;
-                MemoryInterface.Memory.ReadSpan(dictBase, dict.Span, useCache); // Single read into mem buffer
+                var dictBase = LoneEftDmaRadar.DMA.Memory.ReadPtr(addr + EntriesOffset, useCache) + EntriesStartOffset;
+                LoneEftDmaRadar.DMA.Memory.ReadSpan(dictBase, dict.Span, useCache); // Single read into mem buffer
                 return dict;
             }
             catch

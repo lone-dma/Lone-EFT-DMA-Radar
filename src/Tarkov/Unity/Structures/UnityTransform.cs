@@ -27,7 +27,6 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using LoneEftDmaRadar.DMA;
 using LoneEftDmaRadar.Misc;
 
 namespace LoneEftDmaRadar.Tarkov.Unity.Structures

@@ -1,5 +1,4 @@
-﻿using LoneEftDmaRadar.DMA;
-using VmmSharpEx;
+﻿using VmmSharpEx;
 
 namespace LoneEftDmaRadar.Tarkov.Unity.Structures
 {

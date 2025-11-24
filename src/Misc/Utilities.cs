@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.DMA;
 using System.Security.Cryptography;
 
 namespace LoneEftDmaRadar.Misc
