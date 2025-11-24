@@ -29,49 +29,59 @@ SOFTWARE.
 using Collections.Pooled;
 using LoneEftDmaRadar.DMA;
 
-namespace LoneEftDmaRadar.Tarkov.Mono.Collections
+namespace LoneEftDmaRadar.Tarkov.Unity.Collections
 {
     /// <summary>
-    /// DMA Wrapper for a C# List
+    /// DMA Wrapper for a C# Dictionary
     /// Must initialize before use. Must dispose after use.
     /// </summary>
-    /// <typeparam name="T">Collection Type</typeparam>
-    public sealed class MonoList<T> : PooledMemory<T>
-        where T : unmanaged
+    /// <typeparam name="TKey">Key Type between 1-8 bytes.</typeparam>
+    /// <typeparam name="TValue">Value Type between 1-8 bytes.</typeparam>
+    public sealed class UnityDictionary<TKey, TValue> : PooledMemory<UnityDictionary<TKey, TValue>.MemDictEntry>
+        where TKey : unmanaged
+        where TValue : unmanaged
     {
-        public const uint CountOffset = 0x18;
-        public const uint ArrOffset = 0x10;
-        public const uint ArrStartOffset = 0x20;
+        public const uint CountOffset = 0x40;
+        public const uint EntriesOffset = 0x18;
+        public const uint EntriesStartOffset = 0x20;
 
-        private MonoList() : base(0) { }
-        private MonoList(int count) : base(count) { }
+        private UnityDictionary() : base(0) { }
+        private UnityDictionary(int count) : base(count) { }
 
         /// <summary>
-        /// Factory method to create a new <see cref="MonoList{T}"/> instance from a memory address.
+        /// Factory method to create a new <see cref="UnityDictionary{TKey, TValue}"/> instance from a memory address.
         /// </summary>
         /// <param name="addr"></param>
         /// <param name="useCache"></param>
         /// <returns></returns>
-        public static MonoList<T> Create(ulong addr, bool useCache = true)
+        public static UnityDictionary<TKey, TValue> Create(ulong addr, bool useCache = true)
         {
             var count = MemoryInterface.Memory.ReadValue<int>(addr + CountOffset, useCache);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
-            var list = new MonoList<T>(count);
+            var dict = new UnityDictionary<TKey, TValue>(count);
             try
             {
                 if (count == 0)
                 {
-                    return list;
+                    return dict;
                 }
-                var listBase = MemoryInterface.Memory.ReadPtr(addr + ArrOffset, useCache) + ArrStartOffset;
-                MemoryInterface.Memory.ReadSpan(listBase, list.Span, useCache);
-                return list;
+                var dictBase = MemoryInterface.Memory.ReadPtr(addr + EntriesOffset, useCache) + EntriesStartOffset;
+                MemoryInterface.Memory.ReadSpan(dictBase, dict.Span, useCache); // Single read into mem buffer
+                return dict;
             }
             catch
             {
-                list.Dispose();
+                dict.Dispose();
                 throw;
             }
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
+        public readonly struct MemDictEntry
+        {
+            private readonly ulong _pad00;
+            public readonly TKey Key;
+            public readonly TValue Value;
         }
     }
 }

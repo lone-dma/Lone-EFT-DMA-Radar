@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Tarkov.Mono.Collections;
+using LoneEftDmaRadar.Tarkov.Unity.Collections;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives
 {
@@ -75,7 +75,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives
             {
                 var grenades = Memory.ReadPtr(_localGameWorld + Offsets.GameWorld.Grenades);
                 var grenadesListPtr = Memory.ReadPtr(grenades + 0x18);
-                using var grenadesList = MonoList<ulong>.Create(grenadesListPtr, false);
+                using var grenadesList = UnityList<ulong>.Create(grenadesListPtr, false);
                 foreach (var grenade in grenadesList)
                 {
                     ct.ThrowIfCancellationRequested();
@@ -102,7 +102,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives
             try
             {
                 var syncObjectsPtr = Memory.ReadPtrChain(_localGameWorld, true, _toSyncObjects);
-                using var syncObjects = MonoList<ulong>.Create(syncObjectsPtr, true);
+                using var syncObjects = UnityList<ulong>.Create(syncObjectsPtr, true);
                 foreach (var syncObject in syncObjects)
                 {
                     ct.ThrowIfCancellationRequested();

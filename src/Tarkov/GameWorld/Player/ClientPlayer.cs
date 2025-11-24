@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Tarkov.Mono.Collections;
+using LoneEftDmaRadar.Tarkov.Unity.Collections;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
@@ -129,8 +129,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             Offsets.Player._playerBody,
             Offsets.PlayerBody.SkeletonRootJoint,
             Offsets.DizSkinningSkeleton._values,
-            MonoList<byte>.ArrOffset,
-            MonoList<byte>.ArrStartOffset + (uint)Bones.HumanBase * 0x8,
+            UnityList<byte>.ArrOffset,
+            UnityList<byte>.ArrStartOffset + (uint)Bones.HumanBase * 0x8,
             0x10
         ];
     }

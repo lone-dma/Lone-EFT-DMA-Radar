@@ -29,45 +29,47 @@ SOFTWARE.
 using Collections.Pooled;
 using LoneEftDmaRadar.DMA;
 
-namespace LoneEftDmaRadar.Tarkov.Mono.Collections
+namespace LoneEftDmaRadar.Tarkov.Unity.Collections
 {
     /// <summary>
-    /// DMA Wrapper for a C# Array
+    /// DMA Wrapper for a C# List
     /// Must initialize before use. Must dispose after use.
     /// </summary>
-    /// <typeparam name="T">Array Type</typeparam>
-    public sealed class MonoArray<T> : PooledMemory<T>
+    /// <typeparam name="T">Collection Type</typeparam>
+    public sealed class UnityList<T> : PooledMemory<T>
         where T : unmanaged
     {
         public const uint CountOffset = 0x18;
-        public const uint ArrBaseOffset = 0x20;
+        public const uint ArrOffset = 0x10;
+        public const uint ArrStartOffset = 0x20;
 
-        private MonoArray() : base(0) { }
-        private MonoArray(int count) : base(count) { }
+        private UnityList() : base(0) { }
+        private UnityList(int count) : base(count) { }
 
         /// <summary>
-        /// Factory method to create a new <see cref="MonoArray{T}"/> instance from a memory address.
+        /// Factory method to create a new <see cref="UnityList{T}"/> instance from a memory address.
         /// </summary>
         /// <param name="addr"></param>
         /// <param name="useCache"></param>
         /// <returns></returns>
-        public static MonoArray<T> Create(ulong addr, bool useCache = true)
+        public static UnityList<T> Create(ulong addr, bool useCache = true)
         {
             var count = MemoryInterface.Memory.ReadValue<int>(addr + CountOffset, useCache);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 16384, nameof(count));
-            var array = new MonoArray<T>(count);
+            var list = new UnityList<T>(count);
             try
             {
                 if (count == 0)
                 {
-                    return array;
+                    return list;
                 }
-                MemoryInterface.Memory.ReadSpan(addr + ArrBaseOffset, array.Span, useCache);
-                return array;
+                var listBase = MemoryInterface.Memory.ReadPtr(addr + ArrOffset, useCache) + ArrStartOffset;
+                MemoryInterface.Memory.ReadSpan(listBase, list.Span, useCache);
+                return list;
             }
             catch
             {
-                array.Dispose();
+                list.Dispose();
                 throw;
             }
         }
