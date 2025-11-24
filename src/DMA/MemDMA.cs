@@ -194,9 +194,9 @@ namespace LoneEftDmaRadar.DMA
         {
             lock (_restartSync)
             {
-                _cts.Cancel();
-                _cts.Dispose();
-                _cts = new();
+                var old = Interlocked.Exchange(ref _cts, new());
+                old.Cancel();
+                old.Dispose();
             }
         }
 
