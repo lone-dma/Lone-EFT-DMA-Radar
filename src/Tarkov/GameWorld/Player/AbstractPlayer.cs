@@ -35,6 +35,7 @@ using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Radar.ViewModels;
 using LoneEftDmaRadar.UI.Skia;
+using LoneEftDmaRadar.Web.TarkovDev.Data;
 using VmmSharpEx.Scatter;
 using static LoneEftDmaRadar.Tarkov.Unity.Structures.UnityTransform;
 
@@ -914,6 +915,15 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 if (GroupID != -1)
                     g = $" G:{GroupID} ";
                 lines.Add($"{faction}{g}");
+                if (this is ObservedPlayer obs2 &&
+                    obs2.Equipment.Items is IReadOnlyDictionary<string, TarkovMarketItem> equipment)
+                {
+                    lines.Add($"Value: {Utilities.FormatNumberKM(obs2.Equipment.Value)}");
+                    foreach (var item in equipment.OrderBy(e => e.Key))
+                    {
+                        lines.Add($"{item.Key.Substring(0, 5)}: {item.Value.ShortName}");
+                    }
+                }
             }
             else if (!IsAlive)
             {
