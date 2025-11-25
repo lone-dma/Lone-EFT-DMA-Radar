@@ -915,15 +915,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 if (GroupID != -1)
                     g = $" G:{GroupID} ";
                 lines.Add($"{faction}{g}");
-                if (this is ObservedPlayer obs2 &&
-                    obs2.Equipment.Items is IReadOnlyDictionary<string, TarkovMarketItem> equipment)
-                {
-                    lines.Add($"Value: {Utilities.FormatNumberKM(obs2.Equipment.Value)}");
-                    foreach (var item in equipment.OrderBy(e => e.Key))
-                    {
-                        lines.Add($"{item.Key.Substring(0, 5)}: {item.Value?.ShortName ?? "<Empty>"}");
-                    }
-                }
             }
             else if (!IsAlive)
             {
@@ -936,6 +927,16 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             else if (IsAIActive)
             {
                 lines.Add(name);
+            }
+            if (this is ObservedPlayer obs2 &&
+                obs2.Equipment.Items is IReadOnlyDictionary<string, TarkovMarketItem> equipment)
+            {
+                // This is outside of the previous conditionals to always show equipment even if they're dead,etc.
+                lines.Add($"Value: {Utilities.FormatNumberKM(obs2.Equipment.Value)}");
+                foreach (var item in equipment.OrderBy(e => e.Key))
+                {
+                    lines.Add($"{item.Key.Substring(0, 5)}: {item.Value?.ShortName ?? "<Empty>"}");
+                }
             }
 
             Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams).DrawMouseoverText(canvas, lines.Span);
