@@ -106,16 +106,47 @@ namespace LoneEftDmaRadar.UI.Loot
             set { if (_comment != value) { _comment = value; OnPropertyChanged(); } }
         }
 
-        private string _color = SKColors.Turquoise.ToString();
+
+        private string _color = null;
         /// <summary>
-        /// Hex value of the rgba color.
+        /// Hex value of the rgba color. If not set, inherits from parent filter.
         /// </summary>
         [JsonPropertyName("color")]
         public string Color
         {
-            get => _color;
-            set { if (_color != value) { _color = value; OnPropertyChanged(); } }
+            get => _color ?? ParentFilter?.Color ?? SKColors.Turquoise.ToString();
+            set 
+            { 
+                // Treat transparent as "inherit from parent"
+                var newValue = value;
+                if (!string.IsNullOrEmpty(value) && SKColor.TryParse(value, out var skColor) && skColor.Alpha == 0)
+                    newValue = null;
+                    
+                if (_color != newValue) 
+                { 
+                    _color = newValue; 
+                    OnPropertyChanged(); 
+                } 
+            }
         }
+
+        /// <summary>
+        /// Reference to the parent filter (not serialized).
+        /// </summary>
+        [JsonIgnore]
+        public UserLootFilter ParentFilter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the explicit color for this entry (for UI display).
+        /// Returns null if inheriting, otherwise returns the entry's specific color.
+        /// </summary>
+        [JsonIgnore]
+        public string ExplicitColor
+        {
+            get => _color;
+            set => Color = value; // Use Color setter to handle transparent conversion
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string propName = null)
