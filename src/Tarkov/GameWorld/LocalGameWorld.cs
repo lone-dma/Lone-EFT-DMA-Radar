@@ -289,6 +289,20 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             ValidatePlayerTransforms(); // Check for transform anomalies
             // Sync FilteredLoot
             Loot.Refresh(ct);
+            // Refresh player equipment
+            RefreshEquipment();
+        }
+
+        private void RefreshEquipment()
+        {
+            var players = _rgtPlayers
+                .OfType<ObservedPlayer>()
+                .Where(x => !x.IsAI // Only human players
+                    && x.IsActive && x.IsAlive);
+            foreach (var player in players)
+            {
+                player.Equipment.Refresh();
+            }
         }
 
         public void ValidatePlayerTransforms()

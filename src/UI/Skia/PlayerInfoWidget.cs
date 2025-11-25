@@ -57,15 +57,15 @@ namespace LoneEftDmaRadar.UI.Skia
             }
 
             static string MakeRow(string c1, string c2, string c3, string c4,
-                                  string c5, string c6, string c7)
+                                  string c5, string c6, string c7, string c8)
             {
                 // known widths
                 const int W1 = 21, W2 = 5, W3 = 6, W4 = 6, W5 = 6,
-                          W6 = 6, W7 = 4;
+                          W6 = 6, W7 = 4, W8 = 7;
 
-                const int len = W1 + W2 + W3 + W4 + W5 + W6 + W7;
+                const int len = W1 + W2 + W3 + W4 + W5 + W6 + W7 + W8;
 
-                return string.Create(len, (c1, c2, c3, c4, c5, c6, c7), static (span, cols) =>
+                return string.Create(len, (c1, c2, c3, c4, c5, c6, c7, c8), static (span, cols) =>
                 {
                     int pos = 0;
                     WriteAligned(span, ref pos, cols.c1, W1);
@@ -75,6 +75,7 @@ namespace LoneEftDmaRadar.UI.Skia
                     WriteAligned(span, ref pos, cols.c5, W5);
                     WriteAligned(span, ref pos, cols.c6, W6);
                     WriteAligned(span, ref pos, cols.c7, W7);
+                    WriteAligned(span, ref pos, cols.c8, W8);
                 });
             }
 
@@ -115,7 +116,8 @@ namespace LoneEftDmaRadar.UI.Skia
                 "Hours",            // c4
                 "Raids",            // c5
                 "S/R%",             // c6
-                "Grp");             // c7
+                "Grp",              // c7
+                "Value");           // c8      
 
             var len = font.MeasureText(header);
             if (len > maxLength) maxLength = len;
@@ -142,26 +144,29 @@ namespace LoneEftDmaRadar.UI.Skia
                 string raidCount = null;
                 string survivePercent = null;
                 string hours = null;
+                string value = null;
 
-                if (player is ObservedPlayer { Profile: { } profile })
+                if (player is ObservedPlayer obs)
                 {
-                    if (!string.IsNullOrEmpty(profile.Acct))
-                        edition = profile.Acct;
+                    if (!string.IsNullOrEmpty(obs.Profile.Acct))
+                        edition = obs.Profile.Acct;
 
-                    if (profile.Level is int lvl)
+                    if (obs.Profile.Level is int lvl)
                         level = lvl.ToString();
 
-                    if (profile.Overall_KD is float kdVal)
+                    if (obs.Profile.Overall_KD is float kdVal)
                         kd = kdVal.ToString("n1");
 
-                    if (profile.RaidCount is int rc)
+                    if (obs.Profile.RaidCount is int rc)
                         raidCount = Utilities.FormatNumberKM(rc);
 
-                    if (profile.SurvivedRate is float sr)
+                    if (obs.Profile.SurvivedRate is float sr)
                         survivePercent = sr.ToString("n1");
 
-                    if (profile.Hours is int hrs)
+                    if (obs.Profile.Hours is int hrs)
                         hours = Utilities.FormatNumberKM(hrs);
+
+                    value = Utilities.FormatNumberKM(obs.Equipment.Value);
                 }
 
                 string grp = player.GroupID != -1 ? player.GroupID.ToString() : "--";
@@ -174,7 +179,8 @@ namespace LoneEftDmaRadar.UI.Skia
                     hours ?? "--",
                     raidCount ?? "--",
                     survivePercent ?? "--",
-                    grp);
+                    grp,
+                    value);
 
                 canvas.DrawText(line,
                     drawPt,

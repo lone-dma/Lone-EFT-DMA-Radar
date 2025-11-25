@@ -72,9 +72,31 @@ namespace SDK
 
         public readonly partial struct ObservedPlayerController
         {
-            public const uint Player = 0x18; // EFT.NextObservedPlayer.ObservedPlayerView
+            public const uint InventoryController = 0x10; // EFT.NextObservedPlayer.ObservedPlayerInventoryController
+            public const uint PlayerView = 0x18; // EFT.NextObservedPlayer.ObservedPlayerView
             public const uint MovementController = 0xD8; // EFT.NextObservedPlayer.ObservedPlayerMovementController
             public const uint HealthController = 0xE8; // ObservedPlayerHealthController
+        }
+
+        public readonly partial struct InventoryController
+        {
+            public const uint Inventory = 0x100; // EFT.InventoryLogic.Inventory
+        }
+
+        public readonly partial struct Inventory
+        {
+            public const uint Equipment = 0x18; // EFT.InventoryLogic.InventoryEquipment
+        }
+
+        public readonly partial struct InventoryEquipment
+        {
+            public const uint _cachedSlots = 0x90; // EFT.InventoryLogic.Slot[]
+        }
+
+        public readonly partial struct Slot
+        {
+            public const uint ContainedItem = 0x48; // EFT.InventoryLogic.Item
+            public const uint ID = 0x58; // string
         }
 
         public readonly partial struct ObservedPlayerMovementController
