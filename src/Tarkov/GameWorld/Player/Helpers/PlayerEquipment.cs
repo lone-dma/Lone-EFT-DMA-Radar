@@ -22,7 +22,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
         /// <summary>
         /// Player's total equipment flea price value.
         /// </summary>
-        public int Value => (int)_items.Values.Sum(i => i?.FleaPrice ?? 0);
+        public int Value => (int)_items.Values.Sum(i => i.FleaPrice);
 
         public PlayerEquipment(ObservedPlayer player)
         {
@@ -89,12 +89,12 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
                     }
                     else
                     {
-                        _items[slot.Key] = null;
+                        _items.TryRemove(slot.Key, out _);
                     }
                 }
                 catch
                 {
-                    _items[slot.Key] = null;
+                    _items.TryRemove(slot.Key, out _);
                 }
             }
         }
