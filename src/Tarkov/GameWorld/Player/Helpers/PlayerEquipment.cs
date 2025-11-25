@@ -22,7 +22,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
         /// <summary>
         /// Player's total equipment flea price value.
         /// </summary>
-        public int Value => (int)_items.Values.Sum(i => i.FleaPrice);
+        public int Value => (int)_items.Values.Sum(i => i?.FleaPrice ?? 0);
 
         public PlayerEquipment(ObservedPlayer player)
         {
