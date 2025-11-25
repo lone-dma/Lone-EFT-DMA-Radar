@@ -27,8 +27,6 @@ SOFTWARE.
 */
 
 using System.Collections.ObjectModel;
-using SkiaSharp;
-using System.Text.Json.Serialization;
 
 namespace LoneEftDmaRadar.UI.Loot
 {

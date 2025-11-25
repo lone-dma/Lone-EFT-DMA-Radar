@@ -56,6 +56,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             AddFilterCommand = new SimpleCommand(OnAddFilter);
             RenameFilterCommand = new SimpleCommand(OnRenameFilter);
             DeleteFilterCommand = new SimpleCommand(OnDeleteFilter);
+            ApplyColorToAllEntriesCommand = new SimpleCommand(OnApplyColorToAllEntries);
 
             AddEntryCommand = new SimpleCommand(OnAddEntry);
 
@@ -120,10 +121,10 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                 var userFilter = App.Config.LootFilters.Filters[value];
                 CurrentFilterEnabled = userFilter.Enabled;
                 CurrentFilterColor = userFilter.Color;
-                Entries = userFilter.Entries;
                 // Set parent filter reference for all entries
                 foreach (var entry in Entries)
                     entry.ParentFilter = userFilter;
+                Entries = userFilter.Entries;
                 OnPropertyChanged();
             }
         }
@@ -249,6 +250,15 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                     "Loot Filter",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
+            }
+        }
+
+        public ICommand ApplyColorToAllEntriesCommand { get; }
+        private void OnApplyColorToAllEntries()
+        {
+            foreach (var entry in Entries)
+            {
+                entry.Color = CurrentFilterColor;
             }
         }
 
