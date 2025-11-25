@@ -57,9 +57,17 @@
                     Command="{Binding DeleteFilterCommand}"
                     Margin="0,0,10,0" />
             <xctk:ColorPicker SelectedColor="{Binding CurrentFilterColor, Mode=TwoWay, Converter={StaticResource StringToColorConverter}}"
+                              ToolTip="Sets a default color for new entries on this filter."
                               DisplayColorAndName="False"
                               Width="100"
+                              Foreground="Black"
+                              BorderBrush="Black"
+                              BorderThickness="1" 
                               VerticalAlignment="Center" />
+            <Button Content="Apply to All"
+                    Command="{Binding ApplyColorToAllEntriesCommand}"
+                    ToolTip="Apply current filter color to all entries"
+                    Margin="10,0,10,0" />
         </StackPanel>
 
         <!-- Row 1: Add new entry -->
@@ -139,16 +147,18 @@
                         <DataTemplate>
                             <Border Width="16"
                                     Height="16"
-                                    Background="{Binding ExplicitColor, Converter={StaticResource StringToBrushConverter}}"
+                                    Background="{Binding Color, Converter={StaticResource StringToBrushConverter}}"
                                     BorderBrush="Black"
                                     BorderThickness="1" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <xctk:ColorPicker SelectedColor="{Binding ExplicitColor, Mode=TwoWay, Converter={StaticResource StringToColorConverter}}"
+                            <xctk:ColorPicker SelectedColor="{Binding Color, Mode=TwoWay, Converter={StaticResource StringToColorConverter}}"
                                               DisplayColorAndName="True"
-                                              Width="150" />
+                                              Width="150"
+                                            BorderBrush="Black"
+                                            BorderThickness="1" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
