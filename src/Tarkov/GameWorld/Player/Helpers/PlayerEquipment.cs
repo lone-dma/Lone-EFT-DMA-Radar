@@ -20,7 +20,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
         /// </summary>
         public IReadOnlyDictionary<string, TarkovMarketItem> Items => _items;
         /// <summary>
-        /// Player's total equipment trader price value.
+        /// Player's total equipment flea price value.
         /// </summary>
         public int Value => (int)_items.Values.Sum(i => i.FleaPrice);
 
@@ -87,8 +87,15 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
                     {
                         _items[slot.Key] = item;
                     }
+                    else
+                    {
+                        _items[slot.Key] = null;
+                    }
                 }
-                catch { } // Skip over empty slotsPtr
+                catch
+                {
+                    _items[slot.Key] = null;
+                }
             }
         }
 

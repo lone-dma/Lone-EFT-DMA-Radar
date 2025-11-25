@@ -921,7 +921,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                     lines.Add($"Value: {Utilities.FormatNumberKM(obs2.Equipment.Value)}");
                     foreach (var item in equipment.OrderBy(e => e.Key))
                     {
-                        lines.Add($"{item.Key.Substring(0, 5)}: {item.Value.ShortName}");
+                        lines.Add($"{item.Key.Substring(0, 5)}: {item.Value?.ShortName ?? "<Empty>"}");
                     }
                 }
             }
