@@ -107,18 +107,26 @@
                 <WrapPanel Margin="0,0,0,8">
                     <CheckBox Content="Hide Corpses"
                               IsChecked="{Binding HideCorpses}"
+                              ToolTip="Hide corpses from showing as loot on the map."
                               Foreground="White"
                               Margin="0,0,12,0" />
                     <CheckBox Content="Show Meds"
                               IsChecked="{Binding ShowMeds}"
+                              ToolTip="Show medical items as loot on the map."
                               Foreground="White"
                               Margin="0,0,12,0" />
                     <CheckBox Content="Show Food"
                               IsChecked="{Binding ShowFood}"
+                              ToolTip="Show food items as loot on the map."
                               Foreground="White"
                               Margin="0,0,12,0" />
                     <CheckBox Content="Show Backpacks"
                               IsChecked="{Binding ShowBackpacks}"
+                              ToolTip="Show backpacks as loot on the map."
+                              Foreground="White" />
+                    <CheckBox Content="Show Quest Items"
+                              IsChecked="{Binding ShowQuestItems}"
+                              ToolTip="Show *static* quest items as loot on the map."
                               Foreground="White" />
                 </WrapPanel>
 

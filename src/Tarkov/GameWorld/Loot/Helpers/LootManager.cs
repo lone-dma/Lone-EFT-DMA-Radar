@@ -270,8 +270,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
                     {
                         var shortNamePtr = Memory.ReadPtr(itemTemplate + Offsets.ItemTemplate.ShortName);
                         var shortName = Memory.ReadUnicodeString(shortNamePtr, 128);
-                        Debug.WriteLine(shortName);
-                        _ = _loot.TryAdd(p.ItemBase, new LootItem(id, $"Q_{shortName}", pos));
+                        _ = _loot.TryAdd(p.ItemBase, new LootItem(id, $"Q_{shortName}", pos) { IsQuestItem = true });
                     }
                     else
                     {

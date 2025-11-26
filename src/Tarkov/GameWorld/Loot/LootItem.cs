@@ -136,6 +136,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         public bool IsBackpack => _item.IsBackpack;
         public bool IsWeapon => _item.IsWeapon;
         public bool IsCurrency => _item.IsCurrency;
+        public bool IsQuestItem { get; init; }
 
         /// <summary>
         /// Checks if an item exceeds regular loot price threshold.
@@ -267,6 +268,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
                 return new(SKPaints.PaintMeds, SKPaints.TextMeds);
             if (LootFilter.ShowFood && IsFood)
                 return new(SKPaints.PaintFood, SKPaints.TextFood);
+            if (LootFilter.ShowQuestItems && IsQuestItem)
+                return new(SKPaints.PaintQuestItem, SKPaints.TextQuestItem);
             string filterColor = CustomFilter?.Color;
 
             if (!string.IsNullOrEmpty(filterColor))

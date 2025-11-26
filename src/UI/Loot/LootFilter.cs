@@ -39,6 +39,7 @@ namespace LoneEftDmaRadar.UI.Loot
         public static bool ShowMeds;
         public static bool ShowFood;
         public static bool ShowBackpacks;
+        public static bool ShowQuestItems;
 
         /// <summary>
         /// Creates a loot filter based on current FilteredLoot Filter settings.
@@ -55,7 +56,8 @@ namespace LoneEftDmaRadar.UI.Loot
                     return (x.IsRegularLoot || x.IsValuableLoot || x.IsImportant || x.IsWishlisted) ||
                                 (ShowBackpacks && x.IsBackpack) ||
                                 (ShowMeds && x.IsMeds) ||
-                                (ShowFood && x.IsFood);
+                                (ShowFood && x.IsFood) ||
+                                (ShowQuestItems && x.IsQuestItem);
                 };
                 return item =>
                 {
