@@ -385,21 +385,6 @@ namespace LoneEftDmaRadar.UI.Skia
             IsAntialias = true,
         };
 
-        public static SKPaint PaintWishlistItem { get; } = new()
-        {
-            Color = SKColors.Red,
-            StrokeWidth = 0.25f,
-            Style = SKPaintStyle.Fill,
-            IsAntialias = true,
-        };
-
-        public static SKPaint TextWishlistItem { get; } = new()
-        {
-            Color = SKColors.Red,
-            IsStroke = false,
-            IsAntialias = true,
-        };
-
         #endregion
 
         #region Render/Misc Paints

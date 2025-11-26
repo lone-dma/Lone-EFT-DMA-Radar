@@ -27,6 +27,7 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
+using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using VmmSharpEx.Scatter;
 
@@ -34,12 +35,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
 {
     public sealed class LocalPlayer : ClientPlayer
     {
-        public static ulong HandsController { get; private set; }
-        /// <summary>
-        /// All Items on the Player's WishList.
-        /// </summary>
-        public static IReadOnlySet<string> WishlistItems => _wishlistItems;
-        private static readonly HashSet<string> _wishlistItems = new(StringComparer.OrdinalIgnoreCase);
         private UnityTransform _lookRaycastTransform;
 
         /// <summary>
@@ -112,6 +107,40 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             finally
             {
                 base.OnRealtimeLoop(scatter);
+            }
+        }
+
+        public override void OnValidateTransforms(VmmScatter round1, VmmScatter round2)
+        {
+            try
+            {
+                if (App.Config.AimviewWidget.Enabled && _lookRaycastTransform is UnityTransform existing)
+                {
+                    round1.PrepareReadPtr(existing.TransformInternal + UnitySDK.UnityOffsets.TransformAccess_HierarchyOffset); // Transform Hierarchy
+                    round1.Completed += (sender, s1) =>
+                    {
+                        if (s1.ReadPtr(existing.TransformInternal + UnitySDK.UnityOffsets.TransformAccess_HierarchyOffset, out var tra))
+                        {
+                            round2.PrepareReadPtr(tra + UnitySDK.UnityOffsets.Hierarchy_VerticesOffset); // Vertices Ptr
+                            round2.Completed += (sender, s2) =>
+                            {
+                                if (s2.ReadPtr(tra + UnitySDK.UnityOffsets.Hierarchy_VerticesOffset, out var verticesPtr))
+                                {
+                                    if (existing.VerticesAddr != verticesPtr) // check if any addr changed
+                                    {
+                                        Debug.WriteLine($"WARNING - '_lookRaycastTransform' Transform has changed for LocalPlayer '{Name}'");
+                                        var transform = new UnityTransform(existing.TransformInternal);
+                                        _lookRaycastTransform = transform;
+                                    }
+                                }
+                            };
+                        }
+                    };
+                }
+            }
+            finally
+            {
+                base.OnValidateTransforms(round1, round2);
             }
         }
     }

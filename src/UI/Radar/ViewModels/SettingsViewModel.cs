@@ -234,7 +234,6 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             SKPaints.PaintFood.StrokeWidth = 3 * newScale;
             SKPaints.PaintBackpacks.StrokeWidth = 3 * newScale;
             SKPaints.PaintQuestItem.StrokeWidth = 3 * newScale;
-            SKPaints.PaintWishlistItem.StrokeWidth = 3 * newScale;
             SKPaints.PaintDeathMarker.StrokeWidth = 3 * newScale;
             SKPaints.PaintLoot.StrokeWidth = 3 * newScale;
             SKPaints.PaintImportantLoot.StrokeWidth = 3 * newScale;
