@@ -53,19 +53,19 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             {
                 using var path = point.GetUpArrow(4);
                 canvas.DrawPath(path, SKPaints.ShapeOutline);
-                canvas.DrawPath(path, SKPaints.PaintContainerLoot);
+                canvas.DrawPath(path, SKPaints.PaintImportantLoot);
             }
             else if (heightDiff < -1.45) // loot is below player
             {
                 using var path = point.GetDownArrow(4);
                 canvas.DrawPath(path, SKPaints.ShapeOutline);
-                canvas.DrawPath(path, SKPaints.PaintContainerLoot);
+                canvas.DrawPath(path, SKPaints.PaintImportantLoot);
             }
             else // loot is level with player
             {
                 var size = 4 * App.Config.UI.UIScale;
                 canvas.DrawCircle(point, size, SKPaints.ShapeOutline);
-                canvas.DrawCircle(point, size, SKPaints.PaintContainerLoot);
+                canvas.DrawCircle(point, size, SKPaints.PaintImportantLoot);
             }
         }
 
