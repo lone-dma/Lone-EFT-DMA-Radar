@@ -68,8 +68,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
 
         public override void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
-            if (App.Config.Loot.HideCorpses)
-                return;
             var heightDiff = Position.Y - localPlayer.Position.Y;
             var point = Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);
             MouseoverPosition = new Vector2(point.X, point.Y);
@@ -111,8 +109,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
 
         public override void DrawMouseover(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
-            if (App.Config.Loot.HideCorpses)
-                return;
             using var lines = new PooledList<string>();
             if (Player is AbstractPlayer player)
             {
