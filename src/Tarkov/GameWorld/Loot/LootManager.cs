@@ -32,7 +32,7 @@ using LoneEftDmaRadar.Tarkov.Unity.Collections;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.UI.Loot;
 
-namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
+namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
 {
     public sealed class LootManager
     {

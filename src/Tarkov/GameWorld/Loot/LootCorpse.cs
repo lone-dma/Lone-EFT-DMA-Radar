@@ -30,7 +30,6 @@ using Collections.Pooled;
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.UI.Radar.Maps;
-using LoneEftDmaRadar.UI.Radar.ViewModels;
 using LoneEftDmaRadar.UI.Skia;
 using LoneEftDmaRadar.Web.TarkovDev.Data;
 
