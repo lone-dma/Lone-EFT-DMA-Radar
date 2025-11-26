@@ -27,6 +27,7 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
+using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Radar.ViewModels;
@@ -119,6 +120,14 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
                 string g = null;
                 if (player.GroupID != -1) g = $"G:{player.GroupID} ";
                 if (g is not null) lines.Add(g);
+                if (Player is ObservedPlayer obs) // show equipment info
+                {
+                    lines.Add($"Value: {Utilities.FormatNumberKM(obs.Equipment.Value)}");
+                    foreach (var item in obs.Equipment.Items.OrderBy(e => e.Key))
+                    {
+                        lines.Add($"{item.Key.Substring(0, 5)}: {item.Value.ShortName}");
+                    }
+                }
             }
             else
             {
