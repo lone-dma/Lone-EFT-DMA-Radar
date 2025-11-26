@@ -126,7 +126,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
             {
                 _player.IsFocused = true;
             }
-            else if (Hours is int hrs && hrs < 30 && 
+            else if (Hours is int hrs && hrs < 30 &&
                     !IsEOD && !IsUnheard) // Low hours played on std account, could be a brand new cheater account
             {
                 _player.IsFocused = true;

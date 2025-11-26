@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
 using SkiaSharp.Views.WPF;
@@ -36,10 +37,16 @@ namespace LoneEftDmaRadar.UI.Skia
     {
         // Constants
         public const float AimviewBaseStrokeSize = 1.33f;
+        private const float LOOT_RENDER_DISTANCE = 10f;
+        private const float CONTAINER_RENDER_DISTANCE = 10f;
         // Fields
         private Vector3 _forward, _right, _up, _camPos;
         private SKBitmap _bitmap;
         private SKCanvas _canvas;
+
+        private static IEnumerable<LootItem> Loot => Memory.Loot?.FilteredLoot;
+        private static IEnumerable<LootAirdrop> Airdrops => Memory.Loot?.AllLoot?.OfType<LootAirdrop>();
+        private static IEnumerable<StaticLootContainer> Containers => Memory.Loot?.AllLoot?.OfType<StaticLootContainer>();
 
         public AimviewWidget(SKGLElement parent, SKRect location, bool minimized, float scale)
             : base(parent, "Aimview",
@@ -81,6 +88,13 @@ namespace LoneEftDmaRadar.UI.Skia
                 // Precompute scale factors once per frame
                 UpdateMatrix(localPlayer);
 
+                if (App.Config.Loot.Enabled)
+                {
+                    DrawLoot(localPlayer);
+                    if (App.Config.Containers.Enabled)
+                        DrawContainers(localPlayer);
+                }
+
                 DrawPlayers(localPlayer);
                 DrawCrosshair();
             }
@@ -93,10 +107,10 @@ namespace LoneEftDmaRadar.UI.Skia
             targetCanvas.DrawBitmap(_bitmap, dest, SKPaints.PaintBitmap);
         }
 
-        private void UpdateMatrix(LocalPlayer lp)
+        private void UpdateMatrix(LocalPlayer localPlayer)
         {
-            float yaw = lp.Rotation.X * (MathF.PI / 180f);   // horizontal
-            float pitch = lp.Rotation.Y * (MathF.PI / 180f);   // vertical
+            float yaw = localPlayer.Rotation.X * (MathF.PI / 180f);   // horizontal
+            float pitch = localPlayer.Rotation.Y * (MathF.PI / 180f);   // vertical
 
             float cy = MathF.Cos(yaw);
             float sy = MathF.Sin(yaw);
@@ -117,7 +131,7 @@ namespace LoneEftDmaRadar.UI.Skia
 
             _up = -_up;
 
-            _camPos = lp.Position;
+            _camPos = localPlayer.LookPosition;
         }
 
         private void DrawPlayers(LocalPlayer localPlayer)
@@ -135,7 +149,7 @@ namespace LoneEftDmaRadar.UI.Skia
             {
                 if (WorldToScreen(in player.Position, out var screen))
                 {
-                    float distance = Vector3.Distance(localPlayer.Position, player.Position);
+                    float distance = Vector3.Distance(localPlayer.LookPosition, player.Position);
                     if (distance > App.Config.UI.MaxDistance)
                         continue;
 
@@ -144,6 +158,63 @@ namespace LoneEftDmaRadar.UI.Skia
                     _canvas.DrawCircle(screen, radius, GetPaint(player));
                 }
             }
+        }
+
+        private void DrawLoot(LocalPlayer localPlayer)
+        {
+            if (Loot is not IEnumerable<LootItem> loot)
+                return;
+            if (Airdrops is not IEnumerable<LootAirdrop> airdrops)
+                return;
+
+            float boxHalf = 4f * ScaleFactor;
+
+            foreach (var item in loot.Concat(airdrops))
+            {
+                // Distance squared test first
+                var itemPos = item.Position;
+                var dist = Vector3.Distance(localPlayer.LookPosition, itemPos);
+                if (dist > LOOT_RENDER_DISTANCE)
+                    continue;
+
+                if (!WorldToScreen(in itemPos, out var scrPos))
+                    continue;
+
+                DrawBoxAndLabel(scrPos, boxHalf, $"{item.GetUILabel()} ({dist:n1}m)", SKPaints.PaintAimviewWidgetLoot, SKPaints.TextAimviewWidgetLoot);
+            }
+        }
+
+        private void DrawContainers(LocalPlayer localPlayer)
+        {
+            if (Containers is not IEnumerable<StaticLootContainer> containers)
+                return;
+
+            float boxHalf = 4f * ScaleFactor;
+
+            foreach (var container in containers)
+            {
+                if (!(MainWindow.Instance?.Settings?.ViewModel?.ContainerIsTracked(container.ID ?? "NULL") ?? false))
+                    continue;
+
+                var cPos = container.Position;
+                var dist = Vector3.Distance(localPlayer.LookPosition, cPos);
+                if (dist > CONTAINER_RENDER_DISTANCE)
+                    continue;
+
+                if (!WorldToScreen(in cPos, out var scrPos))
+                    continue;
+
+                DrawBoxAndLabel(scrPos, boxHalf, $"{container.Name} ({dist:n1}m)", SKPaints.PaintAimviewWidgetLoot, SKPaints.TextAimviewWidgetLoot);
+            }
+        }
+
+        private void DrawBoxAndLabel(SKPoint center, float half, string label, SKPaint boxPaint, SKPaint textPaint)
+        {
+            var rect = new SKRect(center.X - half, center.Y - half, center.X + half, center.Y + half);
+            var textPt = new SKPoint(center.X, center.Y + 12.5f * ScaleFactor);
+
+            _canvas.DrawRect(rect, boxPaint);
+            _canvas.DrawText(label, textPt, SKTextAlign.Left, SKFonts.AimviewWidgetFont, textPaint);
         }
 
         private void DrawCrosshair()
@@ -188,7 +259,7 @@ namespace LoneEftDmaRadar.UI.Skia
         public override void SetScaleFactor(float newScale)
         {
             base.SetScaleFactor(newScale);
-            // Consolidated strokes
+            // Paints
             float std = AimviewBaseStrokeSize * newScale;
             SKPaints.PaintAimviewWidgetCrosshair.StrokeWidth = std;
             SKPaints.PaintAimviewWidgetLocalPlayer.StrokeWidth = std;
@@ -201,6 +272,9 @@ namespace LoneEftDmaRadar.UI.Skia
             SKPaints.PaintAimviewWidgetRaider.StrokeWidth = std;
             SKPaints.PaintAimviewWidgetPScav.StrokeWidth = std;
             SKPaints.PaintAimviewWidgetFocused.StrokeWidth = std;
+            SKPaints.PaintAimviewWidgetLoot.StrokeWidth = std;
+            // Fonts
+            SKFonts.AimviewWidgetFont.Size = 9f * newScale;
         }
 
         public override void Dispose()

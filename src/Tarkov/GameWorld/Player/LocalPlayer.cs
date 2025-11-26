@@ -26,7 +26,9 @@ SOFTWARE.
  *
 */
 
+using Collections.Pooled;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
+using VmmSharpEx.Scatter;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
 {
@@ -38,6 +40,16 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         public static IReadOnlySet<string> WishlistItems => _wishlistItems;
         private static readonly HashSet<string> _wishlistItems = new(StringComparer.OrdinalIgnoreCase);
+        private UnityTransform _lookRaycastTransform;
+
+        /// <summary>
+        /// Local Player's 'Look' position.
+        /// Useful for proper POV on Aimview,etc.
+        /// </summary>
+        /// <remarks>
+        /// Will failover to root position if there is no Look Pos.
+        /// </remarks>
+        public Vector3 LookPosition => _lookRaycastTransform?.Position ?? this.Position;
 
         /// <summary>
         /// Player name.
@@ -58,6 +70,49 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             if (!(classType == "LocalPlayer" || classType == "ClientPlayer"))
                 throw new ArgumentOutOfRangeException(nameof(classType));
             IsHuman = true;
+        }
+
+        public override void OnRealtimeLoop(VmmScatter scatter)
+        {
+            try
+            {
+                if (App.Config.AimviewWidget.Enabled)
+                {
+                    _lookRaycastTransform ??= new UnityTransform(
+                        transformInternal: Memory.ReadPtrChain(Memory.ReadPtr(this + Offsets.Player._playerLookRaycastTransform), true, 0x10),
+                        useCache: false);
+                    scatter.PrepareReadArray<UnityTransform.TrsX>(_lookRaycastTransform.VerticesAddr, _lookRaycastTransform.Count);
+                    scatter.Completed += (sender, s) =>
+                    {
+                        try
+                        {
+                            if (s.ReadArray<UnityTransform.TrsX>(_lookRaycastTransform.VerticesAddr, _lookRaycastTransform.Count) is PooledMemory<UnityTransform.TrsX> vertices)
+                            {
+                                using (vertices)
+                                {
+                                    _ = _lookRaycastTransform.UpdatePosition(vertices.Span);
+                                }
+                            }
+                            else
+                            {
+                                throw new InvalidOperationException("Failed to set LookRaycastTransform pos.");
+                            }
+                        }
+                        catch
+                        {
+                            _lookRaycastTransform = null;
+                        }
+                    };
+                }
+            }
+            catch
+            {
+                _lookRaycastTransform = null;
+            }
+            finally
+            {
+                base.OnRealtimeLoop(scatter);
+            }
         }
     }
 }

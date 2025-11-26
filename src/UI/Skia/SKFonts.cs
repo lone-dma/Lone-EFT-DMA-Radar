@@ -57,7 +57,7 @@ namespace LoneEftDmaRadar.UI.Skia
         /// <summary>
         /// Regular body font (size 9) with default typeface.
         /// </summary>
-        public static SKFont EspWidgetFont { get; } = new SKFont(CustomFonts.NeoSansStdRegular, 9f)
+        public static SKFont AimviewWidgetFont { get; } = new SKFont(CustomFonts.NeoSansStdRegular, 9f)
         {
             Subpixel = true,
             Edging = SKFontEdging.SubpixelAntialias

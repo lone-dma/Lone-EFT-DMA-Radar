@@ -593,6 +593,21 @@ namespace LoneEftDmaRadar.UI.Skia
             Style = SKPaintStyle.Stroke
         };
 
+        public static SKPaint PaintAimviewWidgetLoot { get; } = new()
+        {
+            Color = SKColors.WhiteSmoke,
+            StrokeWidth = 0.75f,
+            Style = SKPaintStyle.Fill,
+            IsAntialias = true
+        };
+
+        public static SKPaint TextAimviewWidgetLoot { get; } = new()
+        {
+            Color = SKColors.WhiteSmoke,
+            IsStroke = false,
+            IsAntialias = true
+        };
+
         #endregion
 
     }
