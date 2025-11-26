@@ -106,6 +106,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             }
         }
 
+
         /// <summary>
         /// Number of grid spaces this item takes up.
         /// </summary>
