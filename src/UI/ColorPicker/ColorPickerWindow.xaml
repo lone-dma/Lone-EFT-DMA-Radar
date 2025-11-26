@@ -32,6 +32,8 @@
                       Margin="5,0"/>
             <xctk:ColorPicker SelectedColor="{Binding SelectedMediaColor, Mode=TwoWay}"
                               ShowDropDownButton="True"
+                              Foreground="Black"
+                              BorderBrush="Black"
                               Width="200"
                               Margin="5,0"/>
             <TextBox Text="{Binding ColorValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

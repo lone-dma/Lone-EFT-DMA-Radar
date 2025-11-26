@@ -136,8 +136,7 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                 [ColorPickerOption.ValuableLoot] = SKColors.Turquoise.ToString(),
                 [ColorPickerOption.WishlistLoot] = SKColors.Red.ToString(),
                 [ColorPickerOption.ContainerLoot] = SKColor.Parse("FFFFCC").ToString(),
-                [ColorPickerOption.QuestLoot] = SKColors.YellowGreen.ToString(),
-                [ColorPickerOption.StaticQuestItemsAndZones] = SKColors.DeepPink.ToString(),
+                [ColorPickerOption.QuestItemsFilterLoot] = SKColors.YellowGreen.ToString(),
                 [ColorPickerOption.Corpse] = SKColors.Silver.ToString(),
                 [ColorPickerOption.MedsFilterLoot] = SKColors.LightSalmon.ToString(),
                 [ColorPickerOption.FoodFilterLoot] = SKColors.CornflowerBlue.ToString(),
@@ -229,13 +228,9 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                             SKPaints.PaintWishlistItem.Color = skColor;
                             SKPaints.TextWishlistItem.Color = skColor;
                             break;
-                        case ColorPickerOption.QuestLoot:
+                        case ColorPickerOption.QuestItemsFilterLoot:
                             SKPaints.PaintQuestItem.Color = skColor;
                             SKPaints.TextQuestItem.Color = skColor;
-                            break;
-                        case ColorPickerOption.StaticQuestItemsAndZones:
-                            SKPaints.QuestHelperPaint.Color = skColor;
-                            SKPaints.QuestHelperText.Color = skColor;
                             break;
                         case ColorPickerOption.Corpse:
                             SKPaints.PaintCorpse.Color = skColor;

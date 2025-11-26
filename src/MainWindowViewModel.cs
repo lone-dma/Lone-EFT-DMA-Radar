@@ -90,6 +90,8 @@ namespace LoneEftDmaRadar
             toggleShowFood.HotkeyStateChanged += ToggleShowFood_HotkeyStateChanged;
             var toggleShowMeds = new HotkeyActionController("Toggle Show Meds");
             toggleShowMeds.HotkeyStateChanged += ToggleShowMeds_HotkeyStateChanged;
+            var toggleShowQuestItems = new HotkeyActionController("Toggle Show Quest Items");
+            toggleShowQuestItems.HotkeyStateChanged += ToggleShowQuestItems_HotkeyStateChanged;
             // Add to Static Collection:
             HotkeyAction.RegisterController(zoomIn);
             HotkeyAction.RegisterController(zoomOut);
@@ -99,6 +101,15 @@ namespace LoneEftDmaRadar
             HotkeyAction.RegisterController(toggleInfo);
             HotkeyAction.RegisterController(toggleShowFood);
             HotkeyAction.RegisterController(toggleShowMeds);
+            HotkeyAction.RegisterController(toggleShowQuestItems);
+        }
+
+        private void ToggleShowQuestItems_HotkeyStateChanged(object sender, HotkeyEventArgs e)
+        {
+            if (e.State && _parent.Radar?.Overlay?.ViewModel is RadarOverlayViewModel vm)
+            {
+                vm.ShowQuestItems = !vm.ShowQuestItems;
+            }
         }
 
         private void ToggleAimviewWidget_HotkeyStateChanged(object sender, HotkeyEventArgs e)

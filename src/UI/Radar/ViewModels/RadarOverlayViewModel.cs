@@ -216,6 +216,19 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             }
         }
 
+        public bool ShowQuestItems
+        {
+            get => LootFilter.ShowQuestItems;
+            set
+            {
+                if (LootFilter.ShowQuestItems != value)
+                {
+                    LootFilter.ShowQuestItems = value;
+                    OnPropertyChanged(nameof(ShowQuestItems));
+                }
+            }
+        }
+
         private string _searchText = string.Empty;
         public string SearchText
         {
