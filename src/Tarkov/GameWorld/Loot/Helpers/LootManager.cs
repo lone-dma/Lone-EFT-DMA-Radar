@@ -268,7 +268,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
                     var id = mongoId.ReadString();
                     if (isQuestItem)
                     {
-                        var shortName = Memory.ReadUnicodeString(itemTemplate + Offsets.ItemTemplate.ShortName, 128);
+                        var shortNamePtr = Memory.ReadPtr(itemTemplate + Offsets.ItemTemplate.ShortName);
+                        var shortName = Memory.ReadUnicodeString(shortNamePtr, 128);
+                        Debug.WriteLine(shortName);
                         _ = _loot.TryAdd(p.ItemBase, new LootItem(id, $"Q_{shortName}", pos));
                     }
                     else
