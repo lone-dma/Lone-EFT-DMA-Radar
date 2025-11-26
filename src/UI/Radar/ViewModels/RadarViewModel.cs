@@ -282,7 +282,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                         .Where(x => !x.HasExfild); // Skip exfil'd players
                     if (App.Config.Loot.Enabled) // Draw loot (if enabled)
                     {
-                        if (FilteredLoot?.Reverse() is IEnumerable<LootItem> loot) // Draw important loot last (on top)
+                        if (FilteredLoot is IEnumerable<LootItem> loot) // Draw important loot last (on top)
                         {
                             foreach (var item in loot)
                             {
