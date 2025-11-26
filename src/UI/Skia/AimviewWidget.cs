@@ -44,9 +44,8 @@ namespace LoneEftDmaRadar.UI.Skia
         private SKBitmap _bitmap;
         private SKCanvas _canvas;
 
-        private static IEnumerable<LootItem> Loot => Memory.Loot?.FilteredLoot;
-        private static IEnumerable<LootAirdrop> Airdrops => Memory.Loot?.AllLoot?.OfType<LootAirdrop>();
-        private static IEnumerable<StaticLootContainer> Containers => Memory.Loot?.AllLoot?.OfType<StaticLootContainer>();
+        private static IEnumerable<LootItem> FilteredLoot => Memory.Loot?.FilteredLoot;
+        private static IEnumerable<StaticLootContainer> Containers => Memory.Loot?.StaticContainers;
 
         public AimviewWidget(SKGLElement parent, SKRect location, bool minimized, float scale)
             : base(parent, "Aimview",
@@ -162,14 +161,12 @@ namespace LoneEftDmaRadar.UI.Skia
 
         private void DrawLoot(LocalPlayer localPlayer)
         {
-            if (Loot is not IEnumerable<LootItem> loot)
-                return;
-            if (Airdrops is not IEnumerable<LootAirdrop> airdrops)
+            if (FilteredLoot is not IEnumerable<LootItem> loot)
                 return;
 
             float boxHalf = 4f * ScaleFactor;
 
-            foreach (var item in loot.Concat(airdrops))
+            foreach (var item in loot)
             {
                 // Distance squared test first
                 var itemPos = item.Position;

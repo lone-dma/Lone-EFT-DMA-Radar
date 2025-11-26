@@ -51,13 +51,17 @@ namespace LoneEftDmaRadar.UI.Loot
             bool usePrices = string.IsNullOrEmpty(search);
             if (usePrices)
             {
-                Predicate<LootItem> p = x => // Default Predicate
+                Predicate<LootItem> p = item => // Default Predicate
                 {
-                    return (x.IsRegularLoot || x.IsValuableLoot || x.IsImportant || x.IsWishlisted) ||
-                                (ShowBackpacks && x.IsBackpack) ||
-                                (ShowMeds && x.IsMeds) ||
-                                (ShowFood && x.IsFood) ||
-                                (ShowQuestItems && x.IsQuestItem);
+                    if (item is LootAirdrop)
+                        return true;
+                    if (!App.Config.Loot.HideCorpses && item is LootCorpse)
+                        return true;
+                    return (item.IsRegularLoot || item.IsValuableLoot || item.IsImportant) ||
+                                (ShowBackpacks && item.IsBackpack) ||
+                                (ShowMeds && item.IsMeds) ||
+                                (ShowFood && item.IsFood) ||
+                                (ShowQuestItems && item.IsQuestItem);
                 };
                 return item =>
                 {
@@ -73,6 +77,8 @@ namespace LoneEftDmaRadar.UI.Loot
                 };
                 return item =>
                 {
+                    if (item is LootAirdrop)
+                        return true;
                     return item.ContainsSearchPredicate(p);
                 };
             }

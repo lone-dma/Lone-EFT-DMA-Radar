@@ -83,9 +83,9 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
         /// </summary>
         private static IEnumerable<LootItem> FilteredLoot => Memory.Loot?.FilteredLoot;
         /// <summary>
-        /// All Unfiltered Loot on the map.
+        /// All Static Containers on the map.
         /// </summary>
-        private static IEnumerable<LootItem> AllLoot => Memory.Loot?.AllLoot;
+        private static IEnumerable<StaticLootContainer> Containers => Memory.Loot?.StaticContainers;
 
         /// <summary>
         /// All Players in Local Game World (including dead/exfil'd) 'Player' collection.
@@ -126,15 +126,14 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                         Enumerable.Empty<AbstractPlayer>();
 
                 var loot = FilteredLoot ?? Enumerable.Empty<IMouseoverEntity>();
-                var containers = AllLoot?.OfType<StaticLootContainer>() ?? Enumerable.Empty<IMouseoverEntity>();
+                var containers = Containers ?? Enumerable.Empty<IMouseoverEntity>();
                 var exits = Exits ?? Enumerable.Empty<IMouseoverEntity>();
 
                 if (SearchFilterIsSet && !(MainWindow.Instance?.Radar?.Overlay?.ViewModel?.HideCorpses ?? false)) // Item Search
                     players = players.Where(x =>
                         x.LootObject is null || !loot.Contains(x.LootObject)); // Don't show both corpse objects
 
-                var corpses = AllLoot?.OfType<LootCorpse>() ?? Enumerable.Empty<IMouseoverEntity>();
-                var result = loot.Concat(containers).Concat(corpses).Concat(players).Concat(exits);
+                var result = loot.Concat(containers).Concat(players).Concat(exits);
                 return result.Any() ? result : null;
             }
         }
@@ -292,7 +291,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                         }
                         if (App.Config.Containers.Enabled &&
                             MainWindow.Instance?.Settings?.ViewModel is SettingsViewModel vm &&
-                            AllLoot?.OfType<StaticLootContainer>() is IEnumerable<StaticLootContainer> containers)
+                            Containers is IEnumerable<StaticLootContainer> containers)
                         {
                             foreach (var container in containers) // Draw static loot containers
                             {
@@ -300,22 +299,6 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                                 {
                                     container.Draw(canvas, mapParams, localPlayer);
                                 }
-                            }
-                        }
-                        if (!App.Config.Loot.HideCorpses &&
-                            LootCorpsesVisible &&
-                            AllLoot?.OfType<LootCorpse>() is IEnumerable<LootCorpse> corpses)
-                        {
-                            foreach (var corpse in corpses) // Draw corpses
-                            {
-                                corpse.Draw(canvas, mapParams, localPlayer);
-                            }
-                        }
-                        if (AllLoot?.OfType<LootAirdrop>() is IEnumerable<LootAirdrop> airdrops)
-                        {
-                            foreach (var airdrop in airdrops) // Draw Airdrops
-                            {
-                                airdrop.Draw(canvas, mapParams, localPlayer);
                             }
                         }
                     }

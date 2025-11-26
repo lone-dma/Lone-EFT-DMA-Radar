@@ -46,11 +46,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
         /// All loot (with filter applied).
         /// </summary>
         public IReadOnlyList<LootItem> FilteredLoot { get; private set; }
-
         /// <summary>
-        /// All unfiltered loot.
+        /// All Static Containers on the map.
         /// </summary>
-        public IEnumerable<LootItem> AllLoot => _loot.Values;
+        public IEnumerable<StaticLootContainer> StaticContainers => _loot.Values.OfType<StaticLootContainer>();
 
         public LootManager(ulong localGameWorld)
         {

@@ -134,7 +134,6 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                 [ColorPickerOption.DeathMarker] = SKColors.Black.ToString(),
                 [ColorPickerOption.RegularLoot] = SKColors.WhiteSmoke.ToString(),
                 [ColorPickerOption.ValuableLoot] = SKColors.Turquoise.ToString(),
-                [ColorPickerOption.WishlistLoot] = SKColors.Red.ToString(),
                 [ColorPickerOption.ContainerLoot] = SKColor.Parse("FFFFCC").ToString(),
                 [ColorPickerOption.QuestItemsFilterLoot] = SKColors.YellowGreen.ToString(),
                 [ColorPickerOption.Corpse] = SKColors.Silver.ToString(),
@@ -223,10 +222,6 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                         case ColorPickerOption.ValuableLoot:
                             SKPaints.PaintImportantLoot.Color = skColor;
                             SKPaints.TextImportantLoot.Color = skColor;
-                            break;
-                        case ColorPickerOption.WishlistLoot:
-                            SKPaints.PaintWishlistItem.Color = skColor;
-                            SKPaints.TextWishlistItem.Color = skColor;
                             break;
                         case ColorPickerOption.QuestItemsFilterLoot:
                             SKPaints.PaintQuestItem.Color = skColor;
