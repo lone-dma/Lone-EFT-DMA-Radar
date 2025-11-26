@@ -72,10 +72,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot.Helpers
                 {
                     var filter = LootFilter.Create();
                     FilteredLoot = _loot.Values?
-                        .OfType<LootItem>()
                         .Where(x => filter(x))
-                        .OrderByDescending(x => x.Important)
-                        .ThenByDescending(x => x?.Price ?? 0)
+                        .OrderBy(x => x.Important)
+                        .ThenBy(x => x?.Price ?? 0)
                         .ToList();
                 }
                 catch { }
