@@ -57,6 +57,7 @@ namespace SDK
             public const uint Corpse = 0x670; // EFT.Interactive.Corpse
             public const uint Location = 0x860; // string
             public const uint Profile = 0x8D8; // EFT.Profile
+            public const uint _playerLookRaycastTransform = 0x9E0; // UnityEngine.Transform
         }
 
         public readonly partial struct ObservedPlayerView
