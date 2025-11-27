@@ -254,7 +254,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             return label;
         }
 
-        private ValueTuple<SKPaint, SKPaint> GetPaints()
+        public virtual ValueTuple<SKPaint, SKPaint> GetPaints()
         {
             if (LootFilter.ShowBackpacks && IsBackpack)
                 return new(SKPaints.PaintBackpacks, SKPaints.TextBackpacks);
