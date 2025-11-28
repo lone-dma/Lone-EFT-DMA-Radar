@@ -335,15 +335,15 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             }
         }
 
-        public bool ShowMines
+        public bool ShowHazards
         {
-            get => App.Config.UI.ShowMines;
+            get => App.Config.UI.ShowHazards;
             set
             {
-                if (App.Config.UI.ShowMines != value)
+                if (App.Config.UI.ShowHazards != value)
                 {
-                    App.Config.UI.ShowMines = value;
-                    OnPropertyChanged(nameof(ShowMines));
+                    App.Config.UI.ShowHazards = value;
+                    OnPropertyChanged(nameof(ShowHazards));
                 }
             }
         }

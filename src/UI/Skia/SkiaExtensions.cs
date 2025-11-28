@@ -213,16 +213,16 @@ namespace LoneEftDmaRadar.UI.Skia
         }
 
         /// <summary>
-        /// Draws a Mine/Explosive Marker on this zoomed location.
+        /// Draws a Hazard Marker on this zoomed location.
         /// </summary>
-        public static void DrawMineMarker(this SKPoint zoomedMapPos, SKCanvas canvas)
+        public static void DrawHazardMarker(this SKPoint zoomedMapPos, SKCanvas canvas)
         {
             float scale = App.Config.UI.UIScale;
 
             canvas.Save();
             canvas.Translate(zoomedMapPos.X, zoomedMapPos.Y);
             canvas.Scale(scale, scale);
-            canvas.DrawPath(_minePath, SKPaints.PaintExplosives);
+            canvas.DrawPath(_minePath, SKPaints.PaintExplosives); // Uses explosives paint for hazard marker
             canvas.Restore();
         }
 
