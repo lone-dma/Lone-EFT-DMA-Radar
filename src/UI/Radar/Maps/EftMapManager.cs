@@ -36,7 +36,6 @@ namespace LoneEftDmaRadar.UI.Radar.Maps
     /// </summary>
     internal static class EftMapManager
     {
-        private static readonly Lock _sync = new();
         private static ZipArchive _zip;
         private static FrozenDictionary<string, EftMapConfig> _maps;
 
@@ -77,28 +76,33 @@ namespace LoneEftDmaRadar.UI.Radar.Maps
             }
         }
 
+
         /// <summary>
-        /// Update the current map and load resources into Memory.
+        /// Checks the requested map ID and loads the map if not loaded.
+        /// Returns the loaded map.
         /// </summary>
+        /// <remarks>
+        /// NOT THREAD SAFE! Should be called from a single thread only.
+        /// </remarks>
         /// <param name="mapId">Id of map to load.</param>
-        /// <param name="map"></param>
-        /// <exception cref="Exception"></exception>
-        public static void LoadMap(string mapId)
+        /// <returns><see cref="IEftMap"/> instance if loaded, otherwise <see langword="null"/>.</returns>
+        public static IEftMap LoadMap(string mapId)
         {
-            lock (_sync)
+            try
             {
-                try
-                {
-                    if (!_maps.TryGetValue(mapId, out var newMap))
-                        newMap = _maps["default"];
-                    Map?.Dispose();
-                    Map = null;
-                    Map = new EftSvgMap(_zip, mapId, newMap);
-                }
-                catch (Exception ex)
-                {
-                    throw new InvalidOperationException($"ERROR loading '{mapId}'", ex);
-                }
+                if (Map?.ID?.Equals(mapId, StringComparison.OrdinalIgnoreCase) ?? false)
+                    return Map;
+                if (!_maps.TryGetValue(mapId, out var newMap))
+                    throw new KeyNotFoundException($"Map ID '{mapId}' not found!");
+                Map?.Dispose();
+                Map = null;
+                Map = new EftSvgMap(_zip, mapId, newMap);
+                return Map;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ERROR loading '{mapId}': {ex}");
+                return null;
             }
         }
     }

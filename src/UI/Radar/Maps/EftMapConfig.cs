@@ -69,7 +69,7 @@ namespace LoneEftDmaRadar.UI.Radar.Maps
         /// </summary>
         [JsonIgnore]
         public string Name =>
-            StaticGameData.MapNames[MapID[0]].ToUpper();
+            TarkovDataManager.MapData[MapID[0]].Name.ToUpper();
 
         /// <summary>
         /// Map ID(s) for this Map.

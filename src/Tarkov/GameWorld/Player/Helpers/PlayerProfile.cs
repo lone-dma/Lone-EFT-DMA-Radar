@@ -94,7 +94,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
             // --- Level ---
             var xp = Data?.Info?.Experience;
             if (xp.HasValue)
-                Level = StaticGameData.XPTable
+                Level = TarkovDataManager.XPTable
                     .Where(x => x.Key > xp.Value)
                     .Select(x => x.Value)
                     .FirstOrDefault() - 1;

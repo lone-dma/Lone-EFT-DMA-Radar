@@ -89,6 +89,18 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
                             description
                             position {x,y,z}
                         }
+                        hazards {
+                          hazardType
+                          position {
+                            x
+                            y
+                            z
+                          }
+                        }
+                    }
+                    playerLevels {
+                        exp
+                        level
                     }
                     items { 
                         id 
