@@ -35,6 +35,7 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
 using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
+using TwitchLib.Api.Helix;
 using VmmSharpEx;
 using VmmSharpEx.Extensions;
 using VmmSharpEx.Options;
@@ -329,7 +330,7 @@ namespace LoneEftDmaRadar.DMA
         private static void LoadModules()
         {
             var unityBase = _vmm.ProcessGetModuleBase(_pid, "UnityPlayer.dll");
-            unityBase.ThrowIfInvalidVirtualAddress(nameof(unityBase));
+            unityBase.ThrowIfInvalidUserVA(nameof(unityBase));
             GOM = GameObjectManager.GetAddr(unityBase);
             UnityBase = unityBase;
         }
@@ -472,11 +473,11 @@ namespace LoneEftDmaRadar.DMA
         /// <param name="count">Number of array elements to read.</param>
         /// <param name="useCache">Use caching for this read.</param>
         /// <returns><see cref="PooledMemory{T}"/> value. Be sure to call <see cref="IDisposable.Dispose"/>!</returns>
-        public static PooledMemory<T> ReadArray<T>(ulong addr, int count, bool useCache = true)
+        public static IMemoryOwner<T> ReadPooled<T>(ulong addr, int count, bool useCache = true)
             where T : unmanaged
         {
             var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
-            var arr = _vmm.MemReadArray<T>(_pid, addr, count, flags) ??
+            var arr = _vmm.MemReadPooled<T>(_pid, addr, count, flags) ??
                 throw new VmmException("Memory Read Failed!");
             return arr;
         }
@@ -505,7 +506,7 @@ namespace LoneEftDmaRadar.DMA
         public static ulong ReadPtr(ulong addr, bool useCache = true)
         {
             var pointer = ReadValue<VmmPointer>(addr, useCache);
-            pointer.ThrowIfInvalid();
+            pointer.ThrowIfInvalidUserVA();
             return pointer;
         }
 
@@ -514,13 +515,12 @@ namespace LoneEftDmaRadar.DMA
         /// </summary>
         /// <typeparam name="T">Specified Value Type.</typeparam>
         /// <param name="addr">Address to read from.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T ReadValue<T>(ulong addr, bool useCache = true)
             where T : unmanaged, allows ref struct
         {
             var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
-            if (!_vmm.MemReadValue<T>(_pid, addr, out var result, flags))
-                throw new VmmException("Memory Read Failed!");
-            return result;
+            return _vmm.MemReadValue<T>(_pid, addr, flags);
         }
 
         /// <summary>
@@ -532,14 +532,11 @@ namespace LoneEftDmaRadar.DMA
             where T : unmanaged, allows ref struct
         {
             int cb = Unsafe.SizeOf<T>();
-            if (!_vmm.MemReadValue<T>(_pid, addr, out var r1, VmmFlags.NOCACHE))
-                throw new VmmException("Memory Read Failed!");
+            T r1 = _vmm.MemReadValue<T>(_pid, addr, VmmFlags.NOCACHE);
             Thread.SpinWait(5);
-            if (!_vmm.MemReadValue<T>(_pid, addr, out var r2, VmmFlags.NOCACHE))
-                throw new VmmException("Memory Read Failed!");
+            T r2 = _vmm.MemReadValue<T>(_pid, addr, VmmFlags.NOCACHE);
             Thread.SpinWait(5);
-            if (!_vmm.MemReadValue<T>(_pid, addr, out var r3, VmmFlags.NOCACHE))
-                throw new VmmException("Memory Read Failed!");
+            T r3 = _vmm.MemReadValue<T>(_pid, addr, VmmFlags.NOCACHE);
             var b1 = new ReadOnlySpan<byte>(&r1, cb);
             var b2 = new ReadOnlySpan<byte>(&r2, cb);
             var b3 = new ReadOnlySpan<byte>(&r3, cb);
@@ -596,10 +593,7 @@ namespace LoneEftDmaRadar.DMA
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong FindSignature(string signature)
         {
-
-            if (!_vmm.Map_GetModuleFromName(_pid, "UnityPlayer.dll", out var info))
-                throw new VmmException("Failed to get process information.");
-            return _vmm.FindSignature(_pid, signature, info.vaBase, info.vaBase + info.cbImageSize);
+            return _vmm.FindSignature(_pid, signature, "UnityPlayer.dll");
         }
 
         /// <summary>
@@ -639,17 +633,6 @@ namespace LoneEftDmaRadar.DMA
         #endregion
 
         #region Memory Macros
-
-        /// <summary>
-        /// Checks if a Virtual Address is valid.
-        /// </summary>
-        /// <param name="va">Virtual Address to validate.</param>
-        /// <returns>True if valid, otherwise False.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsValidVirtualAddress(ulong va)
-        {
-            return va >= 0x10000 && ((long)va << 16) >> 16 == (long)va;
-        }
 
         /// <summary>
         /// The PAGE_ALIGN macro returns a page-aligned virtual address for a given virtual address.

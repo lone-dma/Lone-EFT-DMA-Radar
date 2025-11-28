@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using Collections.Pooled;
 using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using VmmSharpEx.Scatter;
@@ -81,11 +80,11 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                     {
                         try
                         {
-                            if (s.ReadArray<UnityTransform.TrsX>(_lookRaycastTransform.VerticesAddr, _lookRaycastTransform.Count) is PooledMemory<UnityTransform.TrsX> vertices)
+                            if (s.ReadPooled<UnityTransform.TrsX>(_lookRaycastTransform.VerticesAddr, _lookRaycastTransform.Count) is IMemoryOwner<UnityTransform.TrsX> vertices)
                             {
                                 using (vertices)
                                 {
-                                    _ = _lookRaycastTransform.UpdatePosition(vertices.Span);
+                                    _ = _lookRaycastTransform.UpdatePosition(vertices.Memory.Span);
                                 }
                             }
                             else

@@ -477,7 +477,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 if (s.ReadValue<Vector2>(RotationAddress, out var rotation))
                     successRot = SetRotation(rotation);
 
-                if (s.ReadArray<TrsX>(SkeletonRoot.VerticesAddr, SkeletonRoot.Count) is PooledMemory<TrsX> vertices)
+                if (s.ReadPooled<TrsX>(SkeletonRoot.VerticesAddr, SkeletonRoot.Count) is IMemoryOwner<TrsX> vertices)
                 {
                     using (vertices)
                     {
@@ -485,7 +485,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                         {
                             try
                             {
-                                _ = SkeletonRoot.UpdatePosition(vertices.Span);
+                                _ = SkeletonRoot.UpdatePosition(vertices.Memory.Span);
                             }
                             catch (Exception ex) // Attempt to re-allocate Transform on error
                             {

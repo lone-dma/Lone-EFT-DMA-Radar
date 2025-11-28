@@ -30,8 +30,8 @@
             var componentArr = Memory.ReadValue<DynamicArray>(Components);
             int size = componentArr.Size <= 0x1000 ?
                 (int)componentArr.Size : 0x1000;
-            using var compsBuf = Memory.ReadArray<DynamicArray.Entry>(0x0, size); // TODO: componentArr.ArrayBase
-            foreach (var comp in compsBuf)
+            using var compsBuf = Memory.ReadPooled<DynamicArray.Entry>(0x0, size); // TODO: componentArr.ArrayBase
+            foreach (var comp in compsBuf.Memory.Span)
             {
                 var compClass = Memory.ReadPtr(comp.Component + UnitySDK.UnityOffsets.Component_ObjectClassOffset);
                 var name = Structures.ObjectClass.ReadName(compClass);

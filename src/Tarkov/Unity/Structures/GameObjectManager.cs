@@ -1,4 +1,5 @@
 ﻿using VmmSharpEx;
+using VmmSharpEx.Extensions;
 
 namespace LoneEftDmaRadar.Tarkov.Unity.Structures
 {
@@ -27,17 +28,17 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
                 {
                     const string signature = "48 89 05 ?? ?? ?? ?? 48 83 C4 ?? C3 33 C9";
                     ulong gomSig = Memory.FindSignature(signature);
-                    gomSig.ThrowIfInvalidVirtualAddress(nameof(gomSig));
+                    gomSig.ThrowIfInvalidUserVA(nameof(gomSig));
                     int rva = Memory.ReadValueEnsure<int>(gomSig + 3);
                     var gomPtr = Memory.ReadValueEnsure<VmmPointer>(gomSig.AddRVA(7, rva));
-                    gomPtr.ThrowIfInvalid();
+                    gomPtr.ThrowIfInvalidUserVA();
                     Debug.WriteLine("GOM Located via Signature.");
                     return gomPtr;
                 }
                 catch
                 {
                     var gomPtr = Memory.ReadValueEnsure<VmmPointer>(unityBase + UnitySDK.UnityOffsets.GameObjectManager);
-                    gomPtr.ThrowIfInvalid();
+                    gomPtr.ThrowIfInvalidUserVA();
                     Debug.WriteLine("GOM Located via Hardcoded Offset.");
                     return gomPtr;
                 }

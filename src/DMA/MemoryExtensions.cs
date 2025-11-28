@@ -124,35 +124,5 @@ namespace LoneEftDmaRadar.DMA
         {
             return address + instructionSize + rva;
         }
-
-        /// <summary>
-        /// Checks if a Virtual Address is valid.
-        /// </summary>
-        /// <param name="va">Virtual Address to validate.</param>
-        /// <returns>True if valid, otherwise False.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsValidVirtualAddress(this ulong va) =>
-            Memory.IsValidVirtualAddress(va);
-
-        /// <summary>
-        /// Throws an exception if the Virtual Address is invalid.
-        /// </summary>
-        /// <param name="va">Virtual address to validate.</param>
-        /// <param name="paramName">Parameter name to pass in exception message.</param>
-        /// <exception cref="InvalidOperationException"></exception>
-        public static void ThrowIfInvalidVirtualAddress(this ulong va, string paramName = null)
-        {
-            string errorMsg;
-            if (paramName is not null)
-            {
-                errorMsg = $"Invalid Virtual Address 0x{va:X} [{paramName}]";
-            }
-            else
-            {
-                errorMsg = $"Invalid Virtual Address 0x{va:X}";
-            }
-            if (!Memory.IsValidVirtualAddress(va))
-                throw new InvalidOperationException(errorMsg);
-        }
     }
 }
