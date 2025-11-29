@@ -177,7 +177,8 @@ namespace LoneEftDmaRadar.UI.Skia
                 if (!WorldToScreen(in itemPos, out var scrPos))
                     continue;
 
-                DrawBoxAndLabel(scrPos, boxHalf, $"{item.GetUILabel()} ({dist:n1}m)", SKPaints.PaintAimviewWidgetLoot, SKPaints.TextAimviewWidgetLoot);
+                var paints = item.GetPaints();
+                DrawBoxAndLabel(scrPos, boxHalf, $"{item.GetUILabel()} ({dist:n1}m)", paints.Item1, paints.Item2);
             }
         }
 
@@ -201,7 +202,8 @@ namespace LoneEftDmaRadar.UI.Skia
                 if (!WorldToScreen(in cPos, out var scrPos))
                     continue;
 
-                DrawBoxAndLabel(scrPos, boxHalf, $"{container.Name} ({dist:n1}m)", SKPaints.PaintAimviewWidgetLoot, SKPaints.TextAimviewWidgetLoot);
+                var paints = container.GetPaints();
+                DrawBoxAndLabel(scrPos, boxHalf, $"{container.Name} ({dist:n1}m)", paints.Item1, paints.Item2);
             }
         }
 

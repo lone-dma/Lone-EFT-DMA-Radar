@@ -88,5 +88,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         {
             Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams).DrawMouseoverText(canvas, Name);
         }
+
+        public override ValueTuple<SKPaint, SKPaint> GetPaints()
+        {
+            return new(SKPaints.PaintContainerLoot, SKPaints.PaintContainerLoot);
+        }
     }
 }
