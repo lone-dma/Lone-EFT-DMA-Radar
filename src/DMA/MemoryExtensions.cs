@@ -30,32 +30,6 @@ namespace LoneEftDmaRadar.DMA
 {
     internal static class MemoryExtensions
     {
-        /// <summary>
-        /// Calculates a new address by adding the instruction size and a relative virtual address (RVA) to the current address.
-        /// </summary>
-        /// <param name="address">Current virtual address.</param>
-        /// <param name="instructionSize">Assembly instruction length in bytes.</param>
-        /// <param name="rva">Relative virtual address (RVA).</param>
-        /// <returns>New address calculated from the RVA.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong AddRVA(this ulong address, uint instructionSize, int rva)
-        {
-            // signed rva can be negative, so we need to use long for the calculation
-            long result = (long)address + instructionSize + rva;
-            return (ulong)result;
-        }
-
-        /// <summary>
-        /// Calculates a new address by adding the instruction size and a relative virtual address (RVA) to the current address.
-        /// </summary>
-        /// <param name="address">Current virtual address.</param>
-        /// <param name="instructionSize">Assembly instruction length in bytes.</param>
-        /// <param name="rva">Relative virtual address (RVA).</param>
-        /// <returns>New address calculated from the RVA.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong AddRVA(this ulong address, uint instructionSize, uint rva)
-        {
-            return address + instructionSize + rva;
-        }
+        // empty... for now
     }
 }
