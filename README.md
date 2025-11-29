@@ -6,6 +6,8 @@ I have since changed Lone EFT DMA Radar to be **READ-ONLY** and **RADAR-ONLY**.
 
 If you are looking for the old **FULL FEATURED** version of Lone EFT DMA, it is now being maintained by [DMA Educational Resources](https://github.com/dma-educational-resources/eft-dma-radar).
 
+No feature requests in Issues please.
+
 ## 👋 Welcome
 This is the original Lone EFT DMA Radar by Lone, with some key differences from the original version:
 1. **Radar Only/No Memwrites.**
