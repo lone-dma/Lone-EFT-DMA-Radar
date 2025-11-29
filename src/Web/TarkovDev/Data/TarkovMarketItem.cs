@@ -120,7 +120,7 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
     /// <summary>
     /// Class JSON Representation of Tarkov Market Data.
     /// </summary>
-    public class TarkovMarketItem
+    public sealed class TarkovMarketItem
     {
         /// <summary>
         /// Item ID.

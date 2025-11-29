@@ -57,7 +57,7 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
             .AddStandardResilienceHandler(options =>
             {
                 // Add retry logic for 403 responses -> sometimes tarkov.dev returns 403 for no reason but works immediately on retry
-                options.Retry.ShouldHandle = args =>
+                options.Retry.ShouldHandle += args =>
                 {
                     if (args.Outcome.Result is HttpResponseMessage response)
                         return ValueTask.FromResult(response.StatusCode == HttpStatusCode.Forbidden);

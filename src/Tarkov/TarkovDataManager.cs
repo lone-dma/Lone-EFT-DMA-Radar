@@ -116,7 +116,7 @@ namespace LoneEftDmaRadar.Tarkov
         /// Sets the input <paramref name="data"/> into the static dictionaries.
         /// </summary>
         /// <param name="data">Data to be set.</param>
-        private static void SetData(TarkovMarketData data)
+        private static void SetData(TarkovData data)
         {
             AllItems = data.Items.Where(x => !x.Tags?.Contains("Static Container") ?? false)
                 .DistinctBy(x => x.BsgId, StringComparer.OrdinalIgnoreCase)
@@ -131,7 +131,7 @@ namespace LoneEftDmaRadar.Tarkov
         }
 
         /// <summary>
-        /// Loads default embedded <see cref="TarkovMarketData"/> and sets the static dictionaries.
+        /// Loads default embedded <see cref="TarkovData"/> and sets the static dictionaries.
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
@@ -141,13 +141,13 @@ namespace LoneEftDmaRadar.Tarkov
             const string resource = "LoneEftDmaRadar.DEFAULT_DATA.json";
             using var dataStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource) ??
                 throw new ArgumentNullException(resource);
-            var data = await JsonSerializer.DeserializeAsync<TarkovMarketData>(dataStream)
+            var data = await JsonSerializer.DeserializeAsync<TarkovData>(dataStream)
                 ?? throw new InvalidOperationException($"Failed to deserialize {nameof(dataStream)}");
             SetData(data);
         }
 
         /// <summary>
-        /// Loads <see cref="TarkovMarketData"/> from disk and sets the static dictionaries.
+        /// Loads <see cref="TarkovData"/> from disk and sets the static dictionaries.
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
@@ -164,14 +164,14 @@ namespace LoneEftDmaRadar.Tarkov
             }
             SetData(data);
 
-            static async Task<TarkovMarketData> TryLoadFromDiskAsync(FileInfo file)
+            static async Task<TarkovData> TryLoadFromDiskAsync(FileInfo file)
             {
                 try
                 {
                     if (!file.Exists)
                         return null;
                     using var dataStream = File.OpenRead(file.FullName);
-                    return await JsonSerializer.DeserializeAsync<TarkovMarketData>(dataStream, _jsonOptions) ??
+                    return await JsonSerializer.DeserializeAsync<TarkovData>(dataStream, _jsonOptions) ??
                         throw new InvalidOperationException($"Failed to deserialize {nameof(dataStream)}");
                 }
                 catch
@@ -212,7 +212,7 @@ namespace LoneEftDmaRadar.Tarkov
                         destFileName: _dataFile.FullName,
                         overwrite: true);
                 }
-                var data = JsonSerializer.Deserialize<TarkovMarketData>(dataJson, _jsonOptions) ??
+                var data = JsonSerializer.Deserialize<TarkovData>(dataJson, _jsonOptions) ??
                     throw new InvalidOperationException($"Failed to deserialize {nameof(dataJson)}");
                 SetData(data);
             }
@@ -232,7 +232,7 @@ namespace LoneEftDmaRadar.Tarkov
 
         #region Types
 
-        public sealed class TarkovMarketData
+        public sealed class TarkovData
         {
             [JsonPropertyName("items")]
             public List<TarkovMarketItem> Items { get; set; } = new();
@@ -241,7 +241,7 @@ namespace LoneEftDmaRadar.Tarkov
             public List<MapElement> Maps { get; set; } = new();
 
             [JsonPropertyName("playerLevels")]
-            public List<PlayerLevel> PlayerLevels { get; set; }
+            public List<PlayerLevelElement> PlayerLevels { get; set; }
         }
 
 
@@ -274,10 +274,10 @@ namespace LoneEftDmaRadar.Tarkov
             public List<TransitElement> Transits { get; set; } = new();
 
             [JsonPropertyName("hazards")]
-            public List<Hazard> Hazards { get; set; }
+            public List<HazardElement> Hazards { get; set; } = new();
         }
 
-        public partial class PlayerLevel
+        public partial class PlayerLevelElement
         {
             [JsonPropertyName("exp")]
             public int Exp { get; set; }
@@ -286,7 +286,7 @@ namespace LoneEftDmaRadar.Tarkov
             public int Level { get; set; }
         }
 
-        public partial class Hazard
+        public partial class HazardElement
         {
             [JsonPropertyName("hazardType")]
             public string HazardType { get; set; }
