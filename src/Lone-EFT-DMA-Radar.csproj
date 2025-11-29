@@ -69,7 +69,7 @@
 		<PackageReference Include="Extended.Wpf.Toolkit" Version="5.0.0" />
 		<PackageReference Include="TwitchLib.Api" Version="3.10.2" />
 		<PackageReference Include="Velopack" Version="0.0.1298" />
-		<PackageReference Include="VmmSharpEx" Version="3.110.7" />
+		<PackageReference Include="VmmSharpEx" Version="3.110.12" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="10.0.0" />
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 		<PackageReference Include="Open.Nat.V2" Version="3.1.1" />
