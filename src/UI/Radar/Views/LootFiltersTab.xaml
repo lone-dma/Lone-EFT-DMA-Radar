@@ -90,7 +90,11 @@
             <TextBox Text="{Binding ItemSearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
                      Width="200"
                      Margin="0,0,10,0"
-                     VerticalAlignment="Center" />
+                     VerticalAlignment="Center">
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Enter" Command="{Binding AddEntryCommand}" />
+                </TextBox.InputBindings>
+            </TextBox>
             <Button Content="Add"
                     Command="{Binding AddEntryCommand}"
                     VerticalAlignment="Center" />
