@@ -734,6 +734,12 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                     Name = "Vsrf",
                     Type = PlayerType.AIRaider
                 };
+            if (voiceLine.Contains("civilian", StringComparison.OrdinalIgnoreCase)) // CIVILIAN_01
+                return new AIRole
+                {
+                    Name = "Civ",
+                    Type = PlayerType.AIScav
+                };
             Debug.WriteLine($"Unknown Voice Line: {voiceLine}");
             return new AIRole
             {
