@@ -1,0 +1,14 @@
+{
+  "mapID": ["Terminal"],
+  "x": 834,
+  "y": 391,
+  "scale": 1.0,
+  "svgScale": 1.0,
+  "mapLayers": [
+    {
+      "minHeight": null,
+	  "maxHeight": null,
+      "filename": "Terminal.svg"
+    }
+  ]
+}

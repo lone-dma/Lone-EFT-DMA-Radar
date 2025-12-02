@@ -695,6 +695,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                         Name = "Zombie",
                         Type = PlayerType.AIScav
                     };
+                default:
+                    break;
             }
             if (voiceLine.Contains("scav", StringComparison.OrdinalIgnoreCase))
                 return new AIRole
@@ -718,6 +720,18 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 return new AIRole
                 {
                     Name = "Bear",
+                    Type = PlayerType.AIRaider
+                };
+            if (voiceLine.Contains("black_division", StringComparison.OrdinalIgnoreCase)) // BLACK_DIVISION_1
+                return new AIRole
+                {
+                    Name = "BD",
+                    Type = PlayerType.AIRaider
+                };
+            if (voiceLine.Contains("vsrf", StringComparison.OrdinalIgnoreCase)) // VSRF_01
+                return new AIRole
+                {
+                    Name = "Vsrf",
                     Type = PlayerType.AIRaider
                 };
             Debug.WriteLine($"Unknown Voice Line: {voiceLine}");
