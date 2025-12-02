@@ -22,7 +22,7 @@
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ReadString(int cb = 128, bool useCache = true)
         {
-            return Memory.ReadUnicodeString(_stringId, cb, useCache);
+            return Memory.ReadUnityString(_stringId, cb, useCache);
         }
     }
 }

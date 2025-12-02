@@ -145,7 +145,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                             mapPtr = Memory.ReadPtr(localPlayer + Offsets.Player.Location);
                         }
 
-                        string map = Memory.ReadUnicodeString(mapPtr, 128);
+                        string map = Memory.ReadUnityString(mapPtr, 128);
                         Debug.WriteLine("Detected Map " + map);
                         if (!TarkovDataManager.MapData.ContainsKey(map)) // Also makes sure we're not in the hideout
                             throw new ArgumentException("Invalid Map ID!");

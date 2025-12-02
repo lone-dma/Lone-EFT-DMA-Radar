@@ -558,9 +558,9 @@ namespace LoneEftDmaRadar.DMA
         }
 
         /// <summary>
-        /// Read null terminated Unicode string.
+        /// Read null terminated Unity string (Unicode Encoding).
         /// </summary>
-        public static string ReadUnicodeString(ulong addr, int cb = 128, bool useCache = true)
+        public static string ReadUnityString(ulong addr, int cb = 128, bool useCache = true)
         {
             ArgumentOutOfRangeException.ThrowIfGreaterThan(cb, 0x1000, nameof(cb));
             var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;

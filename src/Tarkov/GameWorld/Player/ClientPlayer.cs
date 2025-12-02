@@ -104,7 +104,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             try
             {
                 var groupIdPtr = Memory.ReadPtr(Info + Offsets.PlayerInfo.GroupId);
-                string groupId = Memory.ReadUnicodeString(groupIdPtr);
+                string groupId = Memory.ReadUnityString(groupIdPtr);
                 return _groups.GetOrAdd(
                     groupId,
                     _ => Interlocked.Increment(ref _lastGroupNumber));
