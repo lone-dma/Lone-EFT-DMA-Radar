@@ -67,6 +67,20 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
                 canvas.DrawCircle(point, size, SKPaints.ShapeOutline);
                 canvas.DrawCircle(point, size, SKPaints.PaintImportantLoot);
             }
+            point.Offset(7 * App.Config.UI.UIScale, 3 * App.Config.UI.UIScale);
+
+            canvas.DrawText(
+                this.Name,
+                point,
+                SKTextAlign.Left,
+                SKFonts.UIRegular,
+                SKPaints.TextOutline); // Draw outline
+            canvas.DrawText(
+                this.Name,
+                point,
+                SKTextAlign.Left,
+                SKFonts.UIRegular,
+                SKPaints.TextImportantLoot);
         }
 
 
