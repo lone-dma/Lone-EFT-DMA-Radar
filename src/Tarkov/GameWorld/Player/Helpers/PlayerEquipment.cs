@@ -46,7 +46,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
                     foreach (var slotPtr in slotsArray)
                     {
                         var namePtr = Memory.ReadPtr(slotPtr + Offsets.Slot.ID);
-                        var name = Memory.ReadUnicodeString(namePtr);
+                        var name = Memory.ReadUnityString(namePtr);
                         if (_skipSlots.Contains(name))
                             continue;
                         _slots.TryAdd(name, slotPtr);

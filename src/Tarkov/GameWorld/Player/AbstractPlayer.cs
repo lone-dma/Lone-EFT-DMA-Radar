@@ -120,8 +120,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// <summary>
         /// Allocates a player.
         /// </summary>
-        /// <param name="regPlayers">Player Dictionary collection to add the newly allocated player to.</param>
-        /// <param name="playerBase">Player base memory address.</param>
         public static void Allocate(ConcurrentDictionary<ulong, AbstractPlayer> regPlayers, ulong playerBase)
         {
             try
@@ -236,7 +234,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         #region Virtual Properties
 
         /// <summary>
-        /// Player name.
+        /// Player nickName.
         /// </summary>
         public virtual string Name { get; set; }
 
@@ -375,7 +373,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// <summary>
         /// Update the Alerts for this Player Object.
         /// </summary>
-        /// <param name="alert">Alert to set.</param>
+        /// <param nickName="alert">Alert to set.</param>
         public void UpdateAlerts(string alert)
         {
             if (alert is null)
@@ -392,7 +390,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// <summary>
         /// Validates the Rotation Address.
         /// </summary>
-        /// <param name="rotationAddr">Rotation va</param>
+        /// <param nickName="rotationAddr">Rotation va</param>
         /// <returns>Validated rotation virtual address.</returns>
         protected static ulong ValidateRotationAddr(ulong rotationAddr)
         {
@@ -408,9 +406,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// <summary>
         /// Refreshes non-realtime player information. Call in the Registered Players Loop (T0).
         /// </summary>
-        /// <param name="scatter"></param>
-        /// <param name="registered"></param>
-        /// <param name="isActiveParam"></param>
+        /// <param nickName="scatter"></param>
+        /// <param nickName="registered"></param>
+        /// <param nickName="isActiveParam"></param>
         public virtual void OnRegRefresh(VmmScatter scatter, ISet<ulong> registered, bool? isActiveParam = null)
         {
             if (isActiveParam is not bool isActive)
@@ -435,7 +433,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// <summary>
         /// Mark player as dead.
         /// </summary>
-        /// <param name="corpse">Corpse address.</param>
+        /// <param nickName="corpse">Corpse address.</param>
         public void SetDead(ulong corpse)
         {
             Corpse = corpse;
@@ -464,7 +462,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// <summary>
         /// Executed on each Realtime Loop.
         /// </summary>
-        /// <param name="index">Scatter read index dedicated to this player.</param>
+        /// <param nickName="index">Scatter read index dedicated to this player.</param>
         public virtual void OnRealtimeLoop(VmmScatter scatter)
         {
             scatter.PrepareReadValue<Vector2>(RotationAddress); // Rotation
@@ -508,8 +506,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// <summary>
         /// Executed on each Transform Validation Loop.
         /// </summary>
-        /// <param name="round1">Index (round 1)</param>
-        /// <param name="round2">Index (round 2)</param>
+        /// <param nickName="round1">Index (round 1)</param>
+        /// <param nickName="round2">Index (round 2)</param>
         public virtual void OnValidateTransforms(VmmScatter round1, VmmScatter round2)
         {
             round1.PrepareReadPtr(SkeletonRoot.TransformInternal + UnitySDK.UnityOffsets.TransformAccess_HierarchyOffset); // Bone Hierarchy
@@ -569,7 +567,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// <summary>
         /// Lookup AI Info based on Voice Line.
         /// </summary>
-        /// <param name="voiceLine"></param>
         /// <returns></returns>
         public static AIRole GetAIRoleInfo(string voiceLine)
         {
@@ -918,11 +915,12 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             using var lines = new PooledList<string>();
             var name = App.Config.UI.HideNames && IsHuman ? "<Hidden>" : Name;
             string health = null;
-            if (this is ObservedPlayer observed)
-                health = observed.HealthStatus is Enums.ETagStatus.Healthy
+            var obs = this as ObservedPlayer;
+            if (obs is not null)
+                health = obs.HealthStatus is Enums.ETagStatus.Healthy
                     ? null
-                    : $" ({observed.HealthStatus.ToString()})"; // Only display abnormal health status
-            if (this is ObservedPlayer obs && obs.IsStreaming) // Streamer Notice
+                    : $" ({obs.HealthStatus.ToString()})"; // Only display abnormal health status
+            if (obs is not null && obs.IsStreaming) // Streamer Notice
                 lines.Add("[LIVE TTV - Double Click]");
             string alert = Alerts?.Trim();
             if (!string.IsNullOrEmpty(alert)) // Special Players,etc.
@@ -948,11 +946,11 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             {
                 lines.Add(name);
             }
-            if (this is ObservedPlayer obs2 &&
-                obs2.Equipment.Items is IReadOnlyDictionary<string, TarkovMarketItem> equipment)
+            if (obs is not null &&
+                obs.Equipment.Items is IReadOnlyDictionary<string, TarkovMarketItem> equipment)
             {
                 // This is outside of the previous conditionals to always show equipment even if they're dead,etc.
-                lines.Add($"Value: {Utilities.FormatNumberKM(obs2.Equipment.Value)}");
+                lines.Add($"Value: {Utilities.FormatNumberKM(obs.Equipment.Value)}");
                 foreach (var item in equipment.OrderBy(e => e.Key))
                 {
                     lines.Add($"{item.Key.Substring(0, 5)}: {item.Value.ShortName}");
@@ -967,7 +965,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         #region High Alert
 
         /// <summary>
-        /// True if Current Player is facing <paramref name="target"/>.
+        /// True if Current Player is facing <paramref nickName="target"/>.
         /// </summary>
         public bool IsFacingTarget(AbstractPlayer target, float? maxDist = null)
         {
