@@ -118,7 +118,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         private ulong GetMovementContext()
         {
             var movementContext = Memory.ReadPtr(this + Offsets.Player.MovementContext);
-            var player = Memory.ReadPtr(movementContext + Offsets.MovementContext.Player, false);
+            var player = Memory.ReadPtr(movementContext + Offsets.MovementContext._player, false);
             if (player != this)
                 throw new ArgumentOutOfRangeException(nameof(movementContext));
             return movementContext;

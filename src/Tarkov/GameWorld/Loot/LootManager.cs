@@ -245,7 +245,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
                         else
                         {
                             var itemOwner = Memory.ReadPtr(interactiveClass + Offsets.LootableContainer.ItemOwner);
-                            var ownerItemBase = Memory.ReadPtr(itemOwner + Offsets.LootableContainerItemOwner.RootItem);
+                            var ownerItemBase = Memory.ReadPtr(itemOwner + Offsets.ItemController.RootItem);
                             var ownerItemTemplate = Memory.ReadPtr(ownerItemBase + Offsets.LootItem.Template);
                             var ownerItemMongoId = Memory.ReadValue<MongoID>(ownerItemTemplate + Offsets.ItemTemplate._id);
                             var ownerItemId = ownerItemMongoId.ReadString();
