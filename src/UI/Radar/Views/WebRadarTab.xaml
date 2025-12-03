@@ -80,7 +80,6 @@
                                    ToolTip="Password required by clients."
                                    Margin="0,0,4,8" />
                         <TextBox Width="140"
-                                 IsReadOnly="True"
                                  Margin="0,0,12,8"
                                  ToolTip="Password required by clients."
                                  IsEnabled="{Binding UiEnabled}"

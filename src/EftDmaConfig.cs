@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Misc.JSON;
 using LoneEftDmaRadar.UI.ColorPicker;
 using LoneEftDmaRadar.UI.Data;
@@ -762,5 +763,10 @@ namespace LoneEftDmaRadar
         /// </summary>
         [JsonPropertyName("tickRate")]
         public string TickRate { get; set; } = "60";
+        /// <summary>
+        /// Password.
+        /// </summary>
+        [JsonPropertyName("password")]
+        public string Password { get; set; } = Utilities.GetRandomPassword(10);
     }
 }

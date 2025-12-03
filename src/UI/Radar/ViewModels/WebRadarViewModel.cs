@@ -174,7 +174,18 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             }
         }
 
-        public string Password => WebRadarServer.Password; // always generates a new one on open
+        public string Password
+        {
+            get => App.Config.WebRadar.Password;
+            set
+            {
+                if (!string.Equals(App.Config.WebRadar.Password, value, StringComparison.OrdinalIgnoreCase))
+                {
+                    App.Config.WebRadar.Password = value ?? string.Empty;
+                    OnPropertyChanged(nameof(Password));
+                }
+            }
+        }
 
         private string _serverUrl;
         public string ServerUrl
