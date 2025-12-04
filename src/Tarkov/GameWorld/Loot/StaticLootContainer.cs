@@ -55,6 +55,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             }
         }
 
+        public override string GetUILabel() => this.Name;
+
         public override void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
             if (Position.WithinDistance(localPlayer.Position, App.Config.Containers.DrawDistance))
