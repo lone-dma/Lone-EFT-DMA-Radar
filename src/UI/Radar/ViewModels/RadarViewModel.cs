@@ -128,7 +128,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
 
                 var loot = App.Config.Loot.Enabled ?
                     FilteredLoot ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
-                var containers = App.Config.Loot.Enabled ?
+                var containers = App.Config.Loot.Enabled && App.Config.Containers.Enabled ?
                     Containers ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
                 var exits = Exits ?? Enumerable.Empty<IMouseoverEntity>();
 
