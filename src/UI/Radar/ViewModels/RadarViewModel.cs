@@ -126,8 +126,10 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                         && !x.HasExfild && (!LootCorpsesVisible || x.IsAlive)) ??
                         Enumerable.Empty<AbstractPlayer>();
 
-                var loot = FilteredLoot ?? Enumerable.Empty<IMouseoverEntity>();
-                var containers = Containers ?? Enumerable.Empty<IMouseoverEntity>();
+                var loot = App.Config.Loot.Enabled ?
+                    FilteredLoot ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
+                var containers = App.Config.Loot.Enabled ?
+                    Containers ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
                 var exits = Exits ?? Enumerable.Empty<IMouseoverEntity>();
 
                 if (SearchFilterIsSet && !(MainWindow.Instance?.Radar?.Overlay?.ViewModel?.HideCorpses ?? false)) // Item Search
