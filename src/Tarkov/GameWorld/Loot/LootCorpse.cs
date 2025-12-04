@@ -111,8 +111,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
 
         public override void DrawMouseover(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
-            if (!App.Config.Loot.Enabled)
-                return;
             using var lines = new PooledList<string>();
             if (Player is AbstractPlayer player)
             {
