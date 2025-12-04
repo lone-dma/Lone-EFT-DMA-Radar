@@ -240,7 +240,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         /// Gets a UI Friendly Label.
         /// </summary>
         /// <returns>Item Label string cleaned up for UI usage.</returns>
-        public string GetUILabel()
+        public virtual string GetUILabel()
         {
             string label = "";
             if (IsImportant)
