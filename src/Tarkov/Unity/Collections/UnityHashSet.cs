@@ -38,7 +38,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Collections
     public sealed class UnityHashSet<T> : PooledMemory<UnityHashSet<T>.MemHashEntry>
         where T : unmanaged
     {
-        public const uint CountOffset = 0x3C;
+        public const uint CountOffset = 0x38;
         public const uint ArrOffset = 0x18;
         public const uint ArrStartOffset = 0x20;
 

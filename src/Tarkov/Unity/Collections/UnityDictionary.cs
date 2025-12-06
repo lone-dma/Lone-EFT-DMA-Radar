@@ -40,7 +40,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Collections
         where TKey : unmanaged
         where TValue : unmanaged
     {
-        public const uint CountOffset = 0x40;
+        public const uint CountOffset = 0x20;
         public const uint EntriesOffset = 0x18;
         public const uint EntriesStartOffset = 0x20;
 
