@@ -123,6 +123,11 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         public bool Important => CustomFilter?.Important ?? false;
 
         /// <summary>
+        /// True if this item is wishlisted.
+        /// </summary>
+        public bool IsWishlisted => Config.Loot.ShowWishlist && LocalPlayer.WishlistItems.Contains(ID);
+
+        /// <summary>
         /// True if the item is blacklisted via the UI.
         /// </summary>
         public bool Blacklisted => CustomFilter?.Blacklisted ?? false;
@@ -170,7 +175,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             {
                 if (Blacklisted)
                     return false;
-                return _item.Important;
+                return _item.Important || IsWishlisted;
             }
         }
 
@@ -249,6 +254,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         {
             if (IsQuestHelperItem)
                 return new(SKPaints.PaintQuestItem, SKPaints.TextQuestItem);
+            if (IsWishlisted)
+                return new(SKPaints.PaintWishlistItem, SKPaints.TextWishlistItem);
             if (LootFilter.ShowBackpacks && IsBackpack)
                 return new(SKPaints.PaintBackpacks, SKPaints.TextBackpacks);
             if (LootFilter.ShowMeds && IsMeds)

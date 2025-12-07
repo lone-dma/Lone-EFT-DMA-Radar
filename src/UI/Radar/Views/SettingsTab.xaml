@@ -202,6 +202,10 @@ Toggle Fullscreen: F11
                                   ToolTip="Toggles displaying Loot on the Radar/ESP."
                                   IsChecked="{Binding ShowLoot, Mode=TwoWay}"
                                   Margin="0,0,16,8" />
+                        <CheckBox Content="Show Loot Wishlist"
+                                  ToolTip="Tracks loot on your account's Loot Wishlist (Manual Adds Only, does not work for Automatically Added Items)."
+                                  IsChecked="{Binding LootWishlist, Mode=TwoWay}"
+                                  Margin="0,0,16,8" />
                         <CheckBox Content="Show Static Containers"
                                   ToolTip="Shows static containers on the map. Due to recent Tarkov Anti‑Cheat Measures, you cannot see what the contents are however."
                                   IsChecked="{Binding ShowStaticContainers, Mode=TwoWay}"

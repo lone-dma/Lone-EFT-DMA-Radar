@@ -123,6 +123,12 @@ namespace SDK
             public const uint AccountId = 0x18; // string
             public const uint Info = 0x48; // object
             public const uint QuestsData = 0x98; // object
+            public const uint WishlistManager = 0x108; // object
+        }
+
+        public readonly partial struct WishlistManager
+        {
+            public const uint _wishlistItems = 0x30; // object
         }
 
         public readonly partial struct PlayerInfo
