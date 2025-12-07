@@ -208,10 +208,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
                     if (objective.Type == QuestObjectiveType.FindItem
                         || objective.Type == QuestObjectiveType.FindQuestItem)
                     {
-                        if (objective.Item?.Id is not null)
+                        if (objective.QuestItem?.Id is not null)
                         {
-                            masterItems.Add(objective.Item.Id);
-                            _ = _items.GetOrAdd(objective.Item.Id, 0);
+                            masterItems.Add(objective.QuestItem.Id);
+                            _ = _items.GetOrAdd(objective.QuestItem.Id, 0);
                         }
                     }
                     // Location Visit Objectives visitLocation
