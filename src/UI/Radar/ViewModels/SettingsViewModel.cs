@@ -506,17 +506,17 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                 Memory.QuestManager?.Quests is IReadOnlyDictionary<string, QuestEntry> quests)
             {
                 using var currentQuests = CurrentQuests.ToPooledList(); // snapshot
-                using var currentIds = new PooledSet<string>(currentQuests.Select(q => q.Id), StringComparer.OrdinalIgnoreCase);
-                using var desiredIds = new PooledSet<string>(quests.Keys, StringComparer.OrdinalIgnoreCase);
+                using var existingIds = new PooledSet<string>(currentQuests.Select(q => q.Id), StringComparer.OrdinalIgnoreCase);
+                using var newIds = new PooledSet<string>(quests.Keys, StringComparer.OrdinalIgnoreCase);
 
                 // remove stale
-                foreach (var q in currentQuests.Where(q => !desiredIds.Contains(q.Id)))
+                foreach (var q in currentQuests.Where(q => !newIds.Contains(q.Id)))
                     CurrentQuests.Remove(q);
 
                 // add missing
-                foreach (var key in desiredIds.Except(currentIds))
+                foreach (var key in newIds)
                 {
-                    if (quests.TryGetValue(key, out var newQuest))
+                    if (!existingIds.Contains(key) && quests.TryGetValue(key, out var newQuest))
                         CurrentQuests.Add(newQuest);
                 }
             }

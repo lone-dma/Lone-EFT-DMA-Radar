@@ -136,7 +136,7 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
                         type
                         description
                         maps {
-                          id
+                          nameId
                           name
                           normalizedName
                         }
@@ -149,7 +149,7 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
                           zones {
                             id
                             map {
-                              id
+                              nameId
                               normalizedName
                               name
                             }
@@ -176,14 +176,14 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
                             shortName
                           }
                           maps {
-                            id
+                            nameId
                             normalizedName
                             name
                           }
                           zones {
                             id
                             map {
-                              id
+                              nameId
                               normalizedName
                               name
                             }
@@ -208,7 +208,7 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
                             shortName
                           }
                           maps {
-                            id
+                            nameId
                             normalizedName
                             name
                           }
@@ -248,14 +248,14 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
                             shortName
                           }
                           maps {
-                            id
+                            nameId
                             normalizedName
                             name
                           }
                           zones {
                             id
                             map {
-                              id
+                              nameId
                               normalizedName
                               name
                             }

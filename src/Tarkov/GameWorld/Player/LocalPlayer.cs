@@ -150,8 +150,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// <summary>
         /// All Items on the Player's WishList.
         /// </summary>
-        public static IReadOnlySet<string> WishlistItems => _wishlistItems;
-        private static readonly HashSet<string> _wishlistItems = new(StringComparer.OrdinalIgnoreCase);
+        public static IReadOnlyDictionary<string, byte> WishlistItems => _wishlistItems;
+        private static readonly ConcurrentDictionary<string, byte> _wishlistItems = new(StringComparer.OrdinalIgnoreCase);
         private static DateTimeOffset _wishlistLast = DateTimeOffset.MinValue;
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                     return;
                 var wishlistManager = Memory.ReadPtr(Profile + Offsets.Profile.WishlistManager);
                 var itemsPtr = Memory.ReadPtr(wishlistManager + Offsets.WishlistManager._wishlistItems);
-                using var items = UnityDictionary<MongoID, int>.Create(itemsPtr, true);
+                using var items = UnityDictionary<MongoID, int>.Create(itemsPtr);
                 using var wishlist = new PooledSet<string>(StringComparer.OrdinalIgnoreCase);
                 foreach (var item in items)
                 {
@@ -174,22 +174,18 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                     try
                     {
                         string id = item.Key.ReadString();
-                        if (string.IsNullOrWhiteSpace(id))
-                            continue;
                         wishlist.Add(id);
                     }
-                    catch { throw; }
+                    catch { }
                 }
                 foreach (var existing in _wishlistItems)
                 {
-                    ct.ThrowIfCancellationRequested();
-                    if (!wishlist.Contains(existing))
-                        _wishlistItems.Remove(existing);
+                    if (!wishlist.Contains(existing.Key))
+                        _wishlistItems.TryRemove(existing.Key, out _);
                 }
                 foreach (var newItem in wishlist)
                 {
-                    ct.ThrowIfCancellationRequested();
-                    _wishlistItems.Add(newItem);
+                    _wishlistItems.TryAdd(newItem, 0);
                 }
                 _wishlistLast = now;
             }

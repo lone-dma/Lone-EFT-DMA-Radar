@@ -125,7 +125,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         /// <summary>
         /// True if this item is wishlisted.
         /// </summary>
-        public bool IsWishlisted => Config.Loot.ShowWishlist && LocalPlayer.WishlistItems.Contains(ID);
+        public bool IsWishlisted => Config.Loot.ShowWishlist && LocalPlayer.WishlistItems.ContainsKey(ID);
 
         /// <summary>
         /// True if the item is blacklisted via the UI.

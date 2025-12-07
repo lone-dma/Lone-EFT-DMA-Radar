@@ -1,53 +1,10 @@
 ﻿using Collections.Pooled;
 using LoneEftDmaRadar.Tarkov.Unity.Collections;
-using System.Collections.Frozen;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
 {
     public sealed class QuestManager
     {
-        private static readonly FrozenDictionary<string, string> _mapToId = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            { "factory4_day", "55f2d3fd4bdc2d5f408b4567" },
-            { "factory4_night", "59fc81d786f774390775787e" },
-            { "bigmap", "56f40101d2720b2a4d8b45d6" },
-            { "woods", "5704e3c2d2720bac5b8b4567" },
-            { "lighthouse", "5704e4dad2720bb55b8b4567" },
-            { "shoreline", "5704e554d2720bac5b8b456e" },
-            { "rezervbase", "5704e5fad2720bc05b8b4567" },
-            { "interchange", "5714dbc024597771384a510d" },
-            { "tarkovstreets", "5714dc692459777137212e12" },
-            { "laboratory", "5b0fc42d86f7744a585f9105" },
-            { "Sandbox", "653e6760052c01c1c805532f" },
-            { "Sandbox_high", "65b8d6f5cdde2479cb2a3125" },
-            { "Labyrinth", "6733700029c367a3d40b02af" }
-        }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
-
-        private static readonly FrozenDictionary<string, FrozenDictionary<string, Vector3>> _questZones = TarkovDataManager.TaskData.Values
-            .Where(task => task.Objectives is not null) // Ensure the Objectives are not null
-            .SelectMany(task => task.Objectives)   // Flatten the Objectives from each TaskElement
-            .Where(objective => objective.Zones is not null) // Ensure the Zones are not null
-            .SelectMany(objective => objective.Zones)    // Flatten the Zones from each Objective
-            .Where(zone => zone.Position is not null && zone.Map?.Id is not null) // Ensure Position and Map are not null
-            .GroupBy(zone => zone.Map.Id, zone => new
-            {
-                id = zone.Id,
-                pos = new Vector3(zone.Position.X, zone.Position.Y, zone.Position.Z)
-            }, StringComparer.OrdinalIgnoreCase)
-            .DistinctBy(group => group.Key, StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(
-                group => group.Key, // Map Id
-                group => group
-                .DistinctBy(x => x.id, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(
-                    zone => zone.id,
-                    zone => zone.pos,
-                    StringComparer.OrdinalIgnoreCase
-                ).ToFrozenDictionary(StringComparer.OrdinalIgnoreCase),
-                StringComparer.OrdinalIgnoreCase
-            )
-            .ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
-
         private readonly ulong _profile;
         private DateTimeOffset _last = DateTimeOffset.MinValue;
 
@@ -228,7 +185,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
                     {
                         if (objective.Zones is not null && objective.Zones.Count > 0)
                         {
-                            if (_mapToId.TryGetValue(MapID, out var currentMapId) && _questZones.TryGetValue(currentMapId, out var zonesForMap))
+                            if (TarkovDataManager.TaskZones.TryGetValue(MapID, out var zonesForMap))
                             {
                                 foreach (var zone in objective.Zones)
                                 {
