@@ -133,6 +133,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         public bool IsWeapon => _item.IsWeapon;
         public bool IsCurrency => _item.IsCurrency;
         public bool IsQuestItem { get; init; }
+        public bool IsQuestHelperItem => App.Config.QuestHelper.Enabled && (Memory.QuestManager?.ItemConditions?.ContainsKey(ID) ?? false);
 
         /// <summary>
         /// Checks if an item exceeds regular loot price threshold.
@@ -256,6 +257,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
 
         private ValueTuple<SKPaint, SKPaint> GetPaints()
         {
+            if (IsQuestHelperItem)
+                return new(SKPaints.PaintQuestItem, SKPaints.TextQuestItem);
             if (LootFilter.ShowBackpacks && IsBackpack)
                 return new(SKPaints.PaintBackpacks, SKPaints.TextBackpacks);
             if (LootFilter.ShowMeds && IsMeds)

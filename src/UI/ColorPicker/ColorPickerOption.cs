@@ -47,7 +47,8 @@ namespace LoneEftDmaRadar.UI.ColorPicker
         MedsFilterLoot,
         FoodFilterLoot,
         BackpacksFilterLoot,
-        QuestItemsFilterLoot,
+        QuestHelperItems,
+        QuestHelperZones,
         Corpse,
         Explosives
     }

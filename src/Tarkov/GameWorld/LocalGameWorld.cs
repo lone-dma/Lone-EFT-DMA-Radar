@@ -32,6 +32,7 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
 using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
+using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using VmmSharpEx.Options;
 
@@ -70,6 +71,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         public IReadOnlyCollection<IExitPoint> Exits => _exfilManager;
         public LocalPlayer LocalPlayer => _rgtPlayers?.LocalPlayer;
         public LootManager Loot { get; }
+        public QuestManager QuestManager { get; }
 
         private LocalGameWorld() { }
 
@@ -108,6 +110,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 var rgtPlayersAddr = Memory.ReadPtr(localGameWorld + Offsets.GameWorld.RegisteredPlayers, false);
                 _rgtPlayers = new RegisteredPlayers(rgtPlayersAddr, this);
                 ArgumentOutOfRangeException.ThrowIfLessThan(_rgtPlayers.GetPlayerCount(), 1, nameof(_rgtPlayers));
+                QuestManager = new(_rgtPlayers.LocalPlayer.Profile);
                 Loot = new(localGameWorld);
                 _exfilManager = new(mapID, _rgtPlayers.LocalPlayer.IsPmc);
                 _explosivesManager = new(localGameWorld);
@@ -290,10 +293,11 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             // Sync FilteredLoot
             Loot.Refresh(ct);
             // Refresh player equipment
-            RefreshEquipment();
+            RefreshEquipment(ct);
+            RefreshQuestHelper(ct);
         }
 
-        private void RefreshEquipment()
+        private void RefreshEquipment(CancellationToken ct)
         {
             var players = _rgtPlayers
                 .OfType<ObservedPlayer>()
@@ -301,7 +305,16 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                     && x.IsActive && x.IsAlive);
             foreach (var player in players)
             {
+                ct.ThrowIfCancellationRequested();
                 player.Equipment.Refresh();
+            }
+        }
+
+        private void RefreshQuestHelper(CancellationToken ct)
+        {
+            if (App.Config.QuestHelper.Enabled)
+            {
+                QuestManager.Refresh(ct);
             }
         }
 
