@@ -174,16 +174,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             }
         }
 
-        /// <summary>
-        /// True if this item contains the specified Search Predicate.
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns>True if search matches, otherwise False.</returns>
-        public bool ContainsSearchPredicate(Predicate<LootItem> predicate)
-        {
-            return predicate(this);
-        }
-
         private readonly Vector3 _position; // FilteredLoot doesn't move, readonly ok
         public ref readonly Vector3 Position => ref _position;
         public Vector2 MouseoverPosition { get; set; }

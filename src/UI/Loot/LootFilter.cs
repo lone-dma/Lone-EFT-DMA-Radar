@@ -75,15 +75,13 @@ namespace LoneEftDmaRadar.UI.Loot
                 var names = search!.Split(',').Select(a => a.Trim()).ToList(); // Pooled wasnt working well here
                 Predicate<LootItem> p = item => // Search Predicate
                 {
-                    if (App.Config.QuestHelper.Enabled && item.IsQuestHelperItem)
+                    if (item is LootAirdrop)
                         return true;
                     return names.Any(a => item.Name.Contains(a, StringComparison.OrdinalIgnoreCase));
                 };
                 return item =>
                 {
-                    if (item is LootAirdrop)
-                        return true;
-                    return item.ContainsSearchPredicate(p);
+                    return p(item);
                 };
             }
         }
