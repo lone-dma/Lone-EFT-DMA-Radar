@@ -321,7 +321,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                         }
                     }
 
-                    if (Exits is IReadOnlyCollection<IExitPoint> exits)
+                    if (App.Config.UI.ShowExfils && Exits is IReadOnlyCollection<IExitPoint> exits)
                     {
                         foreach (var exit in exits)
                         {

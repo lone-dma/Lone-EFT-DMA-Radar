@@ -409,6 +409,19 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             }
         }
 
+        public bool ShowExfils
+        {
+            get => App.Config.UI.ShowExfils;
+            set
+            {
+                if (App.Config.UI.ShowExfils != value)
+                {
+                    App.Config.UI.ShowExfils = value;
+                    OnPropertyChanged(nameof(ShowExfils));
+                }
+            }
+        }
+
         #endregion
 
         #region Loot
