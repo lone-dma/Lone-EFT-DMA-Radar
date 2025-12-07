@@ -134,7 +134,7 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                 [ColorPickerOption.DeathMarker] = SKColors.Black.ToString(),
                 [ColorPickerOption.RegularLoot] = SKColors.WhiteSmoke.ToString(),
                 [ColorPickerOption.ValuableLoot] = SKColors.Turquoise.ToString(),
-                [ColorPickerOption.WishlistLoot] = SKColors.Red.ToString(),
+                [ColorPickerOption.WishlistLoot] = SKColors.Lime.ToString(),
                 [ColorPickerOption.ContainerLoot] = SKColor.Parse("FFFFCC").ToString(),
                 [ColorPickerOption.QuestHelperItems] = SKColors.YellowGreen.ToString(),
                 [ColorPickerOption.Corpse] = SKColors.Silver.ToString(),
