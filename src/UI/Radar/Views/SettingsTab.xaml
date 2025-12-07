@@ -187,7 +187,11 @@ Toggle Fullscreen: F11
                         <CheckBox Content="Mark Sus Players"
                                   ToolTip="Marks players as suspicious based on certain criteria (K/D, S/R, etc.)"
                                   IsChecked="{Binding MarkSusPlayers, Mode=TwoWay}"
-                                  Margin="0,0,0,8" />
+                                  Margin="0,0,16,8" />
+                        <CheckBox Content="Show Exfils"
+                              ToolTip="Toggle rendering Exfils/Transits on map."
+                              IsChecked="{Binding ShowExfils, Mode=TwoWay}"
+                              Margin="0,0,0,8" />
                     </WrapPanel>
 
                 </StackPanel>
