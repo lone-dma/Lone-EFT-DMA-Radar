@@ -89,7 +89,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
 
         public void DrawMouseover(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
-            Debug.WriteLine("Mouseover Quest Location: " + Name);
             using var lines = new PooledList<string>();
             lines.Add(Name);
             lines.Add($"Type: {Type.ToString()}");
