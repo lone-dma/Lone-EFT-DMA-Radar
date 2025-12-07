@@ -108,17 +108,15 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
                         if (qStatus != 2) // started
                             continue;
                         var qId = Memory.ReadUnityString(Memory.ReadPtr(qDataEntry + Offsets.QuestsData.Id));
-                        if (App.Config.QuestHelper.BlacklistedQuests.ContainsKey(qId))
-                        {
-                            masterQuests.Add(qId);
-                            _ = _quests.GetOrAdd(
-                                qId,
-                                id => new QuestEntry(id));
-                            continue; // Log the quest but dont get any conditions
-                        }
                         // qID should be Task ID
                         if (!TarkovDataManager.TaskData.TryGetValue(qId, out var task))
                             continue;
+                        masterQuests.Add(qId);
+                        _ = _quests.GetOrAdd(
+                            qId,
+                            id => new QuestEntry(id));
+                        if (App.Config.QuestHelper.BlacklistedQuests.ContainsKey(qId))
+                            continue; // Log the quest but dont get any conditions
                         //Debug.WriteLine($"[QuestManager] Processing Quest ID: {task.Id} {task.Name}");
                         using var completedHS = UnityHashSet<MongoID>.Create(Memory.ReadPtr(qDataEntry + Offsets.QuestsData.CompletedConditions), true);
                         using var completedConditions = new PooledSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -127,10 +125,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
                             var completedCond = c.Value.ReadString();
                             completedConditions.Add(completedCond);
                         }
-                        masterQuests.Add(qId);
-                        _ = _quests.GetOrAdd(
-                            qId,
-                            id => new QuestEntry(id));
 
                         FilterConditions(task, qId, completedConditions, masterItems, masterLocations);
 
