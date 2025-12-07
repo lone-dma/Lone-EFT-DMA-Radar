@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
 using LoneEftDmaRadar.Web.TarkovDev.Data;
 using System.Collections.Frozen;
 
@@ -59,6 +60,10 @@ namespace LoneEftDmaRadar.Tarkov
         /// Maps Data for Tarkov.
         /// </summary>
         public static FrozenDictionary<string, MapElement> MapData { get; private set; }
+        /// <summary>
+        ///  Tasks Data for Tarkov.
+        /// </summary>
+        public static FrozenDictionary<string, TaskElement> TaskData { get; private set; }
         /// <summary>
         /// XP Table for Tarkov.
         /// </summary>
@@ -125,6 +130,11 @@ namespace LoneEftDmaRadar.Tarkov
             AllContainers = data.Items.Where(x => x.Tags?.Contains("Static Container") ?? false)
                 .DistinctBy(x => x.BsgId, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(k => k.BsgId, v => v, StringComparer.OrdinalIgnoreCase)
+                .ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
+            TaskData = (data.Tasks ?? new List<TaskElement>())
+                .Where(t => !string.IsNullOrWhiteSpace(t?.Id))
+                .DistinctBy(t => t.Id, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(t => t.Id, t => t, StringComparer.OrdinalIgnoreCase)
                 .ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
             XPTable = data.PlayerLevels?.ToDictionary(x => x.Exp, x => x.Level) ?? new Dictionary<int, int>();
             var maps = data.Maps.ToDictionary(x => x.NameId, StringComparer.OrdinalIgnoreCase) ??
@@ -249,6 +259,9 @@ namespace LoneEftDmaRadar.Tarkov
 
             [JsonPropertyName("playerLevels")]
             public List<PlayerLevelElement> PlayerLevels { get; set; }
+
+            [JsonPropertyName("tasks")]
+            public List<TaskElement> Tasks { get; set; } = new();
         }
 
 
@@ -327,6 +340,149 @@ namespace LoneEftDmaRadar.Tarkov
             [JsonPropertyName("position")]
             public PositionElement Position { get; set; }
         }
+
+
+        public partial class TaskElement
+        {
+            [JsonPropertyName("id")]
+            public string Id { get; set; }
+
+            [JsonPropertyName("name")]
+            public string Name { get; set; }
+
+            [JsonPropertyName("objectives")]
+            public List<ObjectiveElement> Objectives { get; set; }
+
+            public partial class ObjectiveElement
+            {
+                [JsonPropertyName("id")]
+                public string Id { get; set; }
+
+                [JsonPropertyName("type")]
+#pragma warning disable IDE1006 // Naming Styles
+                public string _type { get; set; }
+#pragma warning restore IDE1006 // Naming Styles
+
+                [JsonIgnore]
+                public QuestObjectiveType Type =>
+                _type switch
+                {
+                    "visit" => QuestObjectiveType.Visit,
+                    "mark" => QuestObjectiveType.Mark,
+                    "giveItem" => QuestObjectiveType.GiveItem,
+                    "shoot" => QuestObjectiveType.Shoot,
+                    "extract" => QuestObjectiveType.Extract,
+                    "findQuestItem" => QuestObjectiveType.FindQuestItem,
+                    "giveQuestItem" => QuestObjectiveType.GiveQuestItem,
+                    "findItem" => QuestObjectiveType.FindItem,
+                    "buildWeapon" => QuestObjectiveType.BuildWeapon,
+                    "plantItem" => QuestObjectiveType.PlantItem,
+                    "plantQuestItem" => QuestObjectiveType.PlantQuestItem,
+                    "traderLevel" => QuestObjectiveType.TraderLevel,
+                    "traderStanding" => QuestObjectiveType.TraderStanding,
+                    "skill" => QuestObjectiveType.Skill,
+                    "experience" => QuestObjectiveType.Experience,
+                    "useItem" => QuestObjectiveType.UseItem,
+                    "sellItem" => QuestObjectiveType.SellItem,
+                    "taskStatus" => QuestObjectiveType.TaskStatus,
+                    _ => QuestObjectiveType.Unknown
+                };
+
+                [JsonPropertyName("description")]
+                public string Description { get; set; }
+
+                [JsonPropertyName("requiredKeys")]
+                public List<List<MarkerItemClass>> RequiredKeys { get; set; }
+
+                [JsonPropertyName("maps")]
+                public List<BasicDataElement> Maps { get; set; }
+
+                [JsonPropertyName("zones")]
+                public List<ZoneElement> Zones { get; set; }
+
+                [JsonPropertyName("count")]
+                public int Count { get; set; }
+
+                [JsonPropertyName("foundInRaid")]
+                public bool FoundInRaid { get; set; }
+
+                [JsonPropertyName("item")]
+                public MarkerItemClass Item { get; set; }
+
+                [JsonPropertyName("questItem")]
+                public ObjectiveQuestItem QuestItem { get; set; }
+
+                [JsonPropertyName("markerItem")]
+                public MarkerItemClass MarkerItem { get; set; }
+
+                public class MarkerItemClass
+                {
+                    [JsonPropertyName("id")]
+                    public string Id { get; set; }
+
+                    [JsonPropertyName("name")]
+                    public string Name { get; set; }
+
+                    [JsonPropertyName("shortName")]
+                    public string ShortName { get; set; }
+                }
+
+                public class ObjectiveQuestItem
+                {
+                    [JsonPropertyName("id")]
+                    public string Id { get; set; }
+
+                    [JsonPropertyName("name")]
+                    public string Name { get; set; }
+
+                    [JsonPropertyName("shortName")]
+                    public string ShortName { get; set; }
+
+                    [JsonPropertyName("normalizedName")]
+                    public string NormalizedName { get; set; }
+
+                    [JsonPropertyName("description")]
+                    public string Description { get; set; }
+                }
+
+                public class ZoneElement
+                {
+                    [JsonPropertyName("id")]
+                    public string Id { get; set; }
+
+                    [JsonPropertyName("position")]
+                    public PositionElement Position { get; set; }
+
+                    [JsonPropertyName("map")]
+                    public BasicDataElement Map { get; set; }
+                }
+
+                public class BasicDataElement
+                {
+                    [JsonPropertyName("id")]
+                    public string Id { get; set; }
+
+                    [JsonPropertyName("normalizedName")]
+                    public string NormalizedName { get; set; }
+
+                    [JsonPropertyName("name")]
+                    public string Name { get; set; }
+                }
+
+                public class PositionElement
+                {
+                    [JsonPropertyName("y")]
+                    public float Y { get; set; }
+
+                    [JsonPropertyName("x")]
+                    public float X { get; set; }
+
+                    [JsonPropertyName("z")]
+                    public float Z { get; set; }
+                }
+            }
+        }
+
 
         #endregion
     }

@@ -370,6 +370,20 @@ namespace LoneEftDmaRadar.UI.Skia
             IsAntialias = true,
         };
 
+        public static SKPaint PaintQuestZone { get; } = new()
+        {
+            Color = SKColors.DeepPink,
+            StrokeWidth = 0.25f,
+            Style = SKPaintStyle.Fill,
+            IsAntialias = true,
+        };
+        public static SKPaint TextQuestZone { get; } = new()
+        {
+            Color = SKColors.DeepPink,
+            IsStroke = false,
+            IsAntialias = true,
+        };
+
         public static SKPaint PaintQuestItem { get; } = new()
         {
             Color = SKColors.YellowGreen,
