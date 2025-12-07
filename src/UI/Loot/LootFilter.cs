@@ -59,7 +59,7 @@ namespace LoneEftDmaRadar.UI.Loot
                         return true;
                     if (!App.Config.Loot.HideCorpses && item is LootCorpse)
                         return true;
-                    return (item.IsRegularLoot || item.IsValuableLoot || item.IsImportant) ||
+                    return (item.IsRegularLoot || item.IsValuableLoot || item.IsImportant || item.IsWishlisted) ||
                                 (ShowBackpacks && item.IsBackpack) ||
                                 (ShowMeds && item.IsMeds) ||
                                 (ShowFood && item.IsFood) ||

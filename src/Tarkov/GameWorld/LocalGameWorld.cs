@@ -290,9 +290,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         {
             var ct = e.CancellationToken;
             ValidatePlayerTransforms(); // Check for transform anomalies
-            // Sync FilteredLoot
             Loot.Refresh(ct);
-            // Refresh player equipment
+            if (App.Config.Loot.ShowWishlist)
+                Memory.LocalPlayer?.RefreshWishlist(ct);
             RefreshEquipment(ct);
             RefreshQuestHelper(ct);
         }

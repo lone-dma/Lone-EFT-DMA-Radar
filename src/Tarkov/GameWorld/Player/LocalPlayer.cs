@@ -26,7 +26,9 @@ SOFTWARE.
  *
 */
 
+using Collections.Pooled;
 using LoneEftDmaRadar.Tarkov.Unity;
+using LoneEftDmaRadar.Tarkov.Unity.Collections;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using VmmSharpEx.Scatter;
 
@@ -34,6 +36,11 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
 {
     public sealed class LocalPlayer : ClientPlayer
     {
+        /// <summary>
+        /// All Items on the Player's WishList.
+        /// </summary>
+        public static IReadOnlySet<string> WishlistItems => _wishlistItems;
+        private static readonly HashSet<string> _wishlistItems = new(StringComparer.OrdinalIgnoreCase);
         private UnityTransform _lookRaycastTransform;
 
         /// <summary>
@@ -64,6 +71,53 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             if (!(classType == "LocalPlayer" || classType == "ClientPlayer"))
                 throw new ArgumentOutOfRangeException(nameof(classType));
             IsHuman = true;
+        }
+
+        private static DateTimeOffset _wishlistLast = DateTimeOffset.MinValue;
+        /// <summary>
+        /// Set the Player's WishList.
+        /// </summary>
+        public void RefreshWishlist(CancellationToken ct)
+        {
+            try
+            {
+                var now = DateTimeOffset.UtcNow;
+                if ((now - _wishlistLast).TotalSeconds < 10d)
+                    return;
+                var wishlistManager = Memory.ReadPtr(Profile + Offsets.Profile.WishlistManager);
+                var itemsPtr = Memory.ReadPtr(wishlistManager + Offsets.WishlistManager._wishlistItems);
+                using var items = UnityDictionary<MongoID, int>.Create(itemsPtr, true);
+                using var wishlist = new PooledSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var item in items)
+                {
+                    ct.ThrowIfCancellationRequested();
+                    try
+                    {
+                        string id = item.Key.ReadString();
+                        if (string.IsNullOrWhiteSpace(id))
+                            continue;
+                        wishlist.Add(id);
+                    }
+                    catch { throw; }
+                }
+                foreach (var existing in _wishlistItems)
+                {
+                    ct.ThrowIfCancellationRequested();
+                    if (!wishlist.Contains(existing))
+                        _wishlistItems.Remove(existing);
+                }
+                foreach (var newItem in wishlist)
+                {
+                    ct.ThrowIfCancellationRequested();
+                    _wishlistItems.Add(newItem);
+                }
+                _wishlistLast = now;
+            }
+            catch (OperationCanceledException) { throw; }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Wishlist] ERROR Refreshing: {ex}");
+            }
         }
 
         public override void OnRealtimeLoop(VmmScatter scatter)
