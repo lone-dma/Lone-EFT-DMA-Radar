@@ -30,6 +30,7 @@ using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Misc.Workers;
 using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
+using LoneEftDmaRadar.Tarkov.GameWorld.Hazards;
 using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
@@ -72,6 +73,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         public LocalPlayer LocalPlayer => _rgtPlayers?.LocalPlayer;
         public LootManager Loot { get; }
         public QuestManager QuestManager { get; }
+        public IReadOnlyList<IWorldHazard> Hazards { get; }
 
         private LocalGameWorld() { }
 
@@ -114,6 +116,15 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 Loot = new(localGameWorld);
                 _exfilManager = new(mapID, _rgtPlayers.LocalPlayer.IsPmc);
                 _explosivesManager = new(localGameWorld);
+                var hazards = new List<IWorldHazard>();
+                if (TarkovDataManager.MapData.TryGetValue(MapID, out var mapData))
+                { 
+                    foreach (var hazard in mapData.Hazards)
+                    {
+                        hazards.Add(hazard);
+                    }
+                }
+                Hazards = hazards;
             }
             catch
             {

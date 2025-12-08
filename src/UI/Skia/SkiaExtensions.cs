@@ -213,7 +213,7 @@ namespace LoneEftDmaRadar.UI.Skia
         }
 
         /// <summary>
-        /// Draws a HazardElement Marker on this zoomed location.
+        /// Draws a GenericWorldHazard Marker on this zoomed location.
         /// </summary>
         public static void DrawHazardMarker(this SKPoint zoomedMapPos, SKCanvas canvas)
         {

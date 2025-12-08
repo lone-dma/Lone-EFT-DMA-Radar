@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.Tarkov.GameWorld.Hazards;
 using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
 using LoneEftDmaRadar.Web.TarkovDev.Data;
 using System.Collections.Frozen;
@@ -323,7 +324,7 @@ namespace LoneEftDmaRadar.Tarkov
             public List<TransitElement> Transits { get; set; } = new();
 
             [JsonPropertyName("hazards")]
-            public List<HazardElement> Hazards { get; set; } = new();
+            public List<GenericWorldHazard> Hazards { get; set; } = new();
         }
 
         public partial class PlayerLevelElement
@@ -333,15 +334,6 @@ namespace LoneEftDmaRadar.Tarkov
 
             [JsonPropertyName("level")]
             public int Level { get; set; }
-        }
-
-        public partial class HazardElement
-        {
-            [JsonPropertyName("hazardType")]
-            public string HazardType { get; set; }
-
-            [JsonPropertyName("position")]
-            public PositionElement Position { get; set; }
         }
 
         public partial class ExtractElement
