@@ -1,9 +1,9 @@
 {
   "mapID": ["Terminal"],
-  "x": 834,
-  "y": 391,
+  "x": 735,
+  "y": 486,
   "scale": 1.0,
-  "svgScale": 1.0,
+  "svgScale": 2.0,
   "mapLayers": [
     {
       "minHeight": null,
