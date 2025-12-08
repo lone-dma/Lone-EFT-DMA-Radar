@@ -38,7 +38,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
         public Exfil(TarkovDataManager.ExtractElement extract)
         {
             Name = extract.Name;
-            _position = extract.Position.AsVector3();
+            _position = extract.Position;
         }
 
         public string Name { get; }

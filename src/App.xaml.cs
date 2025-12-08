@@ -45,6 +45,8 @@ global using System.Text;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
 global using System.Windows;
+global using RateLimiter = LoneEftDmaRadar.Misc.RateLimiter;
+using LoneEftDmaRadar.Misc.JSON;
 using LoneEftDmaRadar.Misc.Services;
 using LoneEftDmaRadar.Tarkov;
 using LoneEftDmaRadar.UI.ColorPicker;
@@ -92,6 +94,18 @@ namespace LoneEftDmaRadar
         /// TRUE if the application is currently using Dark Mode resources, otherwise FALSE for Light Mode.
         /// </summary>
         public static bool IsDarkMode { get; private set; }
+        /// <summary>
+        /// Default JSON Options for this App Domain.
+        /// </summary>
+        public static JsonSerializerOptions JsonOptions { get; } = new()
+        {
+            Converters = { Vector2JsonConverter.Instance, Vector3JsonConverter.Instance },
+            WriteIndented = true,
+            PropertyNameCaseInsensitive = true,
+            AllowTrailingCommas = true,
+            NumberHandling = JsonNumberHandling.AllowReadingFromString,
+            ReadCommentHandling = JsonCommentHandling.Skip
+        };
 
         static App()
         {

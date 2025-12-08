@@ -41,11 +41,6 @@ namespace LoneEftDmaRadar.Tarkov
         private static readonly FileInfo _bakDataFile = new(Path.Combine(App.ConfigPath.FullName, "data.json.bak"));
         private static readonly FileInfo _tempDataFile = new(Path.Combine(App.ConfigPath.FullName, "data.json.tmp"));
         private static readonly FileInfo _dataFile = new(Path.Combine(App.ConfigPath.FullName, "data.json"));
-        private static readonly JsonSerializerOptions _jsonOptions = new()
-        {
-            PropertyNameCaseInsensitive = true,
-            NumberHandling = JsonNumberHandling.AllowReadingFromString
-        };
 
         /// <summary>
         /// Master items dictionary - mapped via BSGID String.
@@ -217,7 +212,7 @@ namespace LoneEftDmaRadar.Tarkov
                     if (!file.Exists)
                         return null;
                     using var dataStream = File.OpenRead(file.FullName);
-                    return await JsonSerializer.DeserializeAsync<TarkovData>(dataStream, _jsonOptions) ??
+                    return await JsonSerializer.DeserializeAsync<TarkovData>(dataStream, App.JsonOptions) ??
                         throw new InvalidOperationException($"Failed to deserialize {nameof(dataStream)}");
                 }
                 catch
@@ -258,7 +253,7 @@ namespace LoneEftDmaRadar.Tarkov
                         destFileName: _dataFile.FullName,
                         overwrite: true);
                 }
-                var data = JsonSerializer.Deserialize<TarkovData>(dataJson, _jsonOptions) ??
+                var data = JsonSerializer.Deserialize<TarkovData>(dataJson, App.JsonOptions) ??
                     throw new InvalidOperationException($"Failed to deserialize {nameof(dataJson)}");
                 SetData(data);
             }
@@ -291,22 +286,6 @@ namespace LoneEftDmaRadar.Tarkov
 
             [JsonPropertyName("tasks")]
             public List<TaskElement> Tasks { get; set; } = new();
-        }
-
-
-        public class PositionElement
-        {
-            [JsonPropertyName("x")]
-            public float X { get; set; }
-
-            [JsonPropertyName("y")]
-            public float Y { get; set; }
-
-            [JsonPropertyName("z")]
-            public float Z { get; set; }
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public Vector3 AsVector3() => new(X, Y, Z);
         }
 
         public partial class MapElement
@@ -345,7 +324,7 @@ namespace LoneEftDmaRadar.Tarkov
             public string Faction { get; set; }
 
             [JsonPropertyName("position")]
-            public PositionElement Position { get; set; }
+            public Vector3 Position { get; set; }
 
             [JsonIgnore]
             public bool IsPmc => Faction?.Equals("pmc", StringComparison.OrdinalIgnoreCase) ?? false;
@@ -359,7 +338,7 @@ namespace LoneEftDmaRadar.Tarkov
             public string Description { get; set; }
 
             [JsonPropertyName("position")]
-            public PositionElement Position { get; set; }
+            public Vector3 Position { get; set; }
         }
 
 

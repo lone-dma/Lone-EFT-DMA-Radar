@@ -14,26 +14,13 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Hazards
         public string HazardType { get; set; }
 
         [JsonPropertyName("position")]
-        public TarkovDataManager.PositionElement PositionJson { get; set; }
+        public Vector3 Position { get; set; }
 
         [JsonIgnore]
         public Vector2 MouseoverPosition { get; set; }
 
         [JsonIgnore]
-        ref readonly Vector3 Position
-        {
-            get
-            {
-                if (_position == default)
-                {
-                    _position = PositionJson.AsVector3();
-                }
-                return ref _position;
-            }
-        }
-
-        [JsonIgnore]
-        ref readonly Vector3 IWorldEntity.Position => ref Position;
+        ref readonly Vector3 IWorldEntity.Position => throw new NotImplementedException();
 
         public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {

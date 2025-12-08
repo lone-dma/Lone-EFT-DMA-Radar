@@ -38,7 +38,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
         public TransitPoint(TarkovDataManager.TransitElement transit)
         {
             Description = transit.Description;
-            _position = transit.Position.AsVector3();
+            _position = transit.Position;
         }
 
         public string Description { get; }

@@ -128,7 +128,7 @@ namespace LoneEftDmaRadar.Web.EftApiTech
                 var epoch = jsonDoc.RootElement.GetProperty("lastUpdated").GetProperty("epoch").GetInt64();
                 var data = jsonDoc.RootElement.GetProperty("data");
                 string raw = data.GetRawText();
-                var result = JsonSerializer.Deserialize<ProfileData>(raw, IProfileApiProvider.JsonOptions) ??
+                var result = JsonSerializer.Deserialize<ProfileData>(raw, App.JsonOptions) ??
                     throw new InvalidOperationException("Failed to deserialize response");
                 Debug.WriteLine($"[EftApiTechProvider] Got Profile '{accountId}'!");
                 return new()
