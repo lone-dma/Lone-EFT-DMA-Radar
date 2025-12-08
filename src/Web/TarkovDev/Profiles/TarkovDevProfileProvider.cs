@@ -107,7 +107,7 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Profiles
                 string json = await response.Content.ReadAsStringAsync(ct);
                 using var jsonDoc = JsonDocument.Parse(json);
                 long epoch = jsonDoc.RootElement.GetProperty("updated").GetInt64();
-                var result = JsonSerializer.Deserialize<ProfileData>(json, IProfileApiProvider.JsonOptions) ??
+                var result = JsonSerializer.Deserialize<ProfileData>(json, App.JsonOptions) ??
                     throw new InvalidOperationException("Failed to deserialize response");
                 Debug.WriteLine($"[TarkovDevProvider] Got Profile '{accountId}'!");
                 return new()

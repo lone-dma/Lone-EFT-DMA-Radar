@@ -73,7 +73,7 @@ namespace LoneEftDmaRadar.Web.ProfileApi.Schema
         /// <exception cref="InvalidOperationException"></exception>
         public ProfileData ToProfileData()
         {
-            return System.Text.Json.JsonSerializer.Deserialize<ProfileData>(this.Data, IProfileApiProvider.JsonOptions) ??
+            return System.Text.Json.JsonSerializer.Deserialize<ProfileData>(this.Data, App.JsonOptions) ??
                 throw new InvalidOperationException($"Failed to deserialize ProfileData from {nameof(EftProfileDto)}.");
         }
 

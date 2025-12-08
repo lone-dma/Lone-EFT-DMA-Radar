@@ -208,8 +208,11 @@ namespace LoneEftDmaRadar.UI.Skia
         private void Parent_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e) => CancelInteractions();
         private void Parent_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e) => CancelInteractions();
 
+        private readonly RateLimiter _mouseMoveRL = new(TimeSpan.FromSeconds(1d / 60));
         private void Parent_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
+            if (!_mouseMoveRL.TryEnter())
+                return;
             var element = (IInputElement)sender;
             var pos = e.GetPosition(element);
             var posF = new SKPoint((float)pos.X, (float)pos.Y);

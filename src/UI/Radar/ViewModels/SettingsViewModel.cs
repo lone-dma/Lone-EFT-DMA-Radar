@@ -147,7 +147,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                     MessageBox.Show(MainWindow.Instance, "Overwrite backup?", "Backup Config", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                     return;
 
-                await File.WriteAllTextAsync(backupFile, JsonSerializer.Serialize(App.Config, new JsonSerializerOptions { WriteIndented = true }));
+                await File.WriteAllTextAsync(backupFile, JsonSerializer.Serialize(App.Config, App.JsonOptions));
                 MessageBox.Show(MainWindow.Instance, $"Backed up to {backupFile}", "Backup Config");
             }
             catch (Exception ex)

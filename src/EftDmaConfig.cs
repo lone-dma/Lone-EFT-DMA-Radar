@@ -40,10 +40,6 @@ namespace LoneEftDmaRadar
     /// </summary>
     public sealed class EftDmaConfig
     {
-        private static readonly JsonSerializerOptions _jsonOptions = new()
-        {
-            WriteIndented = true
-        };
         /// <summary>
         /// Public Constructor required for deserialization.
         /// DO NOT CALL - USE LOAD().
@@ -387,7 +383,7 @@ namespace LoneEftDmaRadar
                 if (!file.Exists)
                     return null;
                 string json = File.ReadAllText(file.FullName);
-                return JsonSerializer.Deserialize<EftDmaConfig>(json, _jsonOptions);
+                return JsonSerializer.Deserialize<EftDmaConfig>(json, App.JsonOptions);
             }
             catch
             {
@@ -422,7 +418,7 @@ namespace LoneEftDmaRadar
 
         private static void SaveInternal(EftDmaConfig config)
         {
-            var json = JsonSerializer.Serialize(config, _jsonOptions);
+            var json = JsonSerializer.Serialize(config, App.JsonOptions);
             using (var fs = new FileStream(
                 _tempFile.FullName,
                 FileMode.Create,

@@ -34,18 +34,6 @@ namespace LoneEftDmaRadar.Web.ProfileApi
     /// </summary>
     public interface IProfileApiProvider
     {
-        /// <summary>
-        /// Default JSON Options for all Profile API providers and related services.
-        /// </summary>
-        internal static JsonSerializerOptions JsonOptions { get; } = new()
-        {
-            WriteIndented = false,
-            PropertyNameCaseInsensitive = true,
-            AllowTrailingCommas = true,
-            NumberHandling = JsonNumberHandling.AllowReadingFromString,
-            ReadCommentHandling = JsonCommentHandling.Skip
-        };
-
         private static readonly ConcurrentBag<IProfileApiProvider> _providers = new();
         /// <summary>
         /// All Profile API providers.
