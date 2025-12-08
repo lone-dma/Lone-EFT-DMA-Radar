@@ -27,7 +27,6 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using LoneEftDmaRadar.Tarkov;
 using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
 using LoneEftDmaRadar.Tarkov.GameWorld.Hazards;
@@ -100,9 +99,18 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
         private static IReadOnlyCollection<IExplosiveItem> Explosives => Memory.Explosives;
 
         /// <summary>
+        /// Contains all 'Hazards' in Local Game World, and their type/position(s).
+        /// </summary>
+        private static IReadOnlyCollection<IWorldHazard> Hazards => Memory.Game?.Hazards;
+
+        /// <summary>
         /// Contains all 'Exits' in Local Game World, and their status/position(s).
         /// </summary>
         private static IReadOnlyCollection<IExitPoint> Exits => Memory.Exits;
+        /// <summary>
+        /// Contains the Quest Manager.
+        /// </summary>
+        private static QuestManager Quests => Memory.QuestManager;
 
         /// <summary>
         /// Item Search Filter has been set/applied.
@@ -134,10 +142,10 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                 var exits = App.Config.UI.ShowExfils ?
                     Exits ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
                 var quests = App.Config.QuestHelper.Enabled ?
-                    Memory.QuestManager?.LocationConditions?.Values?.OfType<IMouseoverEntity>() ?? Enumerable.Empty<IMouseoverEntity>()
+                    Quests?.LocationConditions?.Values?.OfType<IMouseoverEntity>() ?? Enumerable.Empty<IMouseoverEntity>()
                     : Enumerable.Empty<IMouseoverEntity>();
                 var hazards = App.Config.UI.ShowHazards ?
-                    Memory.Game?.Hazards ?? Enumerable.Empty<IMouseoverEntity>()
+                    Hazards ?? Enumerable.Empty<IMouseoverEntity>()
                     : Enumerable.Empty<IMouseoverEntity>();
 
                 if (SearchFilterIsSet && !(MainWindow.Instance?.Radar?.Overlay?.ViewModel?.HideCorpses ?? false)) // Item Search
@@ -309,9 +317,9 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                     }
 
                     if (App.Config.UI.ShowHazards &&
-                        TarkovDataManager.MapData.TryGetValue(mapID, out var mapData) && mapData.Hazards is not null) // Draw Hazards
+                        Hazards is IReadOnlyCollection<IWorldHazard> hazards) // Draw Hazards
                     {
-                        foreach (var hazard in mapData.Hazards)
+                        foreach (var hazard in hazards)
                         {
                             hazard.Draw(canvas, mapParams, localPlayer);
                         }
@@ -335,7 +343,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
 
                     if (App.Config.QuestHelper.Enabled)
                     {
-                        if (Memory.QuestManager?.LocationConditions?.Values is IEnumerable<QuestLocation> questLocations)
+                        if (Quests?.LocationConditions?.Values is IEnumerable<QuestLocation> questLocations)
                         {
                             foreach (var loc in questLocations)
                             {
