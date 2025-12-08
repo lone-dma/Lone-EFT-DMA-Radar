@@ -55,7 +55,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         private ulong Base { get; }
 
         private readonly RegisteredPlayers _rgtPlayers;
-        private readonly ExitManager _exfilManager;
         private readonly ExplosivesManager _explosivesManager;
         private readonly WorkerThread _t1;
         private readonly WorkerThread _t2;
@@ -69,10 +68,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         public bool InRaid => !_disposed;
         public IReadOnlyCollection<AbstractPlayer> Players => _rgtPlayers;
         public IReadOnlyCollection<IExplosiveItem> Explosives => _explosivesManager;
-        public IReadOnlyCollection<IExitPoint> Exits => _exfilManager;
         public LocalPlayer LocalPlayer => _rgtPlayers?.LocalPlayer;
         public LootManager Loot { get; }
         public QuestManager QuestManager { get; }
+        public IReadOnlyList<IExitPoint> Exits { get; }
         public IReadOnlyList<IWorldHazard> Hazards { get; }
 
         private LocalGameWorld() { }
@@ -114,23 +113,48 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 ArgumentOutOfRangeException.ThrowIfLessThan(_rgtPlayers.GetPlayerCount(), 1, nameof(_rgtPlayers));
                 QuestManager = new(_rgtPlayers.LocalPlayer.Profile);
                 Loot = new(localGameWorld);
-                _exfilManager = new(mapID, _rgtPlayers.LocalPlayer.IsPmc);
                 _explosivesManager = new(localGameWorld);
-                var hazards = new List<IWorldHazard>();
-                if (TarkovDataManager.MapData.TryGetValue(MapID, out var mapData))
-                { 
-                    foreach (var hazard in mapData.Hazards)
-                    {
-                        hazards.Add(hazard);
-                    }
-                }
-                Hazards = hazards;
+                Hazards = GetHazards(MapID);
+                Exits = GetExits(MapID, _rgtPlayers.LocalPlayer.IsPmc);
             }
             catch
             {
                 Dispose();
                 throw;
             }
+        }
+
+        private static List<IWorldHazard> GetHazards(string mapId)
+        {
+            var list = new List<IWorldHazard>();
+            if (TarkovDataManager.MapData.TryGetValue(mapId, out var mapData))
+            {
+                foreach (var hazard in mapData.Hazards)
+                {
+                    list.Add(hazard);
+                }
+            }
+            return list;
+        }
+
+        private static List<IExitPoint> GetExits(string mapId, bool isPMC)
+        {
+            var list = new List<IExitPoint>();
+            if (TarkovDataManager.MapData.TryGetValue(mapId, out var mapData))
+            {
+                var filteredExfils = isPMC ?
+                    mapData.Extracts.Where(x => x.IsShared || x.IsPmc) :
+                    mapData.Extracts.Where(x => !x.IsPmc);
+                foreach (var exfil in filteredExfils)
+                {
+                    list.Add(new Exfil(exfil));
+                }
+                foreach (var transit in mapData.Transits)
+                {
+                    list.Add(new TransitPoint(transit));
+                }
+            }
+            return list;
         }
 
         /// <summary>

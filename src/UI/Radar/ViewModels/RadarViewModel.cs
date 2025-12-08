@@ -133,10 +133,10 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                     Containers ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
                 var exits = App.Config.UI.ShowExfils ?
                     Exits ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
-                var quests = App.Config.QuestHelper.Enabled ? 
+                var quests = App.Config.QuestHelper.Enabled ?
                     Memory.QuestManager?.LocationConditions?.Values?.OfType<IMouseoverEntity>() ?? Enumerable.Empty<IMouseoverEntity>()
                     : Enumerable.Empty<IMouseoverEntity>();
-                var hazards = App.Config.UI.ShowHazards ? 
+                var hazards = App.Config.UI.ShowHazards ?
                     Memory.Game?.Hazards ?? Enumerable.Empty<IMouseoverEntity>()
                     : Enumerable.Empty<IMouseoverEntity>();
 
