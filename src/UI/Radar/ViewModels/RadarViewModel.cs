@@ -30,6 +30,7 @@ using Collections.Pooled;
 using LoneEftDmaRadar.Tarkov;
 using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
+using LoneEftDmaRadar.Tarkov.GameWorld.Hazards;
 using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
@@ -117,7 +118,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
         /// <summary>
         /// Contains all 'mouse-overable' items.
         /// </summary>
-        private static IEnumerable<IMouseoverEntity> MouseOverItems
+        private static IEnumerable<IMouseoverEntity> MouseoverItems
         {
             get
             {
@@ -130,16 +131,20 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                     FilteredLoot ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
                 var containers = App.Config.Loot.Enabled && App.Config.Containers.Enabled ?
                     Containers ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
-                var exits = Exits ?? Enumerable.Empty<IMouseoverEntity>();
-                var quests = App.Config.QuestHelper.Enabled
-                    ? Memory.QuestManager?.LocationConditions?.Values?.OfType<IMouseoverEntity>() ?? Enumerable.Empty<IMouseoverEntity>()
+                var exits = App.Config.UI.ShowExfils ?
+                    Exits ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
+                var quests = App.Config.QuestHelper.Enabled ? 
+                    Memory.QuestManager?.LocationConditions?.Values?.OfType<IMouseoverEntity>() ?? Enumerable.Empty<IMouseoverEntity>()
+                    : Enumerable.Empty<IMouseoverEntity>();
+                var hazards = App.Config.UI.ShowHazards ? 
+                    Memory.Game?.Hazards ?? Enumerable.Empty<IMouseoverEntity>()
                     : Enumerable.Empty<IMouseoverEntity>();
 
                 if (SearchFilterIsSet && !(MainWindow.Instance?.Radar?.Overlay?.ViewModel?.HideCorpses ?? false)) // Item Search
                     players = players.Where(x =>
                         x.LootObject is null || !loot.Contains(x.LootObject)); // Don't show both corpse objects
 
-                var result = loot.Concat(containers).Concat(players).Concat(exits).Concat(quests);
+                var result = loot.Concat(containers).Concat(players).Concat(exits).Concat(quests).Concat(hazards);
                 return result.Any() ? result : null;
             }
         }
@@ -308,8 +313,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                     {
                         foreach (var hazard in mapData.Hazards)
                         {
-                            var mineZoomedPos = hazard.Position.AsVector3().ToMapPos(map.Config).ToZoomedPos(mapParams);
-                            mineZoomedPos.DrawHazardMarker(canvas);
+                            hazard.Draw(canvas, mapParams, localPlayer);
                         }
                     }
 
@@ -646,7 +650,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                     return;
                 }
 
-                var items = MouseOverItems;
+                var items = MouseoverItems;
                 if (items?.Any() != true)
                 {
                     ClearRefs();
@@ -698,6 +702,11 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
 
                     case QuestLocation quest:
                         _mouseOverItem = quest;
+                        MouseoverGroup = null;
+                        break;
+
+                    case IWorldHazard hazard:
+                        _mouseOverItem = hazard;
                         MouseoverGroup = null;
                         break;
 
