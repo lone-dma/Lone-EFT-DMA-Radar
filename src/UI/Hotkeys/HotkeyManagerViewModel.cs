@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.UI.Hotkeys.Internal;
 using LoneEftDmaRadar.UI.Misc;
 using System.Collections.ObjectModel;
 using System.Windows.Input;

@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.UI.Hotkeys.Internal;
 using VmmSharpEx.Extensions.Input;
 
 namespace LoneEftDmaRadar.UI.Hotkeys

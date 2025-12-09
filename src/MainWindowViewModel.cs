@@ -27,6 +27,7 @@ SOFTWARE.
 */
 
 using LoneEftDmaRadar.UI.Hotkeys;
+using LoneEftDmaRadar.UI.Hotkeys.Internal;
 using LoneEftDmaRadar.UI.Radar.ViewModels;
 
 namespace LoneEftDmaRadar
@@ -72,92 +73,83 @@ namespace LoneEftDmaRadar
         /// </summary>
         private void LoadHotkeyManager()
         {
-            var zoomIn = new HotkeyActionController("Zoom In");
-            zoomIn.Delay = HK_ZOOMTICKDELAY;
-            zoomIn.HotkeyDelayElapsed += ZoomIn_HotkeyDelayElapsed;
-            var zoomOut = new HotkeyActionController("Zoom Out");
-            zoomOut.Delay = HK_ZOOMTICKDELAY;
-            zoomOut.HotkeyDelayElapsed += ZoomOut_HotkeyDelayElapsed;
-            var toggleLoot = new HotkeyActionController("Toggle Loot");
-            toggleLoot.HotkeyStateChanged += ToggleLoot_HotkeyStateChanged;
-            var toggleAimviewWidget = new HotkeyActionController("Toggle Aimview Widget");
-            toggleAimviewWidget.HotkeyStateChanged += ToggleAimviewWidget_HotkeyStateChanged;
-            var toggleNames = new HotkeyActionController("Toggle Player Names");
-            toggleNames.HotkeyStateChanged += ToggleNames_HotkeyStateChanged;
-            var toggleInfo = new HotkeyActionController("Toggle Game Info Tab");
-            toggleInfo.HotkeyStateChanged += ToggleInfo_HotkeyStateChanged;
-            var toggleShowFood = new HotkeyActionController("Toggle Show Food");
-            toggleShowFood.HotkeyStateChanged += ToggleShowFood_HotkeyStateChanged;
-            var toggleShowMeds = new HotkeyActionController("Toggle Show Meds");
-            toggleShowMeds.HotkeyStateChanged += ToggleShowMeds_HotkeyStateChanged;
-            var toggleShowQuestItems = new HotkeyActionController("Toggle Show Quest Items");
-            toggleShowQuestItems.HotkeyStateChanged += ToggleShowQuestItems_HotkeyStateChanged;
-            // Add to Static Collection:
-            HotkeyAction.RegisterController(zoomIn);
-            HotkeyAction.RegisterController(zoomOut);
-            HotkeyAction.RegisterController(toggleLoot);
-            HotkeyAction.RegisterController(toggleAimviewWidget);
-            HotkeyAction.RegisterController(toggleNames);
-            HotkeyAction.RegisterController(toggleInfo);
-            HotkeyAction.RegisterController(toggleShowFood);
-            HotkeyAction.RegisterController(toggleShowMeds);
-            HotkeyAction.RegisterController(toggleShowQuestItems);
+            var methods = this.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
+                .Where(m => m.GetCustomAttribute<HotkeyAttribute>() is not null);
+
+            foreach (var method in methods)
+            {
+                var attr = (HotkeyAttribute)method.GetCustomAttributes(typeof(HotkeyAttribute), false).FirstOrDefault();
+                if (attr is not null)
+                {
+                    var controller = new HotkeyActionController(attr.Name, attr.Type, method.CreateDelegate<HotkeyDelegate>(this), attr.Interval);
+                    HotkeyAction.RegisterController(controller);
+                }
+            }
         }
 
-        private void ToggleShowQuestItems_HotkeyStateChanged(object sender, HotkeyEventArgs e)
+        [Hotkey("Toggle Show Quest Items")]
+        private void ToggleShowQuestItems_HotkeyStateChanged(bool isKeyDown)
         {
-            if (e.State && _parent.Radar?.Overlay?.ViewModel is RadarOverlayViewModel vm)
+            if (isKeyDown && _parent.Radar?.Overlay?.ViewModel is RadarOverlayViewModel vm)
             {
                 vm.ShowQuestItems = !vm.ShowQuestItems;
             }
         }
 
-        private void ToggleAimviewWidget_HotkeyStateChanged(object sender, HotkeyEventArgs e)
+        [Hotkey("Toggle Aimview Widget")]
+        private void ToggleAimviewWidget_HotkeyStateChanged(bool isKeyDown)
         {
-            if (e.State && _parent.Settings?.ViewModel is SettingsViewModel vm)
+            if (isKeyDown && _parent.Settings?.ViewModel is SettingsViewModel vm)
                 vm.AimviewWidget = !vm.AimviewWidget;
         }
 
-        private void ToggleShowMeds_HotkeyStateChanged(object sender, HotkeyEventArgs e)
+        [Hotkey("Toggle Show Meds")]
+        private void ToggleShowMeds_HotkeyStateChanged(bool isKeyDown)
         {
-            if (e.State && _parent.Radar?.Overlay?.ViewModel is RadarOverlayViewModel vm)
+            if (isKeyDown && _parent.Radar?.Overlay?.ViewModel is RadarOverlayViewModel vm)
             {
                 vm.ShowMeds = !vm.ShowMeds;
             }
         }
 
-        private void ToggleShowFood_HotkeyStateChanged(object sender, HotkeyEventArgs e)
+        [Hotkey("Toggle Show Food")]
+        private void ToggleShowFood_HotkeyStateChanged(bool isKeyDown)
         {
-            if (e.State && _parent.Radar?.Overlay?.ViewModel is RadarOverlayViewModel vm)
+            if (isKeyDown && _parent.Radar?.Overlay?.ViewModel is RadarOverlayViewModel vm)
             {
                 vm.ShowFood = !vm.ShowFood;
             }
         }
 
-        private void ToggleInfo_HotkeyStateChanged(object sender, HotkeyEventArgs e)
+        [Hotkey("Toggle Game Info Tab")]
+        private void ToggleInfo_HotkeyStateChanged(bool isKeyDown)
         {
-            if (e.State && _parent.Settings?.ViewModel is SettingsViewModel vm)
+            if (isKeyDown && _parent.Settings?.ViewModel is SettingsViewModel vm)
                 vm.PlayerInfoWidget = !vm.PlayerInfoWidget;
         }
 
-        private void ToggleNames_HotkeyStateChanged(object sender, HotkeyEventArgs e)
+        [Hotkey("Toggle Player Names")]
+        private void ToggleNames_HotkeyStateChanged(bool isKeyDown)
         {
-            if (e.State && _parent.Settings?.ViewModel is SettingsViewModel vm)
+            if (isKeyDown && _parent.Settings?.ViewModel is SettingsViewModel vm)
                 vm.HideNames = !vm.HideNames;
         }
 
-        private void ToggleLoot_HotkeyStateChanged(object sender, HotkeyEventArgs e)
+        [Hotkey("Toggle Loot")]
+        private void ToggleLoot_HotkeyStateChanged(bool isKeyDown)
         {
-            if (e.State && _parent.Settings?.ViewModel is SettingsViewModel vm)
+            if (isKeyDown && _parent.Settings?.ViewModel is SettingsViewModel vm)
                 vm.ShowLoot = !vm.ShowLoot;
         }
 
-        private void ZoomOut_HotkeyDelayElapsed(object sender, EventArgs e)
+        [Hotkey("Zoom Out", HotkeyType.OnIntervalElapsed, HK_ZOOMTICKDELAY)]
+        private void ZoomOut_HotkeyDelayElapsed(bool isKeyDown)
         {
             _parent.Radar?.ViewModel?.ZoomOut(HK_ZOOMTICKAMT);
         }
 
-        private void ZoomIn_HotkeyDelayElapsed(object sender, EventArgs e)
+        [Hotkey("Zoom In", HotkeyType.OnIntervalElapsed, HK_ZOOMTICKDELAY)]
+        private void ZoomIn_HotkeyDelayElapsed(bool isKeyDown)
         {
             _parent.Radar?.ViewModel?.ZoomIn(HK_ZOOMTICKAMT);
         }
