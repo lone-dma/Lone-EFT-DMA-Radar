@@ -179,8 +179,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                     catch { }
                 }
                 
-                // Single pass: remove old, add new
-                foreach (var existing in _wishlistItems.Keys.ToArray()) // Snapshot keys
+                foreach (var existing in _wishlistItems.Keys)
                 {
                     if (!newWishlist.Contains(existing))
                         _wishlistItems.TryRemove(existing, out _);
