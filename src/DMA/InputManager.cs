@@ -53,15 +53,15 @@ namespace LoneEftDmaRadar.DMA
 
         private void InputManager_PerformWork(object sender, WorkerThreadArgs e)
         {
-            var hotkeys = HotkeyManagerViewModel.Hotkeys.AsEnumerable();
-            if (hotkeys.Any())
+            var hotkeys = HotkeyManagerViewModel.Hotkeys;
+            if (hotkeys.Count == 0)
+                return;
+
+            _input.UpdateKeys();
+            foreach (var kvp in hotkeys)
             {
-                _input.UpdateKeys();
-                foreach (var kvp in hotkeys)
-                {
-                    bool isKeyDown = _input.IsKeyDown(kvp.Key);
-                    kvp.Value.Execute(isKeyDown);
-                }
+                bool isKeyDown = _input.IsKeyDown(kvp.Key);
+                kvp.Value.Execute(isKeyDown);
             }
         }
     }

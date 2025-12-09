@@ -364,29 +364,32 @@ namespace LoneEftDmaRadar.Tarkov
 #pragma warning restore IDE1006 // Naming Styles
 
                 [JsonIgnore]
-                public QuestObjectiveType Type =>
-                _type switch
-                {
-                    "visit" => QuestObjectiveType.Visit,
-                    "mark" => QuestObjectiveType.Mark,
-                    "giveItem" => QuestObjectiveType.GiveItem,
-                    "shoot" => QuestObjectiveType.Shoot,
-                    "extract" => QuestObjectiveType.Extract,
-                    "findQuestItem" => QuestObjectiveType.FindQuestItem,
-                    "giveQuestItem" => QuestObjectiveType.GiveQuestItem,
-                    "findItem" => QuestObjectiveType.FindItem,
-                    "buildWeapon" => QuestObjectiveType.BuildWeapon,
-                    "plantItem" => QuestObjectiveType.PlantItem,
-                    "plantQuestItem" => QuestObjectiveType.PlantQuestItem,
-                    "traderLevel" => QuestObjectiveType.TraderLevel,
-                    "traderStanding" => QuestObjectiveType.TraderStanding,
-                    "skill" => QuestObjectiveType.Skill,
-                    "experience" => QuestObjectiveType.Experience,
-                    "useItem" => QuestObjectiveType.UseItem,
-                    "sellItem" => QuestObjectiveType.SellItem,
-                    "taskStatus" => QuestObjectiveType.TaskStatus,
-                    _ => QuestObjectiveType.Unknown
-                };
+                private static readonly FrozenDictionary<string, QuestObjectiveType> _objectiveTypes = 
+    new Dictionary<string, QuestObjectiveType>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["visit"] = QuestObjectiveType.Visit,
+        ["mark"] = QuestObjectiveType.Mark,
+        ["giveItem"] = QuestObjectiveType.GiveItem,
+        ["shoot"] = QuestObjectiveType.Shoot,
+        ["extract"] = QuestObjectiveType.Extract,
+        ["findQuestItem"] = QuestObjectiveType.FindQuestItem,
+        ["giveQuestItem"] = QuestObjectiveType.GiveQuestItem,
+        ["findItem"] = QuestObjectiveType.FindItem,
+        ["buildWeapon"] = QuestObjectiveType.BuildWeapon,
+        ["plantItem"] = QuestObjectiveType.PlantItem,
+        ["plantQuestItem"] = QuestObjectiveType.PlantQuestItem,
+        ["traderLevel"] = QuestObjectiveType.TraderLevel,
+        ["traderStanding"] = QuestObjectiveType.TraderStanding,
+        ["skill"] = QuestObjectiveType.Skill,
+        ["experience"] = QuestObjectiveType.Experience,
+        ["useItem"] = QuestObjectiveType.UseItem,
+        ["sellItem"] = QuestObjectiveType.SellItem,
+        ["taskStatus"] = QuestObjectiveType.TaskStatus,
+    }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
+
+                [JsonIgnore]
+                public QuestObjectiveType Type => 
+                    _objectiveTypes.TryGetValue(_type, out var type) ? type : QuestObjectiveType.Unknown;
 
                 [JsonPropertyName("description")]
                 public string Description { get; set; }

@@ -271,6 +271,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
                         {
                             var shortNamePtr = Memory.ReadPtr(itemTemplate + Offsets.ItemTemplate.ShortName);
                             var shortName = Memory.ReadUnityString(shortNamePtr, 128);
+                            if (shortName.Any(c => c > 127))
+                            {
+                                shortName = id.Length > 8 ? id[^8..] : id; // Edge case some shortnames are russki
+                            }
                             _ = _loot.TryAdd(p.ItemBase, new LootItem(id, $"Q_{shortName}", pos) { IsQuestItem = true });
                             _loggedQuestItems.Add(id);
                         }
