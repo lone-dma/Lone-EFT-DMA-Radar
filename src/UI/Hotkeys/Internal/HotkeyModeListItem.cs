@@ -26,20 +26,30 @@ SOFTWARE.
  *
 */
 
-namespace LoneEftDmaRadar.UI.Hotkeys
+namespace LoneEftDmaRadar.UI.Hotkeys.Internal
 {
-    public sealed class HotkeyEventArgs : EventArgs
+    public sealed class HotkeyModeListItem
     {
-        /// <summary>
-        /// State of the Hotkey.
-        /// True: Key is down.
-        /// False: Key is up.
-        /// </summary>
-        public bool State { get; }
-
-        public HotkeyEventArgs(bool state)
+        public string Name { get; }
+        public EMode Mode { get; }
+        public HotkeyModeListItem(EMode mode)
         {
-            State = state;
+            Name = mode.ToString();
+            Mode = mode;
+        }
+        public override string ToString() => Name;
+
+
+        public enum EMode
+        {
+            /// <summary>
+            /// Continuous Hold the hotkey.
+            /// </summary>
+            Hold = 1,
+            /// <summary>
+            /// Toggle hotkey on/off.
+            /// </summary>
+            Toggle = 2
         }
     }
 }

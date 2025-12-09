@@ -28,7 +28,7 @@ SOFTWARE.
 
 using VmmSharpEx.Extensions.Input;
 
-namespace LoneEftDmaRadar.UI.Hotkeys
+namespace LoneEftDmaRadar.UI.Hotkeys.Internal
 {
     /// <summary>
     /// Combo Box Wrapper for WindowsVirtualKeyCode Enums for Hotkey Manager.

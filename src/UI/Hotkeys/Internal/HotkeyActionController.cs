@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-namespace LoneEftDmaRadar.UI.Hotkeys
+namespace LoneEftDmaRadar.UI.Hotkeys.Internal
 {
     /// <summary>
     /// Wraps a Unity Hotkey/Event Delegate, and maintains it's State.
@@ -36,50 +36,43 @@ namespace LoneEftDmaRadar.UI.Hotkeys
     /// </summary>
     public sealed class HotkeyActionController
     {
+        private readonly HotkeyType _type;
+        private readonly HotkeyDelegate _delegate;
+        private readonly System.Timers.Timer _timer;
+        private bool _state;
+
         /// <summary>
         /// Action Name used for lookup.
         /// </summary>
         public string Name { get; }
         /// <summary>
-        /// Delay (ms) between 'HotkeyDelayElapsed' Event Firing.
-        /// Default: 100ms
-        /// </summary>
-        public double Delay
-        {
-            get => _timer.Interval;
-            set => _timer.Interval = value;
-        }
-        /// <summary>
         /// GUI Thread/Window to execute delegate(s) on.
         /// </summary>
         private MainWindow Window { get; set; }
-        /// <summary>
-        /// Event Occurs when associated Hotkey changes state.
-        /// </summary>
-        public event EventHandler<HotkeyEventArgs> HotkeyStateChanged;
-        /// <summary>
-        /// Event Occurs during Initial 'Key Down', and repeats while key is down.
-        /// Be sure to set the 'Delay' Property (Default: 100ms).
-        /// </summary>
-        public event EventHandler HotkeyDelayElapsed;
 
-        private readonly System.Timers.Timer _timer;
-        private bool _state;
+        private HotkeyActionController() { }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="name">Name of action.</param>
-        /// Required for OnHotkeyDelay.</param>
-        public HotkeyActionController(string name)
+        /// <param name="type">Type of Hotkey activation.</param>
+        /// <param name="delegate">Hotkey action delegate.</param>
+        /// <param name="interval">Interval (ms) between Hotkey activations.</param>
+        public HotkeyActionController(string name, HotkeyType type, HotkeyDelegate @delegate, double interval = 100)
         {
             Name = name;
-            _timer = new()
+            _type = type;
+            _delegate = @delegate;
+            if (type == HotkeyType.OnIntervalElapsed)
             {
-                Interval = 100,
-                AutoReset = true
-            };
-            _timer.Elapsed += OnHotkeyDelayElapsed;
+                _timer = new()
+                {
+                    Interval = interval,
+                    AutoReset = true
+                };
+                _timer.Elapsed += OnHotkeyIntervalElapsed;
+            }
         }
 
         /// <summary>
@@ -95,56 +88,41 @@ namespace LoneEftDmaRadar.UI.Hotkeys
             bool keyUp = _state && !isKeyDown;
             if (keyDown || keyUp) // State has changed
             {
-                UpdateState(keyDown);
-                if (HotkeyStateChanged is not null) // Invoke Event if Set.
-                    OnHotkeyStateChanged(new HotkeyEventArgs(keyDown));
-            }
-        }
-
-        /// <summary>
-        /// Executed whenever a Hotkey Changes State.
-        /// Updates the Internal 'State' of this controller and it's Events.
-        /// </summary>
-        /// <param name="newState">New State of the Hotkey.
-        /// True: Key is down.
-        /// False: Key is up.</param>
-        private void UpdateState(bool newState)
-        {
-            _state = newState;
-            if (HotkeyDelayElapsed is not null) // Set 'HotkeyDelayElapsed' State
-            {
-                if (newState) // Key Down
+                _state = isKeyDown;
+                switch (_type)
                 {
-                    Window?.Dispatcher.InvokeAsync(() =>
-                    {
-                        HotkeyDelayElapsed?.Invoke(this, EventArgs.Empty); // Invoke Delay Event on Initial Keydown
-                    });
-                    _timer.Start(); // Start Callback Timer
+                    case HotkeyType.OnKeyStateChanged:
+                        Window?.Dispatcher.InvokeAsync(() =>
+                        {
+                            _delegate.Invoke(isKeyDown);
+                        });
+                        break;
+                    case HotkeyType.OnIntervalElapsed:
+                        if (isKeyDown) // Key Down
+                        {
+                            Window?.Dispatcher.InvokeAsync(() =>
+                            {
+                                _delegate.Invoke(true); // Initial Invoke
+                            });
+                            _timer.Start(); // Start Callback Timer
+                        }
+                        else // Key Up
+                        {
+                            _timer.Stop(); // Stop Timer (Resets to 0)
+                        }
+                        break;
                 }
-                else // Key Up
-                    _timer.Stop(); // Stop Timer (Resets to 0)
             }
-        }
-
-        /// <summary>
-        /// Invokes 'HotkeyStateChanged' Event Delegate.
-        /// </summary>
-        private void OnHotkeyStateChanged(HotkeyEventArgs e)
-        {
-            Window?.Dispatcher.InvokeAsync(() =>
-            {
-                HotkeyStateChanged?.Invoke(this, e);
-            });
         }
 
         /// <summary>
         /// Invokes 'HotkeyDelayElapsed' Event Delegate.
         /// </summary>
-        private void OnHotkeyDelayElapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private void OnHotkeyIntervalElapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             Window?.Dispatcher.InvokeAsync(() =>
             {
-                HotkeyDelayElapsed?.Invoke(this, EventArgs.Empty);
+                _delegate.Invoke(true);
             });
         }
 

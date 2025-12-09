@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-namespace LoneEftDmaRadar.UI.Hotkeys
+namespace LoneEftDmaRadar.UI.Hotkeys.Internal
 {
     /// <summary>
     /// Links a Unity Hotkey to it's Action Controller.
