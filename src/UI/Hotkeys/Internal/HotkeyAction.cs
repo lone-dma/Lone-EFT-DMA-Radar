@@ -34,10 +34,12 @@ namespace LoneEftDmaRadar.UI.Hotkeys.Internal
     /// </summary>
     public sealed class HotkeyAction
     {
+        private static readonly ConcurrentBag<HotkeyActionController> _controllers = new();
         /// <summary>
-        /// Registered Hotkey Action Controllers (API Internal).
+        /// Registered Hotkey Action Controllers.
         /// </summary>
-        internal static ConcurrentBag<HotkeyActionController> Controllers { get; } = new();
+        public static IEnumerable<HotkeyActionController> RegisteredControllers => _controllers;
+
         /// <summary>
         /// Action Name used for lookup.
         /// </summary>
@@ -58,7 +60,7 @@ namespace LoneEftDmaRadar.UI.Hotkeys.Internal
         /// <param name="controller">Controller to register.</param>
         internal static void RegisterController(HotkeyActionController controller)
         {
-            Controllers.Add(controller);
+            _controllers.Add(controller);
         }
 
         /// <summary>
@@ -67,7 +69,7 @@ namespace LoneEftDmaRadar.UI.Hotkeys.Internal
         /// <param name="isKeyDown">True if the key is pressed.</param>
         public void Execute(bool isKeyDown)
         {
-            Action ??= Controllers.FirstOrDefault(x => x.Name == Name);
+            Action ??= _controllers.FirstOrDefault(x => x.Name == Name);
             Action?.Execute(isKeyDown);
         }
 

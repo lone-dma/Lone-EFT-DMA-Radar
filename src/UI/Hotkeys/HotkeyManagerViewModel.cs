@@ -66,7 +66,7 @@ namespace LoneEftDmaRadar.UI.Hotkeys
         {
             _parent = parent ?? throw new ArgumentNullException(nameof(parent));
             // populate the two dropdowns:
-            Controllers = new ObservableCollection<HotkeyActionController>(HotkeyAction.Controllers);
+            Controllers = new ObservableCollection<HotkeyActionController>(HotkeyAction.RegisteredControllers);
             AvailableKeys = new ObservableCollection<ComboHotkeyValue>(_allKeys.Select(code => new ComboHotkeyValue(code)));
 
             // seed the listbox from whatever was in config:
