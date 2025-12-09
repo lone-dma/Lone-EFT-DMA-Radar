@@ -73,7 +73,7 @@ namespace LoneEftDmaRadar
         /// </summary>
         private void LoadHotkeyManager()
         {
-            var methods = this.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
+            var methods = this.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
                 .Where(m => m.GetCustomAttribute<HotkeyAttribute>() is not null);
 
             foreach (var method in methods)
