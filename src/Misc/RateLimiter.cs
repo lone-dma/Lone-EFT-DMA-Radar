@@ -5,13 +5,14 @@
     /// </summary>
     public struct RateLimiter
     {
-        private readonly TimeSpan _interval = TimeSpan.Zero;
-        private DateTimeOffset _last = DateTimeOffset.MinValue;
+        private readonly long _intervalTicks;
+        private long _lastTicks;
 
         public RateLimiter() { }
+        
         public RateLimiter(TimeSpan interval)
         {
-            _interval = interval;
+            _intervalTicks = interval.Ticks;
         }
 
         /// <summary>
@@ -21,10 +22,11 @@
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryEnter()
         {
-            var now = DateTimeOffset.UtcNow;
-            if (now - _last >= _interval)
+            long now = Stopwatch.GetTimestamp();
+            long elapsed = Stopwatch.GetElapsedTime(_lastTicks, now).Ticks;
+            if (elapsed >= _intervalTicks)
             {
-                _last = now;
+                _lastTicks = now;
                 return true;
             }
             return false;

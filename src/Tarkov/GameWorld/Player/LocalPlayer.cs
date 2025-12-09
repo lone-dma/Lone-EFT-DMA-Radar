@@ -163,26 +163,30 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             {
                 if (!_wishlistRL.TryEnter())
                     return;
+                    
                 var wishlistManager = Memory.ReadPtr(Profile + Offsets.Profile.WishlistManager);
                 var itemsPtr = Memory.ReadPtr(wishlistManager + Offsets.WishlistManager._wishlistItems);
                 using var items = UnityDictionary<MongoID, int>.Create(itemsPtr);
-                using var wishlist = new PooledSet<string>(StringComparer.OrdinalIgnoreCase);
+                using var newWishlist = new PooledSet<string>(items.Count, StringComparer.OrdinalIgnoreCase);
+                
                 foreach (var item in items)
                 {
                     ct.ThrowIfCancellationRequested();
                     try
                     {
-                        string id = item.Key.ReadString();
-                        wishlist.Add(id);
+                        newWishlist.Add(item.Key.ReadString());
                     }
                     catch { }
                 }
-                foreach (var existing in _wishlistItems)
+                
+                // Single pass: remove old, add new
+                foreach (var existing in _wishlistItems.Keys.ToArray()) // Snapshot keys
                 {
-                    if (!wishlist.Contains(existing.Key))
-                        _wishlistItems.TryRemove(existing.Key, out _);
+                    if (!newWishlist.Contains(existing))
+                        _wishlistItems.TryRemove(existing, out _);
                 }
-                foreach (var newItem in wishlist)
+                
+                foreach (var newItem in newWishlist)
                 {
                     _wishlistItems.TryAdd(newItem, 0);
                 }

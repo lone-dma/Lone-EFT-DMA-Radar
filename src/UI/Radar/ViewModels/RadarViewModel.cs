@@ -321,29 +321,39 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                             player.Draw(canvas, mapParams, localPlayer);
                         }
                     }
-                    if (App.Config.UI.ConnectGroups) // Connect Groups together
+                    if (App.Config.UI.ConnectGroups && allPlayers is not null)
                     {
-                        var groupedPlayers = allPlayers?
-                            .Where(x => x.IsHumanHostileActive && x.GroupID != -1);
-                        if (groupedPlayers is not null)
+                        using var groupedByGrp = new PooledDictionary<int, PooledList<SKPoint>>(capacity: 16);
+                        try
                         {
-                            using var groups = groupedPlayers.Select(x => x.GroupID).ToPooledSet();
-                            foreach (var grp in groups)
+                            foreach (var player in allPlayers)
                             {
-                                var grpMembers = groupedPlayers.Where(x => x.GroupID == grp);
-                                if (grpMembers is not null && grpMembers.Any())
+                                if (player.IsHumanHostileActive && player.GroupID != -1)
                                 {
-                                    var combinations = grpMembers
-                                        .SelectMany(x => grpMembers, (x, y) =>
-                                            Tuple.Create(
-                                                x.Position.ToMapPos(map.Config).ToZoomedPos(mapParams),
-                                                y.Position.ToMapPos(map.Config).ToZoomedPos(mapParams)));
-                                    foreach (var pair in combinations)
+                                    if (!groupedByGrp.TryGetValue(player.GroupID, out var list))
                                     {
-                                        canvas.DrawLine(pair.Item1.X, pair.Item1.Y, pair.Item2.X, pair.Item2.Y, SKPaints.PaintConnectorGroup);
+                                        list = new PooledList<SKPoint>(capacity: 5);
+                                        groupedByGrp[player.GroupID] = list;
+                                    }
+                                    list.Add(player.Position.ToMapPos(map.Config).ToZoomedPos(mapParams));
+                                }
+                            }
+        
+                            foreach (var grp in groupedByGrp.Values)
+                            {
+                                for (int i = 0; i < grp.Count; i++)
+                                {
+                                    for (int j = i + 1; j < grp.Count; j++)
+                                    {
+                                        canvas.DrawLine(grp[i].X, grp[i].Y, grp[j].X, grp[j].Y, SKPaints.PaintConnectorGroup);
                                     }
                                 }
                             }
+                        }
+                        finally
+                        {
+                            foreach (var list in groupedByGrp.Values)
+                                list.Dispose();
                         }
                     }
 
@@ -639,7 +649,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
 
             // Get all eligible mouseover items
             var items = GetMouseoverItems();
-            if (items?.Any() != true)
+            if (items is null)
             {
                 ClearRefs();
                 return;
@@ -743,7 +753,12 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                         x.LootObject is null || !loot.Contains(x.LootObject)); // Don't show both corpse objects
 
                 var result = loot.Concat(containers).Concat(players).Concat(exits).Concat(quests).Concat(hazards);
-                return result.Any() ? result : null;
+                
+                using var enumerator = result.GetEnumerator();
+                if (!enumerator.MoveNext())
+                    return null;
+                
+                return result;
             }
         }
 

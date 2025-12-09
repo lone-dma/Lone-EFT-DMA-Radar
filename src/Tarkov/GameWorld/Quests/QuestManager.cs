@@ -1,5 +1,6 @@
 ﻿using Collections.Pooled;
 using LoneEftDmaRadar.Tarkov.Unity.Collections;
+using System.Collections.Frozen;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
 {
@@ -132,6 +133,16 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
         }
 
 
+        private static readonly FrozenSet<QuestObjectiveType> _skipObjectiveTypes = new HashSet<QuestObjectiveType>
+        {
+            QuestObjectiveType.BuildWeapon,
+            QuestObjectiveType.GiveQuestItem,
+            QuestObjectiveType.Extract,
+            QuestObjectiveType.Shoot,
+            QuestObjectiveType.TraderLevel,
+            QuestObjectiveType.GiveItem
+        }.ToFrozenSet();
+
         private void FilterConditions(TarkovDataManager.TaskElement task, string questId, PooledSet<string> completedConditions, PooledSet<string> masterItems, PooledSet<string> masterLocations)
         {
             if (task is null)
@@ -148,16 +159,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
                     // Skip objectives that are already completed (by condition id)
                     if (!string.IsNullOrEmpty(objective.Id) && completedConditions.Contains(objective.Id))
                         continue;
-                    //skip Type: buildWeapon, giveQuestItem, extract, shoot, traderLevel, giveItem
-                    if (objective.Type == QuestObjectiveType.BuildWeapon
-                        || objective.Type == QuestObjectiveType.GiveQuestItem
-                        || objective.Type == QuestObjectiveType.Extract
-                        || objective.Type == QuestObjectiveType.Shoot
-                        || objective.Type == QuestObjectiveType.TraderLevel
-                        || objective.Type == QuestObjectiveType.GiveItem)
-                    {
+
+                    if (_skipObjectiveTypes.Contains(objective.Type))
                         continue;
-                    }
 
                     // Item Pickup Objectives findItem and findQuestItem
                     if (objective.Type == QuestObjectiveType.FindQuestItem)

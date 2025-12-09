@@ -34,11 +34,13 @@ namespace LoneEftDmaRadar.UI.Hotkeys.Internal
     /// </summary>
     public sealed class HotkeyAction
     {
-        private static readonly ConcurrentBag<HotkeyActionController> _controllers = new();
+        private static readonly ConcurrentDictionary<string, HotkeyActionController> _controllers = 
+            new(StringComparer.OrdinalIgnoreCase);
+        
         /// <summary>
         /// Registered Hotkey Action Controllers.
         /// </summary>
-        public static IEnumerable<HotkeyActionController> RegisteredControllers => _controllers;
+        public static IEnumerable<HotkeyActionController> RegisteredControllers => _controllers.Values;
 
         /// <summary>
         /// Action Name used for lookup.
@@ -47,7 +49,7 @@ namespace LoneEftDmaRadar.UI.Hotkeys.Internal
         /// <summary>
         /// Action Controller to execute.
         /// </summary>
-        private HotkeyActionController Action { get; set; }
+        private HotkeyActionController _action;
 
         public HotkeyAction(string name)
         {
@@ -60,7 +62,7 @@ namespace LoneEftDmaRadar.UI.Hotkeys.Internal
         /// <param name="controller">Controller to register.</param>
         internal static void RegisterController(HotkeyActionController controller)
         {
-            _controllers.Add(controller);
+            _controllers.TryAdd(controller.Name, controller);
         }
 
         /// <summary>
@@ -69,8 +71,8 @@ namespace LoneEftDmaRadar.UI.Hotkeys.Internal
         /// <param name="isKeyDown">True if the key is pressed.</param>
         public void Execute(bool isKeyDown)
         {
-            Action ??= _controllers.FirstOrDefault(x => x.Name == Name);
-            Action?.Execute(isKeyDown);
+            _action ??= _controllers.GetValueOrDefault(Name);
+            _action?.Execute(isKeyDown);
         }
 
         public override string ToString() => Name;

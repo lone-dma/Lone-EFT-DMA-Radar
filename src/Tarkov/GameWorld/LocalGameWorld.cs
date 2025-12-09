@@ -297,19 +297,24 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         /// </summary>
         private void RealtimeWorker_PerformWork(object sender, WorkerThreadArgs e)
         {
-            var players = _rgtPlayers.Where(x => x.IsActive && x.IsAlive);
-            var localPlayer = LocalPlayer;
-            if (!players.Any()) // No players - Throttle
+            bool hasPlayers = false;
+            
+            using var scatter = Memory.CreateScatter(VmmFlags.NOCACHE);
+            foreach (var player in _rgtPlayers)
+            {
+                if (player.IsActive && player.IsAlive)
+                {
+                    hasPlayers = true;
+                    player.OnRealtimeLoop(scatter);
+                }
+            }
+            
+            if (!hasPlayers)
             {
                 Thread.Sleep(1);
                 return;
             }
-
-            using var scatter = Memory.CreateScatter(VmmFlags.NOCACHE);
-            foreach (var player in players)
-            {
-                player.OnRealtimeLoop(scatter);
-            }
+            
             scatter.Execute();
         }
 
@@ -357,19 +362,22 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         {
             try
             {
-                var players = _rgtPlayers
-                    .Where(x => x.IsActive && x.IsAlive && x is not BtrPlayer);
-                if (players.Any()) // at least 1 player
+                using var map = Memory.CreateScatterMap();
+                var round1 = map.AddRound();
+                var round2 = map.AddRound();
+                bool hasPlayers = false;
+                
+                foreach (var player in _rgtPlayers)
                 {
-                    using var map = Memory.CreateScatterMap();
-                    var round1 = map.AddRound();
-                    var round2 = map.AddRound();
-                    foreach (var player in players)
+                    if (player.IsActive && player.IsAlive && player is not BtrPlayer)
                     {
+                        hasPlayers = true;
                         player.OnValidateTransforms(round1, round2);
                     }
-                    map.Execute(); // execute scatter read
                 }
+                
+                if (hasPlayers)
+                    map.Execute();
             }
             catch (Exception ex)
             {

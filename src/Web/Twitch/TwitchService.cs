@@ -142,6 +142,17 @@ namespace LoneEftDmaRadar.Web.Twitch
             return stripped;
         }
 
+        // Pre-compute login combinations once per username instead of rebuilding list each time
+        private static List<string> BuildLoginList(string username)
+        {
+            var logins = new List<string>(_ttvAppends.Count);
+            foreach (var append in _ttvAppends)
+            {
+                logins.Add(append is null ? username : $"{username}{append}");
+            }
+            return logins;
+        }
+
         /// <summary>
         /// Takes an Input Username and checks if they are live on any combination of channel URLs.
         /// </summary>
@@ -149,18 +160,16 @@ namespace LoneEftDmaRadar.Web.Twitch
         /// <returns>User's Twitch Login if LIVE, otherwise NULL.</returns>
         private static async Task<string> LookupTwitchApiAsync(string username)
         {
-            await _lock.WaitAsync(); // Only one request at a time
+            await _lock.WaitAsync();
             try
             {
-                /// Build API Request
-                var logins = _ttvAppends.Select(x => $"{username}{x}").ToList();
+                var logins = BuildLoginList(username);
                 var response = await _api.Helix.Streams.GetStreamsAsync(
                     first: 1,
                     userLogins: logins);
-                string channel = response.Streams.First().UserLogin;
-                return channel;
+                return response.Streams.FirstOrDefault()?.UserLogin;
             }
-            catch (BadRequestException) // Fake TTVer
+            catch (BadRequestException)
             {
                 return null;
             }
