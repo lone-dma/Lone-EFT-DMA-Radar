@@ -27,7 +27,7 @@ jobs:
       - name: Send Discord Webhook
         shell: pwsh
         env:
-          WEBHOOK: ${{ secrets.DER_WEBHOOK }}
+          WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
           REPO: ${{ github.repository }}
           JOB_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
