@@ -20,7 +20,7 @@ namespace SDK
 
 		public readonly partial struct SynchronizableObjectLogicProcessor
 		{
-			public const uint _activeSynchronizableObjects = 0x10; // object
+			public const uint _staticSynchronizableObjects = 0x18; // object
 		}
 
 		public readonly partial struct TripwireSynchronizableObject
@@ -37,6 +37,7 @@ namespace SDK
 		public readonly partial struct BTRView
 		{
 			public const uint turret = 0x60; // object
+			public const uint _previousPosition = 0xB4; // object
 		}
 
 		public readonly partial struct BTRTurretView
