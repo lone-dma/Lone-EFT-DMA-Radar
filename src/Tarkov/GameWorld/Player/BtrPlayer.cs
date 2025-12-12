@@ -36,38 +36,14 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
     /// </summary>
     public sealed class BtrPlayer : ObservedPlayer
     {
-        private readonly ulong _btrView;
-        private Vector3 _position;
-
-        public override ref readonly Vector3 Position
-        {
-            get => ref _position;
-        }
         public override string Name
         {
             get => "BTR";
             set { }
         }
-        public BtrPlayer(ulong btrView, ulong playerBase) : base(playerBase)
+        public BtrPlayer(ulong playerBase) : base(playerBase)
         {
-            _btrView = btrView;
             Type = PlayerType.AIRaider;
-        }
-
-        /// <summary>
-        /// Set the position of the BTR.
-        /// Give this function it's own unique Index.
-        /// </summary>
-        /// <param name="index">Scatter read index to read off of.</param>
-        public override void OnRealtimeLoop(VmmScatter scatter)
-        {
-            ulong posAddr = _btrView + Offsets.BTRView._targetPosition;
-            scatter.PrepareReadValue<Vector3>(posAddr);
-            scatter.Completed += (sender, s) =>
-            {
-                if (s.ReadValue<Vector3>(posAddr, out var position))
-                    _position = position;
-            };
         }
     }
 }
