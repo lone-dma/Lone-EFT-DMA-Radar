@@ -123,7 +123,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         {
             if (_players.TryGetValue(btrPlayerBase, out var existing) && existing is not BtrPlayer)
             {
-                var btr = new BtrPlayer(btrPlayerBase);
+                var btr = new BtrPlayer(btrView, btrPlayerBase);
                 _players[btrPlayerBase] = btr;
                 Debug.WriteLine("BTR Allocated!");
             }
