@@ -37,12 +37,12 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
         private static readonly ConcurrentDictionary<string, int> _highAchievements = new(StringComparer.OrdinalIgnoreCase)
         {
             /// Very hard tasks, only veterans will have these (1k+ hours)
-            ["68d3ff840531ed76e808866c"] = 2, // No Limit to Perfection
-            ["68d3fe84757f8967ec09099b"] = 2, // Five Plus
-            ["68e8f02ff3a1196d1a05f2cb"] = 2, // Survivor
-            ["68e8f042b8efa2bbeb009d89"] = 2, // Fallen
-            ["68e8f04eb841bc8ac305350a"] = 2, // Debtor
-            ["68e8f0575eb7e5ce5000ba0a"] = 2, // Savior
+            ["68d3ff840531ed76e808866c"] = 2, // No Limit to Perfection (Prestige 6)
+            ["68d3fe84757f8967ec09099b"] = 2, // Five Plus (Prestige 5)
+            ["68e8f02ff3a1196d1a05f2cb"] = 2, // Survivor (Escaped From Tarkov)
+            ["68e8f042b8efa2bbeb009d89"] = 2, // Fallen (Escaped From Tarkov)
+            ["68e8f04eb841bc8ac305350a"] = 2, // Debtor (Escaped From Tarkov)
+            ["68e8f0575eb7e5ce5000ba0a"] = 2, // Savior (Escaped From Tarkov)
             ["6529097eccf6aa5f8737b3d0"] = 2, // Snowball
             ["6514143d59647d2cb3213c93"] = 2, // Master of ULTRA
             ["6514174fb1c08b0feb216d73"] = 2, // Chris's Heir
