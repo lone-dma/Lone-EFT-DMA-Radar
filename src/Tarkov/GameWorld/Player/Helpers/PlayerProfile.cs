@@ -139,7 +139,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
             if (Data?.Achievements is Dictionary<string, long> achievs)
             {
                 Debug.WriteLine($"Found {achievs.Count} achievements for player '{Name}'");
-                var matches = _highAchievements
+                using var matches = _highAchievements
                     .Where(kvp => achievs.ContainsKey(kvp.Key))
                     .Select(kvp => kvp.Value)
                     .ToPooledList();
