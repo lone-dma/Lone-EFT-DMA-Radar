@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using Collections.Pooled;
 using LoneEftDmaRadar.Web.ProfileApi.Schema;
 using LoneEftDmaRadar.Web.Twitch;
 
@@ -33,6 +34,26 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
 {
     public sealed class PlayerProfile : INotifyPropertyChanged
     {
+        private static readonly ConcurrentDictionary<string, int> _highAchievements = new(StringComparer.OrdinalIgnoreCase)
+        {
+            /// Very hard tasks, only veterans will have these (1k+ hours)
+            ["68d3ff840531ed76e808866c"] = 2, // No Limit to Perfection
+            ["68d3fe84757f8967ec09099b"] = 2, // Five Plus
+            ["68e8f02ff3a1196d1a05f2cb"] = 2, // Survivor
+            ["68e8f042b8efa2bbeb009d89"] = 2, // Fallen
+            ["68e8f04eb841bc8ac305350a"] = 2, // Debtor
+            ["68e8f0575eb7e5ce5000ba0a"] = 2, // Savior
+            ["6529097eccf6aa5f8737b3d0"] = 2, // Snowball
+            ["6514143d59647d2cb3213c93"] = 2, // Master of ULTRA
+            ["6514174fb1c08b0feb216d73"] = 2, // Chris's Heir
+            /// Hard-ish tasks but do-able for dedicated players
+            ["6514184ec31fcb0e163577d2"] = 1, // Killer7
+            ["676091c0f457869a94017a23"] = 1, // Prestigious
+            ["6514321bec10ff011f17ccac"] = 1, // Firefly
+            ["651415feb49e3253755f4b68"] = 1, // Long Live The King!
+            ["664f1f8768508d74604bf556"] = 1  // The Kappa Path
+        };
+
         private readonly ObservedPlayer _player;
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string name) =>
@@ -112,6 +133,22 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
                 Acct = "EOD";
             else
                 Acct = "--";
+
+            // --- Achievement Level ---
+            int achievLevel = 0;
+            if (Data?.Achievements is Dictionary<string, long> achievs)
+            {
+                Debug.WriteLine($"Found {achievs.Count} achievements for player '{Name}'");
+                var matches = _highAchievements
+                    .Where(kvp => achievs.ContainsKey(kvp.Key))
+                    .Select(kvp => kvp.Value)
+                    .ToPooledList();
+                if (matches.Count > 0)
+                {
+                    achievLevel = matches.Max();
+                }
+            }
+            AchievLevel = achievLevel;
         }
 
         /// <summary>
@@ -122,24 +159,35 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
         {
             if (_player.Type is not PlayerType.PMC or PlayerType.PScav)
                 return;
-            if (Overall_KD is float kd && kd >= 15f) // Excessive KD (or they are just really good and we should watch them anyway!)
+            float overallKd = Overall_KD ?? 0f;
+            int hours = Hours ?? 0;
+            float sr = SurvivedRate ?? 0f;
+            if (overallKd >= 15f) // Excessive KD (or they are just really good and we should watch them anyway!)
             {
                 _player.IsFocused = true;
             }
-            else if (Hours is int hrs && hrs < 30 &&
+            else if (hours < 30 &&
                     !IsEOD && !IsUnheard) // Low hours played on std account, could be a brand new cheater account
             {
                 _player.IsFocused = true;
             }
-            else if (SurvivedRate is float sr && sr >= 65f) // Very high survival rate
+            else if (sr >= 65f) // Very high survival rate
             {
                 _player.IsFocused = true;
             }
-            else if (Overall_KD is float kd2 && kd2 >= 10f && SurvivedRate is float sr2 && sr2 < 35f) // Possible KD Dropping
+            else if (overallKd >= 10f && sr < 35f) // Possible KD Dropping
             {
                 _player.IsFocused = true;
             }
-            else if (Hours is int hrs2 && hrs2 >= 1000 && SurvivedRate is float sr3 && sr3 < 25f) // Possible KD Dropping
+            else if (hours >= 1000 && sr < 25f) // Possible KD Dropping
+            {
+                _player.IsFocused = true;
+            }
+            else if (AchievLevel >= 2 && hours < 1000) // Very High achievement level but not enough hours to have legitimately earned them
+            {
+                _player.IsFocused = true;
+            }
+            else if (AchievLevel >= 1 && hours < 100) // High achievement level but not enough hours to have legitimately earned them
             {
                 _player.IsFocused = true;
             }
@@ -389,6 +437,18 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
                 if (_acct == value) return;
                 _acct = value;
                 OnPropertyChanged(nameof(Acct));
+            }
+        }
+
+        private int _achievLevel = 0;
+        public int AchievLevel
+        {
+            get => _achievLevel;
+            set
+            {
+                if (_achievLevel == value) return;
+                _achievLevel = value;
+                OnPropertyChanged(nameof(AchievLevel));
             }
         }
 

@@ -9,7 +9,7 @@
         private long _lastTicks;
 
         public RateLimiter() { }
-        
+
         public RateLimiter(TimeSpan interval)
         {
             _intervalTicks = interval.Ticks;

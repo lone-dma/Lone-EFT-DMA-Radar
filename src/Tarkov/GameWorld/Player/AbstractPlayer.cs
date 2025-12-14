@@ -588,7 +588,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         {
             if (_aiRoles.TryGetValue(voiceLine, out var role))
                 return role;
-            
+
             // Fallback pattern matching
             return voiceLine switch
             {
@@ -626,17 +626,17 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                     return;
                 }
                 _paints = GetPaints();
-                
+
                 DrawPlayerPill(canvas, localPlayer, point);
                 if (this == localPlayer)
                     return;
-                    
+
                 var height = Position.Y - localPlayer.Position.Y;
                 var dist = Vector3.Distance(localPlayer.Position, Position);
-                
+
                 _drawStringBuilder ??= new StringBuilder(64);
                 _drawStringBuilder.Clear();
-                
+
                 using var lines = new PooledList<string>(2);
                 if (!App.Config.UI.HideNames)
                 {
@@ -781,19 +781,19 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         {
             if (this == localPlayer)
                 return;
-            
+
             _mouseoverStringBuilder ??= new StringBuilder(128);
             using var lines = new PooledList<string>(8);
-            
+
             var name = App.Config.UI.HideNames && IsHuman ? "<Hidden>" : Name;
             var obs = this as ObservedPlayer;
-            
+
             if (obs?.IsStreaming == true)
                 lines.Add("[LIVE TTV - Double Click]");
-                
+
             if (Alerts?.Trim() is string alert && alert.Length > 0)
                 lines.Add(alert);
-                
+
             if (IsHostileActive)
             {
                 _mouseoverStringBuilder.Clear();
@@ -802,7 +802,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                     _mouseoverStringBuilder.Append(" (").Append(status).Append(')');
                 _mouseoverStringBuilder.Append(' ').Append(AccountID);
                 lines.Add(_mouseoverStringBuilder.ToString().Trim());
-                
+
                 _mouseoverStringBuilder.Clear();
                 _mouseoverStringBuilder.Append(PlayerSide.ToString());
                 if (GroupID != -1)
@@ -819,7 +819,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             {
                 lines.Add(name);
             }
-            
+
             if (obs?.Equipment.Items is IReadOnlyDictionary<string, TarkovMarketItem> equipment)
             {
                 lines.Add($"Value: {Utilities.FormatNumberKM(obs.Equipment.Value)}");

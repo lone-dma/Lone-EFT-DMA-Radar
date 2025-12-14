@@ -57,15 +57,15 @@ namespace LoneEftDmaRadar.UI.Skia
             }
 
             static string MakeRow(string c1, string c2, string c3, string c4,
-                                  string c5, string c6, string c7, string c8)
+                                  string c5, string c6, string c7, string c8, string c9)
             {
                 // known widths
-                const int W1 = 21, W2 = 5, W3 = 6, W4 = 6, W5 = 6,
-                          W6 = 6, W7 = 4, W8 = 7;
+                const int W1 = 21, W2 = 5, W3 = 6, W4 = 6, W5 = 6, W6 = 6,
+                          W7 = 6, W8 = 4, W9 = 7;
 
-                const int len = W1 + W2 + W3 + W4 + W5 + W6 + W7 + W8;
+                const int len = W1 + W2 + W3 + W4 + W5 + W6 + W7 + W8 + W9;
 
-                return string.Create(len, (c1, c2, c3, c4, c5, c6, c7, c8), static (span, cols) =>
+                return string.Create(len, (c1, c2, c3, c4, c5, c6, c7, c8, c9), static (span, cols) =>
                 {
                     int pos = 0;
                     WriteAligned(span, ref pos, cols.c1, W1);
@@ -76,6 +76,7 @@ namespace LoneEftDmaRadar.UI.Skia
                     WriteAligned(span, ref pos, cols.c6, W6);
                     WriteAligned(span, ref pos, cols.c7, W7);
                     WriteAligned(span, ref pos, cols.c8, W8);
+                    WriteAligned(span, ref pos, cols.c9, W9);
                 });
             }
 
@@ -112,12 +113,13 @@ namespace LoneEftDmaRadar.UI.Skia
             string header = MakeRow(
                 "Fac / Lvl / Name", // c1
                 "Acct",             // c2
-                "K/D",              // c3
-                "Hours",            // c4
-                "Raids",            // c5
-                "S/R%",             // c6
-                "Grp",              // c7
-                "Value");           // c8      
+                "Achvs",            // c3
+                "K/D",              // c4
+                "Hours",            // c5
+                "Raids",            // c6
+                "S/R%",             // c7
+                "Grp",              // c8
+                "Value");           // c9
 
             var len = font.MeasureText(header);
             if (len > maxLength) maxLength = len;
@@ -140,6 +142,7 @@ namespace LoneEftDmaRadar.UI.Skia
                 // Defaults
                 string edition = null;
                 string level = null;
+                string achievs = null;
                 string kd = null;
                 string raidCount = null;
                 string survivePercent = null;
@@ -153,6 +156,16 @@ namespace LoneEftDmaRadar.UI.Skia
 
                     if (obs.Profile.Level is int lvl)
                         level = lvl.ToString();
+
+                    if (obs.Profile.AchievLevel is int al)
+                    {
+                        achievs = al switch
+                        {
+                            1 => "+",
+                            2 => "++",
+                            _ => "--",
+                        };
+                    }
 
                     if (obs.Profile.Overall_KD is float kdVal)
                         kd = kdVal.ToString("n1");
@@ -175,6 +188,7 @@ namespace LoneEftDmaRadar.UI.Skia
                 string line = MakeRow(
                     facLvlName,
                     edition ?? "--",
+                    achievs ?? "--",
                     kd ?? "--",
                     hours ?? "--",
                     raidCount ?? "--",

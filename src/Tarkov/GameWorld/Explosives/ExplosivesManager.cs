@@ -33,7 +33,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives
     public sealed class ExplosivesManager : IReadOnlyCollection<IExplosiveItem>
     {
         private static readonly uint[] _toSyncObjects = [
-            Offsets.GameWorld.SynchronizableObjectLogicProcessor, 
+            Offsets.GameWorld.SynchronizableObjectLogicProcessor,
             Offsets.SynchronizableObjectLogicProcessor._staticSynchronizableObjects];
         private readonly ulong _localGameWorld;
         private readonly ConcurrentDictionary<ulong, IExplosiveItem> _explosives = new();
