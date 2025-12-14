@@ -73,8 +73,20 @@ namespace LoneEftDmaRadar.Web.EftApiTech
                 options.CircuitBreaker.StateProvider = _circuitBreakerStateProvider;
                 options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
                 options.CircuitBreaker.FailureRatio = 1.0;
-                options.CircuitBreaker.MinimumThroughput = 3;
+                options.CircuitBreaker.MinimumThroughput = 5;
                 options.CircuitBreaker.BreakDuration = TimeSpan.FromMinutes(1);
+                options.CircuitBreaker.OnOpened = args =>
+                {
+                    var statusCode = args.Outcome.Result?.StatusCode;
+                    var exception = args.Outcome.Exception;
+                    Debug.WriteLine($"[EftApiTechProvider] Circuit OPENED! StatusCode: {statusCode}, Exception: {exception?.GetType().Name}: {exception?.Message}");
+                    return ValueTask.CompletedTask;
+                };
+                options.CircuitBreaker.OnClosed = _ =>
+                {
+                    Debug.WriteLine("[EftApiTechProvider] Circuit CLOSED");
+                    return ValueTask.CompletedTask;
+                };
             });
         }
 
@@ -114,16 +126,10 @@ namespace LoneEftDmaRadar.Web.EftApiTech
                 if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
                 {
                     MessageBox.Show(MainWindow.Instance, $"eft-api.tech returned '{response.StatusCode}'. Please make sure your Api Key and IP Address are set correctly.", nameof(EftApiTechProvider), MessageBoxButton.OK, MessageBoxImage.Warning);
-                    // Allow EnsureSuccessStatusCode to throw
-                }
-                else if (response.StatusCode is HttpStatusCode.TooManyRequests) // Rate limit hit
-                {
-                    return null;
                 }
                 else if (response.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.NotFound) // No profile exists
                 {
                     _skip.TryAdd(accountId, 0);
-                    return null;
                 }
                 response.EnsureSuccessStatusCode();
                 string json = await response.Content.ReadAsStringAsync(ct);
