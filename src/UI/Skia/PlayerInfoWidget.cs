@@ -99,7 +99,7 @@ namespace LoneEftDmaRadar.UI.Skia
             var localPos = localPlayer.Position;
             using var filteredPlayers = players
                 .Where(p => p.IsHumanHostileActive)
-                .OrderBy(p => Vector3.Distance(localPos, p.Position))
+                .OrderBy(p => Vector3.DistanceSquared(localPos, p.Position))
                 .ToPooledList();
 
             // Setup Frame and Draw Header
