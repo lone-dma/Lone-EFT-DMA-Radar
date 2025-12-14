@@ -60,7 +60,7 @@ namespace LoneEftDmaRadar.UI.Skia
                                   string c5, string c6, string c7, string c8, string c9)
             {
                 // known widths
-                const int W1 = 21, W2 = 5, W3 = 6, W4 = 6, W5 = 6, W6 = 6,
+                const int W1 = 21, W2 = 5, W3 = 5, W4 = 6, W5 = 6, W6 = 6,
                           W7 = 6, W8 = 4, W9 = 7;
 
                 const int len = W1 + W2 + W3 + W4 + W5 + W6 + W7 + W8 + W9;
@@ -113,7 +113,7 @@ namespace LoneEftDmaRadar.UI.Skia
             string header = MakeRow(
                 "Fac / Lvl / Name", // c1
                 "Acct",             // c2
-                "Achvs",            // c3
+                "Achv",            // c3
                 "K/D",              // c4
                 "Hours",            // c5
                 "Raids",            // c6
