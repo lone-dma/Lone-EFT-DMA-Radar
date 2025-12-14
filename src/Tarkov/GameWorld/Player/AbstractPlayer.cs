@@ -774,61 +774,58 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             }
         }
 
-        [ThreadStatic]
-        private static StringBuilder _mouseoverStringBuilder;
-
         public void DrawMouseover(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
             if (this == localPlayer)
                 return;
-
-            _mouseoverStringBuilder ??= new StringBuilder(128);
-            using var lines = new PooledList<string>(8);
-
+            using var lines = new PooledList<string>();
             var name = App.Config.UI.HideNames && IsHuman ? "<Hidden>" : Name;
+            string health = null;
             var obs = this as ObservedPlayer;
-
-            if (obs?.IsStreaming == true)
+            if (obs is not null)
+                health = obs.HealthStatus is Enums.ETagStatus.Healthy
+                    ? null
+                    : $" ({obs.HealthStatus.ToString()})"; // Only display abnormal health status
+            if (obs is not null && obs.IsStreaming) // Streamer Notice
                 lines.Add("[LIVE TTV - Double Click]");
-
-            if (Alerts?.Trim() is string alert && alert.Length > 0)
+            string alert = Alerts?.Trim();
+            if (!string.IsNullOrEmpty(alert)) // Special Players,etc.
                 lines.Add(alert);
-
-            if (IsHostileActive)
+            if (IsHostileActive) // Enemy Players, display information
             {
-                _mouseoverStringBuilder.Clear();
-                _mouseoverStringBuilder.Append(name);
-                if (obs?.HealthStatus is Enums.ETagStatus status && status != Enums.ETagStatus.Healthy)
-                    _mouseoverStringBuilder.Append(" (").Append(status).Append(')');
-                _mouseoverStringBuilder.Append(' ').Append(AccountID);
-                lines.Add(_mouseoverStringBuilder.ToString().Trim());
-
-                _mouseoverStringBuilder.Clear();
-                _mouseoverStringBuilder.Append(PlayerSide.ToString());
+                lines.Add($"{name}{health} {AccountID}");
+                var faction = PlayerSide.ToString();
+                string g = null;
                 if (GroupID != -1)
-                    _mouseoverStringBuilder.Append(" G:").Append(GroupID).Append(' ');
-                lines.Add(_mouseoverStringBuilder.ToString());
+                    g = $" G:{GroupID} ";
+                lines.Add($"{faction}{g}");
+                // Check Achievs
+                if (obs?.Profile?.HighAchievs is IReadOnlyList<string> highAchievs)
+                {
+                    foreach (var ach in highAchievs)
+                        lines.Add(ach);
+                }
             }
             else if (!IsAlive)
             {
-                lines.Add($"{Type}:{name}");
+                lines.Add($"{Type.ToString()}:{name}");
+                string g = null;
                 if (GroupID != -1)
-                    lines.Add($"G:{GroupID} ");
+                    g = $"G:{GroupID} ";
+                if (g is not null) lines.Add(g);
             }
             else if (IsAIActive)
             {
                 lines.Add(name);
             }
-
-            if (obs?.Equipment.Items is IReadOnlyDictionary<string, TarkovMarketItem> equipment)
+            if (obs is not null &&
+                obs.Equipment.Items is IReadOnlyDictionary<string, TarkovMarketItem> equipment)
             {
+                // This is outside of the previous conditionals to always show equipment even if they're dead,etc.
                 lines.Add($"Value: {Utilities.FormatNumberKM(obs.Equipment.Value)}");
                 foreach (var item in equipment.OrderBy(e => e.Key))
                 {
-                    _mouseoverStringBuilder.Clear();
-                    _mouseoverStringBuilder.Append(item.Key.AsSpan(0, Math.Min(5, item.Key.Length)));
-                    _mouseoverStringBuilder.Append(": ").Append(item.Value.ShortName);
-                    lines.Add(_mouseoverStringBuilder.ToString());
+                    lines.Add($"{item.Key.Substring(0, 5)}: {item.Value.ShortName}");
                 }
             }
 
