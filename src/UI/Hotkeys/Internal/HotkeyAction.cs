@@ -34,9 +34,9 @@ namespace LoneEftDmaRadar.UI.Hotkeys.Internal
     /// </summary>
     public sealed class HotkeyAction
     {
-        private static readonly ConcurrentDictionary<string, HotkeyActionController> _controllers = 
+        private static readonly ConcurrentDictionary<string, HotkeyActionController> _controllers =
             new(StringComparer.OrdinalIgnoreCase);
-        
+
         /// <summary>
         /// Registered Hotkey Action Controllers.
         /// </summary>

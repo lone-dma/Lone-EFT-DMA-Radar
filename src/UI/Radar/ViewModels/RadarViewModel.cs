@@ -338,7 +338,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                                     list.Add(player.Position.ToMapPos(map.Config).ToZoomedPos(mapParams));
                                 }
                             }
-        
+
                             foreach (var grp in groupedByGrp.Values)
                             {
                                 for (int i = 0; i < grp.Count; i++)
@@ -753,11 +753,11 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                         x.LootObject is null || !loot.Contains(x.LootObject)); // Don't show both corpse objects
 
                 var result = loot.Concat(containers).Concat(players).Concat(exits).Concat(quests).Concat(hazards);
-                
+
                 using var enumerator = result.GetEnumerator();
                 if (!enumerator.MoveNext())
                     return null;
-                
+
                 return result;
             }
         }

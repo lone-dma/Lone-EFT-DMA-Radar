@@ -364,7 +364,7 @@ namespace LoneEftDmaRadar.Tarkov
 #pragma warning restore IDE1006 // Naming Styles
 
                 [JsonIgnore]
-                private static readonly FrozenDictionary<string, QuestObjectiveType> _objectiveTypes = 
+                private static readonly FrozenDictionary<string, QuestObjectiveType> _objectiveTypes =
     new Dictionary<string, QuestObjectiveType>(StringComparer.OrdinalIgnoreCase)
     {
         ["visit"] = QuestObjectiveType.Visit,
@@ -388,7 +388,7 @@ namespace LoneEftDmaRadar.Tarkov
     }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
                 [JsonIgnore]
-                public QuestObjectiveType Type => 
+                public QuestObjectiveType Type =>
                     _objectiveTypes.TryGetValue(_type, out var type) ? type : QuestObjectiveType.Unknown;
 
                 [JsonPropertyName("description")]

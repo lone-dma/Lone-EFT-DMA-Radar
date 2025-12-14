@@ -298,7 +298,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         private void RealtimeWorker_PerformWork(object sender, WorkerThreadArgs e)
         {
             bool hasPlayers = false;
-            
+
             using var scatter = Memory.CreateScatter(VmmFlags.NOCACHE);
             foreach (var player in _rgtPlayers)
             {
@@ -308,13 +308,13 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                     player.OnRealtimeLoop(scatter);
                 }
             }
-            
+
             if (!hasPlayers)
             {
                 Thread.Sleep(1);
                 return;
             }
-            
+
             scatter.Execute();
         }
 
@@ -366,7 +366,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 var round1 = map.AddRound();
                 var round2 = map.AddRound();
                 bool hasPlayers = false;
-                
+
                 foreach (var player in _rgtPlayers)
                 {
                     if (player.IsActive && player.IsAlive && player is not BtrPlayer)
@@ -375,7 +375,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                         player.OnValidateTransforms(round1, round2);
                     }
                 }
-                
+
                 if (hasPlayers)
                     map.Execute();
             }

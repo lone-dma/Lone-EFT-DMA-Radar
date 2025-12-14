@@ -8,5 +8,8 @@
 
         [JsonPropertyName("pmcStats")]
         public StatsContainer PmcStats { get; set; }
+
+        [JsonPropertyName("achievements")]
+        public Dictionary<string, long> Achievements { get; set; }
     }
 }
