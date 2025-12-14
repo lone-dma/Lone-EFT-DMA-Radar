@@ -38,7 +38,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
     {
         private readonly ulong _btrView;
         private readonly ulong _posAddr;
-        private Vector3 _position;
+        private Vector3 _position = new(9999, 0, 9999);
 
         public override ref readonly Vector3 Position
         {
@@ -66,8 +66,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             scatter.PrepareReadValue<Vector3>(_posAddr);
             scatter.Completed += (sender, s) =>
             {
-                if (s.ReadValue<Vector3>(_posAddr, out var position))
+                if (s.ReadValue<Vector3>(_posAddr, out var position) && position != default)
+                {
                     _position = position;
+                }
             };
         }
     }
