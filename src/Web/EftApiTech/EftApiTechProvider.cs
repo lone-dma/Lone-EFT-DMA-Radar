@@ -113,11 +113,11 @@ namespace LoneEftDmaRadar.Web.EftApiTech
 
         public bool IsEnabled { get; } = App.Config.ProfileApi.EftApiTech.Enabled;
 
-        public bool CanRun => _circuitBreakerStateProvider.CircuitState == CircuitState.Closed && (_limiter.GetStatistics()?.CurrentAvailablePermits ?? 0) > 0;
+        public bool CanRun => (_limiter.GetStatistics()?.CurrentAvailablePermits ?? 0) > 0;
 
         private EftApiTechProvider() { }
 
-        public bool CanLookup(string accountId) => !_skip.ContainsKey(accountId);
+        public bool CanLookup(string accountId) => _circuitBreakerStateProvider.CircuitState == CircuitState.Closed && !_skip.ContainsKey(accountId);
 
         public async Task<EFTProfileResponse> GetProfileAsync(string accountId, CancellationToken ct)
         {

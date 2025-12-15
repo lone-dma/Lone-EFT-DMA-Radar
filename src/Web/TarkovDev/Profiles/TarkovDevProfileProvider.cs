@@ -83,11 +83,11 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Profiles
 
         public bool IsEnabled { get; } = App.Config.ProfileApi.TarkovDev.Enabled;
 
-        public bool CanRun => _circuitBreakerStateProvider.CircuitState == CircuitState.Closed; // true
+        public bool CanRun { get; } = true;
 
         private TarkovDevProfileProvider() { }
 
-        public bool CanLookup(string accountId) => !_skip.ContainsKey(accountId);
+        public bool CanLookup(string accountId) => _circuitBreakerStateProvider.CircuitState == CircuitState.Closed && !_skip.ContainsKey(accountId);
 
         public async Task<EFTProfileResponse> GetProfileAsync(string accountId, CancellationToken ct)
         {
