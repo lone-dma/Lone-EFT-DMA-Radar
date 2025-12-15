@@ -73,8 +73,17 @@ namespace LoneEftDmaRadar.Web.EftApiTech
                 options.CircuitBreaker.StateProvider = _circuitBreakerStateProvider;
                 options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
                 options.CircuitBreaker.FailureRatio = 1.0;
-                options.CircuitBreaker.MinimumThroughput = 5;
+                options.CircuitBreaker.MinimumThroughput = Math.Min(options.Retry.MaxRetryAttempts * 3, App.Config.ProfileApi.EftApiTech.RequestsPerMinute);
                 options.CircuitBreaker.BreakDuration = TimeSpan.FromMinutes(1);
+                var defaultHandler = options.CircuitBreaker.ShouldHandle;
+                options.CircuitBreaker.ShouldHandle = async args =>
+                {
+                    var statusCode = args.Outcome.Result?.StatusCode;
+                    if (statusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
+                        return true;
+
+                    return await defaultHandler(args);
+                };
                 options.CircuitBreaker.OnOpened = args =>
                 {
                     var statusCode = args.Outcome.Result?.StatusCode;
@@ -123,20 +132,21 @@ namespace LoneEftDmaRadar.Web.EftApiTech
                     return null; // Rate limit hit
                 var client = App.HttpClientFactory.CreateClient(nameof(EftApiTechProvider));
                 using var response = await client.GetAsync($"api/profile/{accountId}", ct);
-                if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
+                string content = await response.Content.ReadAsStringAsync(ct);
+                if (!response.IsSuccessStatusCode) // Handle errors
                 {
-                    MessageBox.Show(MainWindow.Instance, $"eft-api.tech returned '{response.StatusCode}'. Please make sure your Api Key and IP Address are set correctly.", nameof(EftApiTechProvider), MessageBoxButton.OK, MessageBoxImage.Warning);
+                    if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden) // Auth failure
+                    {
+                        MessageBox.Show(MainWindow.Instance, $"eft-api.tech returned '{response.StatusCode}'. Please make sure your Api Key and IP Address are set correctly.", nameof(EftApiTechProvider), MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                    else if (response.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.NotFound) // No profile exists
+                    {
+                        _skip.TryAdd(accountId, 0);
+                    }
+                    Debug.WriteLine($"[EftApiTechProvider] Failed to get Profile '{accountId}': [{response.StatusCode}] '{content}'");
+                    return null;
                 }
-                else if (response.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.NotFound) // No profile exists
-                {
-                    _skip.TryAdd(accountId, 0);
-                }
-                response.EnsureSuccessStatusCode();
-                string json = await response.Content.ReadAsStringAsync(ct);
-                using var jsonDoc = JsonDocument.Parse(json);
-                bool success = jsonDoc.RootElement.GetProperty("success").GetBoolean();
-                if (!success)
-                    throw new InvalidOperationException("Profile request was not successful.");
+                using var jsonDoc = JsonDocument.Parse(content);
                 var epoch = jsonDoc.RootElement.GetProperty("lastUpdated").GetProperty("epoch").GetInt64();
                 var data = jsonDoc.RootElement.GetProperty("data");
                 string raw = data.GetRawText();
@@ -152,7 +162,7 @@ namespace LoneEftDmaRadar.Web.EftApiTech
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[EftApiTechProvider] Failed to get profile: {ex}");
+                Debug.WriteLine($"[EftApiTechProvider] Unhandled Exception: {ex}");
                 return null;
             }
         }
