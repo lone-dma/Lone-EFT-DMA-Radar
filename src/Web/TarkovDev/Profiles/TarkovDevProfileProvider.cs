@@ -72,7 +72,7 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Profiles
                 options.CircuitBreaker.StateProvider = _circuitBreakerStateProvider;
                 options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
                 options.CircuitBreaker.FailureRatio = 1.0;
-                options.CircuitBreaker.MinimumThroughput = 2;
+                options.CircuitBreaker.MinimumThroughput = options.Retry.MaxRetryAttempts * 3;
                 options.CircuitBreaker.BreakDuration = TimeSpan.FromMinutes(1);
             });
         }
@@ -99,27 +99,31 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Profiles
                 }
                 var client = App.HttpClientFactory.CreateClient(nameof(TarkovDevProfileProvider));
                 using var response = await client.GetAsync($"profile/{accountId}.json", ct);
-                if (response.StatusCode is HttpStatusCode.NotFound)
+                string content = await response.Content.ReadAsStringAsync(ct);
+                if (!response.IsSuccessStatusCode) // Handle errors
                 {
-                    _skip.TryAdd(accountId, 0);
+                    if (response.StatusCode is HttpStatusCode.NotFound)
+                    {
+                        _skip.TryAdd(accountId, 0);
+                    }
+                    Debug.WriteLine($"[TarkovDevProvider] Failed to get Profile '{accountId}': [{response.StatusCode}] '{content}'");
+                    return null;
                 }
-                response.EnsureSuccessStatusCode();
-                string json = await response.Content.ReadAsStringAsync(ct);
-                using var jsonDoc = JsonDocument.Parse(json);
+                using var jsonDoc = JsonDocument.Parse(content);
                 long epoch = jsonDoc.RootElement.GetProperty("updated").GetInt64();
-                var result = JsonSerializer.Deserialize<ProfileData>(json, App.JsonOptions) ??
+                var result = JsonSerializer.Deserialize<ProfileData>(content, App.JsonOptions) ??
                     throw new InvalidOperationException("Failed to deserialize response");
                 Debug.WriteLine($"[TarkovDevProvider] Got Profile '{accountId}'!");
                 return new()
                 {
                     Data = result,
-                    Raw = json,
+                    Raw = content,
                     Updated = DateTimeOffset.FromUnixTimeMilliseconds(epoch)
                 };
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[TarkovDevProvider] Failed to get profile: {ex}");
+                Debug.WriteLine($"[TarkovDevProvider] Unhandled Exception: {ex}");
                 return null;
             }
         }
