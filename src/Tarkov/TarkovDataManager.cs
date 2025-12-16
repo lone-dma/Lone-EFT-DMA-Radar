@@ -28,6 +28,7 @@ SOFTWARE.
 
 using LoneEftDmaRadar.Tarkov.GameWorld.Hazards;
 using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
+using LoneEftDmaRadar.Web.ProfileApi;
 using LoneEftDmaRadar.Web.TarkovDev.Data;
 using System.Collections.Frozen;
 
@@ -67,7 +68,88 @@ namespace LoneEftDmaRadar.Tarkov
         /// <summary>
         /// XP Table for Tarkov.
         /// </summary>
-        public static IReadOnlyDictionary<int, int> XPTable { get; private set; }
+        public static IReadOnlyDictionary<int, int> XPTable { get; } = new Dictionary<int, int>
+        {
+            [1] = 0,
+            [2] = 1_000,
+            [3] = 4_017,
+            [4] = 8_432,
+            [5] = 14_256,
+            [6] = 21_477,
+            [7] = 30_023,
+            [8] = 39_936,
+            [9] = 51_204,
+            [10] = 63_723,
+            [11] = 77_563,
+            [12] = 93_279,
+            [13] = 115_302,
+            [14] = 143_253,
+            [15] = 177_337,
+            [16] = 217_885,
+            [17] = 264_432,
+            [18] = 316_851,
+            [19] = 374_400,
+            [20] = 437_465,
+            [21] = 505_161,
+            [22] = 577_978,
+            [23] = 656_347,
+            [24] = 741_150,
+            [25] = 836_066,
+            [26] = 944_133,
+            [27] = 1_066_259,
+            [28] = 1_199_423,
+            [29] = 1_343_743,
+            [30] = 1_499_338,
+            [31] = 1_666_320,
+            [32] = 1_846_664,
+            [33] = 2_043_349,
+            [34] = 2_258_436,
+            [35] = 2_492_126,
+            [36] = 2_750_217,
+            [37] = 3_032_022,
+            [38] = 3_337_766,
+            [39] = 3_663_831,
+            [40] = 4_010_401,
+            [41] = 4_377_662,
+            [42] = 4_765_799,
+            [43] = 5_182_399,
+            [44] = 5_627_732,
+            [45] = 6_102_063,
+            [46] = 6_630_287,
+            [47] = 7_189_442,
+            [48] = 7_779_792,
+            [49] = 8_401_607,
+            [50] = 9_055_144,
+            [51] = 9_740_666,
+            [52] = 10_458_431,
+            [53] = 11_219_666,
+            [54] = 12_024_744,
+            [55] = 12_874_041,
+            [56] = 13_767_918,
+            [57] = 14_706_741,
+            [58] = 15_690_872,
+            [59] = 16_720_667,
+            [60] = 17_816_442,
+            [61] = 19_041_492,
+            [62] = 20_360_945,
+            [63] = 21_792_266,
+            [64] = 23_350_443,
+            [65] = 25_098_462,
+            [66] = 27_100_775,
+            [67] = 29_581_231,
+            [68] = 33_028_574,
+            [69] = 37_953_544,
+            [70] = 44_260_543,
+            [71] = 51_901_513,
+            [72] = 60_887_711,
+            [73] = 71_228_846,
+            [74] = 82_933_459,
+            [75] = 96_009_180,
+            [76] = 110_462_910,
+            [77] = 126_300_949,
+            [78] = 144_924_572,
+            [79] = 172_016_256
+        };
 
         #region Startup
 
@@ -160,7 +242,11 @@ namespace LoneEftDmaRadar.Tarkov
                     StringComparer.OrdinalIgnoreCase
                 )
                 .ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
-            XPTable = data.PlayerLevels?.ToDictionary(x => x.Exp, x => x.Level) ?? new Dictionary<int, int>();
+            // Tarkov.Dev XP Table out of date (TODO)
+            //XPTable = data.PlayerLevels?
+            //    .OrderBy(x => x.Exp)
+            //    .ToDictionary(x => x.Exp, x => x.Level) 
+            //    ?? new Dictionary<int, int>();
             var maps = data.Maps.ToDictionary(x => x.NameId, StringComparer.OrdinalIgnoreCase) ??
                 new Dictionary<string, MapElement>(StringComparer.OrdinalIgnoreCase);
             maps.TryAdd("Terminal", new MapElement() // Preliminary terminal support
@@ -168,7 +254,7 @@ namespace LoneEftDmaRadar.Tarkov
                 Name = "Terminal",
                 NameId = "Terminal"
             });
-            MapData = maps.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase) ?? new Dictionary<string, MapElement>().ToFrozenDictionary();
+            MapData = maps.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
         }
 
         /// <summary>
