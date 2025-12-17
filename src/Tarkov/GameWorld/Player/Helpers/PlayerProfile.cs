@@ -59,6 +59,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
         private void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
+        public bool IsStandard => !IsEOD && !IsUnheard;
         public bool IsEOD => MemberCategory is Enums.EMemberCategory mc && (mc & Enums.EMemberCategory.UniqueId) == Enums.EMemberCategory.UniqueId;
         public bool IsUnheard => MemberCategory is Enums.EMemberCategory mc && (mc & Enums.EMemberCategory.Unheard) == Enums.EMemberCategory.Unheard;
 
@@ -108,17 +109,19 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
                 : SurvivedCount.GetValueOrDefault() / (float)rc * 100f;
 
             // --- Hours Played ---
-            var totalTime = Data?.PmcStats?.Counters?.TotalInGameTime;
-            if (totalTime.HasValue && totalTime.Value > 0)
-                Hours = (int)Math.Round(totalTime.Value / 3600f);
+            if (Data?.PmcStats?.Counters?.TotalInGameTime is int totalTime)
+            {
+                Hours = (int)Math.Round(totalTime / 3600f); // Seconds to hours
+            }
 
             // --- Level ---
-            var xp = Data?.Info?.Experience;
-            if (xp.HasValue)
+            if (Data?.Info?.Experience is int xp)
+            {
                 Level = TarkovDataManager.XPTable
-                    .Where(x => x.Key > xp.Value)
+                    .Where(x => x.Key > xp)
                     .Select(x => x.Value)
                     .FirstOrDefault() - 1;
+            }
 
             // --- Member Category ---
             var info = Data?.Info;
@@ -176,8 +179,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
             {
                 _player.IsFocused = true;
             }
-            else if (hrs < 30 &&
-                    !IsEOD && !IsUnheard) // Low hrs played on std account, could be a brand new cheater account
+            else if (hrs < 30 && IsStandard) // Low hrs played on std account, could be a brand new cheater account
             {
                 _player.IsFocused = true;
             }

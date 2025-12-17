@@ -44,7 +44,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         public PlayerProfile Profile { get; }
         /// <summary>
-        /// Player's Current Items.
+        /// Player's Current TarkovDevItems.
         /// </summary>
         public PlayerEquipment Equipment { get; }
         /// <summary>

@@ -30,12 +30,13 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Skia;
+using LoneEftDmaRadar.Web.TarkovDev.Data;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
 {
     public class Exfil : IExitPoint, IWorldEntity, IMapEntity, IMouseoverEntity
     {
-        public Exfil(TarkovDataManager.ExtractElement extract)
+        public Exfil(TarkovDevTypes.ExtractElement extract)
         {
             Name = extract.Name;
             _position = extract.Position;

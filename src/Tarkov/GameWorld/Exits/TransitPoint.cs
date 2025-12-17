@@ -30,12 +30,13 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Skia;
+using LoneEftDmaRadar.Web.TarkovDev.Data;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Exits
 {
     public sealed class TransitPoint : IExitPoint, IWorldEntity, IMapEntity, IMouseoverEntity
     {
-        public TransitPoint(TarkovDataManager.TransitElement transit)
+        public TransitPoint(TarkovDevTypes.TransitElement transit)
         {
             Description = transit.Description;
             _position = transit.Position;
