@@ -22,9 +22,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Hazards
 
         public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
-            var mineZoomedPos = this.Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);
-            MouseoverPosition = mineZoomedPos.AsVector2();
-            mineZoomedPos.DrawHazardMarker(canvas);
+            var hazardZoomedPos = this.Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);
+            MouseoverPosition = hazardZoomedPos.AsVector2();
+            hazardZoomedPos.DrawHazardMarker(canvas);
         }
 
         public void DrawMouseover(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
