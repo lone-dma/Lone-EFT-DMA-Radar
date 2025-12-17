@@ -163,11 +163,6 @@ namespace LoneEftDmaRadar.Tarkov
             XPTable = BuildXPTable(data.PlayerLevels);
             var maps = data.Maps.ToDictionary(x => x.NameId, StringComparer.OrdinalIgnoreCase) ??
                 new Dictionary<string, TarkovDevTypes.MapElement>(StringComparer.OrdinalIgnoreCase);
-            maps.TryAdd("Terminal", new TarkovDevTypes.MapElement() // Preliminary terminal support
-            {
-                Name = "Terminal",
-                NameId = "Terminal"
-            });
             MapData = maps.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
         }
 
