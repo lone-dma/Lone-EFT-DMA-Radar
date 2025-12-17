@@ -1,5 +1,6 @@
 ﻿using Collections.Pooled;
 using LoneEftDmaRadar.Tarkov.Unity.Collections;
+using LoneEftDmaRadar.Web.TarkovDev.Data;
 using System.Collections.Frozen;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
@@ -86,7 +87,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
                         FilterConditions(task, qId, completedConditions, masterItems, masterLocations);
 
                         ////print masterItems and masterLocations for debugging
-                        //Debug.WriteLine($"[QuestManager] Master Items for Quest ID: {task.Id} {task.Name}");
+                        //Debug.WriteLine($"[QuestManager] Master TarkovDevItems for Quest ID: {task.Id} {task.Name}");
                         //foreach (var item in masterItems)
                         //{
                         //    Debug.WriteLine($"[QuestManager]   Item ID: {item}");
@@ -102,7 +103,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
 
                     }
                 }
-                // Remove stale Quests/Items/Locations
+                // Remove stale Quests/TarkovDevItems/Locations
                 foreach (var oldQuest in _quests)
                 {
                     if (!masterQuests.Contains(oldQuest.Key))
@@ -143,7 +144,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
             QuestObjectiveType.GiveItem
         }.ToFrozenSet();
 
-        private void FilterConditions(TarkovDataManager.TaskElement task, string questId, PooledSet<string> completedConditions, PooledSet<string> masterItems, PooledSet<string> masterLocations)
+        private void FilterConditions(TarkovDevTypes.TaskElement task, string questId, PooledSet<string> completedConditions, PooledSet<string> masterItems, PooledSet<string> masterLocations)
         {
             if (task is null)
                 return;

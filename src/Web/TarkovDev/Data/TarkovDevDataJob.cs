@@ -63,95 +63,52 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
         /// Retrieves updated Tarkov data from the Tarkov Dev GraphQL API and formats it into a JSON string.
         /// </summary>
         /// <returns>Json string of <see cref="OutgoingTarkovMarketData"/>.</returns>
-        public static async Task<string> GetUpdatedDataAsync()
+        public static async Task<TarkovDevData> GetUpdatedDataAsync()
         {
             var json = await TarkovDevGraphQLApi.GetTarkovDataAsync();
-            var data = JsonSerializer.Deserialize<TarkovDevDataQuery>(json, App.JsonOptions) ??
+            var data = JsonSerializer.Deserialize<TarkovDevTypes.TarkovDevDataQuery>(json, App.JsonOptions) ??
                 throw new InvalidOperationException("Failed to deserialize Tarkov data.");
-            var result = new OutgoingTarkovMarketData
-            {
-                Items = ParseMarketData(data),
-                Maps = data.Data.Maps,
-                PlayerLevels = data.Data.PlayerLevels,
-                Tasks = data.Data.Tasks
-            };
-            return JsonSerializer.Serialize(result); // No options is intentional here to keep it minified
+            ProcessRawQuery(data);
+            return data.Data;
         }
 
-        private static List<OutgoingItem> ParseMarketData(TarkovDevDataQuery data)
+        private static void ProcessRawQuery(TarkovDevTypes.TarkovDevDataQuery query)
         {
-            var outgoingItems = new List<OutgoingItem>();
-            foreach (var item in data.Data.Items)
+#pragma warning disable CS0618 // Type or member is obsolete
+            var cleanedItems = new List<TarkovMarketItem>();
+            foreach (var item in query.Data.TarkovDevItems)
             {
                 int slots = item.Width * item.Height;
-                outgoingItems.Add(new OutgoingItem
+                cleanedItems.Add(new TarkovMarketItem
                 {
-                    ID = item.Id,
+                    BsgId = item.Id,
                     ShortName = item.ShortName,
                     Name = item.Name,
-                    Categories = item.Categories?.Select(x => x.Name)?.ToList() ?? new(), // Flatten categories
+                    Tags = item.Categories?.Select(x => x.Name)?.ToList() ?? new(), // Flatten categories
                     TraderPrice = item.HighestVendorPrice,
                     FleaPrice = item.OptimalFleaPrice,
                     Slots = slots
                 });
             }
-            foreach (var container in data.Data.LootContainers)
+            foreach (var container in query.Data.TarkovDevContainers)
             {
-                outgoingItems.Add(new OutgoingItem
+                cleanedItems.Add(new TarkovMarketItem
                 {
-                    ID = container.Id,
+                    BsgId = container.Id,
                     ShortName = container.Name,
                     Name = container.NormalizedName,
-                    Categories = new() { "Static Container" },
+                    Tags = new List<string>() { "Static Container" },
                     TraderPrice = -1,
                     FleaPrice = -1,
                     Slots = 1
                 });
             }
-            return outgoingItems;
+            // Set result
+            query.Data.Items = cleanedItems;
+            // Null out processed query
+            query.Data.TarkovDevItems = null;
+            query.Data.TarkovDevContainers = null;
+#pragma warning restore CS0618 // Type or member is obsolete
         }
-
-        #region Outgoing JSON
-
-        // This section duplicates some types, but this used to be on my web backend =D
-
-        private sealed class OutgoingTarkovMarketData
-        {
-            [JsonPropertyName("items")]
-            public List<OutgoingItem> Items { get; set; }
-
-            [JsonPropertyName("maps")]
-            public List<object> Maps { get; set; }
-
-            [JsonPropertyName("playerLevels")]
-            public List<object> PlayerLevels { get; set; }
-
-            [JsonPropertyName("tasks")]
-            public List<object> Tasks { get; set; }
-        }
-
-        private sealed class OutgoingItem
-        {
-            [JsonPropertyName("bsgID")]
-            public string ID { get; set; }
-
-            [JsonPropertyName("name")]
-            public string Name { get; set; }
-
-            [JsonPropertyName("shortName")]
-            public string ShortName { get; set; }
-
-            [JsonPropertyName("price")]
-            public long TraderPrice { get; set; }
-            [JsonPropertyName("fleaPrice")]
-            public long FleaPrice { get; set; }
-            [JsonPropertyName("slots")]
-            public int Slots { get; set; }
-
-            [JsonPropertyName("categories")]
-            public List<string> Categories { get; set; }
-        }
-        #endregion
-
     }
 }

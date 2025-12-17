@@ -148,7 +148,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         #region Wishlist
 
         /// <summary>
-        /// All Items on the Player's WishList.
+        /// All TarkovDevItems on the Player's WishList.
         /// </summary>
         public static IReadOnlyDictionary<string, byte> WishlistItems => _wishlistItems;
         private static readonly ConcurrentDictionary<string, byte> _wishlistItems = new(StringComparer.OrdinalIgnoreCase);
