@@ -8,8 +8,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Hazards
 {
     public class GenericWorldHazard : IWorldHazard
     {
-        [JsonIgnore]
-        private Vector3 _position;
         [JsonPropertyName("hazardType")]
         public string HazardType { get; set; }
 
