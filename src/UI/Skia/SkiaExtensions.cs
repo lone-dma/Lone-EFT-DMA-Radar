@@ -33,7 +33,7 @@ namespace LoneEftDmaRadar.UI.Skia
     internal static class SkiaExtensions
     {
         private static readonly SKPath _arrowBase = CreateArrowPath();
-        private static readonly SKPath _minePath = CreateMineMarkerPath();
+        private static readonly SKPath _hazardPath = CreateHazardMarkerPath();
 
         private static SKPath CreateArrowPath()
         {
@@ -46,7 +46,7 @@ namespace LoneEftDmaRadar.UI.Skia
             return path;
         }
 
-        private static SKPath CreateMineMarkerPath()
+        private static SKPath CreateHazardMarkerPath()
         {
             const float len = 3.5f; // base, unscaled length
             var path = new SKPath();
@@ -222,7 +222,7 @@ namespace LoneEftDmaRadar.UI.Skia
             canvas.Save();
             canvas.Translate(zoomedMapPos.X, zoomedMapPos.Y);
             canvas.Scale(scale, scale);
-            canvas.DrawPath(_minePath, SKPaints.PaintExplosives); // Uses explosives paint for hazard marker
+            canvas.DrawPath(_hazardPath, SKPaints.PaintExplosives); // Uses explosives paint for hazard marker
             canvas.Restore();
         }
 
