@@ -57,12 +57,13 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
             .AddStandardResilienceHandler(options =>
             {
                 // Add retry logic for 403 responses -> sometimes tarkov.dev returns 403 for no reason but works immediately on retry
-                options.Retry.ShouldHandle += args =>
+                var origShouldHandle = options.Retry.ShouldHandle;
+                options.Retry.ShouldHandle = args =>
                 {
-                    if (args.Outcome.Result is HttpResponseMessage response)
-                        return ValueTask.FromResult(response.StatusCode == HttpStatusCode.Forbidden);
+                    if (args.Outcome.Result is HttpResponseMessage response && response.StatusCode == HttpStatusCode.Forbidden)
+                        return ValueTask.FromResult(true);
 
-                    return ValueTask.FromResult(false);
+                    return origShouldHandle(args);
                 };
                 options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(100);
                 options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(30);
