@@ -121,7 +121,7 @@ namespace LoneEftDmaRadar.Tarkov
         /// Sets the input <paramref name="data"/> into the static dictionaries.
         /// </summary>
         /// <param name="data">Data to be set.</param>
-        private static void SetData(TarkovDevData data)
+        private static void SetData(TarkovDevTypes.DataElement data)
         {
             AllItems = data.Items.Where(x => !x.Tags?.Contains("Static Container") ?? false)
                 .DistinctBy(x => x.BsgId, StringComparer.OrdinalIgnoreCase)
@@ -203,7 +203,7 @@ namespace LoneEftDmaRadar.Tarkov
             const string resource = "LoneEftDmaRadar.DEFAULT_DATA.json";
             using var dataStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource) ??
                 throw new ArgumentNullException(resource);
-            var data = await JsonSerializer.DeserializeAsync<TarkovDevData>(dataStream)
+            var data = await JsonSerializer.DeserializeAsync<TarkovDevTypes.DataElement>(dataStream)
                 ?? throw new InvalidOperationException($"Failed to deserialize {nameof(dataStream)}");
             SetData(data);
         }
@@ -226,14 +226,14 @@ namespace LoneEftDmaRadar.Tarkov
             }
             SetData(data);
 
-            static async Task<TarkovDevData> TryLoadFromDiskAsync(FileInfo file)
+            static async Task<TarkovDevTypes.DataElement> TryLoadFromDiskAsync(FileInfo file)
             {
                 try
                 {
                     if (!file.Exists)
                         return null;
                     using var dataStream = File.OpenRead(file.FullName);
-                    return await JsonSerializer.DeserializeAsync<TarkovDevData>(dataStream, App.JsonOptions) ??
+                    return await JsonSerializer.DeserializeAsync<TarkovDevTypes.DataElement>(dataStream, App.JsonOptions) ??
                         throw new InvalidOperationException($"Failed to deserialize {nameof(dataStream)}");
                 }
                 catch
@@ -252,7 +252,7 @@ namespace LoneEftDmaRadar.Tarkov
         {
             try
             {
-                var data = await TarkovDevDataJob.GetUpdatedDataAsync();
+                var data = await TarkovDevGraphQLApi.GetTarkovDataAsync();
                 ArgumentNullException.ThrowIfNull(data, nameof(data));
                 var jsonOptions = new JsonSerializerOptions(App.JsonOptions);
                 jsonOptions.WriteIndented = false;
