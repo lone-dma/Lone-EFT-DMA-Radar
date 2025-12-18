@@ -261,11 +261,11 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             {
                 try
                 {
-                    if (!IsRaidActive())
-                        continue;
-                    return;
+                    if (IsRaidActive())
+                        return;
                 }
-                catch { Thread.Sleep(10); } // short delay between read attempts
+                catch { }
+                Thread.Sleep(50); // Small delay before retry
             }
             throw new OperationCanceledException("Raid has ended!"); // Still not valid? Raid must have ended.
         }
