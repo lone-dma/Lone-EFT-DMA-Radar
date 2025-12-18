@@ -5,6 +5,12 @@ using System.Collections.Frozen;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
 {
+    /// <summary>
+    /// Quest Manager handles reading current quests and their conditions.
+    /// </summary>
+    /// <remarks>
+    /// Thanks to Keeegi for helping with the post 1.0 implementation!
+    /// </remarks>
     public sealed class QuestManager
     {
         private readonly ulong _profile;
