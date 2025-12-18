@@ -70,7 +70,59 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
             });
         }
 
-        public static async Task<string> GetTarkovDataAsync()
+        /// <summary>
+        /// Retrieves updated data from the Tarkov.Dev GraphQL API and returns the <see cref="TarkovDevTypes.DataElement"/>.
+        /// </summary>
+        public static async Task<TarkovDevTypes.DataElement> GetTarkovDataAsync()
+        {
+            using var response = await QueryTarkovDevAsync();
+            response.EnsureSuccessStatusCode();
+            var query = await JsonSerializer.DeserializeAsync<TarkovDevTypes.ApiResponse>(await response.Content.ReadAsStreamAsync(), App.JsonOptions) ??
+                throw new InvalidOperationException("Failed to deserialize Tarkov.Dev Query Response.");
+            ProcessRawQuery(query);
+            return query.Data;
+        }
+
+        private static void ProcessRawQuery(TarkovDevTypes.ApiResponse query)
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            var cleanedItems = new List<TarkovMarketItem>();
+            foreach (var item in query.Data.TarkovDevItems)
+            {
+                int slots = item.Width * item.Height;
+                cleanedItems.Add(new TarkovMarketItem
+                {
+                    BsgId = item.Id,
+                    ShortName = item.ShortName,
+                    Name = item.Name,
+                    Tags = item.Categories?.Select(x => x.Name)?.ToList() ?? new(), // Flatten categories
+                    TraderPrice = item.HighestVendorPrice,
+                    FleaPrice = item.OptimalFleaPrice,
+                    Slots = slots
+                });
+            }
+            foreach (var container in query.Data.TarkovDevContainers)
+            {
+                cleanedItems.Add(new TarkovMarketItem
+                {
+                    BsgId = container.Id,
+                    ShortName = container.Name,
+                    Name = container.NormalizedName,
+                    Tags = new List<string>() { "Static Container" },
+                    TraderPrice = -1,
+                    FleaPrice = -1,
+                    Slots = 1
+                });
+            }
+            // Set result
+            query.Data.Items = cleanedItems;
+            // Null out processed query
+            query.Data.TarkovDevItems = null;
+            query.Data.TarkovDevContainers = null;
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+
+        private static async Task<HttpResponseMessage> QueryTarkovDevAsync()
         {
             var query = new Dictionary<string, string>
             {
@@ -278,11 +330,9 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
                 }
             };
             var client = App.HttpClientFactory.CreateClient(nameof(TarkovDevGraphQLApi));
-            using var response = await client.PostAsJsonAsync(
+            return await client.PostAsJsonAsync(
                 requestUri: "https://api.tarkov.dev/graphql",
                 value: query);
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsStringAsync();
         }
     }
 }

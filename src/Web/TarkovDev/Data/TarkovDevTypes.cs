@@ -1,126 +1,124 @@
 ﻿using LoneEftDmaRadar.Tarkov.GameWorld.Hazards;
 using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
 using System.Collections.Frozen;
-using static LoneEftDmaRadar.Web.TarkovDev.Data.TarkovDevTypes;
-using static LoneEftDmaRadar.Web.TarkovDev.Data.TarkovDevTypes.TarkovDevDataQuery;
 
 namespace LoneEftDmaRadar.Web.TarkovDev.Data
 {
-    public sealed class TarkovDevData
-    {
-        [JsonPropertyName("lootContainers")]
-        [Obsolete("Raw Tarkov.Dev Data. Discarded after processing. Do not use.")]
-        public List<BasicDataElement> TarkovDevContainers { get; set; }
-
-        [JsonPropertyName("items")]
-        [Obsolete("Raw Tarkov.Dev Data. Discarded after processing. Do not use.")]
-        public List<ItemElement> TarkovDevItems { get; set; }
-
-        [JsonPropertyName("items_clean")]
-        public List<TarkovMarketItem> Items { get; set; }
-
-        [JsonPropertyName("maps")]
-        public List<MapElement> Maps { get; set; }
-
-        [JsonPropertyName("playerLevels")]
-        public List<PlayerLevelElement> PlayerLevels { get; set; }
-
-        [JsonPropertyName("tasks")]
-        public List<TaskElement> Tasks { get; set; }
-    }
-
     public static class TarkovDevTypes
     {
-        public sealed class TarkovDevDataQuery
+        public sealed class ApiResponse
         {
             [JsonPropertyName("warnings")]
-            public List<WarningMessage> Warnings { get; set; }
+            public List<MessageElement> Warnings { get; set; }
 
             [JsonPropertyName("data")]
-            public TarkovDevData Data { get; set; }
+            public DataElement Data { get; set; }
+        }
 
-            public sealed class WarningMessage
+        public sealed class DataElement
+        {
+            [JsonPropertyName("lootContainers")]
+            [Obsolete("Raw Tarkov.Dev Data. Discarded after processing. Do not use.")]
+            public List<BasicDataElement> TarkovDevContainers { get; set; }
+
+            [JsonPropertyName("items")]
+            [Obsolete("Raw Tarkov.Dev Data. Discarded after processing. Do not use.")]
+            public List<ItemElement> TarkovDevItems { get; set; }
+
+            [JsonPropertyName("items_clean")]
+            public List<TarkovMarketItem> Items { get; set; }
+
+            [JsonPropertyName("maps")]
+            public List<MapElement> Maps { get; set; }
+
+            [JsonPropertyName("playerLevels")]
+            public List<PlayerLevelElement> PlayerLevels { get; set; }
+
+            [JsonPropertyName("tasks")]
+            public List<TaskElement> Tasks { get; set; }
+        }
+
+        public sealed class MessageElement
+        {
+            [JsonPropertyName("message")]
+            public string Message { get; set; }
+        }
+
+        public sealed class ItemElement
+        {
+            [JsonPropertyName("id")]
+            public string Id { get; set; }
+
+            [JsonPropertyName("name")]
+            public string Name { get; set; }
+
+            [JsonPropertyName("shortName")]
+            public string ShortName { get; set; }
+
+            [JsonPropertyName("width")]
+            public int Width { get; set; }
+
+            [JsonPropertyName("height")]
+            public int Height { get; set; }
+
+            [JsonPropertyName("basePrice")]
+            public long BasePrice { get; set; }
+
+            [JsonPropertyName("avg24hPrice")]
+            public long? Avg24HPrice { get; set; }
+
+            [JsonPropertyName("categories")]
+            public List<CategoryElement> Categories { get; set; }
+
+            [JsonPropertyName("sellFor")]
+            public List<SellForElement> SellFor { get; set; }
+
+            [JsonPropertyName("historicalPrices")]
+            public List<HistoricalPrice> HistoricalPrices { get; set; }
+
+            [JsonIgnore]
+            public long HighestVendorPrice => SellFor?
+                .Where(x => x.Vendor.Name != "Flea Market" && x.PriceRub is long)?
+                .Select(x => x.PriceRub)?
+                .DefaultIfEmpty()?
+                .Max() ?? 0;
+
+            [JsonIgnore]
+            public long OptimalFleaPrice
             {
-                [JsonPropertyName("message")]
-                public string Message { get; set; }
+                get
+                {
+                    if (BasePrice == 0)
+                        return 0;
+                    if (Avg24HPrice is long avg24 && FleaTax.Calculate(avg24, BasePrice) < avg24)
+                        return avg24;
+                    return (long)(HistoricalPrices?
+                        .Where(x => x.Price is long price && FleaTax.Calculate(price, BasePrice) < price)?
+                        .Select(x => x.Price)?
+                        .DefaultIfEmpty()?
+                        .Average() ?? 0);
+                }
             }
 
-            public sealed class ItemElement
+            public sealed class HistoricalPrice
             {
-                [JsonPropertyName("id")]
-                public string Id { get; set; }
+                [JsonPropertyName("price")]
+                public long? Price { get; set; }
+            }
 
+            public sealed class SellForElement
+            {
+                [JsonPropertyName("priceRUB")]
+                public long? PriceRub { get; set; }
+
+                [JsonPropertyName("vendor")]
+                public CategoryElement Vendor { get; set; }
+            }
+
+            public sealed class CategoryElement
+            {
                 [JsonPropertyName("name")]
                 public string Name { get; set; }
-
-                [JsonPropertyName("shortName")]
-                public string ShortName { get; set; }
-
-                [JsonPropertyName("width")]
-                public int Width { get; set; }
-
-                [JsonPropertyName("height")]
-                public int Height { get; set; }
-
-                [JsonPropertyName("basePrice")]
-                public long BasePrice { get; set; }
-
-                [JsonPropertyName("avg24hPrice")]
-                public long? Avg24HPrice { get; set; }
-
-                [JsonPropertyName("categories")]
-                public List<CategoryElement> Categories { get; set; }
-
-                [JsonPropertyName("sellFor")]
-                public List<SellForElement> SellFor { get; set; }
-
-                [JsonPropertyName("historicalPrices")]
-                public List<HistoricalPrice> HistoricalPrices { get; set; }
-
-                [JsonIgnore]
-                public long HighestVendorPrice => SellFor?
-                    .Where(x => x.Vendor.Name != "Flea Market" && x.PriceRub is long)?
-                    .Select(x => x.PriceRub)?
-                    .DefaultIfEmpty()?
-                    .Max() ?? 0;
-
-                [JsonIgnore]
-                public long OptimalFleaPrice
-                {
-                    get
-                    {
-                        if (BasePrice == 0)
-                            return 0;
-                        if (Avg24HPrice is long avg24 && FleaTax.Calculate(avg24, BasePrice) < avg24)
-                            return avg24;
-                        return (long)(HistoricalPrices?
-                            .Where(x => x.Price is long price && FleaTax.Calculate(price, BasePrice) < price)?
-                            .Select(x => x.Price)?
-                            .DefaultIfEmpty()?
-                            .Average() ?? 0);
-                    }
-                }
-
-                public sealed class HistoricalPrice
-                {
-                    [JsonPropertyName("price")]
-                    public long? Price { get; set; }
-                }
-
-                public sealed class SellForElement
-                {
-                    [JsonPropertyName("priceRUB")]
-                    public long? PriceRub { get; set; }
-
-                    [JsonPropertyName("vendor")]
-                    public CategoryElement Vendor { get; set; }
-                }
-
-                public sealed class CategoryElement
-                {
-                    [JsonPropertyName("name")]
-                    public string Name { get; set; }
-                }
             }
         }
 
