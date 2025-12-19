@@ -228,7 +228,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                     {
                         var profileData = dto.ToProfileData();
                         Profile.Data = profileData;
-                        Debug.WriteLine($"[ObservedPlayer] Got Profile (Cached) '{acctIdLong}'!");
+                        Logging.WriteLine($"[ObservedPlayer] Got Profile (Cached) '{acctIdLong}'!");
                     }
                     catch
                     {
@@ -325,7 +325,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ERROR updating Health Status for '{Name}': {ex}");
+                Logging.WriteLine($"ERROR updating Health Status for '{Name}': {ex}");
             }
         }
 

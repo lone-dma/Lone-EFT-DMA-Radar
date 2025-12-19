@@ -66,7 +66,7 @@ namespace LoneEftDmaRadar.Web.ProfileApi
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"[EFTProfileService] Unhandled Exception: {ex}");
+                        Logging.WriteLine($"[EFTProfileService] Unhandled Exception: {ex}");
                     }
                 },
                 new ExecutionDataflowBlockOptions

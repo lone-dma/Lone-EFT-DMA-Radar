@@ -106,14 +106,14 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Profiles
                     {
                         _skip.TryAdd(accountId, 0);
                     }
-                    Debug.WriteLine($"[TarkovDevProvider] Failed to get Profile '{accountId}': [{response.StatusCode}] '{content}'");
+                    Logging.WriteLine($"[TarkovDevProvider] Failed to get Profile '{accountId}': [{response.StatusCode}] '{content}'");
                     return null;
                 }
                 using var jsonDoc = JsonDocument.Parse(content);
                 long epoch = jsonDoc.RootElement.GetProperty("updated").GetInt64();
                 var result = JsonSerializer.Deserialize<ProfileData>(content, App.JsonOptions) ??
                     throw new InvalidOperationException("Failed to deserialize response");
-                Debug.WriteLine($"[TarkovDevProvider] Got Profile '{accountId}'!");
+                Logging.WriteLine($"[TarkovDevProvider] Got Profile '{accountId}'!");
                 return new()
                 {
                     Data = result,
@@ -123,7 +123,7 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Profiles
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[TarkovDevProvider] Unhandled Exception: {ex}");
+                Logging.WriteLine($"[TarkovDevProvider] Unhandled Exception: {ex}");
                 return null;
             }
         }

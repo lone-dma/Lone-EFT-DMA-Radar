@@ -100,7 +100,7 @@ namespace LoneEftDmaRadar.Web.Twitch
                 if (replacedName is null)
                     return null;
 
-                Debug.WriteLine($"[Twitch] Checking {username}...");
+                Logging.WriteLine($"[Twitch] Checking {username}...");
                 string channel = await LookupTwitchApiAsync(replacedName);
                 _cache[username] = new CachedTwitchEntry()
                 {

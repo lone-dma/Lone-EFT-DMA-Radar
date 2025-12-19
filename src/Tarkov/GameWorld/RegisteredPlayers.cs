@@ -82,7 +82,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"CRITICAL ERROR - RegisteredPlayers Loop FAILED: {ex}");
+                Logging.WriteLine($"CRITICAL ERROR - RegisteredPlayers Loop FAILED: {ex}");
             }
         }
 
@@ -125,7 +125,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             {
                 var btr = new BtrPlayer(btrView, btrPlayerBase);
                 _players[btrPlayerBase] = btr;
-                Debug.WriteLine("BTR Allocated!");
+                Logging.WriteLine("BTR Allocated!");
             }
         }
 

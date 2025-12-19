@@ -102,7 +102,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"CRITICAL ERROR - Failed to refresh loot: {ex}");
+                Logging.WriteLine($"CRITICAL ERROR - Failed to refresh loot: {ex}");
             }
         }
 

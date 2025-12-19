@@ -47,7 +47,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
 
         public UnityTransform(ulong transformInternal, bool useCache = false)
         {
-            //Debug.WriteLine(transformInternal.ToString("X"));
+            //Logging.WriteLine(transformInternal.ToString("X"));
             /// Constructor
             TransformInternal = transformInternal;
             _useCache = useCache;

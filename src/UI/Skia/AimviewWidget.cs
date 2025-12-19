@@ -99,7 +99,7 @@ namespace LoneEftDmaRadar.UI.Skia
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"CRITICAL AIMVIEW WIDGET RENDER ERROR: {ex}");
+                Logging.WriteLine($"CRITICAL AIMVIEW WIDGET RENDER ERROR: {ex}");
             }
 
             _canvas.Flush();
