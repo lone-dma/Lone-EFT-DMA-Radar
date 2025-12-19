@@ -136,195 +136,107 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
                         extracts {
                             name
                             faction
-                            position {x,y,z}
+                            position { x, y, z }
                         }
                         transits {
                             description
-                            position {x,y,z}
+                            position { x, y, z }
                         }
                         hazards {
-                          hazardType
-                          position {
-                            x
-                            y
-                            z
-                          }
+                            hazardType
+                            position { x, y, z }
                         }
                     }
                     playerLevels {
                         exp
                         level
                     }
-                    items { 
-                        id 
-                        name 
-                        shortName 
-                        width 
-                        height 
-                        sellFor { 
-                            vendor { 
-                                name 
-                            } 
-                            priceRUB 
-                        } 
-                        basePrice 
-                        avg24hPrice 
-                        historicalPrices { 
-                            price 
-                        } 
-                        categories { 
-                            name 
-                        } 
+                    items {
+                        id
+                        name
+                        shortName
+                        width
+                        height
+                        sellFor {
+                            vendor { name }
+                            priceRUB
+                        }
+                        basePrice
+                        avg24hPrice
+                        historicalPrices { price }
+                        categories { name }
                     }
-                    lootContainers { 
-                        id 
-                        normalizedName 
-                        name 
+                    lootContainers {
+                        id
+                        normalizedName
+                        name
                     }
                     tasks {
-                      id
-                      name
-                      objectives {
                         id
-                        type
-                        description
-                        maps {
-                          nameId
-                          name
-                          normalizedName
-                        }
-                        ... on TaskObjectiveItem {
-                          item {
+                        name
+                        objectives {
                             id
-                            name
-                            shortName
-                          }
-                          zones {
-                            id
-                            map {
-                              nameId
-                              normalizedName
-                              name
-                            }
-                            position {
-                              y
-                              x
-                              z
-                            }
-                          }
-                          requiredKeys {
-                            id
-                            name
-                            shortName
-                          }
-                          count
-                          foundInRaid
-                        }
-                        ... on TaskObjectiveMark {
-                          id
-                          description
-                          markerItem {
-                            id
-                            name
-                            shortName
-                          }
-                          maps {
-                            nameId
-                            normalizedName
-                            name
-                          }
-                          zones {
-                            id
-                            map {
-                              nameId
-                              normalizedName
-                              name
-                            }
-                            position {
-                              y
-                              x
-                              z
-                            }
-                          }
-                          requiredKeys {
-                            id
-                            name
-                            shortName
-                          }
-                        }
-                        ... on TaskObjectiveQuestItem {
-                          id
-                          description
-                          requiredKeys {
-                            id
-                            name
-                            shortName
-                          }
-                          maps {
-                            nameId
-                            normalizedName
-                            name
-                          }
-                          zones {
-                            id
-                            map {
-                              id
-                              normalizedName
-                              name
-                            }
-                            position {
-                              y
-                              x
-                              z
-                            }
-                          }
-                          requiredKeys {
-                            id
-                            name
-                            shortName
-                          }
-                          questItem {
-                            id
-                            name
-                            shortName
-                            normalizedName
+                            type
                             description
-                          }
-                          count
-                        }
-                        ... on TaskObjectiveBasic {
-                          id
-                          description
-                          requiredKeys {
-                            id
-                            name
-                            shortName
-                          }
-                          maps {
-                            nameId
-                            normalizedName
-                            name
-                          }
-                          zones {
-                            id
-                            map {
-                              nameId
-                              normalizedName
-                              name
+                            maps {
+                                nameId
+                                name
+                                normalizedName
                             }
-                            position {
-                              y
-                              x
-                              z
+                            ... on TaskObjectiveItem {
+                                item { id, name, shortName }
+                                zones {
+                                    id
+                                    map { nameId, normalizedName, name }
+                                    position { x, y, z }
+                                }
+                                requiredKeys { id, name, shortName }
+                                count
+                                foundInRaid
                             }
-                          }
-                          requiredKeys {
-                            id
-                            name
-                            shortName
-                          }
+                            ... on TaskObjectiveMark {
+                                id
+                                description
+                                markerItem { id, name, shortName }
+                                maps { nameId, normalizedName, name }
+                                zones {
+                                    id
+                                    map { nameId, normalizedName, name }
+                                    position { x, y, z }
+                                }
+                                requiredKeys { id, name, shortName }
+                            }
+                            ... on TaskObjectiveQuestItem {
+                                id
+                                description
+                                maps { nameId, normalizedName, name }
+                                zones {
+                                    id
+                                    map { id, normalizedName, name }
+                                    position { x, y, z }
+                                }
+                                requiredKeys { id, name, shortName }
+                                questItem {
+                                    id
+                                    name
+                                    shortName
+                                    normalizedName
+                                    description
+                                }
+                                count
+                            }
+                            ... on TaskObjectiveBasic {
+                                id
+                                description
+                                maps { nameId, normalizedName, name }
+                                zones {
+                                    id
+                                    map { nameId, normalizedName, name }
+                                    position { x, y, z }
+                                }
+                                requiredKeys { id, name, shortName }
+                            }
                         }
-                      }
                     }
                 }
                 """
