@@ -614,7 +614,7 @@ namespace LoneEftDmaRadar
         /// Select all containers.
         /// </summary>
         [JsonPropertyName("selectAll")]
-        public bool SelectAll { get; set; } = true;
+        public bool SelectAll { get; set; } = false;
 
         /// <summary>
         /// Selected containers to display.
