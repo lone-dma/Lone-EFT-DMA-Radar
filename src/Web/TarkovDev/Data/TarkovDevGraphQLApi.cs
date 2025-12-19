@@ -96,7 +96,7 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
                     BsgId = item.Id,
                     ShortName = item.ShortName,
                     Name = item.Name,
-                    Tags = item.Categories?.Select(x => x.Name)?.ToList() ?? new(), // Flatten categories
+                    Tags = item.Categories?.Select(x => x.Name)?.Distinct().ToHashSet() ?? new(), // Flatten categories
                     TraderPrice = item.HighestVendorPrice,
                     FleaPrice = item.OptimalFleaPrice,
                     Slots = slots
@@ -109,7 +109,7 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
                     BsgId = container.Id,
                     ShortName = container.Name,
                     Name = container.NormalizedName,
-                    Tags = new List<string>() { "Static Container" },
+                    Tags = new HashSet<string>() { "Static Container" },
                     TraderPrice = -1,
                     FleaPrice = -1,
                     Slots = 1

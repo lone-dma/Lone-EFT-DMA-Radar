@@ -45,7 +45,7 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
         public int Slots { get; init; } = 1;
         [JsonInclude]
         [JsonPropertyName("categories")]
-        public IReadOnlyList<string> Tags { get; init; } = new List<string>();
+        public HashSet<string> Tags { get; init; } = new HashSet<string>();
         /// <summary>
         /// True if this item is Important via the Filters.
         /// </summary>
