@@ -230,7 +230,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ERROR updating Member Category for '{Name}': {ex}");
+                Logging.WriteLine($"ERROR updating Member Category for '{Name}': {ex}");
             }
         }
 

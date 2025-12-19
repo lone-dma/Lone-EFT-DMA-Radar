@@ -91,7 +91,7 @@ namespace LoneEftDmaRadar.Misc.Workers
 
         private void Worker()
         {
-            Debug.WriteLine($"[WorkerThread] '{Name}' thread starting...");
+            Logging.WriteLine($"[WorkerThread] '{Name}' thread starting...");
             bool shouldSleep = SleepDuration > TimeSpan.Zero;
             bool shouldDynamicSleep = shouldSleep && SleepMode == WorkerThreadSleepMode.DynamicSleep;
             while (!_disposed)
@@ -104,7 +104,7 @@ namespace LoneEftDmaRadar.Misc.Workers
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"[WorkerThread] WARNING: Unhandled exception on '{Name}' thread: {ex}");
+                    Logging.WriteLine($"[WorkerThread] WARNING: Unhandled exception on '{Name}' thread: {ex}");
                 }
                 finally
                 {
@@ -123,7 +123,7 @@ namespace LoneEftDmaRadar.Misc.Workers
                     }
                 }
             }
-            Debug.WriteLine($"[WorkerThread] '{Name}' thread stopping...");
+            Logging.WriteLine($"[WorkerThread] '{Name}' thread stopping...");
         }
 
         #region IDisposable

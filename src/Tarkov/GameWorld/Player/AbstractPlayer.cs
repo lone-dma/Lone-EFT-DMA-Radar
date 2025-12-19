@@ -131,7 +131,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ERROR during Player Allocation for player @ 0x{playerBase.ToString("X")}: {ex}");
+                Logging.WriteLine($"ERROR during Player Allocation for player @ 0x{playerBase.ToString("X")}: {ex}");
             }
         }
 
@@ -145,7 +145,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 player = new ClientPlayer(playerBase);
             else
                 player = new ObservedPlayer(playerBase);
-            Debug.WriteLine($"Player '{player.Name}' allocated.");
+            Logging.WriteLine($"Player '{player.Name}' allocated.");
             return player;
         }
 
@@ -485,7 +485,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                             }
                             catch (Exception ex) // Attempt to re-allocate Transform on error
                             {
-                                Debug.WriteLine($"ERROR getting Player '{Name}' SkeletonRoot Position: {ex}");
+                                Logging.WriteLine($"ERROR getting Player '{Name}' SkeletonRoot Position: {ex}");
                                 var transform = new UnityTransform(SkeletonRoot.TransformInternal);
                                 SkeletonRoot = transform;
                             }
@@ -520,7 +520,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                         {
                             if (SkeletonRoot.VerticesAddr != verticesPtr) // check if any addr changed
                             {
-                                Debug.WriteLine($"WARNING - SkeletonRoot Transform has changed for Player '{Name}'");
+                                Logging.WriteLine($"WARNING - SkeletonRoot Transform has changed for Player '{Name}'");
                                 var transform = new UnityTransform(SkeletonRoot.TransformInternal);
                                 SkeletonRoot = transform;
                             }
@@ -669,7 +669,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"WARNING! Player Draw Error: {ex}");
+                Logging.WriteLine($"WARNING! Player Draw Error: {ex}");
             }
         }
 

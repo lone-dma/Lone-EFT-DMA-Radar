@@ -78,7 +78,7 @@ namespace LoneEftDmaRadar.Misc
                 }
                 catch { }
             }
-            Debug.WriteLine(sb.ToString());
+            Logging.WriteLine(sb.ToString());
             Environment.Exit(0);
         }
     }

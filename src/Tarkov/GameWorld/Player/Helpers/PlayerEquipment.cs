@@ -59,7 +59,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Error initializing Player Equipment for '{_player.Name}': {ex}");
+                    Logging.WriteLine($"Error initializing Player Equipment for '{_player.Name}': {ex}");
                 }
                 finally
                 {

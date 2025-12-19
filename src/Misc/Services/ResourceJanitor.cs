@@ -60,7 +60,7 @@ namespace LoneEftDmaRadar.Misc
                     var info = new MEMORYSTATUSEX();
                     if (GlobalMemoryStatusEx(ref info) && info.dwMemoryLoad >= 92) // Over 92% memory usage
                     {
-                        Debug.WriteLine("[ResourceJanitor] High Memory Load, running cleanup...");
+                        Logging.WriteLine("[ResourceJanitor] High Memory Load, running cleanup...");
                         Run(false);
                     }
                 }
@@ -99,7 +99,7 @@ namespace LoneEftDmaRadar.Misc
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"ResourceJanitor ERROR: {ex}");
+                    Logging.WriteLine($"ResourceJanitor ERROR: {ex}");
                 }
             }
         }

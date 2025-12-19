@@ -101,7 +101,7 @@ namespace LoneEftDmaRadar.UI.Radar.Maps
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ERROR loading '{mapId}': {ex}");
+                Logging.WriteLine($"ERROR loading '{mapId}': {ex}");
                 return null;
             }
         }

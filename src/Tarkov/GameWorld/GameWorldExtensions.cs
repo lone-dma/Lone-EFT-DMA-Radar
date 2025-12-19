@@ -17,7 +17,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         public static ulong GetGameWorld(this GameObjectManager gom, CancellationToken ct, out string map)
         {
             ct.ThrowIfCancellationRequested();
-            Debug.WriteLine("Searching for GameWorld...");
+            Logging.WriteLine("Searching for GameWorld...");
             var firstObject = Memory.ReadValue<LinkedListObject>(gom.ActiveNodes);
             var lastObject = Memory.ReadValue<LinkedListObject>(gom.LastActiveNode);
             firstObject.ThisObject.ThrowIfInvalidUserVA(nameof(firstObject));
@@ -79,7 +79,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                             break;
                         if (ParseGameWorld(ref currentObject) is GameWorldResult result)
                         {
-                            Debug.WriteLine("GameWorld Found! (Shallow)");
+                            Logging.WriteLine("GameWorld Found! (Shallow)");
                             return result;
                         }
 
@@ -99,7 +99,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 ct2.ThrowIfCancellationRequested();
                 if (ParseGameWorld(ref currentObject) is GameWorldResult result)
                 {
-                    Debug.WriteLine("GameWorld Found! (Forward)");
+                    Logging.WriteLine("GameWorld Found! (Forward)");
                     return result;
                 }
 
@@ -116,7 +116,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 ct2.ThrowIfCancellationRequested();
                 if (ParseGameWorld(ref currentObject) is GameWorldResult result)
                 {
-                    Debug.WriteLine("GameWorld Found! (Backward)");
+                    Logging.WriteLine("GameWorld Found! (Backward)");
                     return result;
                 }
 
@@ -146,7 +146,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                         }
 
                         string map = Memory.ReadUnityString(mapPtr, 128);
-                        Debug.WriteLine("Detected Map " + map);
+                        Logging.WriteLine("Detected Map " + map);
                         if (!TarkovDataManager.MapData.ContainsKey(map)) // Also makes sure we're not in the hideout
                             throw new ArgumentException("Invalid Map ID!");
                         return new GameWorldResult()
@@ -157,7 +157,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"Invalid GameWorld Instance: {ex}");
+                        Logging.WriteLine($"Invalid GameWorld Instance: {ex}");
                     }
                 }
             }

@@ -88,12 +88,12 @@ namespace LoneEftDmaRadar.Web.EftApiTech
                 {
                     var statusCode = args.Outcome.Result?.StatusCode;
                     var exception = args.Outcome.Exception;
-                    Debug.WriteLine($"[EftApiTechProvider] Circuit OPENED! StatusCode: {statusCode}, Exception: {exception?.GetType().Name}: {exception?.Message}");
+                    Logging.WriteLine($"[EftApiTechProvider] Circuit OPENED! StatusCode: {statusCode}, Exception: {exception?.GetType().Name}: {exception?.Message}");
                     return ValueTask.CompletedTask;
                 };
                 options.CircuitBreaker.OnClosed = _ =>
                 {
-                    Debug.WriteLine("[EftApiTechProvider] Circuit CLOSED");
+                    Logging.WriteLine("[EftApiTechProvider] Circuit CLOSED");
                     return ValueTask.CompletedTask;
                 };
             });
@@ -143,7 +143,7 @@ namespace LoneEftDmaRadar.Web.EftApiTech
                     {
                         _skip.TryAdd(accountId, 0);
                     }
-                    Debug.WriteLine($"[EftApiTechProvider] Failed to get Profile '{accountId}': [{response.StatusCode}] '{content}'");
+                    Logging.WriteLine($"[EftApiTechProvider] Failed to get Profile '{accountId}': [{response.StatusCode}] '{content}'");
                     return null;
                 }
                 using var jsonDoc = JsonDocument.Parse(content);
@@ -152,7 +152,7 @@ namespace LoneEftDmaRadar.Web.EftApiTech
                 string raw = data.GetRawText();
                 var result = JsonSerializer.Deserialize<ProfileData>(raw, App.JsonOptions) ??
                     throw new InvalidOperationException("Failed to deserialize response");
-                Debug.WriteLine($"[EftApiTechProvider] Got Profile '{accountId}'!");
+                Logging.WriteLine($"[EftApiTechProvider] Got Profile '{accountId}'!");
                 return new()
                 {
                     Data = result,
@@ -162,7 +162,7 @@ namespace LoneEftDmaRadar.Web.EftApiTech
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[EftApiTechProvider] Unhandled Exception: {ex}");
+                Logging.WriteLine($"[EftApiTechProvider] Unhandled Exception: {ex}");
                 return null;
             }
         }

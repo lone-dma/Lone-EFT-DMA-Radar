@@ -180,7 +180,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 try
                 {
                     var instance = GetLocalGameWorld(ct);
-                    Debug.WriteLine("Raid has started!");
+                    Logging.WriteLine("Raid has started!");
                     return instance;
                 }
                 catch (OperationCanceledException)
@@ -189,7 +189,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"ERROR Instantiating Game Instance: {ex}");
+                    Logging.WriteLine($"ERROR Instantiating Game Instance: {ex}");
                 }
                 finally
                 {
@@ -239,14 +239,14 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                     TryAllocateBTR();
                 _rgtPlayers.Refresh(); // Check for new players, add to list, etc.
             }
-            catch (OperationCanceledException ex) // Raid Ended
+            catch (RaidEndedException ex) // Raid Ended
             {
-                Debug.WriteLine(ex.Message);
+                Logging.WriteLine(ex.Message);
                 Dispose();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"CRITICAL ERROR - Raid ended due to unhandled exception: {ex}");
+                Logging.WriteLine($"CRITICAL ERROR - Raid ended due to unhandled exception: {ex}");
                 throw;
             }
         }
@@ -254,7 +254,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         /// <summary>
         /// Throws an exception if the current raid instance has ended.
         /// </summary>
-        /// <exception cref="OperationCanceledException"></exception>
+        /// <exception cref="RaidEndedException"></exception>
         private void ThrowIfRaidEnded()
         {
             for (int i = 0; i < 5; i++) // Re-attempt if read fails -- 5 times
@@ -267,7 +267,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 catch { }
                 Thread.Sleep(50); // Small delay before retry
             }
-            throw new OperationCanceledException("Raid has ended!"); // Still not valid? Raid must have ended.
+            throw new RaidEndedException(); // Still not valid? Raid must have ended.
         }
 
         /// <summary>
@@ -381,7 +381,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"CRITICAL ERROR - ValidatePlayerTransforms Loop FAILED: {ex}");
+                Logging.WriteLine($"CRITICAL ERROR - ValidatePlayerTransforms Loop FAILED: {ex}");
             }
         }
 
@@ -418,7 +418,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ERROR Allocating BTR: {ex}");
+                Logging.WriteLine($"ERROR Allocating BTR: {ex}");
             }
         }
 
@@ -435,6 +435,18 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 _t1?.Dispose();
                 _t2?.Dispose();
                 _t3?.Dispose();
+            }
+        }
+
+        #endregion
+
+        #region Misc
+
+        private sealed class RaidEndedException : Exception
+        {
+            public RaidEndedException()
+                : base("Raid has ended!")
+            {
             }
         }
 

@@ -129,7 +129,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                                 {
                                     if (existing.VerticesAddr != verticesPtr) // check if any addr changed
                                     {
-                                        Debug.WriteLine($"WARNING - '_lookRaycastTransform' Transform has changed for LocalPlayer '{Name}'");
+                                        Logging.WriteLine($"WARNING - '_lookRaycastTransform' Transform has changed for LocalPlayer '{Name}'");
                                         var transform = new UnityTransform(existing.TransformInternal);
                                         _lookRaycastTransform = transform;
                                     }
@@ -193,7 +193,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             catch (OperationCanceledException) { throw; }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[Wishlist] ERROR Refreshing: {ex}");
+                Logging.WriteLine($"[Wishlist] ERROR Refreshing: {ex}");
             }
         }
 
