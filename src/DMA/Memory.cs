@@ -85,12 +85,19 @@ namespace LoneEftDmaRadar.DMA
                 string lcVersion = FileVersionInfo.GetVersionInfo("leechcore.dll").FileVersion;
                 string versions = $"Vmm Version: {vmmVersion}\n" +
                     $"Leechcore Version: {lcVersion}";
-                string[] initArgs = new[] {
-                "-norefresh",
-                "-device",
-                fpgaAlgo is FpgaAlgo.Auto ?
-                    "fpga" : $"fpga://algo={(int)fpgaAlgo}",
-                "-waitinitialize"};
+                List<string> initArgs = new()
+                {
+                    "-norefresh",
+                    "-device",
+                    fpgaAlgo is FpgaAlgo.Auto ?
+                        "fpga" : $"fpga://algo={(int)fpgaAlgo}",
+                    "-waitinitialize"
+                };
+                if (Logging.UseConsole)
+                {
+                    initArgs.Add("-printf");
+                    initArgs.Add("-v");
+                }
                 try
                 {
                     /// Begin Init...
@@ -99,7 +106,7 @@ namespace LoneEftDmaRadar.DMA
                         if (!File.Exists(_mmap))
                         {
                             Logging.WriteLine("[DMA] No MemMap, attempting to generate...");
-                            _vmm = new Vmm(args: initArgs)
+                            _vmm = new Vmm(args: initArgs.ToArray())
                             {
                                 EnableMemoryWriting = false
                             };
@@ -109,11 +116,11 @@ namespace LoneEftDmaRadar.DMA
                         }
                         else
                         {
-                            var mapArgs = new[] { "-memmap", _mmap };
-                            initArgs = initArgs.Concat(mapArgs).ToArray();
+                            initArgs.Add("-memmap");
+                            initArgs.Add(_mmap);
                         }
                     }
-                    _vmm ??= new Vmm(args: initArgs)
+                    _vmm ??= new Vmm(args: initArgs.ToArray())
                     {
                         EnableMemoryWriting = false
                     };
