@@ -1,5 +1,5 @@
-﻿using LoneEftDmaRadar.Tarkov.Unity.Collections;
-using LoneEftDmaRadar.Web.TarkovDev.Data;
+﻿using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
+using LoneEftDmaRadar.Tarkov.Unity.Collections;
 using System.Collections.Frozen;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
@@ -11,7 +11,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
             "SecuredContainer", "Dogtag", "Compass", "ArmBand", "Eyewear", "Pockets"
         }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, ulong> _slots = new(StringComparer.OrdinalIgnoreCase);
-        private readonly ConcurrentDictionary<string, TarkovMarketItem> _items = new(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<string, LootItem> _items = new(StringComparer.OrdinalIgnoreCase);
         private readonly ObservedPlayer _player;
         private bool _inited;
         private int _cachedValue;
@@ -19,11 +19,15 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
         /// <summary>
         /// Player's eqiuipped gear by slot.
         /// </summary>
-        public IReadOnlyDictionary<string, TarkovMarketItem> Items => _items;
+        public IReadOnlyDictionary<string, LootItem> Items => _items;
         /// <summary>
         /// Player's total equipment flea price value.
         /// </summary>
         public int Value => _cachedValue;
+        /// <summary>
+        /// True if the player is carrying any important loot items.
+        /// </summary>
+        public bool CarryingImportantLoot => _items?.Values?.Any(item => item.IsImportant) ?? false;
 
         public PlayerEquipment(ObservedPlayer player)
         {
@@ -86,7 +90,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
                     var id = mongoId.ReadString();
                     if (TarkovDataManager.AllItems.TryGetValue(id, out var item))
                     {
-                        _items[slot.Key] = item;
+                        _items[slot.Key] = new(item, default);
                         totalValue += item.FleaPrice;
                     }
                     else

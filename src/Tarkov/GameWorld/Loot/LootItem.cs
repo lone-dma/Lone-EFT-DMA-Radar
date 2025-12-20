@@ -123,22 +123,18 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         public bool Important => CustomFilter?.Important ?? false;
 
         /// <summary>
-        /// True if this item is wishlisted.
-        /// </summary>
-        public bool IsWishlisted => Config.Loot.ShowWishlist && LocalPlayer.WishlistItems.ContainsKey(ID);
-
-        /// <summary>
         /// True if the item is blacklisted via the UI.
         /// </summary>
         public bool Blacklisted => CustomFilter?.Blacklisted ?? false;
 
+        public bool IsWishlisted => _item.IsWishlisted;
         public bool IsMeds => _item.IsMed;
         public bool IsFood => _item.IsFood;
         public bool IsBackpack => _item.IsBackpack;
         public bool IsWeapon => _item.IsWeapon;
         public bool IsCurrency => _item.IsCurrency;
+        public bool IsQuestHelperItem => _item.IsQuestHelperItem;
         public bool IsQuestItem { get; init; }
-        public bool IsQuestHelperItem => App.Config.QuestHelper.Enabled && (Memory.QuestManager?.ItemConditions?.ContainsKey(ID) ?? false);
 
         /// <summary>
         /// Checks if an item exceeds regular loot price threshold.
@@ -167,7 +163,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         }
 
         /// <summary>
-        /// Checks if an item/container is important.
+        /// Checks if an item is important via several means.
         /// </summary>
         public bool IsImportant
         {
@@ -175,7 +171,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             {
                 if (Blacklisted)
                     return false;
-                return _item.Important || IsWishlisted;
+                return _item.Important || (Config.Loot.ShowWishlist && IsWishlisted) || (App.Config.QuestHelper.Enabled && IsQuestHelperItem);
             }
         }
 
@@ -252,9 +248,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
 
         private ValueTuple<SKPaint, SKPaint> GetPaints()
         {
-            if (IsQuestHelperItem)
+            if (App.Config.QuestHelper.Enabled && IsQuestHelperItem)
                 return new(SKPaints.PaintQuestItem, SKPaints.TextQuestItem);
-            if (IsWishlisted)
+            if (Config.Loot.ShowWishlist && IsWishlisted)
                 return new(SKPaints.PaintWishlistItem, SKPaints.TextWishlistItem);
             if (LootFilter.ShowBackpacks && IsBackpack)
                 return new(SKPaints.PaintBackpacks, SKPaints.TextBackpacks);

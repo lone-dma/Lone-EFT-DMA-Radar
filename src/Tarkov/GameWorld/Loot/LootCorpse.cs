@@ -94,15 +94,18 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             }
 
             point.Offset(7 * App.Config.UI.UIScale, 3 * App.Config.UI.UIScale);
+            string important = (Player is ObservedPlayer observed && observed.Equipment.CarryingImportantLoot) ?
+                "!!" : null; // Flag important loot
+            string name = $"{important}{Name}";
 
             canvas.DrawText(
-                Name,
+                name,
                 point,
                 SKTextAlign.Left,
                 SKFonts.UIRegular,
                 SKPaints.TextOutline); // Draw outline
             canvas.DrawText(
-                Name,
+                name,
                 point,
                 SKTextAlign.Left,
                 SKFonts.UIRegular,
@@ -124,7 +127,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
                     lines.Add($"Value: {Utilities.FormatNumberKM(obs.Equipment.Value)}");
                     foreach (var item in obs.Equipment.Items.OrderBy(e => e.Key))
                     {
-                        lines.Add($"{item.Key.Substring(0, 5)}: {item.Value.ShortName}");
+                        string important = item.Value.IsImportant ?
+                            "!!" : null; // Flag important loot
+                        lines.Add($"{important}{item.Key.Substring(0, 5)}: {item.Value.ShortName}");
                     }
                 }
             }
