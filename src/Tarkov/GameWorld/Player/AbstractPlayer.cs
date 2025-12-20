@@ -663,7 +663,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"WARNING! Player Draw Error: {ex}");
+                Logging.WriteLine($"WARNING! Player Draw Error: {ex}");
             }
         }
 
