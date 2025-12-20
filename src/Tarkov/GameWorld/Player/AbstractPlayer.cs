@@ -35,7 +35,6 @@ using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Radar.ViewModels;
 using LoneEftDmaRadar.UI.Skia;
-using LoneEftDmaRadar.Web.TarkovDev.Data;
 using System.Collections.Frozen;
 using VmmSharpEx.Scatter;
 using static LoneEftDmaRadar.Tarkov.Unity.Structures.UnityTransform;
@@ -610,9 +609,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         public virtual ref readonly Vector3 Position => ref SkeletonRoot.Position;
         public Vector2 MouseoverPosition { get; set; }
 
-        [ThreadStatic]
-        private static StringBuilder _drawStringBuilder;
-
         private ValueTuple<SKPaint, SKPaint> _paints;
         public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
@@ -620,56 +616,54 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             {
                 var point = Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);
                 MouseoverPosition = new Vector2(point.X, point.Y);
-                if (!IsAlive)
+                if (!IsAlive) // Player Dead -- Draw 'X' death marker and move on
                 {
                     DrawDeathMarker(canvas, point);
-                    return;
-                }
-                _paints = GetPaints();
-
-                DrawPlayerPill(canvas, localPlayer, point);
-                if (this == localPlayer)
-                    return;
-
-                var height = Position.Y - localPlayer.Position.Y;
-                var dist = Vector3.Distance(localPlayer.Position, Position);
-
-                _drawStringBuilder ??= new StringBuilder(64);
-                _drawStringBuilder.Clear();
-
-                using var lines = new PooledList<string>(2);
-                if (!App.Config.UI.HideNames)
-                {
-                    string name = IsError ? "ERROR" : Name;
-                    if (this is ObservedPlayer observed)
-                    {
-                        if (observed.Profile?.Level is int levelResult)
-                            _drawStringBuilder.Append('L').Append(levelResult).Append(':');
-                        _drawStringBuilder.Append(name);
-                        if (observed.HealthStatus is not Enums.ETagStatus.Healthy)
-                            _drawStringBuilder.Append(" (").Append(observed.HealthStatus).Append(')');
-                    }
-                    else
-                    {
-                        _drawStringBuilder.Append(name);
-                    }
-                    lines.Add(_drawStringBuilder.ToString());
-                    _drawStringBuilder.Clear();
-                    _drawStringBuilder.Append("H: ").AppendFormat("{0:n0}", height)
-                                      .Append(" D: ").AppendFormat("{0:n0}", dist);
-                    lines.Add(_drawStringBuilder.ToString());
                 }
                 else
                 {
-                    _drawStringBuilder.AppendFormat("{0:n0}", height).Append(',').AppendFormat("{0:n0}", dist);
-                    lines.Add(IsError ? "ERROR" : _drawStringBuilder.ToString());
-                }
+                    _paints = GetPaints();
+                    DrawPlayerPill(canvas, localPlayer, point);
+                    if (this == localPlayer)
+                        return;
+                    var height = Position.Y - localPlayer.Position.Y;
+                    var dist = Vector3.Distance(localPlayer.Position, Position);
+                    using var lines = new PooledList<string>();
+                    var observed = this as ObservedPlayer;
+                    string important = (observed is not null && observed.Equipment.CarryingImportantLoot) ?
+                        "!!" : null; // Flag important loot
+                    if (!App.Config.UI.HideNames) // show full names & info
+                    {
+                        string name = null;
+                        if (IsError)
+                            name = "ERROR"; // In case POS stops updating, let us know!
+                        else
+                            name = Name;
+                        string health = null; string level = null;
+                        if (observed is not null)
+                        {
+                            health = observed.HealthStatus is Enums.ETagStatus.Healthy
+                                ? null
+                                : $" ({observed.HealthStatus})"; // Only display abnormal health status
+                            if (observed.Profile?.Level is int levelResult)
+                                level = $"L{levelResult}:";
+                        }
+                        lines.Add($"{important}{level}{name}{health}");
+                        lines.Add($"H: {height:n0} D: {dist:n0}");
+                    }
+                    else // just height, distance
+                    {
+                        lines.Add($"{important}{height:n0},{dist:n0}");
+                        if (IsError)
+                            lines[0] = "ERROR"; // In case POS stops updating, let us know!
+                    }
 
-                DrawPlayerText(canvas, point, lines);
+                    DrawPlayerText(canvas, point, lines);
+                }
             }
             catch (Exception ex)
             {
-                Logging.WriteLine($"WARNING! Player Draw Error: {ex}");
+                Debug.WriteLine($"WARNING! Player Draw Error: {ex}");
             }
         }
 
@@ -818,14 +812,15 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             {
                 lines.Add(name);
             }
-            if (obs is not null &&
-                obs.Equipment.Items is IReadOnlyDictionary<string, TarkovMarketItem> equipment)
+            if (obs is not null)
             {
                 // This is outside of the previous conditionals to always show equipment even if they're dead,etc.
                 lines.Add($"Value: {Utilities.FormatNumberKM(obs.Equipment.Value)}");
-                foreach (var item in equipment.OrderBy(e => e.Key))
+                foreach (var item in obs.Equipment.Items.OrderBy(e => e.Key))
                 {
-                    lines.Add($"{item.Key.Substring(0, 5)}: {item.Value.ShortName}");
+                    string important = item.Value.IsImportant ?
+                        "!!" : null; // Flag important loot
+                    lines.Add($"{important}{item.Key.Substring(0, 5)}: {item.Value.ShortName}");
                 }
             }
 

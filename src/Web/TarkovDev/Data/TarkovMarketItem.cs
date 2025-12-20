@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.UI.Loot;
 
 namespace LoneEftDmaRadar.Web.TarkovDev.Data
@@ -109,6 +110,16 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
         /// </summary>
         [JsonIgnore]
         public bool IsCurrency => Tags.Contains("Money");
+        /// <summary>
+        /// Is on the wishlist.
+        /// </summary>
+        [JsonIgnore]
+        public bool IsWishlisted => LocalPlayer.WishlistItems.ContainsKey(BsgId);
+        /// <summary>
+        /// Is a quest helper tracked item.
+        /// </summary>
+        [JsonIgnore]
+        public bool IsQuestHelperItem => Memory.QuestManager?.ItemConditions?.ContainsKey(BsgId) ?? false;
 
         /// <summary>
         /// This field is set if this item has a special filter.
