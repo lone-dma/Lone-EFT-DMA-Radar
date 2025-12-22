@@ -53,7 +53,7 @@ namespace LoneEftDmaRadar.DMA
 
         private void InputManager_PerformWork(object sender, WorkerThreadArgs e)
         {
-            var hotkeys = HotkeyManagerViewModel.Hotkeys;
+            var hotkeys = HotkeyManager.Hotkeys;
             if (hotkeys.Count == 0)
                 return;
 

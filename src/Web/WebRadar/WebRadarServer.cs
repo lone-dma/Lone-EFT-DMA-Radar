@@ -155,7 +155,7 @@ namespace LoneEftDmaRadar.Web.WebRadar
             }
             catch (Exception ex)
             {
-                MessageBox.Show(MainWindow.Instance, $"WebRadarServer Worker Thread Crashed:\n{ex}", "Web Radar Server", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"WebRadarServer Worker Thread Crashed:\n{ex}", "Web Radar Server", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

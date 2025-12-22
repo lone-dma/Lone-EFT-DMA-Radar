@@ -27,7 +27,7 @@ SOFTWARE.
 */
 
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
-using LoneEftDmaRadar.UI.Radar.Maps;
+using LoneEftDmaRadar.UI.Maps;
 
 namespace LoneEftDmaRadar.UI.Skia
 {

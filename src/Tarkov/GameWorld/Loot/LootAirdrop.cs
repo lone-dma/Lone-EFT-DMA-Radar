@@ -27,7 +27,7 @@ SOFTWARE.
 */
 
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
-using LoneEftDmaRadar.UI.Radar.Maps;
+using LoneEftDmaRadar.UI.Maps;
 using LoneEftDmaRadar.UI.Skia;
 using LoneEftDmaRadar.Web.TarkovDev.Data;
 
@@ -65,11 +65,11 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             }
             else // loot is level with player
             {
-                var size = 4 * App.Config.UI.UIScale;
+                var size = 4 * Program.Config.UI.UIScale;
                 canvas.DrawCircle(point, size, SKPaints.ShapeOutline);
                 canvas.DrawCircle(point, size, SKPaints.PaintImportantLoot);
             }
-            point.Offset(7 * App.Config.UI.UIScale, 3 * App.Config.UI.UIScale);
+            point.Offset(7 * Program.Config.UI.UIScale, 3 * Program.Config.UI.UIScale);
 
             canvas.DrawText(
                 this.Name,

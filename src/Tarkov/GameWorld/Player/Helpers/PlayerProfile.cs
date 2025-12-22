@@ -32,7 +32,7 @@ using System.Collections.Frozen;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
 {
-    public sealed class PlayerProfile : INotifyPropertyChanged
+    public sealed class PlayerProfile
     {
         private static readonly FrozenDictionary<string, HighAchiev> _highAchievements = new Dictionary<string, HighAchiev>(StringComparer.OrdinalIgnoreCase)
         {
@@ -55,9 +55,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
         }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
         private readonly ObservedPlayer _player;
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged(string name) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
         public bool IsStandard => !IsEOD && !IsUnheard;
         public bool IsEOD => MemberCategory is Enums.EMemberCategory mc && (mc & Enums.EMemberCategory.UniqueId) == Enums.EMemberCategory.UniqueId;
@@ -129,7 +126,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
                 MemberCategory = (Enums.EMemberCategory)info.MemberCategory;
 
             // --- Account Type ("UH", "EOD", or "--") ---
-            var mc = MemberCategory ?? Enums.EMemberCategory.Default;
             if (IsUnheard)
                 Acct = "UH";
             else if (IsEOD)
@@ -205,7 +201,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
             }
         }
 
-
         private void RefreshMemberCategory(Enums.EMemberCategory memberCategory)
         {
             try
@@ -260,11 +255,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
                 if (_data == value) return;
                 _data = value;
                 RefreshProfile();
-                if (App.Config.UI.MarkSusPlayers)
-                {
+                if (Program.Config.UI.MarkSusPlayers)
                     FocusIfSus();
-                }
-                OnPropertyChanged(nameof(Data));
             }
         }
 
@@ -277,152 +269,22 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
                 if (_name == value) return;
                 _name = value;
                 if (_player.IsHuman)
-                {
                     _ = Task.Run(() => RunTwitchLookupAsync(value));
-                }
-                OnPropertyChanged(nameof(Name));
             }
         }
 
-        private PlayerType _type;
-        public PlayerType Type
-        {
-            get => _type;
-            set
-            {
-                if (_type == value) return;
-                _type = value;
-                OnPropertyChanged(nameof(Type));
-            }
-        }
-
-        private string _accountID;
-        public string AccountID
-        {
-            get => _accountID;
-            private set
-            {
-                if (_accountID == value) return;
-                _accountID = value;
-                OnPropertyChanged(nameof(AccountID));
-            }
-        }
-
-        private int _groupID = -1;
-        public int GroupID
-        {
-            get => _groupID;
-            set
-            {
-                if (_groupID == value) return;
-                _groupID = value;
-                OnPropertyChanged(nameof(GroupID));
-            }
-        }
-
-        private Enums.EPlayerSide _playerSide;
-        public Enums.EPlayerSide PlayerSide
-        {
-            get => _playerSide;
-            set
-            {
-                if (_playerSide == value) return;
-                _playerSide = value;
-                OnPropertyChanged(nameof(PlayerSide));
-            }
-        }
-
-        private string _alerts;
-        public string Alerts
-        {
-            get => _alerts;
-            set
-            {
-                if (_alerts == value) return;
-                _alerts = value;
-                OnPropertyChanged(nameof(Alerts));
-            }
-        }
-
-        private string _twitchChannelURL;
-        public string TwitchChannelURL
-        {
-            get => _twitchChannelURL;
-            set
-            {
-                if (_twitchChannelURL == value) return;
-                _twitchChannelURL = value;
-                OnPropertyChanged(nameof(TwitchChannelURL));
-            }
-        }
-
-        private float? _overallKD;
-        public float? Overall_KD
-        {
-            get => _overallKD;
-            private set
-            {
-                if (_overallKD == value) return;
-                _overallKD = value;
-                OnPropertyChanged(nameof(Overall_KD));
-            }
-        }
-
-        private int? _raidCount;
-        public int? RaidCount
-        {
-            get => _raidCount;
-            private set
-            {
-                if (_raidCount == value) return;
-                _raidCount = value;
-                OnPropertyChanged(nameof(RaidCount));
-            }
-        }
-
-        // SurvivedCount is internal—no public getter—but we need its backing field & setter
-        private int? _survivedCount;
-        private int? SurvivedCount
-        {
-            get => _survivedCount;
-            set => _survivedCount = value;
-        }
-
-        private float? _survivedRate;
-        public float? SurvivedRate
-        {
-            get => _survivedRate;
-            private set
-            {
-                if (_survivedRate == value) return;
-                _survivedRate = value;
-                OnPropertyChanged(nameof(SurvivedRate));
-            }
-        }
-
-        private int? _hours;
-        public int? Hours
-        {
-            get => _hours;
-            private set
-            {
-                if (_hours == value) return;
-                _hours = value;
-                OnPropertyChanged(nameof(Hours));
-            }
-        }
-
-        private int? _level;
-        public int? Level
-        {
-            get => _level;
-            private set
-            {
-                if (_level == value) return;
-                _level = value;
-                OnPropertyChanged(nameof(Level));
-            }
-        }
+        public PlayerType Type { get; set; }
+        public string AccountID { get; private set; }
+        public int GroupID { get; set; } = -1;
+        public Enums.EPlayerSide PlayerSide { get; set; }
+        public string Alerts { get; set; }
+        public string TwitchChannelURL { get; set; }
+        public float? Overall_KD { get; private set; }
+        public int? RaidCount { get; private set; }
+        private int? SurvivedCount { get; set; }
+        public float? SurvivedRate { get; private set; }
+        public int? Hours { get; private set; }
+        public int? Level { get; private set; }
 
         private Enums.EMemberCategory? _memberCategory;
         public Enums.EMemberCategory? MemberCategory
@@ -435,35 +297,12 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
                 {
                     _memberCategory = cat;
                     RefreshMemberCategory(cat);
-                    OnPropertyChanged(nameof(MemberCategory));
                 }
             }
         }
 
-        private string _acct = "--";
-        public string Acct
-        {
-            get => _acct;
-            private set
-            {
-                if (_acct == value) return;
-                _acct = value;
-                OnPropertyChanged(nameof(Acct));
-            }
-        }
-
-        private int _achievLevel = 0;
-        public int AchievLevel
-        {
-            get => _achievLevel;
-            set
-            {
-                if (_achievLevel == value) return;
-                _achievLevel = value;
-                OnPropertyChanged(nameof(AchievLevel));
-            }
-        }
-
+        public string Acct { get; private set; } = "--";
+        public int AchievLevel { get; set; }
         public IReadOnlyList<string> HighAchievs { get; private set; }
 
         /// <summary>
