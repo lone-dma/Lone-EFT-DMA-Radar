@@ -28,8 +28,8 @@ SOFTWARE.
 
 using LoneEftDmaRadar.Misc.JSON;
 using LoneEftDmaRadar.UI.ColorPicker;
+using LoneEftDmaRadar.UI.Data;
 using LoneEftDmaRadar.UI.Loot;
-using LoneEftDmaRadar.UI.Misc;
 using System.Collections.ObjectModel;
 using VmmSharpEx.Extensions.Input;
 
@@ -326,13 +326,13 @@ namespace LoneEftDmaRadar
         private static readonly Lock _syncRoot = new();
 
         [JsonIgnore]
-        private static readonly FileInfo _configFile = new(Path.Combine(Program.ConfigPath.FullName, Filename));
+        private static readonly FileInfo _configFile = new(Path.Combine(App.ConfigPath.FullName, Filename));
 
         [JsonIgnore]
-        private static readonly FileInfo _tempFile = new(Path.Combine(Program.ConfigPath.FullName, Filename + ".tmp"));
+        private static readonly FileInfo _tempFile = new(Path.Combine(App.ConfigPath.FullName, Filename + ".tmp"));
 
         [JsonIgnore]
-        private static readonly FileInfo _backupFile = new(Path.Combine(Program.ConfigPath.FullName, Filename + ".bak"));
+        private static readonly FileInfo _backupFile = new(Path.Combine(App.ConfigPath.FullName, Filename + ".bak"));
 
         /// <summary>
         /// Loads the configuration from disk.
@@ -345,7 +345,7 @@ namespace LoneEftDmaRadar
             EftDmaConfig config;
             lock (_syncRoot)
             {
-                Program.ConfigPath.Create();
+                App.ConfigPath.Create();
                 if (_configFile.Exists)
                 {
                     config = TryLoad(_tempFile) ??
@@ -357,7 +357,7 @@ namespace LoneEftDmaRadar
                         var dlg = MessageBox.Show(
                             "Config File Corruption Detected! If you backed up your config, you may attempt to restore it.\n" +
                             "Press OK to Reset Config and continue startup, or CANCEL to terminate program.",
-                            Program.Name,
+                            App.Name,
                             MessageBoxButton.OKCancel,
                             MessageBoxImage.Error);
                         if (dlg == MessageBoxResult.Cancel)
@@ -383,7 +383,7 @@ namespace LoneEftDmaRadar
                 if (!file.Exists)
                     return null;
                 string json = File.ReadAllText(file.FullName);
-                return JsonSerializer.Deserialize<EftDmaConfig>(json, Program.JsonOptions);
+                return JsonSerializer.Deserialize<EftDmaConfig>(json, App.JsonOptions);
             }
             catch
             {
@@ -418,7 +418,7 @@ namespace LoneEftDmaRadar
 
         private static void SaveInternal(EftDmaConfig config)
         {
-            var json = JsonSerializer.Serialize(config, Program.JsonOptions);
+            var json = JsonSerializer.Serialize(config, App.JsonOptions);
             using (var fs = new FileStream(
                 _tempFile.FullName,
                 FileMode.Create,
@@ -481,7 +481,7 @@ namespace LoneEftDmaRadar
         /// Size of the Radar Window.
         /// </summary>
         [JsonPropertyName("windowSize")]
-        public SKSize WindowSize { get; set; } = new(1280, 720);
+        public Size WindowSize { get; set; } = new(1280, 720);
 
         /// <summary>
         /// Window is maximized.

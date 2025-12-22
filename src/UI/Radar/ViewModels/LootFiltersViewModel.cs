@@ -1,0 +1,389 @@
+﻿/*
+ * Lone EFT DMA Radar
+ * Brought to you by Lone (Lone DMA)
+ * 
+MIT License
+
+Copyright (c) 2025 Lone DMA
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ *
+*/
+
+using LoneEftDmaRadar.Tarkov;
+using LoneEftDmaRadar.UI.Loot;
+using LoneEftDmaRadar.UI.Misc;
+using LoneEftDmaRadar.UI.Radar.Views;
+using LoneEftDmaRadar.Web.TarkovDev.Data;
+using System.Collections.ObjectModel;
+using System.Windows.Data;
+using System.Windows.Input;
+
+namespace LoneEftDmaRadar.UI.Radar.ViewModels
+{
+    public sealed class LootFiltersViewModel : INotifyPropertyChanged
+    {
+        #region Startup
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string n = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(n));
+        }
+
+        public LootFiltersViewModel(LootFiltersTab parent)
+        {
+            FilterNames = new ObservableCollection<string>(App.Config.LootFilters.Filters.Keys);
+            AvailableItems = new ObservableCollection<TarkovMarketItem>(
+                TarkovDataManager.AllItems.Values.OrderBy(x => x.Name));
+
+            AddFilterCommand = new SimpleCommand(OnAddFilter);
+            RenameFilterCommand = new SimpleCommand(OnRenameFilter);
+            DeleteFilterCommand = new SimpleCommand(OnDeleteFilter);
+            ApplyColorToAllEntriesCommand = new SimpleCommand(OnApplyColorToAllEntries);
+
+            AddEntryCommand = new SimpleCommand(OnAddEntry);
+
+            if (FilterNames.Any())
+                SelectedFilterName = App.Config.LootFilters.Selected;
+            EnsureFirstItemSelected();
+            RefreshLootFilter();
+            parent.IsVisibleChanged += Parent_IsVisibleChanged;
+        }
+
+        private void Parent_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.NewValue is bool visible && !visible)
+            {
+                RefreshLootFilter();
+            }
+        }
+
+        #endregion
+
+        #region Top Section - Filters
+
+        private bool _currentFilterEnabled;
+        public bool CurrentFilterEnabled
+        {
+            get => _currentFilterEnabled;
+            set
+            {
+                if (_currentFilterEnabled == value) return;
+                _currentFilterEnabled = value;
+                // persist to config
+                App.Config.LootFilters.Filters[SelectedFilterName].Enabled = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _currentFilterColor;
+        public string CurrentFilterColor
+        {
+            get => _currentFilterColor;
+            set
+            {
+                if (_currentFilterColor == value) return;
+                _currentFilterColor = value;
+                // persist to config
+                if (!string.IsNullOrEmpty(SelectedFilterName))
+                    App.Config.LootFilters.Filters[SelectedFilterName].Color = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<string> FilterNames { get; } // ComboBox of filter names
+        private string _selectedFilterName;
+        public string SelectedFilterName
+        {
+            get => _selectedFilterName;
+            set
+            {
+                if (_selectedFilterName == value) return;
+                _selectedFilterName = value;
+                App.Config.LootFilters.Selected = value;
+                var userFilter = App.Config.LootFilters.Filters[value];
+                CurrentFilterEnabled = userFilter.Enabled;
+                CurrentFilterColor = userFilter.Color;
+                // Set parent filter reference for all entries
+                foreach (var entry in Entries)
+                    entry.ParentFilter = userFilter;
+                Entries = userFilter.Entries;
+                OnPropertyChanged();
+            }
+        }
+
+        public ICommand AddFilterCommand { get; }
+        private void OnAddFilter()
+        {
+            var dlg = new InputBoxWindow("Loot Filter", "Enter the name of the new loot filter:");
+            if (dlg.ShowDialog() != true)
+                return; // user cancelled
+            var name = dlg.InputText;
+            if (string.IsNullOrEmpty(name)) return;
+
+            try
+            {
+                if (!App.Config.LootFilters.Filters.TryAdd(name, new UserLootFilter
+                {
+                    Enabled = true,
+                    Entries = new()
+                }))
+                    throw new InvalidOperationException("That filter already exists.");
+
+                FilterNames.Add(name);
+                SelectedFilterName = name;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    MainWindow.Instance,
+                    $"ERROR Adding Filter: {ex.Message}",
+                    "Loot Filter",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        public ICommand RenameFilterCommand { get; }
+        private void OnRenameFilter()
+        {
+            var oldName = SelectedFilterName;
+            if (string.IsNullOrEmpty(oldName)) return;
+
+            var dlg = new InputBoxWindow($"Rename {oldName}", "Enter the new filter name:");
+            if (dlg.ShowDialog() != true)
+                return; // user cancelled
+            var newName = dlg.InputText;
+            if (string.IsNullOrEmpty(newName)) return;
+
+            try
+            {
+                if (App.Config.LootFilters.Filters.TryGetValue(oldName, out var filter)
+                    && App.Config.LootFilters.Filters.TryAdd(newName, filter)
+                    && App.Config.LootFilters.Filters.TryRemove(oldName, out _))
+                {
+                    var idx = FilterNames.IndexOf(oldName);
+                    FilterNames[idx] = newName;
+                    SelectedFilterName = newName;
+                }
+                else
+                {
+                    throw new InvalidOperationException("Rename failed.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    MainWindow.Instance,
+                    $"ERROR Renaming Filter: {ex.Message}",
+                    "Loot Filter",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        public ICommand DeleteFilterCommand { get; }
+        private void OnDeleteFilter()
+        {
+            var name = SelectedFilterName;
+            if (string.IsNullOrEmpty(name))
+            {
+                MessageBox.Show(
+                    MainWindow.Instance,
+                    "No loot filter selected!",
+                    "Loot Filter",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
+            var result = MessageBox.Show(
+                MainWindow.Instance,
+                $"Are you sure you want to delete '{name}'?",
+                "Loot Filter",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result != MessageBoxResult.Yes) return;
+
+            try
+            {
+                if (!App.Config.LootFilters.Filters.TryRemove(name, out _))
+                    throw new InvalidOperationException("Remove failed.");
+
+                // ensure at least one filter remains
+                if (App.Config.LootFilters.Filters.IsEmpty)
+                    App.Config.LootFilters.Filters.TryAdd("default", new UserLootFilter
+                    {
+                        Enabled = true,
+                        Entries = new()
+                    });
+
+                FilterNames.Clear();
+                foreach (var key in App.Config.LootFilters.Filters.Keys)
+                    FilterNames.Add(key);
+
+                SelectedFilterName = FilterNames[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    MainWindow.Instance,
+                    $"ERROR Deleting Filter: {ex.Message}",
+                    "Loot Filter",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        public ICommand ApplyColorToAllEntriesCommand { get; }
+        private void OnApplyColorToAllEntries()
+        {
+            foreach (var entry in Entries)
+            {
+                entry.Color = CurrentFilterColor;
+            }
+        }
+
+        #endregion
+
+        #region Bottom Section - Entries
+
+        public ObservableCollection<TarkovMarketItem> AvailableItems { get; } // List of items
+        private ICollectionView _filteredItems;
+        public ICollectionView FilteredItems // Filtered list of items
+        {
+            get
+            {
+                if (_filteredItems == null)
+                {
+                    // create the view once
+                    _filteredItems = CollectionViewSource.GetDefaultView(AvailableItems);
+                    _filteredItems.Filter = FilterPredicate;
+                }
+                return _filteredItems;
+            }
+        }
+
+        private TarkovMarketItem _selectedItemToAdd;
+        public TarkovMarketItem SelectedItemToAdd
+        {
+            get => _selectedItemToAdd;
+            set { if (_selectedItemToAdd != value) { _selectedItemToAdd = value; OnPropertyChanged(); } }
+        }
+
+        private void EnsureFirstItemSelected()
+        {
+            var first = FilteredItems.Cast<TarkovMarketItem>().FirstOrDefault();
+            SelectedItemToAdd = first;
+        }
+
+        private string _itemSearchText;
+        public string ItemSearchText
+        {
+            get => _itemSearchText;
+            set
+            {
+                if (_itemSearchText == value) return;
+                _itemSearchText = value;
+                OnPropertyChanged();
+                _filteredItems.Refresh(); // refresh the filter
+                EnsureFirstItemSelected();
+            }
+        }
+
+        public ICommand AddEntryCommand { get; }
+        private void OnAddEntry()
+        {
+            if (SelectedItemToAdd == null) return;
+
+            var currentFilter = App.Config.LootFilters.Filters[SelectedFilterName];
+            var entry = new LootFilterEntry
+            {
+                ItemID = SelectedItemToAdd.BsgId,
+                Color = null, // null means inherit from filter
+                ParentFilter = currentFilter
+            };
+
+            Entries.Add(entry);
+            SelectedItemToAdd = null;
+        }
+
+        public IEnumerable<LootFilterEntryType> FilterEntryTypes { get; } = Enum // ComboBox of Entry Types within DataGrid
+            .GetValues<LootFilterEntryType>()
+            .Cast<LootFilterEntryType>();
+
+        private ObservableCollection<LootFilterEntry> _entries = new();
+        public ObservableCollection<LootFilterEntry> Entries // Entries grid
+        {
+            get => _entries;
+            set
+            {
+                if (_entries != value)
+                {
+                    _entries = value;
+                    OnPropertyChanged(nameof(Entries));
+                }
+            }
+        }
+
+        #endregion
+
+        #region Misc
+
+        private bool FilterPredicate(object obj)
+        {
+            if (string.IsNullOrWhiteSpace(_itemSearchText))
+                return true;
+
+            var itm = obj as TarkovMarketItem;
+            return itm?.Name
+                       .IndexOf(_itemSearchText,
+                                StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        /// <summary>
+        /// Refreshes the FilteredLoot Filter.
+        /// Should be called at startup and during validation.
+        /// </summary>
+        private static void RefreshLootFilter()
+        {
+            /// Remove old filters (if any)
+            foreach (var item in TarkovDataManager.AllItems.Values)
+                item.SetFilter(null);
+            /// Set new filters
+            var currentFilters = App.Config.LootFilters.Filters
+                .Values
+                .Where(x => x.Enabled)
+                .SelectMany(x => x.Entries);
+            if (!currentFilters.Any())
+                return;
+            foreach (var filter in currentFilters)
+            {
+                if (string.IsNullOrEmpty(filter.ItemID))
+                    continue;
+                if (TarkovDataManager.AllItems.TryGetValue(filter.ItemID, out var item))
+                    item.SetFilter(filter);
+            }
+        }
+
+        #endregion
+    }
+}

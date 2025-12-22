@@ -32,8 +32,8 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
 using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
-using LoneEftDmaRadar.UI;
-using LoneEftDmaRadar.UI.Maps;
+using LoneEftDmaRadar.UI.Radar.Maps;
+using LoneEftDmaRadar.UI.Radar.ViewModels;
 using LoneEftDmaRadar.UI.Skia;
 using System.Collections.Frozen;
 using VmmSharpEx.Scatter;
@@ -632,7 +632,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                     var observed = this as ObservedPlayer;
                     string important = (observed is not null && observed.Equipment.CarryingImportantLoot) ?
                         "!!" : null; // Flag important loot
-                    if (!Program.Config.UI.HideNames) // show full names & info
+                    if (!App.Config.UI.HideNames) // show full names & info
                     {
                         string name = null;
                         if (IsError)
@@ -672,10 +672,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         private void DrawPlayerPill(SKCanvas canvas, LocalPlayer localPlayer, SKPoint point)
         {
-            if (this != localPlayer && RadarWindow.MouseoverGroup is int grp && grp == GroupID)
+            if (this != localPlayer && RadarViewModel.MouseoverGroup is int grp && grp == GroupID)
                 _paints.Item1 = SKPaints.PaintMouseoverGroup;
 
-            float scale = 1.65f * Program.Config.UI.UIScale;
+            float scale = 1.65f * App.Config.UI.UIScale;
 
             canvas.Save();
             canvas.Translate(point.X, point.Y);
@@ -687,11 +687,11 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             canvas.DrawPath(_playerPill, SKPaints.ShapeOutline); // outline
             canvas.DrawPath(_playerPill, _paints.Item1);
 
-            var aimlineLength = this == localPlayer || (IsFriendly && Program.Config.UI.TeammateAimlines) ?
-                Program.Config.UI.AimLineLength : 0;
+            var aimlineLength = this == localPlayer || (IsFriendly && App.Config.UI.TeammateAimlines) ?
+                App.Config.UI.AimLineLength : 0;
             if (!IsFriendly &&
-                !(IsAI && !Program.Config.UI.AIAimlines) &&
-                this.IsFacingTarget(localPlayer, Program.Config.UI.MaxDistance)) // Hostile Player, check if aiming at a friendly (High Alert)
+                !(IsAI && !App.Config.UI.AIAimlines) &&
+                this.IsFacingTarget(localPlayer, App.Config.UI.MaxDistance)) // Hostile Player, check if aiming at a friendly (High Alert)
                 aimlineLength = 9999;
 
             if (aimlineLength > 0)
@@ -709,7 +709,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         private static void DrawDeathMarker(SKCanvas canvas, SKPoint point)
         {
-            float scale = Program.Config.UI.UIScale;
+            float scale = App.Config.UI.UIScale;
 
             canvas.Save();
             canvas.Translate(point.X, point.Y);
@@ -723,9 +723,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         private void DrawPlayerText(SKCanvas canvas, SKPoint point, IList<string> lines)
         {
-            if (RadarWindow.MouseoverGroup is int grp && grp == GroupID)
+            if (RadarViewModel.MouseoverGroup is int grp && grp == GroupID)
                 _paints.Item2 = SKPaints.TextMouseoverGroup;
-            point.Offset(9.5f * Program.Config.UI.UIScale, 0);
+            point.Offset(9.5f * App.Config.UI.UIScale, 0);
             foreach (var line in lines)
             {
                 if (string.IsNullOrEmpty(line?.Trim()))
@@ -773,7 +773,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             if (this == localPlayer)
                 return;
             using var lines = new PooledList<string>();
-            var name = Program.Config.UI.HideNames && IsHuman ? "<Hidden>" : Name;
+            var name = App.Config.UI.HideNames && IsHuman ? "<Hidden>" : Name;
             string health = null;
             var obs = this as ObservedPlayer;
             if (obs is not null)

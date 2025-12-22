@@ -79,7 +79,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
                         _ = _quests.GetOrAdd(
                             qId,
                             id => new QuestEntry(id));
-                        if (Program.Config.QuestHelper.BlacklistedQuests.ContainsKey(qId))
+                        if (App.Config.QuestHelper.BlacklistedQuests.ContainsKey(qId))
                             continue; // Log the quest but dont get any conditions
                         //Logging.WriteLine($"[QuestManager] Processing Quest ID: {task.Id} {task.Name}");
                         using var completedHS = UnityHashSet<MongoID>.Create(Memory.ReadPtr(qDataEntry + Offsets.QuestsData.CompletedConditions), true);
