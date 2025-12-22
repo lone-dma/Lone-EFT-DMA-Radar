@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
@@ -177,8 +177,6 @@ namespace LoneEftDmaRadar.DMA
         private static void MemoryPrimaryWorker()
         {
             Logging.WriteLine("Memory thread starting...");
-            // Wait for RadarWindow to be initialized (give it a moment to start up)
-            Thread.Sleep(500);
             while (true)
             {
                 try
