@@ -205,13 +205,13 @@ namespace LoneEftDmaRadar
         {
             try
             {
+                if (!IsInstalled)
+                    return;
                 var updater = new UpdateManager(
                     source: new GithubSource(
                         repoUrl: "https://github.com/lone-dma/Lone-EFT-DMA-Radar",
                         accessToken: null,
                         prerelease: false));
-                if (!updater.IsInstalled)
-                    return;
 
                 var newVersion = await updater.CheckForUpdatesAsync();
                 if (newVersion is not null)
