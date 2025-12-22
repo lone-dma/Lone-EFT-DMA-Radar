@@ -59,7 +59,7 @@ namespace LoneEftDmaRadar.UI
         private static ImGuiController _imgui = null!;
         private static SKSurface _skSurface = null!;
         private static GRContext _grContext = null!;
-        private static bool _purgeSkResources = false;
+        private static volatile bool _purgeSkResources = false;
 
         private static readonly PeriodicTimer _fpsTimer = new(TimeSpan.FromSeconds(1));
         private static int _fpsCounter = 0;
