@@ -27,6 +27,7 @@ SOFTWARE.
 */
 
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Authentication;
@@ -77,7 +78,7 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
         {
             using var response = await QueryTarkovDevAsync();
             response.EnsureSuccessStatusCode();
-            var query = await JsonSerializer.DeserializeAsync<TarkovDevTypes.ApiResponse>(await response.Content.ReadAsStreamAsync(), Program.JsonOptions) ??
+            var query = await JsonSerializer.DeserializeAsync<TarkovDevTypes.ApiResponse>(await response.Content.ReadAsStreamAsync(), App.JsonOptions) ??
                 throw new InvalidOperationException("Failed to deserialize Tarkov.Dev Query Response.");
             ProcessRawQuery(query);
             return query.Data;
@@ -241,7 +242,7 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
                 """
                 }
             };
-            var client = Program.HttpClientFactory.CreateClient(nameof(TarkovDevGraphQLApi));
+            var client = App.HttpClientFactory.CreateClient(nameof(TarkovDevGraphQLApi));
             return await client.PostAsJsonAsync(
                 requestUri: "https://api.tarkov.dev/graphql",
                 value: query);

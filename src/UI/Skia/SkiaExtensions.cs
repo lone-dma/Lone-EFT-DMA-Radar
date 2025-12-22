@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.UI.Maps;
+using LoneEftDmaRadar.UI.Radar.Maps;
 
 namespace LoneEftDmaRadar.UI.Skia
 {
@@ -179,7 +179,7 @@ namespace LoneEftDmaRadar.UI.Skia
         /// </summary>
         public static SKPath GetUpArrow(this SKPoint point, float size = 6f, float offsetX = 0f, float offsetY = 0f)
         {
-            float scale = size * Program.Config.UI.UIScale;
+            float scale = size * App.Config.UI.UIScale;
             float tx = point.X + offsetX;
             float ty = point.Y + offsetY;
 
@@ -199,7 +199,7 @@ namespace LoneEftDmaRadar.UI.Skia
         /// </summary>
         public static SKPath GetDownArrow(this SKPoint point, float size = 6f, float offsetX = 0f, float offsetY = 0f)
         {
-            float scale = size * Program.Config.UI.UIScale;
+            float scale = size * App.Config.UI.UIScale;
             float tx = point.X + offsetX;
             float ty = point.Y + offsetY;
 
@@ -217,7 +217,7 @@ namespace LoneEftDmaRadar.UI.Skia
         /// </summary>
         public static void DrawHazardMarker(this SKPoint zoomedMapPos, SKCanvas canvas)
         {
-            float scale = Program.Config.UI.UIScale;
+            float scale = App.Config.UI.UIScale;
 
             canvas.Save();
             canvas.Translate(zoomedMapPos.X, zoomedMapPos.Y);

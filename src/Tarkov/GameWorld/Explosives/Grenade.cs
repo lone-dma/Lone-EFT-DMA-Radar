@@ -29,7 +29,7 @@ SOFTWARE.
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
-using LoneEftDmaRadar.UI.Maps;
+using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Skia;
 using VmmSharpEx.Extensions;
 using VmmSharpEx.Scatter;
@@ -105,8 +105,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Explosives
             if (_isSmoke)
                 return;
             var circlePosition = Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);
-            var size = 5f * Program.Config.UI.UIScale;
-            SKPaints.ShapeOutline.StrokeWidth = SKPaints.PaintExplosives.StrokeWidth + 2f * Program.Config.UI.UIScale;
+            var size = 5f * App.Config.UI.UIScale;
+            SKPaints.ShapeOutline.StrokeWidth = SKPaints.PaintExplosives.StrokeWidth + 2f * App.Config.UI.UIScale;
             canvas.DrawCircle(circlePosition, size, SKPaints.ShapeOutline); // Draw outline
             canvas.DrawCircle(circlePosition, size, SKPaints.PaintExplosives); // draw LocalPlayer marker
         }

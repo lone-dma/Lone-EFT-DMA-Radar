@@ -30,6 +30,7 @@ using Collections.Pooled;
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
+using SkiaSharp.Views.WPF;
 
 namespace LoneEftDmaRadar.UI.Skia
 {
@@ -38,8 +39,8 @@ namespace LoneEftDmaRadar.UI.Skia
         /// <summary>
         /// Constructs a Player Info Overlay.
         /// </summary>
-        public PlayerInfoWidget(SKSize canvasSize, SKRect location, bool minimized, float scale)
-            : base(canvasSize, "Player Info", new SKPoint(location.Left, location.Top),
+        public PlayerInfoWidget(SKGLElement parent, SKRect location, bool minimized, float scale)
+            : base(parent, "Player Info", new SKPoint(location.Left, location.Top),
                 new SKSize(location.Width, location.Height), scale, false)
         {
             Minimized = minimized;
@@ -135,7 +136,7 @@ namespace LoneEftDmaRadar.UI.Skia
 
             foreach (var player in filteredPlayers)
             {
-                string name = (Program.Config.UI.HideNames && player.IsHuman) ? "<Hidden>" : player.Name;
+                string name = (App.Config.UI.HideNames && player.IsHuman) ? "<Hidden>" : player.Name;
                 char faction = player.PlayerSide.ToString()[0];
 
                 // Defaults

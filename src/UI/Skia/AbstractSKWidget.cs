@@ -27,16 +27,18 @@ SOFTWARE.
 */
 
 using LoneEftDmaRadar.Misc;
+using SkiaSharp.Views.WPF;
 
 namespace LoneEftDmaRadar.UI.Skia
 {
     /// <summary>
-    /// Base class for interactive Skia widgets.
+    /// Base class for interactive Skia widgets hosted in an <see cref="SKGLElement"/>.
     /// Provides dragging, optional resizing, minimizing and basic chrome rendering.
     /// </summary>
     public abstract class AbstractSKWidget : IDisposable
     {
         private readonly Lock _sync = new();
+        private readonly SKGLElement _parent;
 
         private bool _titleDrag;
         private bool _resizeDrag;
@@ -45,7 +47,6 @@ namespace LoneEftDmaRadar.UI.Skia
 
         private SKPoint _location = new(1, 1);
         private SKSize _size = new(200, 200);
-        private SKSize _canvasSize;
         private SKPath _resizeTriangle;
         private float _relativeX;
         private float _relativeY;
@@ -55,11 +56,6 @@ namespace LoneEftDmaRadar.UI.Skia
         protected virtual float BaseFontSize => 9f;
         protected virtual float TitleBarBaseHeight => 12.5f;
         protected virtual float ResizeGlyphBaseSize => 10.5f;
-
-        /// <summary>
-        /// Top margin to account for ImGui main menu bar.
-        /// </summary>
-        protected virtual float TopMargin => 20f;
 
         private float TitleBarHeight => TitleBarBaseHeight * ScaleFactor;
         private SKRect TitleBar => new(Rectangle.Left, Rectangle.Top, Rectangle.Right, Rectangle.Top + TitleBarHeight);
@@ -71,7 +67,6 @@ namespace LoneEftDmaRadar.UI.Skia
         protected SKPath ResizeTriangle => _resizeTriangle;
 
         public bool Minimized { get; protected set; }
-        public bool IsMinimized => Minimized;
 
         public SKRect ClientRectangle => new(
             Rectangle.Left,
@@ -100,9 +95,15 @@ namespace LoneEftDmaRadar.UI.Skia
                     _size = clamped;
                     InitializeResizeTriangle();
 
-                    if (_canvasSize.Width > 0 && _canvasSize.Height > 0)
+                    // NEW: ensure widget remains in bounds after size change (removes need for Location = Location hack)
+                    var canvasSize = _parent.CanvasSize;
+                    if (canvasSize.Width > 0 && canvasSize.Height > 0)
                     {
-                        var canvasRect = new SKRect(0, 0, _canvasSize.Width, _canvasSize.Height);
+                        var canvasRect = new SKRect(
+                            0, 0,
+                            (int)Math.Round(canvasSize.Width),
+                            (int)Math.Round(canvasSize.Height));
+
                         CorrectLocationBounds(canvasRect);
                         _relativeX = canvasRect.Width > 0 ? _location.X / canvasRect.Width : 0f;
                         _relativeY = canvasRect.Height > 0 ? _location.Y / canvasRect.Height : 0f;
@@ -122,10 +123,14 @@ namespace LoneEftDmaRadar.UI.Skia
                         (value.Y != 0f && !value.Y.IsNormalOrZero()))
                         return;
 
-                    if (_canvasSize.Width <= 0 || _canvasSize.Height <= 0)
+                    var canvasSize = _parent.CanvasSize;
+                    if (canvasSize.Width <= 0 || canvasSize.Height <= 0)
                         return;
 
-                    var canvasRect = new SKRect(0, 0, _canvasSize.Width, _canvasSize.Height);
+                    var canvasRect = new SKRect(
+                        0, 0,
+                        (int)Math.Round(canvasSize.Width),
+                        (int)Math.Round(canvasSize.Height));
 
                     _location = value;
                     CorrectLocationBounds(canvasRect);
@@ -144,46 +149,48 @@ namespace LoneEftDmaRadar.UI.Skia
             Location.Y + Size.Height + TitleBarHeight);
 
         protected AbstractSKWidget(
-            SKSize canvasSize,
+            SKGLElement parent,
             string title,
             SKPoint location,
             SKSize clientSize,
             float scaleFactor,
             bool canResize = true)
         {
-            _canvasSize = canvasSize;
+            _parent = parent;
             Title = title;
             CanResize = canResize;
             ScaleFactor = scaleFactor;
             Size = clientSize;
             Location = location;
+            HookParentEvents(parent);
             InitializeResizeTriangle();
         }
 
-        /// <summary>
-        /// Update the canvas size (call on window resize).
-        /// </summary>
-        public void UpdateCanvasSize(SKSize newSize)
+        private void HookParentEvents(SKGLElement parent)
         {
-            if (newSize.Width <= 0 || newSize.Height <= 0)
-                return;
-
-            lock (_sync)
-            {
-                _canvasSize = newSize;
-                var cr = new SKRect(0, 0, newSize.Width, newSize.Height);
-                Location = new SKPoint(cr.Width * _relativeX, cr.Height * _relativeY);
-            }
+            parent.MouseLeave += Parent_MouseLeave;
+            parent.MouseMove += Parent_MouseMove;
+            parent.MouseDown += Parent_MouseDown;
+            parent.MouseUp += Parent_MouseUp;
+            parent.SizeChanged += Parent_SizeChanged;
         }
 
-        /// <summary>
-        /// Handle mouse down event from the radar.
-        /// </summary>
-        public void HandleMouseDown(Vector2 position)
+        private void UnhookParentEvents(SKGLElement parent)
         {
-            _lastMousePosition = position;
-            var pt = new SKPoint(position.X, position.Y);
+            parent.MouseLeave -= Parent_MouseLeave;
+            parent.MouseDown -= Parent_MouseDown;
+            parent.MouseUp -= Parent_MouseUp;
+            parent.MouseMove -= Parent_MouseMove;
+            parent.SizeChanged -= Parent_SizeChanged;
+        }
 
+        private void Parent_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var element = (IInputElement)sender;
+            var pos = e.GetPosition(element);
+            _lastMousePosition = new((float)pos.X, (float)pos.Y);
+
+            var pt = new SKPoint(_lastMousePosition.X, _lastMousePosition.Y);
             switch (HitTest(pt))
             {
                 case SKWidgetClickEvent.ClickedMinimize:
@@ -198,42 +205,26 @@ namespace LoneEftDmaRadar.UI.Skia
             }
         }
 
-        /// <summary>
-        /// Handle mouse up event.
-        /// </summary>
-        public void HandleMouseUp() => CancelInteractions();
+        private void Parent_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e) => CancelInteractions();
+        private void Parent_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e) => CancelInteractions();
 
-        /// <summary>
-        /// Handle mouse leave event.
-        /// </summary>
-        public void HandleMouseLeave() => CancelInteractions();
-
-        /// <summary>
-        /// Handle mouse move event.
-        /// </summary>
-        public void HandleMouseMove(Vector2 position)
+        private readonly RateLimiter _mouseMoveRL = new(TimeSpan.FromSeconds(1d / 60));
+        private void Parent_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            var posF = new SKPoint(position.X, position.Y);
+            if (!_mouseMoveRL.TryEnter())
+                return;
+            var element = (IInputElement)sender;
+            var pos = e.GetPosition(element);
+            var posF = new SKPoint((float)pos.X, (float)pos.Y);
 
             if (_resizeDrag && CanResize)
             {
-                // Calculate new size based on distance from location (top-left of widget)
-                // The resize handle is at the bottom-right of the client area
-                float newWidth = posF.X - _location.X;
-                float newHeight = posF.Y - _location.Y - TitleBarHeight;
-
-                if (newWidth > 0 && newHeight > 0)
+                if (posF.X >= Rectangle.Left && posF.Y >= Rectangle.Top)
                 {
-                    // Clamp size to canvas bounds to prevent location correction from moving the widget
-                    if (_canvasSize.Width > 0 && _canvasSize.Height > 0)
-                    {
-                        float maxWidth = _canvasSize.Width - _location.X;
-                        float maxHeight = _canvasSize.Height - _location.Y - TitleBarHeight;
-                        newWidth = Math.Min(newWidth, maxWidth);
-                        newHeight = Math.Min(newHeight, maxHeight);
-                    }
-
-                    Size = new SKSize(newWidth, newHeight);
+                    var newSize = new SKSize(
+                        Math.Abs(posF.X - Rectangle.Left),
+                        Math.Abs(posF.Y - Rectangle.Top));
+                    Size = newSize;
                 }
             }
             else if (_titleDrag)
@@ -244,15 +235,21 @@ namespace LoneEftDmaRadar.UI.Skia
                     Location = new SKPoint(Location.X + dx, Location.Y + dy);
             }
 
-            _lastMousePosition = position;
+            _lastMousePosition = new Vector2(posF.X, posF.Y);
         }
 
-        /// <summary>
-        /// Check if mouse position is over this widget.
-        /// </summary>
-        public bool ContainsPoint(Vector2 position)
+        private void Parent_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            return Rectangle.Contains(position.X, position.Y);
+            var canvasSize = _parent.CanvasSize;
+            var cr = new SKRect(
+                0, 0,
+                (int)Math.Round(canvasSize.Width),
+                (int)Math.Round(canvasSize.Height));
+            if (cr.Width <= 0 || cr.Height <= 0)
+                return;
+            Location = new SKPoint(
+                cr.Width * _relativeX,
+                cr.Height * _relativeY);
         }
 
         public virtual void Draw(SKCanvas canvas)
@@ -286,9 +283,13 @@ namespace LoneEftDmaRadar.UI.Skia
             Font.Size = BaseFontSize * newScale;
             InitializeResizeTriangle();
 
-            if (_canvasSize.Width > 0 && _canvasSize.Height > 0)
+            // After scale change, size/title bar changes may push widget off screen.
+            var canvasSize = _parent.CanvasSize;
+            if (canvasSize.Width > 0 && canvasSize.Height > 0)
             {
-                var canvasRect = new SKRect(0, 0, _canvasSize.Width, _canvasSize.Height);
+                var canvasRect = new SKRect(0, 0,
+                    (int)Math.Round(canvasSize.Width),
+                    (int)Math.Round(canvasSize.Height));
                 CorrectLocationBounds(canvasRect);
                 _relativeX = canvasRect.Width > 0 ? _location.X / canvasRect.Width : 0f;
                 _relativeY = canvasRect.Height > 0 ? _location.Y / canvasRect.Height : 0f;
@@ -304,9 +305,13 @@ namespace LoneEftDmaRadar.UI.Skia
         private void ToggleMinimized()
         {
             Minimized = !Minimized;
-            if (_canvasSize.Width > 0 && _canvasSize.Height > 0)
+            // Re-run bounds to keep title visible
+            var canvasSize = _parent.CanvasSize;
+            if (canvasSize.Width > 0 && canvasSize.Height > 0)
             {
-                var canvasRect = new SKRect(0, 0, _canvasSize.Width, _canvasSize.Height);
+                var canvasRect = new SKRect(0, 0,
+                    (int)Math.Round(canvasSize.Width),
+                    (int)Math.Round(canvasSize.Height));
                 CorrectLocationBounds(canvasRect);
                 _relativeX = canvasRect.Width > 0 ? _location.X / canvasRect.Width : 0f;
                 _relativeY = canvasRect.Height > 0 ? _location.Y / canvasRect.Height : 0f;
@@ -327,16 +332,13 @@ namespace LoneEftDmaRadar.UI.Skia
                     _location.Y + TitleBarHeight)
                 : Rectangle;
 
-            // Apply top margin to keep widgets below the menu bar
-            float minTop = clientRectangle.Top + TopMargin;
-
             if (rect.Left < clientRectangle.Left)
                 _location = new SKPoint(clientRectangle.Left, _location.Y);
             else if (rect.Right > clientRectangle.Right)
                 _location = new SKPoint(clientRectangle.Right - rect.Width, _location.Y);
 
-            if (rect.Top < minTop)
-                _location = new SKPoint(_location.X, minTop);
+            if (rect.Top < clientRectangle.Top)
+                _location = new SKPoint(_location.X, clientRectangle.Top);
             else if (rect.Bottom > clientRectangle.Bottom)
                 _location = new SKPoint(_location.X, clientRectangle.Bottom - rect.Height);
         }
@@ -448,6 +450,7 @@ namespace LoneEftDmaRadar.UI.Skia
         {
             if (Interlocked.Exchange(ref _disposed, true))
                 return;
+            UnhookParentEvents(_parent);
             ResizeTriangle?.Dispose();
             GC.SuppressFinalize(this);
         }

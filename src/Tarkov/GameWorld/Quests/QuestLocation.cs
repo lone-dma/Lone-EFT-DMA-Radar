@@ -1,7 +1,7 @@
 ﻿using Collections.Pooled;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.Unity;
-using LoneEftDmaRadar.UI.Maps;
+using LoneEftDmaRadar.UI.Radar.Maps;
 using LoneEftDmaRadar.UI.Skia;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
@@ -79,7 +79,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Quests
             }
             else // marker is level with player
             {
-                var squareSize = 8 * Program.Config.UI.UIScale;
+                var squareSize = 8 * App.Config.UI.UIScale;
                 canvas.DrawRect(point.X, point.Y,
                     squareSize, squareSize, SKPaints.ShapeOutline);
                 canvas.DrawRect(point.X, point.Y,

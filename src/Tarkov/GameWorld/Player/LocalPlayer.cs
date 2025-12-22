@@ -72,7 +72,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         {
             try
             {
-                if (Program.Config.AimviewWidget.Enabled)
+                if (App.Config.AimviewWidget.Enabled)
                 {
                     _lookRaycastTransform ??= new UnityTransform(
                         transformInternal: Memory.ReadPtrChain(Memory.ReadPtr(this + Offsets.Player._playerLookRaycastTransform), true, 0x10),
@@ -115,7 +115,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         {
             try
             {
-                if (Program.Config.AimviewWidget.Enabled && _lookRaycastTransform is UnityTransform existing)
+                if (App.Config.AimviewWidget.Enabled && _lookRaycastTransform is UnityTransform existing)
                 {
                     round1.PrepareReadPtr(existing.TransformInternal + UnitySDK.UnityOffsets.TransformAccess_HierarchyOffset); // Transform Hierarchy
                     round1.Completed += (sender, s1) =>

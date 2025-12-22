@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.UI;
 using System.Runtime;
 
 namespace LoneEftDmaRadar.Misc
@@ -71,9 +70,7 @@ namespace LoneEftDmaRadar.Misc
         }
 
         /// <summary>
-        /// Runs resource cleanup on the Program.
-        /// NOTE: This is called from background threads, so we cannot perform GPU operations here.
-        /// GPU resource purging must be done on the render thread.
+        /// Runs resource cleanup on the app.
         /// </summary>
         public static void Run(bool aggressive = true)
         {
@@ -81,7 +78,7 @@ namespace LoneEftDmaRadar.Misc
             {
                 try
                 {
-                    RadarWindow.PurgeSKResources();
+                    MainWindow.Instance?.Radar?.ViewModel?.PurgeSKResources();
                     if (aggressive)
                     {
                         GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;

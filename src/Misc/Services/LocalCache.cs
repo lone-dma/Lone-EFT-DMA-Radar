@@ -33,7 +33,7 @@ namespace LoneEftDmaRadar.Misc.Services
 {
     internal static class LocalCache
     {
-        private static readonly string _dbPath = Path.Combine(Program.ConfigPath.FullName, "cache.db");
+        private static readonly string _dbPath = Path.Combine(App.ConfigPath.FullName, "cache.db");
         private static readonly LiteDatabase _db;
 
         static LocalCache()

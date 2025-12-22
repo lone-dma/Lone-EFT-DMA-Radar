@@ -53,7 +53,7 @@ namespace LoneEftDmaRadar.DMA
 
         private const string GAME_PROCESS_NAME = "EscapeFromTarkov.exe";
         internal const uint MAX_READ_SIZE = 0x1000u * 1500u;
-        private static readonly string _mmap = Path.Combine(Program.ConfigPath.FullName, "mmap.txt");
+        private static readonly string _mmap = Path.Combine(App.ConfigPath.FullName, "mmap.txt");
         private static Vmm _vmm;
         private static InputManager _input;
         private static uint _pid;
@@ -77,8 +77,8 @@ namespace LoneEftDmaRadar.DMA
         {
             await Task.Run(() =>
             {
-                FpgaAlgo fpgaAlgo = Program.Config.DMA.FpgaAlgo;
-                bool useMemMap = Program.Config.DMA.MemMapEnabled;
+                FpgaAlgo fpgaAlgo = App.Config.DMA.FpgaAlgo;
+                bool useMemMap = App.Config.DMA.MemMapEnabled;
                 Logging.WriteLine("Initializing DMA...");
                 /// Check MemProcFS Versions...
                 string vmmVersion = FileVersionInfo.GetVersionInfo("vmm.dll").FileVersion;
@@ -135,7 +135,7 @@ namespace LoneEftDmaRadar.DMA
                     {
                         MessageBox.Show(
                             messageBoxText: $"WARNING: Failed to initialize InputManager (win32). Please note, this only works on Windows 11 (Game PC). Startup will continue without hotkeys.\n\n{ex}",
-                            caption: Program.Name,
+                            caption: App.Name,
                             button: MessageBoxButton.OK,
                             icon: MessageBoxImage.Warning,
                             defaultResult: MessageBoxResult.OK,
@@ -178,8 +178,8 @@ namespace LoneEftDmaRadar.DMA
         private static void MemoryPrimaryWorker()
         {
             Logging.WriteLine("Memory thread starting...");
-            // Wait for RadarWindow to be initialized (give it a moment to start up)
-            Thread.Sleep(500);
+            while (MainWindow.Instance is null)
+                Thread.Sleep(1);
             while (true)
             {
                 try

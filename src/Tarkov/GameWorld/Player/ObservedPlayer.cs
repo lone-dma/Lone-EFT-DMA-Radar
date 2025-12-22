@@ -30,7 +30,7 @@ using LoneEftDmaRadar.Misc.Services;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
 using LoneEftDmaRadar.Tarkov.Unity.Collections;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
-using LoneEftDmaRadar.UI.Panels;
+using LoneEftDmaRadar.UI.Radar.ViewModels;
 using LoneEftDmaRadar.Web.ProfileApi;
 using LoneEftDmaRadar.Web.ProfileApi.Schema;
 using VmmSharpEx.Scatter;
@@ -240,13 +240,12 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 {
                     EFTProfileService.RegisterProfile(Profile);
                 }
-                PlayerHistoryPanel.AddToPlayerHistory(this); /// Log To Player History
+                PlayerHistoryViewModel.Add(this); /// Log To Player History
             }
             if (IsHumanHostile) /// Special Players Check on Hostiles Only
             {
-                var watchlist = Program.Config.PlayerWatchlist;
-                var watchlistEntry = watchlist?.FirstOrDefault(e => e.AcctID == AccountID);
-                if (watchlistEntry is not null) // player is on watchlist
+                if (MainWindow.Instance?.PlayerWatchlist?.ViewModel is PlayerWatchlistViewModel vm &&
+                    vm.Watchlist.TryGetValue(AccountID, out var watchlistEntry)) // player is on watchlist
                 {
                     Type = PlayerType.SpecialPlayer; // Flag watchlist player
                     UpdateAlerts($"[Watchlist] {watchlistEntry.Reason} @ {watchlistEntry.Timestamp}");
