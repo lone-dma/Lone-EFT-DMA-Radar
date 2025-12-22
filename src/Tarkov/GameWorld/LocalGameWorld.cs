@@ -331,7 +331,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             var ct = e.CancellationToken;
             ValidatePlayerTransforms(); // Check for transform anomalies
             Loot.Refresh(ct);
-            if (App.Config.Loot.ShowWishlist)
+            if (Program.Config.Loot.ShowWishlist)
                 Memory.LocalPlayer?.RefreshWishlist(ct);
             RefreshEquipment(ct);
             RefreshQuestHelper(ct);
@@ -352,7 +352,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
 
         private void RefreshQuestHelper(CancellationToken ct)
         {
-            if (App.Config.QuestHelper.Enabled)
+            if (Program.Config.QuestHelper.Enabled)
             {
                 QuestManager.Refresh(ct);
             }

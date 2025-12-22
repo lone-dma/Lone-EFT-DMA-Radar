@@ -31,51 +31,31 @@ using LoneEftDmaRadar.Tarkov;
 namespace LoneEftDmaRadar.UI.Loot
 {
     /// <summary>
-    /// JSON Wrapper for Important FilteredLoot, now with INotifyPropertyChanged.
+    /// JSON Wrapper for Important FilteredLoot.
     /// </summary>
-    public sealed class LootFilterEntry : INotifyPropertyChanged
+    public sealed class LootFilterEntry
     {
-        private string _itemID = string.Empty;
         /// <summary>
         /// Item's BSG ID.
         /// </summary>
         [JsonPropertyName("itemID")]
-        public string ItemID
-        {
-            get => _itemID;
-            set
-            {
-                if (_itemID == value) return;
-                _itemID = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(Name));   // update Name too
-            }
-        }
+        public string ItemID { get; set; } = string.Empty;
 
-        private bool _enabled = true;
         /// <summary>
         /// True if this entry is Enabled/Active.
         /// </summary>
         [JsonPropertyName("enabled")]
-        public bool Enabled
-        {
-            get => _enabled;
-            set { if (_enabled != value) { _enabled = value; OnPropertyChanged(); } }
-        }
+        public bool Enabled { get; set; } = true;
 
-        private LootFilterEntryType _type = LootFilterEntryType.ImportantLoot;
         /// <summary>
         /// Entry Type (0 = Important FilteredLoot, 1 = Blacklisted FilteredLoot)
         /// </summary>
         [JsonPropertyName("type")]
-        public LootFilterEntryType Type
-        {
-            get => _type;
-            set { if (_type != value) { _type = value; OnPropertyChanged(); } }
-        }
+        public LootFilterEntryType Type { get; set; } = LootFilterEntryType.ImportantLoot;
 
         [JsonIgnore]
         public bool Important => Type == LootFilterEntryType.ImportantLoot;
+
         [JsonIgnore]
         public bool Blacklisted => Type == LootFilterEntryType.BlacklistedLoot;
 
@@ -83,45 +63,27 @@ namespace LoneEftDmaRadar.UI.Loot
         /// Item Long Name per Tarkov Market.
         /// </summary>
         [JsonIgnore]
-        public string Name
-        {
-            get
-            {
-                // lazy‑load via your EftDataManager
-                return TarkovDataManager.AllItems?
-                           .FirstOrDefault(x => x.Key.Equals(ItemID, StringComparison.OrdinalIgnoreCase))
-                           .Value?.Name
-                       ?? "NULL";
-            }
-        }
+        public string Name =>
+            TarkovDataManager.AllItems?
+                .FirstOrDefault(x => x.Key.Equals(ItemID, StringComparison.OrdinalIgnoreCase))
+                .Value?.Name
+            ?? "NULL";
 
-        private string _comment = string.Empty;
         /// <summary>
-        /// Entry Comment (name of item,etc.)
+        /// Entry Comment (name of item, etc.)
         /// </summary>
         [JsonPropertyName("comment")]
-        public string Comment
-        {
-            get => _comment;
-            set { if (_comment != value) { _comment = value; OnPropertyChanged(); } }
-        }
+        public string Comment { get; set; } = string.Empty;
 
-        private string _color = null;
+        private string _color;
         /// <summary>
         /// Hex value of the rgba color. If not set, inherits from parent filter.
         /// </summary>
         [JsonPropertyName("color")]
         public string Color
         {
-            get => _color ??= ParentFilter?.Color ?? SKColors.Turquoise.ToString(); // Also sets _color if null
-            set
-            {
-                if (_color != value)
-                {
-                    _color = value;
-                    OnPropertyChanged();
-                }
-            }
+            get => _color ??= ParentFilter?.Color ?? SKColors.Turquoise.ToString();
+            set => _color = value;
         }
 
         /// <summary>
@@ -129,10 +91,6 @@ namespace LoneEftDmaRadar.UI.Loot
         /// </summary>
         [JsonIgnore]
         public UserLootFilter ParentFilter { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged([CallerMemberName] string propName = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
 
         public sealed class EntryType
         {

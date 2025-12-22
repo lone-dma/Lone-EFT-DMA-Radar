@@ -30,7 +30,7 @@ using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.UI.Loot;
-using LoneEftDmaRadar.UI.Radar.Maps;
+using LoneEftDmaRadar.UI.Maps;
 using LoneEftDmaRadar.UI.Skia;
 using LoneEftDmaRadar.Web.TarkovDev.Data;
 
@@ -38,7 +38,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
 {
     public class LootItem : IMouseoverEntity, IMapEntity, IWorldEntity
     {
-        private static EftDmaConfig Config { get; } = App.Config;
+        private static EftDmaConfig Config { get; } = Program.Config;
         private readonly TarkovMarketItem _item;
 
         public LootItem(TarkovMarketItem item, Vector3 position)
@@ -145,7 +145,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             {
                 if (Blacklisted)
                     return false;
-                return Price >= App.Config.Loot.MinValue;
+                return Price >= Program.Config.Loot.MinValue;
             }
         }
 
@@ -158,7 +158,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             {
                 if (Blacklisted)
                     return false;
-                return Price >= App.Config.Loot.MinValueValuable;
+                return Price >= Program.Config.Loot.MinValueValuable;
             }
         }
 
@@ -171,7 +171,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             {
                 if (Blacklisted)
                     return false;
-                return _item.Important || (Config.Loot.ShowWishlist && IsWishlisted) || (App.Config.QuestHelper.Enabled && IsQuestHelperItem);
+                return _item.Important || (Config.Loot.ShowWishlist && IsWishlisted) || (Program.Config.QuestHelper.Enabled && IsQuestHelperItem);
             }
         }
 
@@ -201,12 +201,12 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             }
             else // loot is level with player
             {
-                var size = 5 * App.Config.UI.UIScale;
+                var size = 5 * Program.Config.UI.UIScale;
                 canvas.DrawCircle(point, size, SKPaints.ShapeOutline);
                 canvas.DrawCircle(point, size, paints.Item1);
             }
 
-            point.Offset(7 * App.Config.UI.UIScale, 3 * App.Config.UI.UIScale);
+            point.Offset(7 * Program.Config.UI.UIScale, 3 * Program.Config.UI.UIScale);
 
             canvas.DrawText(
                 label,
@@ -248,7 +248,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
 
         private ValueTuple<SKPaint, SKPaint> GetPaints()
         {
-            if (App.Config.QuestHelper.Enabled && IsQuestHelperItem)
+            if (Program.Config.QuestHelper.Enabled && IsQuestHelperItem)
                 return new(SKPaints.PaintQuestItem, SKPaints.TextQuestItem);
             if (Config.Loot.ShowWishlist && IsWishlisted)
                 return new(SKPaints.PaintWishlistItem, SKPaints.TextWishlistItem);
@@ -291,7 +291,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
                     var paint = new SKPaint
                     {
                         Color = skColor,
-                        StrokeWidth = 3f * App.Config.UI.UIScale,
+                        StrokeWidth = 3f * Program.Config.UI.UIScale,
                         Style = SKPaintStyle.Fill,
                         IsAntialias = true
                     };
@@ -305,7 +305,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
                 },
                 (key, existingValue) =>
                 {
-                    existingValue.Item1.StrokeWidth = 3f * App.Config.UI.UIScale;
+                    existingValue.Item1.StrokeWidth = 3f * Program.Config.UI.UIScale;
                     return existingValue;
                 });
 

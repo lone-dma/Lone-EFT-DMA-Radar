@@ -29,7 +29,6 @@ SOFTWARE.
 using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
-using SkiaSharp.Views.WPF;
 
 namespace LoneEftDmaRadar.UI.Skia
 {
@@ -47,8 +46,8 @@ namespace LoneEftDmaRadar.UI.Skia
         private static IEnumerable<LootItem> FilteredLoot => Memory.Loot?.FilteredLoot;
         private static IEnumerable<StaticLootContainer> Containers => Memory.Loot?.StaticContainers;
 
-        public AimviewWidget(SKGLElement parent, SKRect location, bool minimized, float scale)
-            : base(parent, "Aimview",
+        public AimviewWidget(SKSize canvasSize, SKRect location, bool minimized, float scale)
+            : base(canvasSize, "Aimview",
                 new SKPoint(location.Left, location.Top),
                 new SKSize(location.Width, location.Height),
                 scale)
@@ -87,10 +86,10 @@ namespace LoneEftDmaRadar.UI.Skia
                 // Precompute scale factors once per frame
                 UpdateMatrix(localPlayer);
 
-                if (App.Config.Loot.Enabled)
+                if (Program.Config.Loot.Enabled)
                 {
                     DrawLoot(localPlayer);
-                    if (App.Config.Containers.Enabled)
+                    if (Program.Config.Containers.Enabled)
                         DrawContainers(localPlayer);
                 }
 
@@ -141,15 +140,15 @@ namespace LoneEftDmaRadar.UI.Skia
             if (players is null)
                 return;
 
-            float minRadius = 1.5f * App.Config.UI.UIScale;
-            float maxRadius = 12f * App.Config.UI.UIScale;
+            float minRadius = 1.5f * Program.Config.UI.UIScale;
+            float maxRadius = 12f * Program.Config.UI.UIScale;
 
             foreach (var player in players)
             {
                 if (WorldToScreen(in player.Position, out var screen))
                 {
                     float distance = Vector3.Distance(localPlayer.LookPosition, player.Position);
-                    if (distance > App.Config.UI.MaxDistance)
+                    if (distance > Program.Config.UI.MaxDistance)
                         continue;
 
                     float radius = Math.Clamp(maxRadius - MathF.Sqrt(distance) * 0.65f, minRadius, maxRadius);
@@ -190,7 +189,7 @@ namespace LoneEftDmaRadar.UI.Skia
 
             foreach (var container in containers)
             {
-                if (!(MainWindow.Instance?.Settings?.ViewModel?.ContainerIsTracked(container.ID ?? "NULL") ?? false))
+                if (!Program.Config.Containers.Selected.ContainsKey(container.ID ?? "NULL"))
                     continue;
 
                 var cPos = container.Position;
@@ -331,7 +330,5 @@ namespace LoneEftDmaRadar.UI.Skia
 
             return !(scr.X < 0 || scr.X > w || scr.Y < 0 || scr.Y > h);
         }
-
-
     }
 }
