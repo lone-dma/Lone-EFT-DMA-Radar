@@ -45,10 +45,6 @@ namespace LoneEftDmaRadar.UI.Hotkeys.Internal
         /// Action Name used for lookup.
         /// </summary>
         public string Name { get; }
-        /// <summary>
-        /// GUI Thread/Window to execute delegate(s) on.
-        /// </summary>
-        private MainWindow Window { get; set; }
 
         private HotkeyActionController() { }
 
@@ -81,9 +77,6 @@ namespace LoneEftDmaRadar.UI.Hotkeys.Internal
         /// <param name="isKeyDown">True if Hotkey is currently down.</param>
         public void Execute(bool isKeyDown)
         {
-            Window ??= MainWindow.Instance; // Get Main Form Window if not set.
-            if (Window is null)
-                return; // No Window, cannot execute.
             bool keyDown = !_state && isKeyDown;
             bool keyUp = _state && !isKeyDown;
             if (keyDown || keyUp) // State has changed
@@ -92,18 +85,12 @@ namespace LoneEftDmaRadar.UI.Hotkeys.Internal
                 switch (_type)
                 {
                     case HotkeyType.OnKeyStateChanged:
-                        Window?.Dispatcher.InvokeAsync(() =>
-                        {
-                            _delegate.Invoke(isKeyDown);
-                        });
+                        _delegate.Invoke(isKeyDown);
                         break;
                     case HotkeyType.OnIntervalElapsed:
                         if (isKeyDown) // Key Down
                         {
-                            Window?.Dispatcher.InvokeAsync(() =>
-                            {
-                                _delegate.Invoke(true); // Initial Invoke
-                            });
+                            _delegate.Invoke(true); // Initial Invoke
                             _timer.Start(); // Start Callback Timer
                         }
                         else // Key Up
@@ -120,10 +107,7 @@ namespace LoneEftDmaRadar.UI.Hotkeys.Internal
         /// </summary>
         private void OnHotkeyIntervalElapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            Window?.Dispatcher.InvokeAsync(() =>
-            {
-                _delegate.Invoke(true);
-            });
+            _delegate.Invoke(true);
         }
 
         public override string ToString() => Name;

@@ -260,7 +260,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
                 if (_data == value) return;
                 _data = value;
                 RefreshProfile();
-                if (App.Config.UI.MarkSusPlayers)
+                if (Program.Config.UI.MarkSusPlayers)
                 {
                     FocusIfSus();
                 }

@@ -21,11 +21,11 @@
                 _isEnabled = value;
                 if (value) // Enabled
                 {
-                    App.Config.QuestHelper.BlacklistedQuests.TryRemove(Id, out _);
+                    Program.Config.QuestHelper.BlacklistedQuests.TryRemove(Id, out _);
                 }
                 else
                 {
-                    App.Config.QuestHelper.BlacklistedQuests.TryAdd(Id, 0);
+                    Program.Config.QuestHelper.BlacklistedQuests.TryAdd(Id, 0);
                 }
                 OnPropertyChanged(nameof(IsEnabled));
             }
@@ -41,7 +41,7 @@
             {
                 Name = id;
             }
-            _isEnabled = !App.Config.QuestHelper.BlacklistedQuests.ContainsKey(id);
+            _isEnabled = !Program.Config.QuestHelper.BlacklistedQuests.ContainsKey(id);
         }
 
         public override string ToString() => Name;
