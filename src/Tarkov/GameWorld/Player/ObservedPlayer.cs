@@ -31,6 +31,7 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
 using LoneEftDmaRadar.Tarkov.Unity.Collections;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.UI;
+using LoneEftDmaRadar.UI.Panels;
 using LoneEftDmaRadar.Web.ProfileApi;
 using LoneEftDmaRadar.Web.ProfileApi.Schema;
 using VmmSharpEx.Scatter;
@@ -240,7 +241,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 {
                     EFTProfileService.RegisterProfile(Profile);
                 }
-                RadarUIState.Instance.AddToPlayerHistory(this); /// Log To Player History
+                PlayerHistoryPanel.AddToPlayerHistory(this); /// Log To Player History
             }
             if (IsHumanHostile) /// Special Players Check on Hostiles Only
             {

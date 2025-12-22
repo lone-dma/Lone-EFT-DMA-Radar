@@ -38,7 +38,7 @@ namespace LoneEftDmaRadar.UI.Hotkeys
     /// </summary>
     internal static class HotkeyManagerPanel
     {
-        private static bool _isOpen;
+        // Panel-local state
         private static int _selectedActionIndex = -1;
         private static int _selectedKeyIndex = -1;
         private static string[] _actionNames;
@@ -46,6 +46,11 @@ namespace LoneEftDmaRadar.UI.Hotkeys
         private static Win32VirtualKey[] _keyValues;
         private static Win32VirtualKey? _keyToRemove;
         private static bool _initialized;
+
+        /// <summary>
+        /// Whether the hotkey manager panel is open.
+        /// </summary>
+        public static bool IsOpen { get; set; }
 
         private static void Initialize()
         {
@@ -82,18 +87,17 @@ namespace LoneEftDmaRadar.UI.Hotkeys
         {
             Initialize();
 
-            var state = RadarUIState.Instance;
-            _isOpen = state.IsHotkeyManagerOpen;
+            bool isOpen = IsOpen;
 
             ImGui.SetNextWindowSize(new Vector2(550, 450), ImGuiCond.FirstUseEver);
-            if (!ImGui.Begin("Hotkey Manager", ref _isOpen))
+            if (!ImGui.Begin("Hotkey Manager", ref isOpen))
             {
-                state.IsHotkeyManagerOpen = _isOpen;
+                IsOpen = isOpen;
                 ImGui.End();
                 return;
             }
 
-            state.IsHotkeyManagerOpen = _isOpen;
+            IsOpen = isOpen;
 
             // Refresh action names if needed
             if (_actionNames is null || _actionNames.Length == 0)
@@ -189,6 +193,8 @@ namespace LoneEftDmaRadar.UI.Hotkeys
             {
                 // Selection changed
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Select the action to bind");
 
             ImGui.SameLine();
 
@@ -198,6 +204,8 @@ namespace LoneEftDmaRadar.UI.Hotkeys
             {
                 // Selection changed
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Select the key to bind");
 
             ImGui.SameLine();
 
@@ -237,6 +245,8 @@ namespace LoneEftDmaRadar.UI.Hotkeys
                     _selectedKeyIndex = -1;
                 }
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Add the hotkey binding");
 
             if (!canAdd)
                 ImGui.EndDisabled();

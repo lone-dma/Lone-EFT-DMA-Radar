@@ -39,7 +39,7 @@ namespace LoneEftDmaRadar.UI.Panels
     /// </summary>
     internal static class LootFiltersPanel
     {
-        private static readonly RadarUIState _state = RadarUIState.Instance;
+        // Panel-local state
         private static List<TarkovMarketItem> _allItems;
         private static List<TarkovMarketItem> _filteredItems;
         private static string _itemSearchText = string.Empty;
@@ -54,6 +54,26 @@ namespace LoneEftDmaRadar.UI.Panels
         private static readonly Dictionary<int, Vector3> _entryColors = new();
         private static readonly Dictionary<int, string> _entryColorHexes = new();
 
+        // Filter management state (moved from RadarUIState)
+        private static readonly List<string> _filterNames = new();
+        private static readonly List<LootFilterEntry> _currentFilterEntries = new();
+
+        /// <summary>
+        /// Currently selected filter name.
+        /// </summary>
+        public static string SelectedFilterName
+        {
+            get => Program.Config.LootFilters.Selected;
+            set
+            {
+                if (Program.Config.LootFilters.Selected != value)
+                {
+                    Program.Config.LootFilters.Selected = value;
+                    RefreshCurrentFilterEntries();
+                }
+            }
+        }
+
         /// <summary>
         /// Initialize the loot filters panel.
         /// </summary>
@@ -62,19 +82,44 @@ namespace LoneEftDmaRadar.UI.Panels
             _allItems = TarkovDataManager.AllItems.Values.OrderBy(x => x.Name).ToList();
             _filteredItems = new List<TarkovMarketItem>(_allItems);
             RefreshFilterIndex();
-            _state.RefreshCurrentFilterEntries();
+            RefreshCurrentFilterEntries();
             UpdateFilterColorFromCurrent();
+        }
+
+        private static void RefreshFilterNames()
+        {
+            _filterNames.Clear();
+            _filterNames.AddRange(Program.Config.LootFilters.Filters.Keys);
         }
 
         private static void RefreshFilterIndex()
         {
-            _state.RefreshFilterNames();
-            _selectedFilterIndex = _state.FilterNames.IndexOf(_state.SelectedFilterName);
-            if (_selectedFilterIndex < 0 && _state.FilterNames.Count > 0)
+            RefreshFilterNames();
+            _selectedFilterIndex = _filterNames.IndexOf(SelectedFilterName);
+            if (_selectedFilterIndex < 0 && _filterNames.Count > 0)
             {
                 _selectedFilterIndex = 0;
-                _state.SelectedFilterName = _state.FilterNames[0];
+                SelectedFilterName = _filterNames[0];
             }
+        }
+
+        private static void RefreshCurrentFilterEntries()
+        {
+            _currentFilterEntries.Clear();
+            if (Program.Config.LootFilters.Filters.TryGetValue(SelectedFilterName, out var filter))
+            {
+                foreach (var entry in filter.Entries)
+                {
+                    entry.ParentFilter = filter;
+                    _currentFilterEntries.Add(entry);
+                }
+            }
+        }
+
+        private static UserLootFilter GetCurrentFilter()
+        {
+            Program.Config.LootFilters.Filters.TryGetValue(SelectedFilterName, out var filter);
+            return filter;
         }
 
         /// <summary>
@@ -85,19 +130,19 @@ namespace LoneEftDmaRadar.UI.Panels
             ImGui.SeparatorText("Filter Selection");
 
             // Filter dropdown
-            if (_state.FilterNames.Count > 0)
+            if (_filterNames.Count > 0)
             {
-                string currentFilter = _state.SelectedFilterName ?? string.Empty;
+                string currentFilter = SelectedFilterName ?? string.Empty;
                 if (ImGui.BeginCombo("Active Filter", currentFilter))
                 {
-                    for (int i = 0; i < _state.FilterNames.Count; i++)
+                    for (int i = 0; i < _filterNames.Count; i++)
                     {
                         bool isSelected = (i == _selectedFilterIndex);
-                        if (ImGui.Selectable(_state.FilterNames[i], isSelected))
+                        if (ImGui.Selectable(_filterNames[i], isSelected))
                         {
                             _selectedFilterIndex = i;
-                            _state.SelectedFilterName = _state.FilterNames[i];
-                            _state.RefreshCurrentFilterEntries();
+                            SelectedFilterName = _filterNames[i];
+                            RefreshCurrentFilterEntries();
                             UpdateFilterColorFromCurrent();
                         }
                         if (isSelected)
@@ -105,6 +150,8 @@ namespace LoneEftDmaRadar.UI.Panels
                     }
                     ImGui.EndCombo();
                 }
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Select which loot filter to edit");
             }
 
             // Filter management buttons
@@ -113,17 +160,23 @@ namespace LoneEftDmaRadar.UI.Panels
                 _newFilterName = string.Empty;
                 _showAddFilterPopup = true;
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Create a new loot filter");
             ImGui.SameLine();
             if (ImGui.Button("Rename"))
             {
-                _renameFilterName = _state.SelectedFilterName ?? string.Empty;
+                _renameFilterName = SelectedFilterName ?? string.Empty;
                 _showRenamePopup = true;
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Rename the current filter");
             ImGui.SameLine();
             if (ImGui.Button("Delete"))
             {
                 DeleteCurrentFilter();
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Delete the current filter");
 
             // Add Filter Popup
             if (_showAddFilterPopup)
@@ -178,7 +231,7 @@ namespace LoneEftDmaRadar.UI.Panels
             ImGui.Separator();
 
             // Current filter settings
-            var currentFilterObj = _state.GetCurrentFilter();
+            var currentFilterObj = GetCurrentFilter();
             if (currentFilterObj is not null)
             {
                 bool filterEnabled = currentFilterObj.Enabled;
@@ -187,6 +240,8 @@ namespace LoneEftDmaRadar.UI.Panels
                     currentFilterObj.Enabled = filterEnabled;
                     RefreshLootFilter();
                 }
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Enable or disable this filter");
 
                 // Filter color with color picker
                 ImGui.Text("Filter Color:");
@@ -198,6 +253,8 @@ namespace LoneEftDmaRadar.UI.Panels
                 {
                     ImGui.OpenPopup("FilterColorPicker");
                 }
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Click to change filter color");
 
                 // Color picker popup
                 if (ImGui.BeginPopup("FilterColorPicker"))
@@ -214,17 +271,15 @@ namespace LoneEftDmaRadar.UI.Panels
                 if (ImGui.Button("Apply to all"))
                 {
                     string filterColor = currentFilterObj.Color;
-                    foreach (var entry in _state.CurrentFilterEntries)
+                    foreach (var entry in _currentFilterEntries)
                     {
-                        entry.Color = filterColor; // Set to filter color to indicate inheritance
+                        entry.Color = filterColor;
                     }
                     _entryColors.Clear();
                     _entryColorHexes.Clear();
                 }
                 if (ImGui.IsItemHovered())
-                {
                     ImGui.SetTooltip("Reset all entries to inherit filter color");
-                }
             }
 
             ImGui.SeparatorText("Add Item to Filter");
@@ -234,6 +289,8 @@ namespace LoneEftDmaRadar.UI.Panels
             {
                 FilterItems();
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Search for items to add to the filter");
 
             // Item list
             if (ImGui.BeginListBox("##ItemList", new Vector2(-1, 150)))
@@ -257,6 +314,8 @@ namespace LoneEftDmaRadar.UI.Panels
                 AddItemToFilter(_filteredItems[_selectedItemIndex]);
                 RefreshLootFilter();
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Add the selected item to this filter");
 
             ImGui.SeparatorText("Filter Entries");
 
@@ -272,7 +331,7 @@ namespace LoneEftDmaRadar.UI.Panels
                 var entriesToRemove = new List<LootFilterEntry>();
                 int entryIndex = 0;
 
-                foreach (var entry in _state.CurrentFilterEntries)
+                foreach (var entry in _currentFilterEntries)
                 {
                     ImGui.TableNextRow();
 
@@ -356,7 +415,7 @@ namespace LoneEftDmaRadar.UI.Panels
                 // Remove entries outside of enumeration
                 foreach (var entry in entriesToRemove)
                 {
-                    _state.CurrentFilterEntries.Remove(entry);
+                    _currentFilterEntries.Remove(entry);
                     currentFilterObj?.Entries.Remove(entry);
                 }
 
@@ -374,7 +433,7 @@ namespace LoneEftDmaRadar.UI.Panels
 
         private static void UpdateFilterColorFromCurrent()
         {
-            var currentFilter = _state.GetCurrentFilter();
+            var currentFilter = GetCurrentFilter();
             if (currentFilter is not null)
             {
                 // Use the filter's saved color (already has a default of Turquoise in UserLootFilter)
@@ -435,9 +494,9 @@ namespace LoneEftDmaRadar.UI.Panels
                 }
 
                 RefreshFilterIndex();
-                _state.SelectedFilterName = name;
-                _selectedFilterIndex = _state.FilterNames.IndexOf(name);
-                _state.RefreshCurrentFilterEntries();
+                SelectedFilterName = name;
+                _selectedFilterIndex = _filterNames.IndexOf(name);
+                RefreshCurrentFilterEntries();
                 UpdateFilterColorFromCurrent();
             }
             catch (Exception ex)
@@ -451,7 +510,7 @@ namespace LoneEftDmaRadar.UI.Panels
             if (string.IsNullOrWhiteSpace(newName))
                 return;
 
-            string oldName = _state.SelectedFilterName;
+            string oldName = SelectedFilterName;
             if (string.IsNullOrEmpty(oldName))
                 return;
 
@@ -462,8 +521,8 @@ namespace LoneEftDmaRadar.UI.Panels
                     && Program.Config.LootFilters.Filters.TryRemove(oldName, out _))
                 {
                     RefreshFilterIndex();
-                    _state.SelectedFilterName = newName;
-                    _selectedFilterIndex = _state.FilterNames.IndexOf(newName);
+                    SelectedFilterName = newName;
+                    _selectedFilterIndex = _filterNames.IndexOf(newName);
                 }
                 else
                 {
@@ -478,7 +537,7 @@ namespace LoneEftDmaRadar.UI.Panels
 
         private static void DeleteCurrentFilter()
         {
-            string name = _state.SelectedFilterName;
+            string name = SelectedFilterName;
             if (string.IsNullOrEmpty(name))
             {
                 MessageBox.Show("No loot filter selected!", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -509,7 +568,7 @@ namespace LoneEftDmaRadar.UI.Panels
                 }
 
                 RefreshFilterIndex();
-                _state.RefreshCurrentFilterEntries();
+                RefreshCurrentFilterEntries();
             }
             catch (Exception ex)
             {
@@ -519,7 +578,7 @@ namespace LoneEftDmaRadar.UI.Panels
 
         private static void AddItemToFilter(TarkovMarketItem item)
         {
-            var currentFilter = _state.GetCurrentFilter();
+            var currentFilter = GetCurrentFilter();
             if (currentFilter is null)
                 return;
 
@@ -531,7 +590,7 @@ namespace LoneEftDmaRadar.UI.Panels
             };
 
             currentFilter.Entries.Add(entry);
-            _state.CurrentFilterEntries.Add(entry);
+            _currentFilterEntries.Add(entry);
         }
 
         /// <summary>

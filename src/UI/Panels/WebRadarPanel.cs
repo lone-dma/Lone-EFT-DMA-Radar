@@ -27,6 +27,7 @@ SOFTWARE.
 */
 
 using ImGuiNET;
+using LoneEftDmaRadar.UI.Misc;
 using LoneEftDmaRadar.Web.WebRadar;
 
 namespace LoneEftDmaRadar.UI.Panels
@@ -36,12 +37,16 @@ namespace LoneEftDmaRadar.UI.Panels
     /// </summary>
     internal static class WebRadarPanel
     {
-        private static readonly RadarUIState _state = RadarUIState.Instance;
+        // Panel-local state (moved from RadarUIState)
         private static string _bindAddress;
         private static string _port;
         private static string _tickRate;
         private static bool _upnpEnabled;
-        private static string _password;
+        private static readonly string _password;
+        private static bool _isRunning;
+        private static string _startButtonText = "Start";
+        private static string _serverUrl = string.Empty;
+        private static bool _uiEnabled = true;
 
         static WebRadarPanel()
         {
@@ -60,8 +65,7 @@ namespace LoneEftDmaRadar.UI.Panels
         {
             ImGui.SeparatorText("Web Radar Server");
 
-            bool uiEnabled = _state.IsWebRadarUiEnabled;
-            if (!uiEnabled)
+            if (!_uiEnabled)
             {
                 ImGui.BeginDisabled();
             }
@@ -73,6 +77,8 @@ namespace LoneEftDmaRadar.UI.Panels
             {
                 Program.Config.WebRadar.IP = _bindAddress;
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("IP address to bind the server to (0.0.0.0 for all interfaces)");
             ImGui.SameLine();
             ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "(e.g., 0.0.0.0 for all interfaces)");
 
@@ -85,6 +91,8 @@ namespace LoneEftDmaRadar.UI.Panels
                     Program.Config.WebRadar.Port = _port;
                 }
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Port number for the web radar server");
 
             ImGui.Text("Tick Rate (Hz):");
             ImGui.SetNextItemWidth(100);
@@ -95,11 +103,15 @@ namespace LoneEftDmaRadar.UI.Panels
                     Program.Config.WebRadar.TickRate = _tickRate;
                 }
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Update frequency in Hz (higher = more responsive, more bandwidth)");
 
             if (ImGui.Checkbox("Enable UPnP", ref _upnpEnabled))
             {
                 Program.Config.WebRadar.UPnP = _upnpEnabled;
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Automatically configure port forwarding on your router");
             ImGui.SameLine();
             ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "(Automatic port forwarding)");
 
@@ -109,8 +121,10 @@ namespace LoneEftDmaRadar.UI.Panels
             ImGui.Text("Session Password:");
             ImGui.SameLine();
             ImGui.TextColored(new Vector4(0.2f, 0.8f, 0.2f, 1f), _password);
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Auto-generated password for this session");
 
-            if (!uiEnabled)
+            if (!_uiEnabled)
             {
                 ImGui.EndDisabled();
             }
@@ -118,25 +132,29 @@ namespace LoneEftDmaRadar.UI.Panels
             ImGui.Separator();
 
             // Start/Stop Button
-            if (ImGui.Button(_state.WebRadarStartButtonText, new Vector2(150, 30)))
+            if (ImGui.Button(_startButtonText, new Vector2(150, 30)))
             {
-                if (!_state.IsWebRadarRunning)
+                if (!_isRunning)
                 {
                     StartServer();
                 }
             }
+            if (ImGui.IsItemHovered() && !_isRunning)
+                ImGui.SetTooltip("Start the web radar server");
 
             // Server URL
-            if (!string.IsNullOrEmpty(_state.WebRadarServerUrl))
+            if (!string.IsNullOrEmpty(_serverUrl))
             {
                 ImGui.Separator();
                 ImGui.Text("Server URL:");
-                ImGui.TextWrapped(_state.WebRadarServerUrl);
+                ImGui.TextWrapped(_serverUrl);
 
                 if (ImGui.Button("Copy URL"))
                 {
                     CopyUrlToClipboard();
                 }
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Copy the URL to share with teammates");
             }
 
             ImGui.Separator();
@@ -151,8 +169,8 @@ namespace LoneEftDmaRadar.UI.Panels
 
         private static async void StartServer()
         {
-            _state.IsWebRadarUiEnabled = false;
-            _state.WebRadarStartButtonText = "Starting...";
+            _uiEnabled = false;
+            _startButtonText = "Starting...";
 
             try
             {
@@ -163,16 +181,16 @@ namespace LoneEftDmaRadar.UI.Panels
                 var externalIP = await WebRadarServer.GetExternalIPAsync();
                 await WebRadarServer.StartAsync(bindIP, port, tickRate, _upnpEnabled);
 
-                _state.IsWebRadarRunning = true;
-                _state.WebRadarStartButtonText = "Running...";
-                _state.WebRadarServerUrl = $"http://dc64dcid9fd4.cloudfront.net/?host={externalIP}&port={port}&password={_password}";
+                _isRunning = true;
+                _startButtonText = "Running...";
+                _serverUrl = $"http://dc64dcid9fd4.cloudfront.net/?host={externalIP}&port={port}&password={_password}";
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"ERROR Starting Web Radar Server: {ex.Message}", "Web Radar",
                     MessageBoxButton.OK, MessageBoxImage.Error);
-                _state.WebRadarStartButtonText = "Start";
-                _state.IsWebRadarUiEnabled = true;
+                _startButtonText = "Start";
+                _uiEnabled = true;
             }
         }
 
@@ -180,12 +198,11 @@ namespace LoneEftDmaRadar.UI.Panels
         {
             try
             {
-                var url = _state.WebRadarServerUrl;
-                if (!string.IsNullOrWhiteSpace(url))
+                if (!string.IsNullOrWhiteSpace(_serverUrl))
                 {
                     // Note: Clipboard access in non-WPF requires platform-specific handling
                     // For now, we'll use the Windows clipboard API via PInvoke
-                    Clipboard.SetText(url);
+                    Clipboard.SetText(_serverUrl);
                     MessageBox.Show("Web Radar URL copied to clipboard.", "Web Radar",
                         MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -194,76 +211,6 @@ namespace LoneEftDmaRadar.UI.Panels
             {
                 MessageBox.Show($"Failed to copy URL: {ex.Message}", "Web Radar",
                     MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Simple clipboard helper for non-WPF applications.
-    /// </summary>
-    internal static class Clipboard
-    {
-        [DllImport("user32.dll")]
-        private static extern bool OpenClipboard(IntPtr hWndNewOwner);
-
-        [DllImport("user32.dll")]
-        private static extern bool CloseClipboard();
-
-        [DllImport("user32.dll")]
-        private static extern bool EmptyClipboard();
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr SetClipboardData(uint uFormat, IntPtr hMem);
-
-        [DllImport("kernel32.dll")]
-        private static extern IntPtr GlobalAlloc(uint uFlags, UIntPtr dwBytes);
-
-        [DllImport("kernel32.dll")]
-        private static extern IntPtr GlobalLock(IntPtr hMem);
-
-        [DllImport("kernel32.dll")]
-        private static extern bool GlobalUnlock(IntPtr hMem);
-
-        private const uint CF_UNICODETEXT = 13;
-        private const uint GMEM_MOVEABLE = 0x0002;
-
-        public static void SetText(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-                return;
-
-            if (!OpenClipboard(IntPtr.Zero))
-                throw new Exception("Could not open clipboard");
-
-            try
-            {
-                EmptyClipboard();
-
-                var bytes = (text.Length + 1) * 2;
-                var hGlobal = GlobalAlloc(GMEM_MOVEABLE, (UIntPtr)bytes);
-                if (hGlobal == IntPtr.Zero)
-                    throw new Exception("Could not allocate memory");
-
-                var target = GlobalLock(hGlobal);
-                if (target == IntPtr.Zero)
-                    throw new Exception("Could not lock memory");
-
-                try
-                {
-                    Marshal.Copy(text.ToCharArray(), 0, target, text.Length);
-                    Marshal.WriteInt16(target, text.Length * 2, 0); // Null terminator
-                }
-                finally
-                {
-                    GlobalUnlock(hGlobal);
-                }
-
-                if (SetClipboardData(CF_UNICODETEXT, hGlobal) == IntPtr.Zero)
-                    throw new Exception("Could not set clipboard data");
-            }
-            finally
-            {
-                CloseClipboard();
             }
         }
     }

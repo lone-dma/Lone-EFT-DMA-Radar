@@ -28,6 +28,7 @@ SOFTWARE.
 
 using ImGuiNET;
 using LoneEftDmaRadar.UI.Maps;
+using LoneEftDmaRadar.UI.Misc;
 
 namespace LoneEftDmaRadar.UI.Panels
 {
@@ -36,18 +37,33 @@ namespace LoneEftDmaRadar.UI.Panels
     /// </summary>
     internal static class MapSetupHelperPanel
     {
-        private static readonly RadarUIState _state = RadarUIState.Instance;
+        // Panel-local state
         private static float _x;
         private static float _y;
         private static float _scale;
         private static bool _valuesLoaded;
 
         /// <summary>
+        /// Whether the map setup helper panel is open.
+        /// </summary>
+        public static bool IsOpen { get; set; }
+
+        /// <summary>
+        /// Whether the map setup helper overlay is shown.
+        /// </summary>
+        public static bool ShowOverlay { get; set; }
+
+        /// <summary>
+        /// Map setup helper coordinates display.
+        /// </summary>
+        public static string Coords { get; set; } = string.Empty;
+
+        /// <summary>
         /// Draw the Map Setup Helper window.
         /// </summary>
         public static void Draw()
         {
-            bool isOpen = _state.IsMapSetupHelperOpen;
+            bool isOpen = IsOpen;
             ImGui.SetNextWindowSize(new Vector2(350, 220), ImGuiCond.FirstUseEver);
 
             if (ImGui.Begin("Map Setup Helper", ref isOpen))
@@ -62,17 +78,7 @@ namespace LoneEftDmaRadar.UI.Panels
 
                 // Current coordinates display
                 ImGui.Text("Current Coordinates:");
-                ImGui.TextColored(new Vector4(0.2f, 0.8f, 0.2f, 1f), _state.MapSetupCoords);
-
-                ImGui.SameLine();
-                if (ImGui.Button("Copy##Coords"))
-                {
-                    try
-                    {
-                        Clipboard.SetText(_state.MapSetupCoords);
-                    }
-                    catch { }
-                }
+                ImGui.TextColored(new Vector4(0.2f, 0.8f, 0.2f, 1f), Coords);
 
                 ImGui.Separator();
 
@@ -90,14 +96,20 @@ namespace LoneEftDmaRadar.UI.Panels
                     ImGui.Text("X, Y:");
                     ImGui.SetNextItemWidth(120);
                     ImGui.InputFloat("##MapX", ref _x, 1f, 10f, "%.1f");
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip("Map X offset");
                     ImGui.SameLine();
                     ImGui.SetNextItemWidth(120);
                     ImGui.InputFloat("##MapY", ref _y, 1f, 10f, "%.1f");
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip("Map Y offset");
 
                     // Scale input
                     ImGui.Text("Scale:");
                     ImGui.SetNextItemWidth(120);
                     ImGui.InputFloat("##MapScale", ref _scale, 0.01f, 0.1f, "%.4f");
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip("Map scale factor");
 
                     ImGui.Spacing();
                     ImGui.Separator();
@@ -108,6 +120,8 @@ namespace LoneEftDmaRadar.UI.Panels
                     {
                         ApplyMapValues(currentMap);
                     }
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip("Apply changes to the map");
 
                     ImGui.SameLine();
 
@@ -116,10 +130,12 @@ namespace LoneEftDmaRadar.UI.Panels
                     {
                         LoadMapValues(currentMap);
                     }
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip("Reset to current map values");
                 }
             }
             ImGui.End();
-            _state.IsMapSetupHelperOpen = isOpen;
+            IsOpen = isOpen;
 
             // Reset loaded state when window closes
             if (!isOpen)

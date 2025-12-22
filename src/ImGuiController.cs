@@ -56,7 +56,6 @@ public sealed class ImGuiController : IDisposable
     private int _windowHeight;
 
     private readonly List<char> _pressedChars = [];
-    private readonly Key[] _allKeys = Enum.GetValues<Key>();
 
     /// <summary>
     /// Creates a new ImGuiController.
@@ -244,7 +243,7 @@ public sealed class ImGuiController : IDisposable
         if (linkStatus == 0)
         {
             var infoLog = _gl.GetProgramInfoLog(_shaderProgram);
-            throw new Exception($"Error linking shader program: {infoLog}");
+            throw new InvalidOperationException($"Error linking shader program: {infoLog}");
         }
 
         _gl.DeleteShader(vertexShader);
@@ -269,7 +268,7 @@ public sealed class ImGuiController : IDisposable
         if (compileStatus == 0)
         {
             var infoLog = _gl.GetShaderInfoLog(shader);
-            throw new Exception($"Error compiling {type}: {infoLog}");
+            throw new InvalidOperationException($"Error compiling {type}: {infoLog}");
         }
 
         return shader;

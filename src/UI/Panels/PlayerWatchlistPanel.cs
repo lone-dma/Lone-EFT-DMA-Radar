@@ -28,6 +28,7 @@ SOFTWARE.
 
 using ImGuiNET;
 using LoneEftDmaRadar.UI.Misc;
+using System.Collections.ObjectModel;
 
 namespace LoneEftDmaRadar.UI.Panels
 {
@@ -36,12 +37,73 @@ namespace LoneEftDmaRadar.UI.Panels
     /// </summary>
     internal static class PlayerWatchlistPanel
     {
-        private static readonly RadarUIState _state = RadarUIState.Instance;
+        // Panel-local state
         private static string _newAcctId = string.Empty;
         private static string _newReason = string.Empty;
         private static string _searchText = string.Empty;
         private static bool _showAddPopup = false;
         private static int _selectedIndex = -1;
+
+        // Watchlist lookup for fast access (moved from RadarUIState)
+        private static readonly ConcurrentDictionary<string, PlayerWatchlistEntry> _watchlistLookup = new(StringComparer.OrdinalIgnoreCase);
+        private static bool _initialized;
+
+        /// <summary>
+        /// Thread-safe watchlist lookup.
+        /// </summary>
+        public static IReadOnlyDictionary<string, PlayerWatchlistEntry> WatchlistLookup => _watchlistLookup;
+
+        /// <summary>
+        /// Observable watchlist entries (from config).
+        /// </summary>
+        private static ObservableCollection<PlayerWatchlistEntry> WatchlistEntries => Program.Config.PlayerWatchlist;
+
+        /// <summary>
+        /// Initialize the watchlist panel (call once at startup after config is loaded).
+        /// </summary>
+        public static void Initialize()
+        {
+            if (_initialized) return;
+            _initialized = true;
+
+            // Build initial lookup from config
+            foreach (var entry in WatchlistEntries)
+            {
+                _watchlistLookup.TryAdd(entry.AcctID, entry);
+            }
+
+            // Keep lookup in sync with collection changes
+            WatchlistEntries.CollectionChanged += (s, e) =>
+            {
+                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add && e.NewItems is not null)
+                {
+                    foreach (PlayerWatchlistEntry entry in e.NewItems)
+                        _watchlistLookup.TryAdd(entry.AcctID, entry);
+                }
+                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove && e.OldItems is not null)
+                {
+                    foreach (PlayerWatchlistEntry entry in e.OldItems)
+                        _watchlistLookup.TryRemove(entry.AcctID, out _);
+                }
+            };
+        }
+
+        /// <summary>
+        /// Add an entry to the watchlist.
+        /// </summary>
+        public static void AddToWatchlist(PlayerWatchlistEntry entry)
+        {
+            var existing = WatchlistEntries.FirstOrDefault(x =>
+                string.Equals(x.AcctID, entry.AcctID, StringComparison.OrdinalIgnoreCase));
+            if (existing is not null)
+            {
+                existing.Reason = $"{entry.Reason} | {existing.Reason}";
+            }
+            else
+            {
+                WatchlistEntries.Add(entry);
+            }
+        }
 
         /// <summary>
         /// Draw the player watchlist panel.
@@ -57,12 +119,16 @@ namespace LoneEftDmaRadar.UI.Panels
                 _newReason = string.Empty;
                 _showAddPopup = true;
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Manually add a player to the watchlist");
             ImGui.SameLine();
-            if (ImGui.Button("Remove Selected") && _selectedIndex >= 0 && _selectedIndex < _state.WatchlistEntries.Count)
+            if (ImGui.Button("Remove Selected") && _selectedIndex >= 0 && _selectedIndex < WatchlistEntries.Count)
             {
-                _state.WatchlistEntries.RemoveAt(_selectedIndex);
+                WatchlistEntries.RemoveAt(_selectedIndex);
                 _selectedIndex = -1;
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Remove the selected player from the watchlist");
 
             // Add Player Popup
             if (_showAddPopup)
@@ -87,7 +153,7 @@ namespace LoneEftDmaRadar.UI.Panels
                             Reason = _newReason.Trim(),
                             Timestamp = DateTime.Now
                         };
-                        _state.AddToWatchlist(entry);
+                        AddToWatchlist(entry);
                     }
                     _showAddPopup = false;
                     ImGui.CloseCurrentPopup();
@@ -106,6 +172,8 @@ namespace LoneEftDmaRadar.UI.Panels
             // Search
             ImGui.SetNextItemWidth(200);
             ImGui.InputText("Search", ref _searchText, 64);
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Filter watchlist by account ID or reason");
 
             // Watchlist table
             if (ImGui.BeginTable("WatchlistTable", 4,
@@ -121,7 +189,7 @@ namespace LoneEftDmaRadar.UI.Panels
                 var entriesToRemove = new List<PlayerWatchlistEntry>();
                 int displayIndex = 0;
 
-                foreach (var entry in _state.WatchlistEntries)
+                foreach (var entry in WatchlistEntries)
                 {
                     // Filter by search text
                     if (!string.IsNullOrWhiteSpace(_searchText))
@@ -140,7 +208,6 @@ namespace LoneEftDmaRadar.UI.Panels
                     if (ImGui.Selectable($"{entry.AcctID}##sel{displayIndex}", isSelected))
                     {
                         _selectedIndex = displayIndex;
-                        _state.SelectedWatchlistEntry = entry;
                     }
 
                     // Reason (editable)
@@ -175,12 +242,12 @@ namespace LoneEftDmaRadar.UI.Panels
                 // Remove entries outside enumeration
                 foreach (var entry in entriesToRemove)
                 {
-                    _state.WatchlistEntries.Remove(entry);
+                    WatchlistEntries.Remove(entry);
                 }
             }
 
             // Stats
-            ImGui.Text($"Total: {_state.WatchlistEntries.Count} players");
+            ImGui.Text($"Total: {WatchlistEntries.Count} players");
         }
     }
 }

@@ -36,10 +36,15 @@ namespace LoneEftDmaRadar.UI.ColorPicker
     /// </summary>
     internal static class ColorPickerPanel
     {
-        private static readonly RadarUIState _state = RadarUIState.Instance;
+        // Panel-local state
         private static Vector3 _editingColor = Vector3.One;
         private static ColorPickerOption? _selectedOption;
         private static string _hexInput = "#FFFFFF";
+
+        /// <summary>
+        /// Whether the color picker panel is open.
+        /// </summary>
+        public static bool IsOpen { get; set; }
 
         /// <summary>
         /// Initialize colors from config. Call once at startup.
@@ -105,14 +110,14 @@ namespace LoneEftDmaRadar.UI.ColorPicker
         /// </summary>
         public static void Draw()
         {
-            bool isOpen = _state.IsColorPickerOpen;
+            bool isOpen = IsOpen;
             if (!ImGui.Begin("Color Picker", ref isOpen, ImGuiWindowFlags.AlwaysAutoResize))
             {
-                _state.IsColorPickerOpen = isOpen;
+                IsOpen = isOpen;
                 ImGui.End();
                 return;
             }
-            _state.IsColorPickerOpen = isOpen;
+            IsOpen = isOpen;
 
             ImGui.Text("Select a color option to edit:");
 
@@ -139,6 +144,8 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                 }
                 ImGui.EndListBox();
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Select a UI element to customize its color");
 
             ImGui.Separator();
 
@@ -162,6 +169,8 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                         _editingColor = parsed;
                     }
                 }
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Enter color as hex code (e.g., #FF0000)");
 
                 ImGui.Spacing();
 
@@ -169,12 +178,16 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                 {
                     ApplyColor(_selectedOption.Value, _editingColor);
                 }
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Apply the selected color");
                 ImGui.SameLine();
                 if (ImGui.Button("Reset to Default"))
                 {
                     _editingColor = GetDefaultColor(_selectedOption.Value);
                     _hexInput = ColorToHex(_editingColor);
                 }
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Reset to the default color");
             }
 
             ImGui.End();

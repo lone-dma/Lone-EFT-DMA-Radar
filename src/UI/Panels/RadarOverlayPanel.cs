@@ -28,6 +28,7 @@ SOFTWARE.
 
 using ImGuiNET;
 using LoneEftDmaRadar.UI.Loot;
+using LoneEftDmaRadar.UI.Misc;
 
 namespace LoneEftDmaRadar.UI.Panels
 {
@@ -36,10 +37,18 @@ namespace LoneEftDmaRadar.UI.Panels
     /// </summary>
     internal static class RadarOverlayPanel
     {
-        private static readonly RadarUIState _state = RadarUIState.Instance;
+        // Panel-local state
         private static string _searchText = string.Empty;
         private static bool _lootOverlayVisible;
-        private static bool _mapSetupVisible;
+
+        /// <summary>
+        /// Apply loot search filter.
+        /// </summary>
+        private static void ApplyLootSearch()
+        {
+            LootFilter.SearchString = _searchText?.Trim();
+            Memory.Loot?.RefreshFilter();
+        }
 
         /// <summary>
         /// Draw the overlay controls at the top of the radar.
@@ -56,7 +65,7 @@ namespace LoneEftDmaRadar.UI.Panels
             if (ImGui.Begin("RadarTopBar", flags))
             {
                 // Map Free Toggle Button
-                bool isMapFree = _state.IsMapFreeEnabled;
+                bool isMapFree = RadarWindow.IsMapFreeEnabled;
                 if (isMapFree)
                 {
                     ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.2f, 0.6f, 0.2f, 1.0f));
@@ -66,12 +75,14 @@ namespace LoneEftDmaRadar.UI.Panels
 
                 if (ImGui.Button(isMapFree ? "Map Free: ON" : "Map Free: OFF"))
                 {
-                    _state.IsMapFreeEnabled = !isMapFree;
+                    RadarWindow.IsMapFreeEnabled = !isMapFree;
                     if (isMapFree) // Was on, now turning off
                     {
-                        _state.MapPanPosition = Vector2.Zero;
+                        RadarWindow.MapPanPosition = Vector2.Zero;
                     }
                 }
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Toggle free map panning (drag to move map)");
 
                 if (isMapFree)
                 {
@@ -84,9 +95,10 @@ namespace LoneEftDmaRadar.UI.Panels
                     ImGui.SameLine();
                     if (ImGui.Button("Loot"))
                     {
-                        _state.IsLootOverlayVisible = !_state.IsLootOverlayVisible;
-                        _lootOverlayVisible = _state.IsLootOverlayVisible;
+                        _lootOverlayVisible = !_lootOverlayVisible;
                     }
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip("Open loot filter options");
                 }
 
                 ImGui.End();
@@ -102,7 +114,6 @@ namespace LoneEftDmaRadar.UI.Panels
                 return;
 
             // Loot Options Panel - only show if toggled on
-            _lootOverlayVisible = _state.IsLootOverlayVisible;
             if (!_lootOverlayVisible)
                 return;
 
@@ -115,12 +126,10 @@ namespace LoneEftDmaRadar.UI.Panels
                 DrawLootOptions();
             }
             ImGui.End();
-            _state.IsLootOverlayVisible = _lootOverlayVisible;
         }
 
         private static void DrawLootOptions()
         {
-            // Use a wider layout with two columns for checkboxes
             ImGui.SetNextItemWidth(250);
 
             // Search
@@ -128,18 +137,20 @@ namespace LoneEftDmaRadar.UI.Panels
             ImGui.SetNextItemWidth(250);
             if (ImGui.InputText("##LootSearch", ref _searchText, 64))
             {
-                _state.LootSearchText = _searchText;
-                _state.ApplyLootSearch();
+                ApplyLootSearch();
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Search for specific items by name");
             if (!string.IsNullOrWhiteSpace(_searchText))
             {
                 ImGui.SameLine();
                 if (ImGui.Button("X##ClearSearch"))
                 {
                     _searchText = string.Empty;
-                    _state.LootSearchText = string.Empty;
-                    _state.ApplyLootSearch();
+                    ApplyLootSearch();
                 }
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Clear search");
             }
 
             ImGui.Separator();
@@ -156,6 +167,8 @@ namespace LoneEftDmaRadar.UI.Panels
                 Program.Config.Loot.MinValue = Math.Max(0, minValue);
                 Memory.Loot?.RefreshFilter();
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Minimum value to display regular loot");
             ImGui.SameLine(150);
             ImGui.SetNextItemWidth(140);
             int valuableMin = Program.Config.Loot.MinValueValuable;
@@ -164,6 +177,8 @@ namespace LoneEftDmaRadar.UI.Panels
                 Program.Config.Loot.MinValueValuable = Math.Max(0, valuableMin);
                 Memory.Loot?.RefreshFilter();
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Minimum value to highlight as valuable");
 
             ImGui.Separator();
 
@@ -174,6 +189,8 @@ namespace LoneEftDmaRadar.UI.Panels
                 Program.Config.Loot.PricePerSlot = pricePerSlot;
                 Memory.Loot?.RefreshFilter();
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Calculate value based on price per inventory slot");
             ImGui.SameLine(150);
             ImGui.Text("Mode:");
             ImGui.SameLine();
@@ -183,50 +200,64 @@ namespace LoneEftDmaRadar.UI.Panels
                 Program.Config.Loot.PriceMode = LootPriceMode.FleaMarket;
                 Memory.Loot?.RefreshFilter();
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Use flea market prices");
             ImGui.SameLine();
             if (ImGui.RadioButton("Trader", ref priceMode, 1))
             {
                 Program.Config.Loot.PriceMode = LootPriceMode.Trader;
                 Memory.Loot?.RefreshFilter();
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Use trader sell prices");
 
             ImGui.Separator();
 
-            // Category toggles - two columns
+            // Category toggles
             bool hideCorpses = Program.Config.Loot.HideCorpses;
             if (ImGui.Checkbox("Hide Corpses", ref hideCorpses))
             {
                 Program.Config.Loot.HideCorpses = hideCorpses;
                 Memory.Loot?.RefreshFilter();
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Hide player corpses from the radar");
             ImGui.SameLine(150);
-            bool showMeds = _state.ShowMeds;
+            bool showMeds = LootFilter.ShowMeds;
             if (ImGui.Checkbox("Show Meds", ref showMeds))
             {
-                _state.ShowMeds = showMeds;
+                LootFilter.ShowMeds = showMeds;
                 Memory.Loot?.RefreshFilter();
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Show medical items regardless of value");
 
-            bool showFood = _state.ShowFood;
+            bool showFood = LootFilter.ShowFood;
             if (ImGui.Checkbox("Show Food", ref showFood))
             {
-                _state.ShowFood = showFood;
+                LootFilter.ShowFood = showFood;
                 Memory.Loot?.RefreshFilter();
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Show food and drinks regardless of value");
             ImGui.SameLine(150);
-            bool showBackpacks = _state.ShowBackpacks;
+            bool showBackpacks = LootFilter.ShowBackpacks;
             if (ImGui.Checkbox("Show Backpacks", ref showBackpacks))
             {
-                _state.ShowBackpacks = showBackpacks;
+                LootFilter.ShowBackpacks = showBackpacks;
                 Memory.Loot?.RefreshFilter();
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Show backpacks regardless of value");
 
-            bool showQuestItems = _state.ShowQuestItems;
+            bool showQuestItems = LootFilter.ShowQuestItems;
             if (ImGui.Checkbox("Show Quest Items", ref showQuestItems))
             {
-                _state.ShowQuestItems = showQuestItems;
+                LootFilter.ShowQuestItems = showQuestItems;
                 Memory.Loot?.RefreshFilter();
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Show quest items for active quests");
         }
 
         /// <summary>
@@ -234,8 +265,8 @@ namespace LoneEftDmaRadar.UI.Panels
         /// </summary>
         public static void DrawMapSetupHelper()
         {
-            _mapSetupVisible = _state.ShowMapSetupHelper;
-            if (!_mapSetupVisible)
+            bool mapSetupVisible = MapSetupHelperPanel.ShowOverlay;
+            if (!mapSetupVisible)
                 return;
 
             var io = ImGui.GetIO();
@@ -243,22 +274,13 @@ namespace LoneEftDmaRadar.UI.Panels
             ImGui.SetNextWindowSize(new Vector2(300, 80), ImGuiCond.Appearing);
             ImGui.SetNextWindowBgAlpha(0.8f);
 
-            if (ImGui.Begin("Map Setup Helper", ref _mapSetupVisible, ImGuiWindowFlags.NoSavedSettings))
+            if (ImGui.Begin("Map Setup Helper", ref mapSetupVisible, ImGuiWindowFlags.NoSavedSettings))
             {
                 ImGui.Text("Current Coordinates:");
-                ImGui.TextColored(new Vector4(0.2f, 0.8f, 0.2f, 1f), _state.MapSetupCoords);
-
-                if (ImGui.Button("Copy Coords"))
-                {
-                    try
-                    {
-                        Clipboard.SetText(_state.MapSetupCoords);
-                    }
-                    catch { }
-                }
+                ImGui.TextColored(new Vector4(0.2f, 0.8f, 0.2f, 1f), MapSetupHelperPanel.Coords);
             }
             ImGui.End();
-            _state.ShowMapSetupHelper = _mapSetupVisible;
+            MapSetupHelperPanel.ShowOverlay = mapSetupVisible;
         }
     }
 }

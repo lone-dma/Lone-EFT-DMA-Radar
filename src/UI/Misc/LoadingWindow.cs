@@ -278,7 +278,7 @@ namespace LoneEftDmaRadar.UI.Misc
         private static partial int DwmSetWindowAttribute(nint hwnd, int attr, ref int attrValue, int attrSize);
 
         [LibraryImport("kernel32.dll", StringMarshalling = StringMarshalling.Utf16)]
-        private static partial nint GetModuleHandleW(string? lpModuleName);
+        private static partial nint GetModuleHandleW(string lpModuleName);
 
         private const uint IMAGE_ICON = 1;
         private const uint LR_DEFAULTCOLOR = 0x00000000;

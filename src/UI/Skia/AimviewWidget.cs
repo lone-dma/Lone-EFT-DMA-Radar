@@ -186,11 +186,10 @@ namespace LoneEftDmaRadar.UI.Skia
                 return;
 
             float boxHalf = 4f * ScaleFactor;
-            var state = RadarUIState.Instance;
 
             foreach (var container in containers)
             {
-                if (!state.ContainerIsTracked(container.ID ?? "NULL"))
+                if (!Program.Config.Containers.Selected.ContainsKey(container.ID ?? "NULL"))
                     continue;
 
                 var cPos = container.Position;

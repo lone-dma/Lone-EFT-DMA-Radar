@@ -39,12 +39,36 @@ namespace LoneEftDmaRadar.UI.Panels
     /// </summary>
     internal static class PlayerHistoryPanel
     {
-        private static readonly RadarUIState _state = RadarUIState.Instance;
-        private static string _searchText = string.Empty;
+        // Panel-local state
         private static int _selectedIndex = -1;
         private static bool _showAddToWatchlistPopup = false;
         private static string _watchlistReason = string.Empty;
         private static ObservedPlayer _playerToAdd = null;
+
+        // Player history entries (session-only, not persisted)
+        private static readonly List<ObservedPlayer> _playerHistoryEntries = new();
+
+        /// <summary>
+        /// Player history entries (read-only access).
+        /// </summary>
+        public static IReadOnlyList<ObservedPlayer> PlayerHistoryEntries => _playerHistoryEntries;
+
+        /// <summary>
+        /// Add player to history.
+        /// </summary>
+        public static void AddToPlayerHistory(ObservedPlayer player)
+        {
+            _playerHistoryEntries.Insert(0, player);
+        }
+
+        /// <summary>
+        /// Clear player history (e.g., on new raid).
+        /// </summary>
+        public static void ClearHistory()
+        {
+            _playerHistoryEntries.Clear();
+            _selectedIndex = -1;
+        }
 
         /// <summary>
         /// Draw the player history panel.
@@ -52,12 +76,14 @@ namespace LoneEftDmaRadar.UI.Panels
         public static void Draw()
         {
             // Controls
-            if (ImGui.Button("Add to Watchlist") && _selectedIndex >= 0 && _selectedIndex < _state.PlayerHistoryEntries.Count)
+            if (ImGui.Button("Add to Watchlist") && _selectedIndex >= 0 && _selectedIndex < _playerHistoryEntries.Count)
             {
-                _playerToAdd = _state.PlayerHistoryEntries[_selectedIndex];
+                _playerToAdd = _playerHistoryEntries[_selectedIndex];
                 _watchlistReason = string.Empty;
                 _showAddToWatchlistPopup = true;
             }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Add the selected player to your watchlist");
 
             // Add to Watchlist Popup
             if (_showAddToWatchlistPopup && _playerToAdd is not null)
@@ -80,7 +106,7 @@ namespace LoneEftDmaRadar.UI.Panels
                             Reason = _watchlistReason.Trim(),
                             Timestamp = DateTime.Now
                         };
-                        _state.AddToWatchlist(entry);
+                        PlayerWatchlistPanel.AddToWatchlist(entry);
                         _playerToAdd.UpdateAlerts(_watchlistReason);
                     }
                     _showAddToWatchlistPopup = false;
@@ -117,7 +143,7 @@ namespace LoneEftDmaRadar.UI.Panels
 
                 int displayIndex = 0;
 
-                foreach (var player in _state.PlayerHistoryEntries)
+                foreach (var player in _playerHistoryEntries)
                 {
                     ImGui.TableNextRow();
 
@@ -128,7 +154,6 @@ namespace LoneEftDmaRadar.UI.Panels
                         ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
                     {
                         _selectedIndex = displayIndex;
-                        _state.SelectedHistoryEntry = player;
 
                         // Double-click to add to watchlist
                         if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
@@ -202,7 +227,7 @@ namespace LoneEftDmaRadar.UI.Panels
             }
 
             // Stats footer
-            ImGui.Text($"Total: {_state.PlayerHistoryEntries.Count}");
+            ImGui.Text($"Total: {_playerHistoryEntries.Count}");
         }
 
         private static Vector4 GetPlayerTypeColor(PlayerType type)

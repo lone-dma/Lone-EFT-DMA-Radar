@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.UI;
 using System.Runtime;
 
 namespace LoneEftDmaRadar.Misc
@@ -80,10 +81,7 @@ namespace LoneEftDmaRadar.Misc
             {
                 try
                 {
-                    // NOTE: Do NOT call RadarWindow.PurgeSKResources() here!
-                    // OpenGL operations must be performed on the render thread.
-                    // GPU resource cleanup will happen naturally during render or on window close.
-
+                    RadarWindow.PurgeSKResources();
                     if (aggressive)
                     {
                         GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;

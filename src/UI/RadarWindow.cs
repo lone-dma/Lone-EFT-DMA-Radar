@@ -59,8 +59,8 @@ namespace LoneEftDmaRadar.UI
         private static ImGuiController _imgui = null!;
         private static SKSurface _skSurface = null!;
         private static GRContext _grContext = null!;
+        private static bool _purgeSkResources = false;
 
-        private static readonly RadarUIState _state = RadarUIState.Instance;
         private static readonly PeriodicTimer _fpsTimer = new(TimeSpan.FromSeconds(1));
         private static int _fpsCounter = 0;
         private static int _statusOrder = 1;
@@ -73,6 +73,15 @@ namespace LoneEftDmaRadar.UI
         // Widgets
         private static AimviewWidget _aimviewWidget;
         private static PlayerInfoWidget _playerInfoWidget;
+
+        // UI State (moved from RadarUIState)
+        private static int _fps;
+        private static bool _isLootFiltersOpen;
+        private static bool _isWatchlistOpen;
+        private static bool _isHistoryOpen;
+        private static bool _isWebRadarOpen;
+        private static bool _isMapFreeEnabled;
+        private static Vector2 _mapPanPosition;
 
         #endregion
 
@@ -97,6 +106,24 @@ namespace LoneEftDmaRadar.UI
         /// Currently 'Moused Over' Group.
         /// </summary>
         public static int? MouseoverGroup { get; private set; }
+
+        /// <summary>
+        /// Whether map free mode is enabled.
+        /// </summary>
+        public static bool IsMapFreeEnabled
+        {
+            get => _isMapFreeEnabled;
+            set => _isMapFreeEnabled = value;
+        }
+
+        /// <summary>
+        /// Map pan position when in free mode.
+        /// </summary>
+        public static Vector2 MapPanPosition
+        {
+            get => _mapPanPosition;
+            set => _mapPanPosition = value;
+        }
 
         #endregion
 
@@ -205,6 +232,7 @@ namespace LoneEftDmaRadar.UI
             ColorPickerPanel.Initialize();
             SettingsPanel.Initialize();
             LootFiltersPanel.Initialize();
+            PlayerWatchlistPanel.Initialize();
 
             // Initialize widgets
             InitializeWidgets();
@@ -319,31 +347,33 @@ namespace LoneEftDmaRadar.UI
 
         private static void OnRender(double delta)
         {
-            Interlocked.Increment(ref _fpsCounter);
-
-            // --- SCENE RENDER (Skia) ---
-            // Render Skia FIRST, before ImGui.NewFrame() is called
-            // This prevents Skia's GL flush from corrupting ImGui's texture state
-            var canvas = _skSurface.Canvas;
-            canvas.Clear(SKColors.Black);
-
             try
             {
+                Interlocked.Increment(ref _fpsCounter);
+                if (Interlocked.Exchange(ref _purgeSkResources, false) == true)
+                {
+                    _grContext.PurgeResources();
+                }
+
+                // --- SCENE RENDER (Skia) ---
+                // Render Skia FIRST, before ImGui.NewFrame() is called
+                // This prevents Skia's GL flush from corrupting ImGui's texture state
+                var canvas = _skSurface.Canvas;
+                canvas.Clear(SKColors.Black);
                 DrawRadarScene(canvas);
+                canvas.Flush();
+                _grContext.Flush();
+
+                // --- UI RENDER (ImGui) ---
+                // Now start ImGui frame AFTER Skia has flushed
+                _imgui.Update((float)delta);
+                DrawImGuiUI();
+                _imgui.Render();
             }
             catch (Exception ex)
             {
                 Logging.WriteLine($"***** CRITICAL RENDER ERROR: {ex}");
             }
-
-            canvas.Flush();
-            _grContext.Flush();
-
-            // --- UI RENDER (ImGui) ---
-            // Now start ImGui frame AFTER Skia has flushed
-            _imgui.Update((float)delta);
-            DrawImGuiUI();
-            _imgui.Render();
         }
 
         private static void DrawRadarScene(SKCanvas canvas)
@@ -358,7 +388,7 @@ namespace LoneEftDmaRadar.UI
             }
             else
             {
-                DrawStatusMessage(canvas, isStarting, isReady, inRaid);
+                DrawStatusMessage(canvas, isStarting, isReady);
             }
         }
 
@@ -369,28 +399,28 @@ namespace LoneEftDmaRadar.UI
             var localPlayerMapPos = localPlayerPos.ToMapPos(map.Config);
 
             // Update map setup helper coords
-            if (_state.ShowMapSetupHelper || _state.IsMapSetupHelperOpen)
+            if (MapSetupHelperPanel.ShowOverlay || MapSetupHelperPanel.IsOpen)
             {
-                _state.MapSetupCoords = $"Unity X,Y,Z: {localPlayerPos.X:F1},{localPlayerPos.Y:F1},{localPlayerPos.Z:F1}";
+                MapSetupHelperPanel.Coords = $"Unity X,Y,Z: {localPlayerPos.X:F1},{localPlayerPos.Y:F1},{localPlayerPos.Z:F1}";
             }
 
             // Get map parameters
             EftMapParams mapParams;
             var canvasSize = new SKSize(_window.Size.X, _window.Size.Y);
 
-            if (_state.IsMapFreeEnabled)
+            if (_isMapFreeEnabled)
             {
-                if (_state.MapPanPosition == default)
+                if (_mapPanPosition == default)
                 {
-                    _state.MapPanPosition = localPlayerMapPos;
+                    _mapPanPosition = localPlayerMapPos;
                 }
-                var panPos = _state.MapPanPosition;
+                var panPos = _mapPanPosition;
                 mapParams = map.GetParameters(canvasSize, Program.Config.UI.Zoom, ref panPos);
-                _state.MapPanPosition = panPos;
+                _mapPanPosition = panPos;
             }
             else
             {
-                _state.MapPanPosition = default;
+                _mapPanPosition = default;
                 mapParams = map.GetParameters(canvasSize, Program.Config.UI.Zoom, ref localPlayerMapPos);
             }
 
@@ -414,7 +444,7 @@ namespace LoneEftDmaRadar.UI
                 {
                     foreach (var container in containers)
                     {
-                        if (_state.ContainerIsTracked(container.ID ?? "NULL"))
+                        if (Program.Config.Containers.Selected.ContainsKey(container.ID ?? "NULL"))
                         {
                             container.Draw(canvas, mapParams, localPlayer);
                         }
@@ -531,13 +561,13 @@ namespace LoneEftDmaRadar.UI
             }
         }
 
-        private static void DrawStatusMessage(SKCanvas canvas, bool isStarting, bool isReady, bool inRaid)
+        private static void DrawStatusMessage(SKCanvas canvas, bool isStarting, bool isReady)
         {
             var bounds = new SKRect(0, 0, _window.Size.X, _window.Size.Y);
 
             // Base text (no trailing dots) and how many dots to draw
             string baseText;
-            int dotCount = 0;
+            int dotCount;
 
             if (!isStarting)
             {
@@ -596,33 +626,33 @@ namespace LoneEftDmaRadar.UI
             // Draw main menu bar
             if (ImGui.BeginMainMenuBar())
             {
-                if (ImGui.MenuItem("Settings", null, _state.IsSettingsPanelOpen))
+                if (ImGui.MenuItem("Settings", null, SettingsPanel.IsOpen))
                 {
-                    _state.IsSettingsPanelOpen = !_state.IsSettingsPanelOpen;
+                    SettingsPanel.IsOpen = !SettingsPanel.IsOpen;
                 }
 
                 ImGui.Separator();
 
-                if (ImGui.MenuItem("Web Radar", null, _state.IsWebRadarOpen))
+                if (ImGui.MenuItem("Web Radar", null, _isWebRadarOpen))
                 {
-                    _state.IsWebRadarOpen = !_state.IsWebRadarOpen;
+                    _isWebRadarOpen = !_isWebRadarOpen;
                 }
-                if (ImGui.MenuItem("History", null, _state.IsHistoryOpen))
+                if (ImGui.MenuItem("History", null, _isHistoryOpen))
                 {
-                    _state.IsHistoryOpen = !_state.IsHistoryOpen;
+                    _isHistoryOpen = !_isHistoryOpen;
                 }
-                if (ImGui.MenuItem("Watchlist", null, _state.IsWatchlistOpen))
+                if (ImGui.MenuItem("Watchlist", null, _isWatchlistOpen))
                 {
-                    _state.IsWatchlistOpen = !_state.IsWatchlistOpen;
+                    _isWatchlistOpen = !_isWatchlistOpen;
                 }
-                if (ImGui.MenuItem("Loot Filters", null, _state.IsLootFiltersOpen))
+                if (ImGui.MenuItem("Loot Filters", null, _isLootFiltersOpen))
                 {
-                    _state.IsLootFiltersOpen = !_state.IsLootFiltersOpen;
+                    _isLootFiltersOpen = !_isLootFiltersOpen;
                 }
 
                 // Display current map and FPS on the right
                 string mapName = EftMapManager.Map?.Config?.Name ?? "No Map";
-                string rightText = $"{mapName} | {_state.Fps} FPS";
+                string rightText = $"{mapName} | {_fps} FPS";
                 float rightTextWidth = ImGui.CalcTextSize(rightText).X;
                 ImGui.SetCursorPosX(ImGui.GetWindowWidth() - rightTextWidth - 10);
                 ImGui.Text(rightText);
@@ -637,49 +667,49 @@ namespace LoneEftDmaRadar.UI
         private static void DrawWindows()
         {
             // Settings Panel
-            if (_state.IsSettingsPanelOpen)
+            if (SettingsPanel.IsOpen)
             {
                 SettingsPanel.Draw();
             }
 
             // Loot Filters Window
-            if (_state.IsLootFiltersOpen)
+            if (_isLootFiltersOpen)
             {
                 DrawLootFiltersWindow();
             }
 
             // Watchlist Window
-            if (_state.IsWatchlistOpen)
+            if (_isWatchlistOpen)
             {
                 DrawWatchlistWindow();
             }
 
             // History Window
-            if (_state.IsHistoryOpen)
+            if (_isHistoryOpen)
             {
                 DrawHistoryWindow();
             }
 
             // Web Radar Window
-            if (_state.IsWebRadarOpen)
+            if (_isWebRadarOpen)
             {
                 DrawWebRadarWindow();
             }
 
             // Color Picker
-            if (_state.IsColorPickerOpen)
+            if (ColorPickerPanel.IsOpen)
             {
                 ColorPickerPanel.Draw();
             }
 
             // Hotkey Manager
-            if (_state.IsHotkeyManagerOpen)
+            if (HotkeyManagerPanel.IsOpen)
             {
                 HotkeyManagerPanel.Draw();
             }
 
             // Map Setup Helper
-            if (_state.IsMapSetupHelperOpen)
+            if (MapSetupHelperPanel.IsOpen)
             {
                 MapSetupHelperPanel.Draw();
             }
@@ -687,7 +717,7 @@ namespace LoneEftDmaRadar.UI
 
         private static void DrawLootFiltersWindow()
         {
-            bool isOpen = _state.IsLootFiltersOpen;
+            bool isOpen = _isLootFiltersOpen;
             ImGui.SetNextWindowSize(new Vector2(650, 550), ImGuiCond.FirstUseEver);
             if (ImGui.Begin("Loot Filters", ref isOpen))
             {
@@ -700,24 +730,24 @@ namespace LoneEftDmaRadar.UI
                 }
             }
             ImGui.End();
-            _state.IsLootFiltersOpen = isOpen;
+            _isLootFiltersOpen = isOpen;
         }
 
         private static void DrawWatchlistWindow()
         {
-            bool isOpen = _state.IsWatchlistOpen;
+            bool isOpen = _isWatchlistOpen;
             ImGui.SetNextWindowSize(new Vector2(600, 500), ImGuiCond.FirstUseEver);
             if (ImGui.Begin("Player Watchlist", ref isOpen))
             {
                 PlayerWatchlistPanel.Draw();
             }
             ImGui.End();
-            _state.IsWatchlistOpen = isOpen;
+            _isWatchlistOpen = isOpen;
         }
 
         private static void DrawHistoryWindow()
         {
-            bool isOpen = _state.IsHistoryOpen;
+            bool isOpen = _isHistoryOpen;
             ImGui.SetNextWindowSize(new Vector2(900, 400), ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSizeConstraints(new Vector2(800, 300), new Vector2(float.MaxValue, float.MaxValue));
             if (ImGui.Begin("Player History", ref isOpen))
@@ -725,19 +755,19 @@ namespace LoneEftDmaRadar.UI
                 PlayerHistoryPanel.Draw();
             }
             ImGui.End();
-            _state.IsHistoryOpen = isOpen;
+            _isHistoryOpen = isOpen;
         }
 
         private static void DrawWebRadarWindow()
         {
-            bool isOpen = _state.IsWebRadarOpen;
+            bool isOpen = _isWebRadarOpen;
             ImGui.SetNextWindowSize(new Vector2(450, 350), ImGuiCond.FirstUseEver);
             if (ImGui.Begin("Web Radar", ref isOpen))
             {
                 WebRadarPanel.Draw();
             }
             ImGui.End();
-            _state.IsWebRadarOpen = isOpen;
+            _isWebRadarOpen = isOpen;
         }
 
         #endregion
@@ -782,12 +812,6 @@ namespace LoneEftDmaRadar.UI
                     player.IsFocused = !player.IsFocused;
                 }
             }
-
-            // Hide loot overlay on click (only if not clicking on ImGui)
-            if (_state.IsLootOverlayVisible)
-            {
-                _state.IsLootOverlayVisible = false;
-            }
         }
 
         private static void OnMouseUp(IMouse mouse, MouseButton button)
@@ -831,14 +855,14 @@ namespace LoneEftDmaRadar.UI
                 return;
             }
 
-            if (_mouseDown && _state.IsMapFreeEnabled)
+            if (_mouseDown && _isMapFreeEnabled)
             {
                 var deltaX = -(mousePos.X - _lastMousePosition.X);
                 var deltaY = -(mousePos.Y - _lastMousePosition.Y);
 
-                _state.MapPanPosition = new Vector2(
-                    _state.MapPanPosition.X + deltaX,
-                    _state.MapPanPosition.Y + deltaY);
+                _mapPanPosition = new Vector2(
+                    _mapPanPosition.X + deltaX,
+                    _mapPanPosition.Y + deltaY);
                 _lastMousePosition = mousePos;
             }
             else
@@ -1027,7 +1051,10 @@ namespace LoneEftDmaRadar.UI
         private static void ToggleShowQuestItems_HotkeyStateChanged(bool isKeyDown)
         {
             if (isKeyDown)
-                _state.ShowQuestItems = !_state.ShowQuestItems;
+            {
+                LootFilter.ShowQuestItems = !LootFilter.ShowQuestItems;
+                Memory.Loot?.RefreshFilter();
+            }
         }
 
         [Hotkey("Toggle Aimview Widget")]
@@ -1041,14 +1068,20 @@ namespace LoneEftDmaRadar.UI
         private static void ToggleShowMeds_HotkeyStateChanged(bool isKeyDown)
         {
             if (isKeyDown)
-                _state.ShowMeds = !_state.ShowMeds;
+            {
+                LootFilter.ShowMeds = !LootFilter.ShowMeds;
+                Memory.Loot?.RefreshFilter();
+            }
         }
 
         [Hotkey("Toggle Show Food")]
         private static void ToggleShowFood_HotkeyStateChanged(bool isKeyDown)
         {
             if (isKeyDown)
-                _state.ShowFood = !_state.ShowFood;
+            {
+                LootFilter.ShowFood = !LootFilter.ShowFood;
+                Memory.Loot?.RefreshFilter();
+            }
         }
 
         [Hotkey("Toggle Game Info Tab")]
@@ -1131,7 +1164,7 @@ namespace LoneEftDmaRadar.UI
         /// </summary>
         public static void PurgeSKResources()
         {
-            _grContext?.PurgeResources();
+            _purgeSkResources = true;
         }
 
         private static async Task RunFpsTimerAsync()
@@ -1139,7 +1172,7 @@ namespace LoneEftDmaRadar.UI
             while (await _fpsTimer.WaitForNextTickAsync())
             {
                 _statusOrder = (_statusOrder >= 3) ? 1 : _statusOrder + 1;
-                _state.Fps = Interlocked.Exchange(ref _fpsCounter, 0);
+                _fps = Interlocked.Exchange(ref _fpsCounter, 0);
             }
         }
 
@@ -1159,7 +1192,7 @@ namespace LoneEftDmaRadar.UI
         private static partial nint LoadImageW(nint hInst, nint lpszName, uint uType, int cxDesired, int cyDesired, uint fuLoad);
 
         [LibraryImport("kernel32.dll", StringMarshalling = StringMarshalling.Utf16)]
-        private static partial nint GetModuleHandleW(string? lpModuleName);
+        private static partial nint GetModuleHandleW(string lpModuleName);
 
         private const uint IMAGE_ICON = 1;
         private const uint LR_DEFAULTCOLOR = 0x00000000;
