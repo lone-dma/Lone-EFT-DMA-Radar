@@ -28,7 +28,7 @@ SOFTWARE.
 
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
-using LoneEftDmaRadar.UI.Radar.Maps;
+using LoneEftDmaRadar.UI.Maps;
 using LoneEftDmaRadar.UI.Skia;
 using LoneEftDmaRadar.Web.TarkovDev.Data;
 
@@ -59,7 +59,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
 
         public override void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
         {
-            if (Position.WithinDistance(localPlayer.Position, App.Config.Containers.DrawDistance))
+            if (Position.WithinDistance(localPlayer.Position, Program.Config.Containers.DrawDistance))
             {
                 var heightDiff = Position.Y - localPlayer.Position.Y;
                 var point = Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);
@@ -79,7 +79,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
                 }
                 else // loot is level with player
                 {
-                    var size = 4 * App.Config.UI.UIScale;
+                    var size = 4 * Program.Config.UI.UIScale;
                     canvas.DrawCircle(point, size, SKPaints.ShapeOutline);
                     canvas.DrawCircle(point, size, SKPaints.PaintContainerLoot);
                 }

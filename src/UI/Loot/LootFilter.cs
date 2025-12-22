@@ -53,13 +53,13 @@ namespace LoneEftDmaRadar.UI.Loot
             {
                 Predicate<LootItem> p = item => // Default Predicate
                 {
-                    if (App.Config.QuestHelper.Enabled && item.IsQuestHelperItem)
+                    if (Program.Config.QuestHelper.Enabled && item.IsQuestHelperItem)
                         return true;
                     if (item is LootAirdrop)
                         return true;
-                    if (!App.Config.Loot.HideCorpses && item is LootCorpse)
+                    if (!Program.Config.Loot.HideCorpses && item is LootCorpse)
                         return true;
-                    return (item.IsRegularLoot || item.IsValuableLoot || item.IsImportant || (App.Config.Loot.ShowWishlist && item.IsWishlisted)) ||
+                    return (item.IsRegularLoot || item.IsValuableLoot || item.IsImportant || (Program.Config.Loot.ShowWishlist && item.IsWishlisted)) ||
                                 (ShowBackpacks && item.IsBackpack) ||
                                 (ShowMeds && item.IsMeds) ||
                                 (ShowFood && item.IsFood) ||

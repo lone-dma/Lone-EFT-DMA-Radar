@@ -37,9 +37,9 @@ namespace LoneEftDmaRadar.Tarkov
     public static class TarkovDataManager
     {
         private const string DATA_FILE = "data.json";
-        private static readonly FileInfo _dataFile = new(Path.Combine(App.ConfigPath.FullName, DATA_FILE));
-        private static readonly FileInfo _tempDataFile = new(Path.Combine(App.ConfigPath.FullName, DATA_FILE + ".tmp"));
-        private static readonly FileInfo _bakDataFile = new(Path.Combine(App.ConfigPath.FullName, DATA_FILE + ".bak"));
+        private static readonly FileInfo _dataFile = new(Path.Combine(Program.ConfigPath.FullName, DATA_FILE));
+        private static readonly FileInfo _tempDataFile = new(Path.Combine(Program.ConfigPath.FullName, DATA_FILE + ".tmp"));
+        private static readonly FileInfo _bakDataFile = new(Path.Combine(Program.ConfigPath.FullName, DATA_FILE + ".bak"));
 
         /// <summary>
         /// Master items dictionary - mapped via BSGID String.
@@ -233,7 +233,7 @@ namespace LoneEftDmaRadar.Tarkov
                     if (!file.Exists)
                         return null;
                     using var dataStream = File.OpenRead(file.FullName);
-                    return await JsonSerializer.DeserializeAsync<TarkovDevTypes.DataElement>(dataStream, App.JsonOptions) ??
+                    return await JsonSerializer.DeserializeAsync<TarkovDevTypes.DataElement>(dataStream, Program.JsonOptions) ??
                         throw new InvalidOperationException($"Failed to deserialize {nameof(dataStream)}");
                 }
                 catch
@@ -254,7 +254,7 @@ namespace LoneEftDmaRadar.Tarkov
             {
                 var data = await TarkovDevGraphQLApi.GetTarkovDataAsync();
                 ArgumentNullException.ThrowIfNull(data, nameof(data));
-                var jsonOptions = new JsonSerializerOptions(App.JsonOptions);
+                var jsonOptions = new JsonSerializerOptions(Program.JsonOptions);
                 jsonOptions.WriteIndented = false;
                 var dataJson = JsonSerializer.Serialize(data, jsonOptions);
                 await File.WriteAllTextAsync(_tempDataFile.FullName, dataJson);
@@ -283,7 +283,7 @@ namespace LoneEftDmaRadar.Tarkov
             {
                 MessageBox.Show(
                     messageBoxText: $"An unhandled exception occurred while retrieving updated Game/Loot Data from the web: {ex}",
-                    caption: App.Name,
+                    caption: Program.Name,
                     button: MessageBoxButton.OK,
                     icon: MessageBoxImage.Warning,
                     defaultResult: MessageBoxResult.OK,

@@ -30,7 +30,6 @@ using LoneEftDmaRadar.Web.ProfileApi;
 using LoneEftDmaRadar.Web.ProfileApi.Schema;
 using Microsoft.Extensions.DependencyInjection;
 using Polly.CircuitBreaker;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Authentication;
 
@@ -79,9 +78,9 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Profiles
 
         private readonly ConcurrentDictionary<string, byte> _skip = new(StringComparer.OrdinalIgnoreCase);
 
-        public uint Priority { get; } = App.Config.ProfileApi.TarkovDev.Priority;
+        public uint Priority { get; } = Program.Config.ProfileApi.TarkovDev.Priority;
 
-        public bool IsEnabled { get; } = App.Config.ProfileApi.TarkovDev.Enabled;
+        public bool IsEnabled { get; } = Program.Config.ProfileApi.TarkovDev.Enabled;
 
         public bool CanRun { get; } = true;
 
@@ -97,7 +96,7 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Profiles
                 {
                     return null;
                 }
-                var client = App.HttpClientFactory.CreateClient(nameof(TarkovDevProfileProvider));
+                var client = Program.HttpClientFactory.CreateClient(nameof(TarkovDevProfileProvider));
                 using var response = await client.GetAsync($"profile/{accountId}.json", ct);
                 string content = await response.Content.ReadAsStringAsync(ct);
                 if (!response.IsSuccessStatusCode) // Handle errors
@@ -111,7 +110,7 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Profiles
                 }
                 using var jsonDoc = JsonDocument.Parse(content);
                 long epoch = jsonDoc.RootElement.GetProperty("updated").GetInt64();
-                var result = JsonSerializer.Deserialize<ProfileData>(content, App.JsonOptions) ??
+                var result = JsonSerializer.Deserialize<ProfileData>(content, Program.JsonOptions) ??
                     throw new InvalidOperationException("Failed to deserialize response");
                 Logging.WriteLine($"[TarkovDevProvider] Got Profile '{accountId}'!");
                 return new()
