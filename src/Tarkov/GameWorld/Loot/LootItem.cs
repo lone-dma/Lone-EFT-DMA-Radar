@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
@@ -235,9 +235,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         public virtual string GetUILabel()
         {
             string label = "";
-            if (IsImportant)
-                label += "!!";
-            else if (Price > 0)
+            if (Price > 0)
                 label += $"[{Utilities.FormatNumberKM(Price)}] ";
             label += ShortName;
 
