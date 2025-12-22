@@ -93,7 +93,7 @@ namespace LoneEftDmaRadar
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString(), Name, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.ToString(), Name, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxOptions.DefaultDesktopOnly);
                 throw;
             }
         }
@@ -129,7 +129,7 @@ namespace LoneEftDmaRadar
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString(), Name, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.ToString(), Name, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxOptions.DefaultDesktopOnly);
                 throw;
             }
         }

@@ -500,7 +500,7 @@ namespace LoneEftDmaRadar.UI.Panels
                     Entries = new()
                 }))
                 {
-                    MessageBox.Show("That filter already exists.", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(RadarWindow.Handle, "That filter already exists.", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -512,7 +512,7 @@ namespace LoneEftDmaRadar.UI.Panels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error adding filter: {ex.Message}", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(RadarWindow.Handle, $"Error adding filter: {ex.Message}", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -537,12 +537,12 @@ namespace LoneEftDmaRadar.UI.Panels
                 }
                 else
                 {
-                    MessageBox.Show("Rename failed.", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(RadarWindow.Handle, "Rename failed.", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error renaming filter: {ex.Message}", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(RadarWindow.Handle, $"Error renaming filter: {ex.Message}", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -551,11 +551,11 @@ namespace LoneEftDmaRadar.UI.Panels
             string name = SelectedFilterName;
             if (string.IsNullOrEmpty(name))
             {
-                MessageBox.Show("No loot filter selected!", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(RadarWindow.Handle, "No loot filter selected!", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            var result = MessageBox.Show($"Are you sure you want to delete '{name}'?", "Loot Filter",
+            var result = MessageBox.Show(RadarWindow.Handle, $"Are you sure you want to delete '{name}'?", "Loot Filter",
                 MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result != MessageBoxResult.Yes)
                 return;
@@ -564,7 +564,7 @@ namespace LoneEftDmaRadar.UI.Panels
             {
                 if (!Program.Config.LootFilters.Filters.TryRemove(name, out _))
                 {
-                    MessageBox.Show("Remove failed.", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(RadarWindow.Handle, "Remove failed.", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
@@ -583,7 +583,7 @@ namespace LoneEftDmaRadar.UI.Panels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error deleting filter: {ex.Message}", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(RadarWindow.Handle, $"Error deleting filter: {ex.Message}", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

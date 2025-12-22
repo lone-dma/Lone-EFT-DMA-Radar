@@ -187,7 +187,7 @@ namespace LoneEftDmaRadar.UI.Panels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"ERROR Starting Web Radar Server: {ex.Message}", "Web Radar",
+                MessageBox.Show(RadarWindow.Handle, $"ERROR Starting Web Radar Server: {ex.Message}", "Web Radar",
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 _startButtonText = "Start";
                 _uiEnabled = true;
@@ -201,13 +201,13 @@ namespace LoneEftDmaRadar.UI.Panels
                 if (!string.IsNullOrWhiteSpace(_serverUrl))
                 {
                     Clipboard.SetText(_serverUrl);
-                    MessageBox.Show("Web Radar URL copied to clipboard.", "Web Radar",
+                    MessageBox.Show(RadarWindow.Handle, "Web Radar URL copied to clipboard.", "Web Radar",
                         MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to copy URL: {ex.Message}", "Web Radar",
+                MessageBox.Show(RadarWindow.Handle, $"Failed to copy URL: {ex.Message}", "Web Radar",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

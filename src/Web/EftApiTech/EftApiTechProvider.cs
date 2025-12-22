@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.UI;
 using LoneEftDmaRadar.Web.ProfileApi;
 using LoneEftDmaRadar.Web.ProfileApi.Schema;
 using Microsoft.Extensions.DependencyInjection;
@@ -136,7 +137,7 @@ namespace LoneEftDmaRadar.Web.EftApiTech
                 {
                     if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden) // Auth failure
                     {
-                        MessageBox.Show($"eft-api.tech returned '{response.StatusCode}'. Please make sure your Api Key and IP Address are set correctly.", nameof(EftApiTechProvider), MessageBoxButton.OK, MessageBoxImage.Warning);
+                        MessageBox.Show(RadarWindow.Handle, $"eft-api.tech returned '{response.StatusCode}'. Please make sure your Api Key and IP Address are set correctly.", nameof(EftApiTechProvider), MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
                     else if (response.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.NotFound) // No profile exists
                     {

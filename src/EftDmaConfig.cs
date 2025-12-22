@@ -27,6 +27,7 @@ SOFTWARE.
 */
 
 using LoneEftDmaRadar.Misc.JSON;
+using LoneEftDmaRadar.UI;
 using LoneEftDmaRadar.UI.ColorPicker;
 using LoneEftDmaRadar.UI.Loot;
 using LoneEftDmaRadar.UI.Misc;
@@ -355,6 +356,7 @@ namespace LoneEftDmaRadar
                     if (config is null)
                     {
                         var dlg = MessageBox.Show(
+                            RadarWindow.Handle,
                             "Config File Corruption Detected! If you backed up your config, you may attempt to restore it.\n" +
                             "Press OK to Reset Config and continue startup, or CANCEL to terminate program.",
                             Program.Name,

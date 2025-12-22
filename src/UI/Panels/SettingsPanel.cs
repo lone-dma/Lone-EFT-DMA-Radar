@@ -455,11 +455,11 @@ namespace LoneEftDmaRadar.UI.Panels
             {
                 var backupFile = Path.Combine(Program.ConfigPath.FullName, $"{EftDmaConfig.Filename}.userbak");
                 File.WriteAllText(backupFile, JsonSerializer.Serialize(Program.Config, Program.JsonOptions));
-                MessageBox.Show($"Backed up to {backupFile}", "Backup Config", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(RadarWindow.Handle, $"Backed up to {backupFile}", "Backup Config", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}", "Backup Config", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(RadarWindow.Handle, $"Error: {ex.Message}", "Backup Config", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -471,7 +471,7 @@ namespace LoneEftDmaRadar.UI.Panels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}", "Open Config", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(RadarWindow.Handle, $"Error: {ex.Message}", "Open Config", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
