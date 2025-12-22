@@ -87,6 +87,7 @@ namespace LoneEftDmaRadar.UI
 
         #region Static Properties
 
+        public static IntPtr Handle => _window?.Native?.Win32?.Hwnd ?? IntPtr.Zero;
         private static bool Starting => Memory.Starting;
         private static bool Ready => Memory.Ready;
         private static bool InRaid => Memory.InRaid;

@@ -58,7 +58,7 @@ namespace LoneEftDmaRadar.UI.Hotkeys
 
             // Get all enum values in their original enum order (not sorted)
             _keyValues = Enum.GetValues<Win32VirtualKey>()
-                .Where(k => (int)k != 0) // Exclude None/zero value
+                .Where(k => (int)k != 0) // Exclude Error/zero value
                 .ToArray();
 
             // Use the enum name directly as the display name

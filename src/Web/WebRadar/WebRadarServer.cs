@@ -28,6 +28,7 @@ SOFTWARE.
 
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
+using LoneEftDmaRadar.UI;
 using LoneEftDmaRadar.Web.WebRadar.Data;
 using LoneEftDmaRadar.Web.WebRadar.MessagePack;
 using MessagePack;
@@ -155,7 +156,7 @@ namespace LoneEftDmaRadar.Web.WebRadar
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"WebRadarServer Worker Thread Crashed:\n{ex}", "Web Radar Server", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(RadarWindow.Handle, $"WebRadarServer Worker Thread Crashed:\n{ex}", "Web Radar Server", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

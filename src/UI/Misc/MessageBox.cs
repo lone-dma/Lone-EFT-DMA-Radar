@@ -26,6 +26,8 @@ SOFTWARE.
  *
 */
 
+using System.ComponentModel;
+
 namespace LoneEftDmaRadar.UI.Misc
 {
     /// <summary>
@@ -33,35 +35,78 @@ namespace LoneEftDmaRadar.UI.Misc
     /// </summary>
     internal static partial class MessageBox
     {
+        #region Overloads without owner window
+
         /// <summary>
         /// Displays a message box with the specified text.
         /// </summary>
         public static MessageBoxResult Show(string messageBoxText)
-            => Show(messageBoxText, string.Empty, MessageBoxButton.OK, MessageBoxImage.None);
+            => ShowCore(IntPtr.Zero, messageBoxText, string.Empty, MessageBoxButton.OK, MessageBoxImage.None, MessageBoxOptions.None);
 
         /// <summary>
         /// Displays a message box with the specified text and caption.
         /// </summary>
         public static MessageBoxResult Show(string messageBoxText, string caption)
-            => Show(messageBoxText, caption, MessageBoxButton.OK, MessageBoxImage.None);
+            => ShowCore(IntPtr.Zero, messageBoxText, caption, MessageBoxButton.OK, MessageBoxImage.None, MessageBoxOptions.None);
 
         /// <summary>
         /// Displays a message box with the specified text, caption, and button(s).
         /// </summary>
         public static MessageBoxResult Show(string messageBoxText, string caption, MessageBoxButton button)
-            => Show(messageBoxText, caption, button, MessageBoxImage.None);
+            => ShowCore(IntPtr.Zero, messageBoxText, caption, button, MessageBoxImage.None, MessageBoxOptions.None);
 
         /// <summary>
         /// Displays a message box with the specified text, caption, button(s), and icon.
         /// </summary>
         public static MessageBoxResult Show(string messageBoxText, string caption, MessageBoxButton button, MessageBoxImage icon)
-            => Show(messageBoxText, caption, button, icon, MessageBoxOptions.None);
-
+            => ShowCore(IntPtr.Zero, messageBoxText, caption, button, icon, MessageBoxOptions.None);
 
         /// <summary>
-        /// Displays a message box with the specified text, caption, button(s), icon, default result, and options.
+        /// Displays a message box with the specified text, caption, button(s), icon, and options.
         /// </summary>
-        public static MessageBoxResult Show(
+        public static MessageBoxResult Show(string messageBoxText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxOptions options)
+            => ShowCore(IntPtr.Zero, messageBoxText, caption, button, icon, options);
+
+        #endregion
+
+        #region Overloads with owner window
+
+        /// <summary>
+        /// Displays a message box in front of the specified window with the specified text.
+        /// </summary>
+        public static MessageBoxResult Show(IntPtr owner, string messageBoxText)
+            => ShowCore(owner, messageBoxText, string.Empty, MessageBoxButton.OK, MessageBoxImage.None, MessageBoxOptions.None);
+
+        /// <summary>
+        /// Displays a message box in front of the specified window with the specified text and caption.
+        /// </summary>
+        public static MessageBoxResult Show(IntPtr owner, string messageBoxText, string caption)
+            => ShowCore(owner, messageBoxText, caption, MessageBoxButton.OK, MessageBoxImage.None, MessageBoxOptions.None);
+
+        /// <summary>
+        /// Displays a message box in front of the specified window with the specified text, caption, and button(s).
+        /// </summary>
+        public static MessageBoxResult Show(IntPtr owner, string messageBoxText, string caption, MessageBoxButton button)
+            => ShowCore(owner, messageBoxText, caption, button, MessageBoxImage.None, MessageBoxOptions.None);
+
+        /// <summary>
+        /// Displays a message box in front of the specified window with the specified text, caption, button(s), and icon.
+        /// </summary>
+        public static MessageBoxResult Show(IntPtr owner, string messageBoxText, string caption, MessageBoxButton button, MessageBoxImage icon)
+            => ShowCore(owner, messageBoxText, caption, button, icon, MessageBoxOptions.None);
+
+        /// <summary>
+        /// Displays a message box in front of the specified window with the specified text, caption, button(s), icon, and options.
+        /// </summary>
+        public static MessageBoxResult Show(IntPtr owner, string messageBoxText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxOptions options)
+            => ShowCore(owner, messageBoxText, caption, button, icon, options);
+
+        #endregion
+
+        #region Core implementation
+
+        private static MessageBoxResult ShowCore(
+            IntPtr hWnd,
             string messageBoxText,
             string caption,
             MessageBoxButton button,
@@ -71,15 +116,18 @@ namespace LoneEftDmaRadar.UI.Misc
             uint flags =
                 (uint)button |
                 (uint)icon |
-                0x0u | // MB_DEFBUTTON1
                 (uint)options;
 
-            return MessageBoxW(nint.Zero, messageBoxText, caption, flags);
+            var result = MessageBoxW(hWnd, messageBoxText, caption, flags);
+            if (result == MessageBoxResult.Error)
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to display message box.");
+            return result;
         }
 
-
-        [LibraryImport("user32.dll", StringMarshalling = StringMarshalling.Utf16)]
+        [LibraryImport("user32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
         private static partial MessageBoxResult MessageBoxW(nint hWnd, string lpText, string lpCaption, uint uType);
+
+        #endregion
     }
 
     /// <summary>
@@ -113,7 +161,7 @@ namespace LoneEftDmaRadar.UI.Misc
     /// </summary>
     public enum MessageBoxResult : int
     {
-        None = 0,
+        Error = 0,
         OK = 1,
         Cancel = 2,
         Abort = 3,
