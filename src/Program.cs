@@ -14,6 +14,7 @@ global using System.Runtime.InteropServices;
 global using System.Text;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
+global using Clipboard = LoneEftDmaRadar.UI.Misc.Clipboard;
 global using MessageBox = LoneEftDmaRadar.UI.Misc.MessageBox;
 global using MessageBoxButton = LoneEftDmaRadar.UI.Misc.MessageBoxButton;
 global using MessageBoxImage = LoneEftDmaRadar.UI.Misc.MessageBoxImage;
