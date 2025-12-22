@@ -30,21 +30,14 @@ using LoneEftDmaRadar.Web.TarkovDev.Data;
 
 namespace LoneEftDmaRadar.UI.Misc
 {
-    public sealed class StaticContainerEntry : INotifyPropertyChanged
+    public sealed class StaticContainerEntry
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged(string propertyName) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-        private StaticContainerEntry() { }
-
         public StaticContainerEntry(TarkovMarketItem container)
         {
             Name = container.ShortName;
             Id = container.BsgId;
             _isTracked = Program.Config.Containers.Selected.ContainsKey(container.BsgId);
         }
-
 
         public string Id { get; }
         public string Name { get; }
@@ -59,35 +52,20 @@ namespace LoneEftDmaRadar.UI.Misc
                 {
                     _isTracked = value;
                     if (_isTracked)
-                    {
                         Program.Config.Containers.Selected.TryAdd(Id, 0);
-                    }
                     else
-                    {
                         Program.Config.Containers.Selected.TryRemove(Id, out _);
-                    }
-                    OnPropertyChanged(nameof(IsTracked));
                 }
             }
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object obj) => obj switch
         {
-            if (obj is StaticContainerEntry other)
-            {
-                return string.Equals(Id, other.Id, StringComparison.OrdinalIgnoreCase);
-            }
-            if (obj is string id)
-            {
-                return string.Equals(Id, id, StringComparison.OrdinalIgnoreCase);
-            }
+            StaticContainerEntry other => string.Equals(Id, other.Id, StringComparison.OrdinalIgnoreCase),
+            string id => string.Equals(Id, id, StringComparison.OrdinalIgnoreCase),
+            _ => false
+        };
 
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return StringComparer.OrdinalIgnoreCase.GetHashCode(Id);
-        }
+        public override int GetHashCode() => StringComparer.OrdinalIgnoreCase.GetHashCode(Id);
     }
 }

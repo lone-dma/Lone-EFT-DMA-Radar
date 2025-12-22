@@ -31,47 +31,20 @@ namespace LoneEftDmaRadar.UI.Misc
     /// <summary>
     /// JSON Wrapper for Player Watchlist.
     /// </summary>
-    public sealed class PlayerWatchlistEntry : INotifyPropertyChanged
+    public sealed class PlayerWatchlistEntry
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-        private string _acctId = string.Empty;
         /// <summary>
         /// Player's Account ID as obtained from Player History.
         /// </summary>
         [JsonPropertyName("acctID")]
-        public string AcctID
-        {
-            get => _acctId;
-            set
-            {
-                if (_acctId != value)
-                {
-                    _acctId = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        public string AcctID { get; set; } = string.Empty;
 
-        private string _reason = string.Empty;
         /// <summary>
-        /// Reason for adding player to Watchlist (ex: Cheater, streamer name,etc.)
+        /// Reason for adding player to Watchlist (ex: Cheater, streamer name, etc.)
         /// </summary>
         [JsonPropertyName("reason")]
-        public string Reason
-        {
-            get => _reason;
-            set
-            {
-                if (_reason != value)
-                {
-                    _reason = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        public string Reason { get; set; } = string.Empty;
+
         /// <summary>
         /// Timestamp when the entry was originally added.
         /// </summary>
