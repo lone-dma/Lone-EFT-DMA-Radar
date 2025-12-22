@@ -200,8 +200,6 @@ namespace LoneEftDmaRadar.UI.Panels
             {
                 if (!string.IsNullOrWhiteSpace(_serverUrl))
                 {
-                    // Note: Clipboard access in non-WPF requires platform-specific handling
-                    // For now, we'll use the Windows clipboard API via PInvoke
                     Clipboard.SetText(_serverUrl);
                     MessageBox.Show("Web Radar URL copied to clipboard.", "Web Radar",
                         MessageBoxButton.OK, MessageBoxImage.Information);

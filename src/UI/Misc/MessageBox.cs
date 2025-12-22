@@ -55,7 +55,7 @@ namespace LoneEftDmaRadar.UI.Misc
         /// Displays a message box with the specified text, caption, button(s), and icon.
         /// </summary>
         public static MessageBoxResult Show(string messageBoxText, string caption, MessageBoxButton button, MessageBoxImage icon)
-            => Show(messageBoxText, caption, button, icon);
+            => Show(messageBoxText, caption, button, icon, MessageBoxOptions.None);
 
 
         /// <summary>
