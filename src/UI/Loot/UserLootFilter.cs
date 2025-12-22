@@ -26,8 +26,6 @@ SOFTWARE.
  *
 */
 
-using System.Collections.ObjectModel;
-
 namespace LoneEftDmaRadar.UI.Loot
 {
     public sealed class UserLootFilter
@@ -38,6 +36,6 @@ namespace LoneEftDmaRadar.UI.Loot
 
         [JsonInclude]
         [JsonPropertyName("entries")]
-        public ObservableCollection<LootFilterEntry> Entries { get; init; } = new();
+        public List<LootFilterEntry> Entries { get; init; } = [];
     }
 }
