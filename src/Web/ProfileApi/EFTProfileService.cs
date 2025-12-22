@@ -31,7 +31,6 @@ using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Misc.Services;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
 using LoneEftDmaRadar.Web.EftApiTech;
-using LoneEftDmaRadar.Web.ProfileApi.Schema;
 using LoneEftDmaRadar.Web.TarkovDev.Profiles;
 using System.Threading.Tasks.Dataflow;
 

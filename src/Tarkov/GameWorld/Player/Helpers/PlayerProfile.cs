@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Web.ProfileApi.Schema;
+using LoneEftDmaRadar.Web.ProfileApi;
 using LoneEftDmaRadar.Web.Twitch;
 using System.Collections.Frozen;
 
@@ -246,8 +246,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers
 
         #region Properties
 
-        private ProfileData _data;
-        public ProfileData Data
+        private ProfileApiTypes.ProfileData _data;
+        public ProfileApiTypes.ProfileData Data
         {
             get => _data;
             set
