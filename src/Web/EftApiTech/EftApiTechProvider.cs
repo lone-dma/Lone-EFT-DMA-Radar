@@ -28,7 +28,6 @@ SOFTWARE.
 
 using LoneEftDmaRadar.UI;
 using LoneEftDmaRadar.Web.ProfileApi;
-using LoneEftDmaRadar.Web.ProfileApi.Schema;
 using Microsoft.Extensions.DependencyInjection;
 using Polly.CircuitBreaker;
 using System.Net.Http.Headers;
@@ -150,7 +149,7 @@ namespace LoneEftDmaRadar.Web.EftApiTech
                 var epoch = jsonDoc.RootElement.GetProperty("lastUpdated").GetProperty("epoch").GetInt64();
                 var data = jsonDoc.RootElement.GetProperty("data");
                 string raw = data.GetRawText();
-                var result = JsonSerializer.Deserialize<ProfileData>(raw, Program.JsonOptions) ??
+                var result = JsonSerializer.Deserialize<ProfileApiTypes.ProfileData>(raw, Program.JsonOptions) ??
                     throw new InvalidOperationException("Failed to deserialize response");
                 Logging.WriteLine($"[EftApiTechProvider] Got Profile '{accountId}'!");
                 return new()

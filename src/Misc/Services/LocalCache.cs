@@ -27,7 +27,7 @@ SOFTWARE.
 */
 
 using LiteDB;
-using LoneEftDmaRadar.Web.ProfileApi.Schema;
+using LoneEftDmaRadar.Web.ProfileApi;
 
 namespace LoneEftDmaRadar.Misc.Services
 {

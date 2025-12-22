@@ -27,7 +27,6 @@ SOFTWARE.
 */
 
 using ImGuiNET;
-using LoneEftDmaRadar.UI.Misc;
 using LoneEftDmaRadar.Web.WebRadar;
 
 namespace LoneEftDmaRadar.UI.Panels

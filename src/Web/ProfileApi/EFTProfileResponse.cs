@@ -1,13 +1,11 @@
-﻿using LoneEftDmaRadar.Web.ProfileApi.Schema;
-
-namespace LoneEftDmaRadar.Web.ProfileApi
+﻿namespace LoneEftDmaRadar.Web.ProfileApi
 {
     public sealed class EFTProfileResponse
     {
         /// <summary>
         /// <see cref="ProfileData"/> instance ready for consumption.
         /// </summary>
-        public ProfileData Data { get; init; }
+        public ProfileApiTypes.ProfileData Data { get; init; }
         /// <summary>
         /// Raw web response from the provider (for caching purposes).
         /// </summary>
