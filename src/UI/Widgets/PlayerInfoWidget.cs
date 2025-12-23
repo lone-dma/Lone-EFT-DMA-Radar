@@ -218,16 +218,20 @@ namespace LoneEftDmaRadar.UI.Widgets
         {
             SKColor color;
             if (player.IsFocused)
-                color = SKPaints.PaintFocused.Color;
-
-            color = player.Type switch
             {
-                PlayerType.PMC => SKPaints.PaintPMC.Color,
-                PlayerType.PScav => SKPaints.PaintPScav.Color,
-                PlayerType.Streamer => SKPaints.PaintStreamer.Color,
-                PlayerType.SpecialPlayer => SKPaints.PaintWatchlist.Color,
-                _ => SKColors.White
-            };
+                color = SKPaints.PaintFocused.Color;
+            }
+            else
+            {
+                color = player.Type switch
+                {
+                    PlayerType.PMC => SKPaints.PaintPMC.Color,
+                    PlayerType.PScav => SKPaints.PaintPScav.Color,
+                    PlayerType.Streamer => SKPaints.PaintStreamer.Color,
+                    PlayerType.SpecialPlayer => SKPaints.PaintWatchlist.Color,
+                    _ => SKColors.White
+                };
+            }
             color = color.AdjustBrightness(0.5f);
             return new Vector4(color.Red / 255f, color.Green / 255f, color.Blue / 255f, 1f);
         }
