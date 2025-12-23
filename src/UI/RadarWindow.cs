@@ -60,8 +60,8 @@ namespace LoneEftDmaRadar.UI
         private static ImGuiController _imgui = null!;
         private static SKSurface _skSurface = null!;
         private static GRContext _grContext = null!;
+        private static GRBackendRenderTarget _skBackendRenderTarget = null!;
         private static volatile bool _purgeSkResources = false;
-
         private static readonly PeriodicTimer _fpsTimer = new(TimeSpan.FromSeconds(1));
         private static int _fpsCounter = 0;
         private static int _statusOrder = 1;
@@ -196,7 +196,7 @@ namespace LoneEftDmaRadar.UI
             {
                 string path = Path.Combine(Program.ConfigPath.FullName, "imgui.ini");
                 ImGuiNET.ImGuiNative.igGetIO()->IniFilename = (byte*)Marshal.StringToHGlobalAnsi(path);
-                
+
                 // Explicitly load the ini file if it exists
                 if (File.Exists(path))
                 {
@@ -244,13 +244,14 @@ namespace LoneEftDmaRadar.UI
         private static void CreateSkiaSurface()
         {
             _skSurface?.Dispose();
+            _skBackendRenderTarget?.Dispose();
 
             var fbInfo = new GRGlFramebufferInfo(
                 0, // default framebuffer
                 (uint)InternalFormat.Rgba8
             );
 
-            var backendRenderTarget = new GRBackendRenderTarget(
+            _skBackendRenderTarget = new GRBackendRenderTarget(
                 _window.Size.X,
                 _window.Size.Y,
                 0,
@@ -260,7 +261,7 @@ namespace LoneEftDmaRadar.UI
 
             _skSurface = SKSurface.Create(
                 _grContext,
-                backendRenderTarget,
+                _skBackendRenderTarget,
                 GRSurfaceOrigin.BottomLeft,
                 SKColorType.Rgba8888
             );
@@ -296,6 +297,14 @@ namespace LoneEftDmaRadar.UI
                                                   _window.WindowBorder == WindowBorder.Resizable);
 
             Program.Config.Save();
+
+            // Cleanup resources
+            AimviewWidget.Cleanup();
+            
+            _imgui?.Dispose();
+            _skSurface?.Dispose();
+            _skBackendRenderTarget?.Dispose();
+            _grContext?.Dispose();
         }
 
         #endregion

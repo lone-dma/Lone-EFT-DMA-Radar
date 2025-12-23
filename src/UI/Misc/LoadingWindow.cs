@@ -159,11 +159,18 @@ namespace LoneEftDmaRadar.UI.Misc
             _disposed = true;
             _isRunning = false;
 
-            // Dispose ImGui controller
+            // Dispose ImGui controller first
             if (_imgui is not null)
             {
                 _imgui.Dispose();
                 _imgui = null;
+            }
+
+            // Destroy the ImGui context we created
+            var ctx = ImGui.GetCurrentContext();
+            if (ctx != IntPtr.Zero)
+            {
+                ImGui.DestroyContext(ctx);
             }
 
             // Close and dispose the window
