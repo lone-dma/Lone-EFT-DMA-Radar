@@ -1,0 +1,211 @@
+﻿using ImGuiNET;
+using LoneEftDmaRadar.Misc;
+using LoneEftDmaRadar.Tarkov.GameWorld.Player;
+using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
+
+namespace LoneEftDmaRadar.UI.Widgets
+{
+    /// <summary>
+    /// Player Info Widget that displays a table of hostile human players using ImGui.
+    /// </summary>
+    public static class PlayerInfoWidget
+    {
+        // Row height estimation
+        private const float RowHeight = 18f;
+        private const float HeaderHeight = 20f;
+        private const float WindowPadding = 30f; // Title bar + padding
+        private const float MinHeight = 50f;
+        private const float MaxHeight = 350f;
+
+        /// <summary>
+        /// Whether the Player Info Widget is open.
+        /// </summary>
+        public static bool IsOpen
+        {
+            get => Program.Config.InfoWidget.Enabled;
+            set => Program.Config.InfoWidget.Enabled = value;
+        }
+
+        // Data sources
+        private static LocalPlayer LocalPlayer => Memory.LocalPlayer;
+        private static IReadOnlyCollection<AbstractPlayer> AllPlayers => Memory.Players;
+        private static bool InRaid => Memory.InRaid;
+
+        // Brighter color definitions (adjusted +50% brightness like original)
+        private static readonly Vector4 ColorWhite = new(1f, 1f, 1f, 1f);
+        private static readonly Vector4 ColorPMC = new(1f, 0.5f, 0.5f, 1f); // Bright Red
+        private static readonly Vector4 ColorPScav = new(1f, 1f, 1f, 1f); // White
+        private static readonly Vector4 ColorStreamer = new(0.79f, 0.72f, 0.93f, 1f); // Bright Purple
+        private static readonly Vector4 ColorSpecial = new(1f, 0.71f, 0.85f, 1f); // Bright Pink
+        private static readonly Vector4 ColorFocused = new(1f, 0.75f, 0.65f, 1f); // Bright Coral
+
+        /// <summary>
+        /// Draw the Player Info Widget.
+        /// </summary>
+        public static void Draw()
+        {
+            if (!IsOpen || !InRaid)
+                return;
+
+            var localPlayer = LocalPlayer;
+            var allPlayers = AllPlayers;
+            if (localPlayer is null || allPlayers is null)
+                return;
+
+            // Filter and sort players: only hostile humans, sorted by distance
+            var localPos = localPlayer.Position;
+            var filteredPlayers = allPlayers
+                .Where(p => p.IsHumanHostileActive)
+                .OrderBy(p => Vector3.DistanceSquared(localPos, p.Position))
+                .ToList();
+
+            // Calculate dynamic height based on number of entries
+            float contentHeight = HeaderHeight + (filteredPlayers.Count * RowHeight);
+            float windowHeight = Math.Clamp(contentHeight + WindowPadding, MinHeight, MaxHeight);
+
+            // Set dynamic size - auto width based on content
+            ImGui.SetNextWindowSizeConstraints(new Vector2(100, MinHeight), new Vector2(800, MaxHeight));
+
+            bool isOpen = IsOpen;
+            var windowFlags = ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoScrollbar;
+
+            if (!ImGui.Begin("Player Info", ref isOpen, windowFlags))
+            {
+                IsOpen = isOpen;
+                ImGui.End();
+                return;
+            }
+            IsOpen = isOpen;
+
+            if (filteredPlayers.Count == 0)
+            {
+                ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "No hostile players detected");
+                ImGui.End();
+                return;
+            }
+
+            // Compact table with tight padding
+            ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(4, 1));
+
+            const ImGuiTableFlags tableFlags = ImGuiTableFlags.Borders |
+                                               ImGuiTableFlags.RowBg |
+                                               ImGuiTableFlags.SizingFixedFit |
+                                               ImGuiTableFlags.NoPadOuterX;
+
+            if (ImGui.BeginTable("PlayersTable", 9, tableFlags))
+            {
+                // Setup columns with tight fixed widths
+                ImGui.TableSetupColumn("Fac/Lvl/Name", ImGuiTableColumnFlags.WidthFixed, 140f);
+                ImGui.TableSetupColumn("Acct", ImGuiTableColumnFlags.WidthFixed, 35f);
+                ImGui.TableSetupColumn("Achv", ImGuiTableColumnFlags.WidthFixed, 30f);
+                ImGui.TableSetupColumn("K/D", ImGuiTableColumnFlags.WidthFixed, 35f);
+                ImGui.TableSetupColumn("Hours", ImGuiTableColumnFlags.WidthFixed, 40f);
+                ImGui.TableSetupColumn("Raids", ImGuiTableColumnFlags.WidthFixed, 40f);
+                ImGui.TableSetupColumn("S/R%", ImGuiTableColumnFlags.WidthFixed, 35f);
+                ImGui.TableSetupColumn("Grp", ImGuiTableColumnFlags.WidthFixed, 25f);
+                ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthFixed, 45f);
+                ImGui.TableHeadersRow();
+
+                foreach (var player in filteredPlayers)
+                {
+                    ImGui.TableNextRow();
+
+                    var rowColor = GetTextColor(player);
+
+                    // Column 0: Faction/Level/Name
+                    ImGui.TableNextColumn();
+                    string name = (Program.Config.UI.HideNames && player.IsHuman) ? "<Hidden>" : player.Name;
+                    char faction = player.PlayerSide.ToString()[0];
+                    string level = "0";
+
+                    if (player is ObservedPlayer obs && obs.Profile.Level is int lvl)
+                        level = lvl.ToString();
+
+                    ImGui.TextColored(rowColor, $"{faction}{level}:{name}");
+
+                    // Column 1: Account Edition
+                    ImGui.TableNextColumn();
+                    string edition = "--";
+                    if (player is ObservedPlayer obs1 && !string.IsNullOrEmpty(obs1.Profile.Acct))
+                        edition = obs1.Profile.Acct;
+                    ImGui.TextColored(rowColor, edition);
+
+                    // Column 2: Achievement Level
+                    ImGui.TableNextColumn();
+                    string achievs = "--";
+                    if (player is ObservedPlayer obs2 && obs2.Profile.AchievLevel is int al)
+                    {
+                        achievs = al switch
+                        {
+                            1 => "+",
+                            2 => "++",
+                            _ => "--",
+                        };
+                    }
+                    ImGui.TextColored(rowColor, achievs);
+
+                    // Column 3: K/D
+                    ImGui.TableNextColumn();
+                    string kd = "--";
+                    if (player is ObservedPlayer obs3 && obs3.Profile.Overall_KD is float kdVal)
+                        kd = kdVal.ToString("n1");
+                    ImGui.TextColored(rowColor, kd);
+
+                    // Column 4: Hours
+                    ImGui.TableNextColumn();
+                    string hours = "--";
+                    if (player is ObservedPlayer obs4 && obs4.Profile.Hours is int hrs)
+                        hours = Utilities.FormatNumberKM(hrs);
+                    ImGui.TextColored(rowColor, hours);
+
+                    // Column 5: Raid Count
+                    ImGui.TableNextColumn();
+                    string raidCount = "--";
+                    if (player is ObservedPlayer obs5 && obs5.Profile.RaidCount is int rc)
+                        raidCount = Utilities.FormatNumberKM(rc);
+                    ImGui.TextColored(rowColor, raidCount);
+
+                    // Column 6: Survive Rate
+                    ImGui.TableNextColumn();
+                    string survivePercent = "--";
+                    if (player is ObservedPlayer obs6 && obs6.Profile.SurvivedRate is float sr)
+                        survivePercent = sr.ToString("n1");
+                    ImGui.TextColored(rowColor, survivePercent);
+
+                    // Column 7: Group ID
+                    ImGui.TableNextColumn();
+                    string grp = player.GroupID != -1 ? player.GroupID.ToString() : "--";
+                    ImGui.TextColored(rowColor, grp);
+
+                    // Column 8: Equipment Value
+                    ImGui.TableNextColumn();
+                    string value = "--";
+                    if (player is ObservedPlayer obs7)
+                        value = Utilities.FormatNumberKM(obs7.Equipment.Value);
+                    ImGui.TextColored(rowColor, value);
+                }
+
+                ImGui.EndTable();
+            }
+
+            ImGui.PopStyleVar(); // CellPadding
+
+            ImGui.End();
+        }
+
+        private static Vector4 GetTextColor(AbstractPlayer player)
+        {
+            if (player.IsFocused)
+                return ColorFocused;
+
+            return player.Type switch
+            {
+                PlayerType.PMC => ColorPMC,
+                PlayerType.PScav => ColorPScav,
+                PlayerType.Streamer => ColorStreamer,
+                PlayerType.SpecialPlayer => ColorSpecial,
+                _ => ColorWhite
+            };
+        }
+    }
+}

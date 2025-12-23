@@ -655,19 +655,6 @@ namespace LoneEftDmaRadar
         /// </summary>
         [JsonPropertyName("enabled")]
         public bool Enabled { get; set; } = true;
-
-        /// <summary>
-        /// True if the Aimview Widget is minimized.
-        /// </summary>
-        [JsonPropertyName("minimized")]
-        public bool Minimized { get; set; } = false;
-
-        /// <summary>
-        /// Aimview Location
-        /// </summary>
-        [JsonPropertyName("location")]
-        [JsonConverter(typeof(SKRectJsonConverter))]
-        public SKRect Location { get; set; }
     }
 
     public sealed class InfoWidgetConfig
@@ -677,19 +664,6 @@ namespace LoneEftDmaRadar
         /// </summary>
         [JsonPropertyName("enabled")]
         public bool Enabled { get; set; } = true;
-
-        /// <summary>
-        /// True if the Info Widget is minimized.
-        /// </summary>
-        [JsonPropertyName("minimized")]
-        public bool Minimized { get; set; } = false;
-
-        /// <summary>
-        /// ESP Widget Location
-        /// </summary>
-        [JsonPropertyName("location")]
-        [JsonConverter(typeof(SKRectJsonConverter))]
-        public SKRect Location { get; set; }
     }
 
     public sealed class ProfileApiConfig

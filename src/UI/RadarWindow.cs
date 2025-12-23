@@ -41,6 +41,7 @@ using LoneEftDmaRadar.UI.Loot;
 using LoneEftDmaRadar.UI.Maps;
 using LoneEftDmaRadar.UI.Panels;
 using LoneEftDmaRadar.UI.Skia;
+using LoneEftDmaRadar.UI.Widgets;
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
@@ -69,10 +70,6 @@ namespace LoneEftDmaRadar.UI
         private static bool _mouseDown;
         private static Vector2 _lastMousePosition;
         private static IMouseoverEntity _mouseOverItem;
-
-        // Widgets
-        private static AimviewWidget _aimviewWidget;
-        private static PlayerInfoWidget _playerInfoWidget;
 
         // UI State (moved from RadarUIState)
         private static int _fps;
@@ -241,23 +238,7 @@ namespace LoneEftDmaRadar.UI
 
         private static void InitializeWidgets()
         {
-            var size = new SKSize(_window.Size.X, _window.Size.Y);
-            var cr = new SKRect(0, 0, size.Width, size.Height);
-
-            if (Program.Config.AimviewWidget.Location == default)
-            {
-                Program.Config.AimviewWidget.Location = new SKRect(cr.Left, cr.Bottom - 200, cr.Left + 200, cr.Bottom);
-            }
-
-            if (Program.Config.InfoWidget.Location == default)
-            {
-                Program.Config.InfoWidget.Location = new SKRect(cr.Right - 1, cr.Top, cr.Right, cr.Top + 1);
-            }
-
-            _aimviewWidget = new AimviewWidget(size, Program.Config.AimviewWidget.Location,
-                Program.Config.AimviewWidget.Minimized, Program.Config.UI.UIScale);
-            _playerInfoWidget = new PlayerInfoWidget(size, Program.Config.InfoWidget.Location,
-                Program.Config.InfoWidget.Minimized, Program.Config.UI.UIScale);
+            AimviewWidget.Initialize(_gl, _grContext);
         }
 
         private static void CreateSkiaSurface()
@@ -290,11 +271,6 @@ namespace LoneEftDmaRadar.UI
             _gl.Viewport(size);
             CreateSkiaSurface();
             _imgui.WindowResized(size.X, size.Y);
-
-            // Update widget canvas size
-            var skSize = new SKSize(size.X, size.Y);
-            _aimviewWidget?.UpdateCanvasSize(skSize);
-            _playerInfoWidget?.UpdateCanvasSize(skSize);
         }
 
         private static void OnStateChanged(WindowState state)
@@ -318,26 +294,6 @@ namespace LoneEftDmaRadar.UI
             // Only save maximized if it's regular maximized (not fullscreen)
             Program.Config.UI.WindowMaximized = (_window.WindowState == WindowState.Maximized &&
                                                   _window.WindowBorder == WindowBorder.Resizable);
-
-            // Save widget positions (use Location and Size, not Rectangle which includes title bar)
-            if (_aimviewWidget is not null)
-            {
-                Program.Config.AimviewWidget.Location = new SKRect(
-                    _aimviewWidget.Location.X,
-                    _aimviewWidget.Location.Y,
-                    _aimviewWidget.Location.X + _aimviewWidget.Size.Width,
-                    _aimviewWidget.Location.Y + _aimviewWidget.Size.Height);
-                Program.Config.AimviewWidget.Minimized = _aimviewWidget.IsMinimized;
-            }
-            if (_playerInfoWidget is not null)
-            {
-                Program.Config.InfoWidget.Location = new SKRect(
-                    _playerInfoWidget.Location.X,
-                    _playerInfoWidget.Location.Y,
-                    _playerInfoWidget.Location.X + _playerInfoWidget.Size.Width,
-                    _playerInfoWidget.Location.Y + _playerInfoWidget.Size.Height);
-                Program.Config.InfoWidget.Minimized = _playerInfoWidget.IsMinimized;
-            }
 
             Program.Config.Save();
         }
@@ -364,6 +320,13 @@ namespace LoneEftDmaRadar.UI
                 DrawRadarScene(canvas);
                 canvas.Flush();
                 _grContext.Flush();
+
+                // Render AimviewWidget to its FBO (during Skia phase, before ImGui)
+                AimviewWidget.RenderToFbo();
+
+                // Restore viewport to full window after FBO rendering
+                _gl.Viewport(0, 0, (uint)_window.Size.X, (uint)_window.Size.Y);
+                _gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 
                 // --- UI RENDER (ImGui) ---
                 // Now start ImGui frame AFTER Skia has flushed
@@ -510,20 +473,8 @@ namespace LoneEftDmaRadar.UI
             // Draw local player on top
             localPlayer.Draw(canvas, mapParams, localPlayer);
 
-            // Draw player info widget
-            if (allPlayers is not null && Program.Config.InfoWidget.Enabled)
-            {
-                _playerInfoWidget?.Draw(canvas, localPlayer, allPlayers);
-            }
-
             // Draw mouseover
             closestToMouse?.DrawMouseover(canvas, mapParams, localPlayer);
-
-            // Draw aimview widget
-            if (Program.Config.AimviewWidget.Enabled)
-            {
-                _aimviewWidget?.Draw(canvas);
-            }
         }
 
         private static void DrawGroupConnectors(SKCanvas canvas, IEnumerable<AbstractPlayer> allPlayers, IEftMap map, EftMapParams mapParams)
@@ -714,6 +665,18 @@ namespace LoneEftDmaRadar.UI
             {
                 MapSetupHelperPanel.Draw();
             }
+
+            // Aimview Widget
+            if (AimviewWidget.IsOpen && InRaid)
+            {
+                AimviewWidget.Draw();
+            }
+
+            // Player Info Widget
+            if (PlayerInfoWidget.IsOpen && InRaid)
+            {
+                PlayerInfoWidget.Draw();
+            }
         }
 
         private static void DrawLootFiltersWindow()
@@ -775,9 +738,6 @@ namespace LoneEftDmaRadar.UI
 
         #region Input Handling
 
-        // Track which widget is being interacted with
-        private static AbstractSKWidget _activeWidget;
-
         private static void OnMouseDown(IMouse mouse, MouseButton button)
         {
             // Let ImGui handle mouse if it wants to
@@ -789,20 +749,6 @@ namespace LoneEftDmaRadar.UI
 
             if (button == MouseButton.Left)
             {
-                // Check if clicking on a widget first
-                if (Program.Config.AimviewWidget.Enabled && _aimviewWidget?.ContainsPoint(mousePos) == true)
-                {
-                    _activeWidget = _aimviewWidget;
-                    _aimviewWidget.HandleMouseDown(mousePos);
-                    return;
-                }
-                if (Program.Config.InfoWidget.Enabled && _playerInfoWidget?.ContainsPoint(mousePos) == true)
-                {
-                    _activeWidget = _playerInfoWidget;
-                    _playerInfoWidget.HandleMouseDown(mousePos);
-                    return;
-                }
-
                 _lastMousePosition = mousePos;
                 _mouseDown = true;
             }
@@ -819,12 +765,6 @@ namespace LoneEftDmaRadar.UI
         {
             if (button == MouseButton.Left)
             {
-                // Release any active widget
-                if (_activeWidget is not null)
-                {
-                    _activeWidget.HandleMouseUp();
-                    _activeWidget = null;
-                }
                 _mouseDown = false;
             }
         }
@@ -839,22 +779,10 @@ namespace LoneEftDmaRadar.UI
             if (ImGui.GetIO().WantCaptureMouse)
             {
                 _mouseDown = false; // Reset drag state when ImGui captures
-                if (_activeWidget is not null)
-                {
-                    _activeWidget.HandleMouseUp();
-                    _activeWidget = null;
-                }
                 return;
             }
 
             var mousePos = new Vector2(position.X, position.Y);
-
-            // Forward to active widget if dragging
-            if (_activeWidget is not null)
-            {
-                _activeWidget.HandleMouseMove(mousePos);
-                return;
-            }
 
             if (_mouseDown && _isMapFreeEnabled)
             {
