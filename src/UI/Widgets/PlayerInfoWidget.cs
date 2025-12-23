@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using Collections.Pooled;
 using ImGuiNET;
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
@@ -75,10 +76,10 @@ namespace LoneEftDmaRadar.UI.Widgets
 
             // Filter and sort players: only hostile humans, sorted by distance
             var localPos = localPlayer.Position;
-            var filteredPlayers = allPlayers
+            using var filteredPlayers = allPlayers
                 .Where(p => p.IsHumanHostileActive)
                 .OrderBy(p => Vector3.DistanceSquared(localPos, p.Position))
-                .ToList();
+                .ToPooledList();
 
             // Calculate dynamic height based on number of entries
             float contentHeight = HeaderHeight + (filteredPlayers.Count * RowHeight);
@@ -127,7 +128,7 @@ namespace LoneEftDmaRadar.UI.Widgets
                 ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthFixed, 45f);
                 ImGui.TableHeadersRow();
 
-                foreach (var player in filteredPlayers)
+                foreach (var player in filteredPlayers.Span)
                 {
                     ImGui.TableNextRow();
 
