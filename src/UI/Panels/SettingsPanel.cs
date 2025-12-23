@@ -510,7 +510,6 @@ namespace LoneEftDmaRadar.UI.Panels
             // Fonts
             SKFonts.UIRegular.Size = 12f * newScale;
             SKFonts.UILarge.Size = 48f * newScale;
-            SKFonts.InfoWidgetFont.Size = 12f * newScale;
         }
 
         #endregion
