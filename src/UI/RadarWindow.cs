@@ -183,15 +183,7 @@ namespace LoneEftDmaRadar.UI
             ImGui.CreateContext();
             unsafe
             {
-                string path;
-                if (Program.IsInstalled) // installed version uses common app data folder
-                {
-                    path = "..\\imgui.ini";
-                }
-                else
-                {
-                    path = "imgui.ini";
-                }
+                string path = Path.Combine(Program.ConfigPath.FullName, "imgui.ini");
                 ImGuiNET.ImGuiNative.igGetIO()->IniFilename = (byte*)Marshal.StringToHGlobalAnsi(path);
             }
 
