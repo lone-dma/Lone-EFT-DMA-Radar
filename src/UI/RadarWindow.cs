@@ -767,7 +767,6 @@ namespace LoneEftDmaRadar.UI
 
                 if (isDoubleClick)
                 {
-                    Logging.WriteLine("Double-click detected.");
                     if (InRaid && _mouseOverItem is ObservedPlayer observed && observed.IsStreaming)
                     {
                         // Open Twitch stream in browser
