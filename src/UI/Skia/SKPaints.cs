@@ -26,6 +26,8 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.UI.Widgets;
+
 namespace LoneEftDmaRadar.UI.Skia
 {
     internal static class SKPaints
