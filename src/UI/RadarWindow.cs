@@ -70,6 +70,8 @@ namespace LoneEftDmaRadar.UI
         private static bool _mouseDown;
         private static Vector2 _lastMousePosition;
         private static IMouseoverEntity _mouseOverItem;
+        private static DateTime _lastClickTime;
+        private const double DoubleClickThresholdMs = 300;
 
         // UI State (moved from RadarUIState)
         private static int _fps;
@@ -300,7 +302,7 @@ namespace LoneEftDmaRadar.UI
 
             // Cleanup resources
             AimviewWidget.Cleanup();
-            
+
             _imgui?.Dispose();
             _skSurface?.Dispose();
             _skBackendRenderTarget?.Dispose();
@@ -758,6 +760,32 @@ namespace LoneEftDmaRadar.UI
 
             if (button == MouseButton.Left)
             {
+                // Check for double-click
+                var now = DateTime.UtcNow;
+                bool isDoubleClick = (now - _lastClickTime).TotalMilliseconds < DoubleClickThresholdMs;
+                _lastClickTime = now;
+
+                if (isDoubleClick)
+                {
+                    Logging.WriteLine("Double-click detected.");
+                    if (InRaid && _mouseOverItem is ObservedPlayer observed && observed.IsStreaming)
+                    {
+                        // Open Twitch stream in browser
+                        try
+                        {
+                            Process.Start(new ProcessStartInfo
+                            {
+                                FileName = observed.TwitchChannelURL,
+                                UseShellExecute = true
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            Logging.WriteLine($"Failed to open Twitch URL: {ex.Message}");
+                        }
+                    }
+                }
+
                 _lastMousePosition = mousePos;
                 _mouseDown = true;
             }
@@ -768,6 +796,9 @@ namespace LoneEftDmaRadar.UI
                     player.IsFocused = !player.IsFocused;
                 }
             }
+
+            // Hide loot overlay on mouse down
+            RadarOverlayPanel.HideLootOverlay();
         }
 
         private static void OnMouseUp(IMouse mouse, MouseButton button)

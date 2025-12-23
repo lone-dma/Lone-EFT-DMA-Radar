@@ -41,6 +41,14 @@ namespace LoneEftDmaRadar.UI.Panels
         private static bool _lootOverlayVisible;
 
         /// <summary>
+        /// Hides the loot overlay if it's currently visible.
+        /// </summary>
+        public static void HideLootOverlay()
+        {
+            _lootOverlayVisible = false;
+        }
+
+        /// <summary>
         /// Apply loot search filter.
         /// </summary>
         private static void ApplyLootSearch()
