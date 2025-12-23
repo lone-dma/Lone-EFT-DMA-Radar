@@ -295,7 +295,6 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                     SKPaints.PaintPMC.Color = skColor;
                     SKPaints.TextPMC.Color = skColor;
                     SKPaints.PaintAimviewWidgetPMC.Color = skColor;
-                    SKPaints.TextPlayersOverlayPMC.Color = skColor.AdjustBrightness(0.5f);
                     break;
                 case ColorPickerOption.ScavPlayer:
                     SKPaints.PaintScav.Color = skColor;
@@ -306,7 +305,6 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                     SKPaints.PaintPScav.Color = skColor;
                     SKPaints.TextPScav.Color = skColor;
                     SKPaints.PaintAimviewWidgetPScav.Color = skColor;
-                    SKPaints.TextPlayersOverlayPScav.Color = skColor.AdjustBrightness(0.5f);
                     break;
                 case ColorPickerOption.BossPlayer:
                     SKPaints.PaintBoss.Color = skColor;
@@ -322,19 +320,16 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                     SKPaints.PaintWatchlist.Color = skColor;
                     SKPaints.TextWatchlist.Color = skColor;
                     SKPaints.PaintAimviewWidgetWatchlist.Color = skColor;
-                    SKPaints.TextPlayersOverlaySpecial.Color = skColor.AdjustBrightness(0.5f);
                     break;
                 case ColorPickerOption.StreamerPlayer:
                     SKPaints.PaintStreamer.Color = skColor;
                     SKPaints.TextStreamer.Color = skColor;
                     SKPaints.PaintAimviewWidgetStreamer.Color = skColor;
-                    SKPaints.TextPlayersOverlayStreamer.Color = skColor.AdjustBrightness(0.5f);
                     break;
                 case ColorPickerOption.FocusedPlayer:
                     SKPaints.PaintFocused.Color = skColor;
                     SKPaints.TextFocused.Color = skColor;
                     SKPaints.PaintAimviewWidgetFocused.Color = skColor;
-                    SKPaints.TextPlayersOverlayFocused.Color = skColor.AdjustBrightness(0.5f);
                     break;
                 case ColorPickerOption.RegularLoot:
                     SKPaints.PaintLoot.Color = skColor;
