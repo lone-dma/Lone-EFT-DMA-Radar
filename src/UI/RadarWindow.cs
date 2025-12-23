@@ -181,11 +181,6 @@ namespace LoneEftDmaRadar.UI
 
             // --- ImGui ---
             ImGui.CreateContext();
-            unsafe
-            {
-                string path = Path.Combine(Program.ConfigPath.FullName, "imgui.ini");
-                ImGuiNET.ImGuiNative.igGetIO()->IniFilename = (byte*)Marshal.StringToHGlobalAnsi(path);
-            }
 
             // Pass the existing input context to ImGuiController to share it
             _imgui = new ImGuiController(
@@ -195,6 +190,19 @@ namespace LoneEftDmaRadar.UI
                 _window.Size.Y,
                 _input  // Share the input context
             );
+
+            // Set IniFilename AFTER context and controller are created, then load settings
+            unsafe
+            {
+                string path = Path.Combine(Program.ConfigPath.FullName, "imgui.ini");
+                ImGuiNET.ImGuiNative.igGetIO()->IniFilename = (byte*)Marshal.StringToHGlobalAnsi(path);
+                
+                // Explicitly load the ini file if it exists
+                if (File.Exists(path))
+                {
+                    ImGui.LoadIniSettingsFromDisk(path);
+                }
+            }
 
             // Configure style AFTER ImGuiController is fully initialized
             // to prevent flicker from font texture recreation
