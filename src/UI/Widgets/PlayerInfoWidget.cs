@@ -2,6 +2,7 @@
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
+using LoneEftDmaRadar.UI.Skia;
 
 namespace LoneEftDmaRadar.UI.Widgets
 {
@@ -30,14 +31,6 @@ namespace LoneEftDmaRadar.UI.Widgets
         private static LocalPlayer LocalPlayer => Memory.LocalPlayer;
         private static IReadOnlyCollection<AbstractPlayer> AllPlayers => Memory.Players;
         private static bool InRaid => Memory.InRaid;
-
-        // Brighter color definitions (adjusted +50% brightness like original)
-        private static readonly Vector4 ColorWhite = new(1f, 1f, 1f, 1f);
-        private static readonly Vector4 ColorPMC = new(1f, 0.5f, 0.5f, 1f); // Bright Red
-        private static readonly Vector4 ColorPScav = new(1f, 1f, 1f, 1f); // White
-        private static readonly Vector4 ColorStreamer = new(0.79f, 0.72f, 0.93f, 1f); // Bright Purple
-        private static readonly Vector4 ColorSpecial = new(1f, 0.71f, 0.85f, 1f); // Bright Pink
-        private static readonly Vector4 ColorFocused = new(1f, 0.75f, 0.65f, 1f); // Bright Coral
 
         /// <summary>
         /// Draw the Player Info Widget.
@@ -195,17 +188,20 @@ namespace LoneEftDmaRadar.UI.Widgets
 
         private static Vector4 GetTextColor(AbstractPlayer player)
         {
+            SKColor color;
             if (player.IsFocused)
-                return ColorFocused;
+                color = SKPaints.PaintFocused.Color;
 
-            return player.Type switch
+            color = player.Type switch
             {
-                PlayerType.PMC => ColorPMC,
-                PlayerType.PScav => ColorPScav,
-                PlayerType.Streamer => ColorStreamer,
-                PlayerType.SpecialPlayer => ColorSpecial,
-                _ => ColorWhite
+                PlayerType.PMC => SKPaints.PaintPMC.Color,
+                PlayerType.PScav => SKPaints.PaintPScav.Color,
+                PlayerType.Streamer => SKPaints.PaintStreamer.Color,
+                PlayerType.SpecialPlayer => SKPaints.PaintWatchlist.Color,
+                _ => SKColors.White
             };
+            color = color.AdjustBrightness(0.5f);
+            return new Vector4(color.Red / 255f, color.Green / 255f, color.Blue / 255f, 1f);
         }
     }
 }

@@ -482,47 +482,6 @@ namespace LoneEftDmaRadar.UI.Skia
 
         #endregion
 
-        #region Player Info Widget Paints
-
-        public static SKPaint TextPlayersOverlay { get; } = new()
-        {
-            Color = SKColors.White,
-            IsStroke = false,
-            IsAntialias = true
-        };
-
-        public static SKPaint TextPlayersOverlayPMC { get; } = new()
-        {
-            IsStroke = false,
-            IsAntialias = true
-        };
-
-        public static SKPaint TextPlayersOverlayPScav { get; } = new()
-        {
-            IsStroke = false,
-            IsAntialias = true
-        };
-
-        public static SKPaint TextPlayersOverlayStreamer { get; } = new()
-        {
-            IsStroke = false,
-            IsAntialias = true
-        };
-
-        public static SKPaint TextPlayersOverlaySpecial { get; } = new()
-        {
-            IsStroke = false,
-            IsAntialias = true
-        };
-
-        public static SKPaint TextPlayersOverlayFocused { get; } = new()
-        {
-            IsStroke = false,
-            IsAntialias = true
-        };
-
-        #endregion
-
         #region ESP Widget Paints
 
         public static SKPaint PaintAimviewWidgetCrosshair { get; } = new()
