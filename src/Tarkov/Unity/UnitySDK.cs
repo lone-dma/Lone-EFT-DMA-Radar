@@ -34,7 +34,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity
     {
         public readonly struct UnityOffsets
         {
-            public const uint GameObjectManager = 0x1A208D8;
+            public const uint GameObjectManager = 0x1A233A0;
 
             public const uint GameObject_ObjectClassOffset = 0x80;
             public const uint GameObject_ComponentsOffset = 0x58;
@@ -43,11 +43,11 @@ namespace LoneEftDmaRadar.Tarkov.Unity
             public const uint Component_ObjectClassOffset = 0x20;
             public const uint Component_GameObjectOffset = 0x58;
 
-            public const uint TransformAccess_IndexOffset = 0x98;
-            public const uint TransformAccess_HierarchyOffset = 0x90;
+            public const uint TransformAccess_IndexOffset = 0x78;
+            public const uint TransformAccess_HierarchyOffset = 0x70;
 
-            public const uint Hierarchy_VerticesOffset = 0x40;
-            public const uint Hierarchy_IndicesOffset = 0x90;
+            public const uint Hierarchy_VerticesOffset = 0x68;
+            public const uint Hierarchy_IndicesOffset = 0x40;
 
             public static readonly uint[] GameWorldChain =
             [
