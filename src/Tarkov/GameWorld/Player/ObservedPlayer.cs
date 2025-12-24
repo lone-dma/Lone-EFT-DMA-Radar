@@ -202,15 +202,14 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 }
                 else
                 {
-                    int pscavNumber = Interlocked.Increment(ref _lastPscavNumber);
-                    Name = $"PScav{pscavNumber}";
+                    Name = $"PScav{GetPlayerId()}";
                     Type = GroupID != -1 && GroupID == localPlayer.GroupID ?
                         PlayerType.Teammate : PlayerType.PScav;
                 }
             }
             else if (IsPmc)
             {
-                Name = "PMC";
+                Name = $"PMC{GetPlayerId()}";
                 Type = GroupID != -1 && GroupID == localPlayer.GroupID ?
                     PlayerType.Teammate : PlayerType.PMC;
             }
@@ -264,6 +263,22 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 return "AI";
             var idPTR = Memory.ReadPtr(this + Offsets.ObservedPlayerView.AccountId);
             return Memory.ReadUnityString(idPTR);
+        }
+
+        /// <summary>
+        /// Get the Player's ID.
+        /// </summary>
+        /// <returns>Player Id or 0 if failed.</returns>
+        private int GetPlayerId()
+        {
+            try
+            {
+                return Memory.ReadValue<int>(this + Offsets.ObservedPlayerView.Id);
+            }
+            catch
+            {
+                return 0;
+            }
         }
 
         /// <summary>
