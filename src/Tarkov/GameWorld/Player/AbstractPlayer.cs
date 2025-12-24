@@ -36,6 +36,7 @@ using LoneEftDmaRadar.UI;
 using LoneEftDmaRadar.UI.Maps;
 using LoneEftDmaRadar.UI.Skia;
 using System.Collections.Frozen;
+using VmmSharpEx.Extensions;
 using VmmSharpEx.Scatter;
 using static LoneEftDmaRadar.Tarkov.Unity.Structures.UnityTransform;
 
@@ -144,16 +145,18 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 player = new ClientPlayer(playerBase);
             else
                 player = new ObservedPlayer(playerBase);
-            Logging.WriteLine($"Player '{player.Name}' allocated.");
+            Logging.WriteLine($"Player '{player.Name}' allocated | 0x{playerBase:X}");
             return player;
         }
+
+        private AbstractPlayer() { }
 
         /// <summary>
         /// Player Constructor.
         /// </summary>
         protected AbstractPlayer(ulong playerBase)
         {
-            ArgumentOutOfRangeException.ThrowIfZero(playerBase, nameof(playerBase));
+            playerBase.ThrowIfInvalidUserVA(nameof(playerBase));
             Base = playerBase;
         }
 
