@@ -39,42 +39,35 @@ namespace LoneEftDmaRadar.Web.TarkovDev.Data
         /// <summary>
         /// Item ID.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("bsgID")]
-        public string BsgId { get; init; } = "NULL";
+        public string BsgId { get; set; } = "NULL";
         /// <summary>
         /// Item Full Name.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("name")]
-        public string Name { get; init; } = "NULL";
+        public string Name { get; set; } = "NULL";
         /// <summary>
         /// Item Short Name.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("shortName")]
-        public string ShortName { get; init; } = "NULL";
+        public string ShortName { get; set; } = "NULL";
         /// <summary>
         /// Highest Vendor Price.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("price")]
-        public long TraderPrice { get; init; }
+        public long TraderPrice { get; set; }
         /// <summary>
         /// Optimal Flea Market Price.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("fleaPrice")]
-        public long FleaPrice { get; init; }
+        public long FleaPrice { get; set; }
         /// <summary>
         /// Number of slots taken up in the inventory.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("slots")]
-        public int Slots { get; init; } = 1;
-        [JsonInclude]
+        public int Slots { get; set; } = 1;
         [JsonPropertyName("categories")]
-        public HashSet<string> Tags { get; init; } = new HashSet<string>();
+        public HashSet<string> Tags { get; set; } = new HashSet<string>();
         /// <summary>
         /// True if this item is Important via the Filters.
         /// </summary>

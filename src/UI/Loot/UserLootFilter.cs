@@ -34,8 +34,7 @@ namespace LoneEftDmaRadar.UI.Loot
 
         [JsonPropertyName("color")] public string Color { get; set; } = SKColors.Turquoise.ToString();
 
-        [JsonInclude]
         [JsonPropertyName("entries")]
-        public List<LootFilterEntry> Entries { get; init; } = [];
+        public List<LootFilterEntry> Entries { get; set; } = [];
     }
 }

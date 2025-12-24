@@ -27,11 +27,10 @@ SOFTWARE.
 */
 
 using LoneEftDmaRadar.Misc;
+using LoneEftDmaRadar.Misc.JSON;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.UI;
 using LoneEftDmaRadar.Web.WebRadar.Data;
-using LoneEftDmaRadar.Web.WebRadar.MessagePack;
-using MessagePack;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
@@ -68,12 +67,11 @@ namespace LoneEftDmaRadar.Web.WebRadar
                     .ConfigureServices(services =>
                     {
                         services.AddSignalR()
-                            .AddMessagePackProtocol(options =>
+                            .AddJsonProtocol(options =>
                             {
-                                options.SerializerOptions = MessagePackSerializerOptions.Standard
-                                    .WithSecurity(MessagePackSecurity.TrustedData)
-                                    .WithCompression(MessagePackCompression.Lz4BlockArray)
-                                    .WithResolver(ResolverGenerator.Instance);
+                                options.PayloadSerializerOptions.TypeInfoResolver = WebRadarJsonContext.Default;
+                                options.PayloadSerializerOptions.Converters.Add(new Vector2JsonConverter());
+                                options.PayloadSerializerOptions.Converters.Add(new Vector3JsonConverter());
                             });
                         services.AddCors(options =>
                         {
@@ -134,13 +132,12 @@ namespace LoneEftDmaRadar.Web.WebRadar
                 while (await timer.WaitForNextTickAsync()) // Wait for specified interval to regulate Tick Rate
                 {
                     try
-
                     {
                         if (Memory.InRaid && Memory.Players is IReadOnlyCollection<AbstractPlayer> players && players.Count > 0)
                         {
                             update.InGame = true;
                             update.MapID = Memory.MapID;
-                            update.Players = players.Select(p => WebRadarPlayer.Create(p));
+                            update.Players = players.Select(p => WebRadarPlayer.Create(p)).ToArray();
                         }
                         else
                         {

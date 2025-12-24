@@ -329,8 +329,6 @@ namespace LoneEftDmaRadar.UI.Widgets
                 PlayerType.AIRaider => SKPaints.PaintAimviewWidgetRaider,
                 PlayerType.AIBoss => SKPaints.PaintAimviewWidgetBoss,
                 PlayerType.PScav => SKPaints.PaintAimviewWidgetPScav,
-                PlayerType.SpecialPlayer => SKPaints.PaintAimviewWidgetWatchlist,
-                PlayerType.Streamer => SKPaints.PaintAimviewWidgetStreamer,
                 _ => SKPaints.PaintAimviewWidgetPMC
             };
         }

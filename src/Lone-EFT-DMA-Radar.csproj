@@ -14,6 +14,15 @@
   </PropertyGroup>
 
 	<PropertyGroup>
+		<PublishAot>true</PublishAot>
+		<HighEntropyVA>true</HighEntropyVA>
+		<OptimizationPreference>Speed</OptimizationPreference>
+		<CetCompat>false</CetCompat>
+		<DebuggerSupport>true</DebuggerSupport>
+		<StackTraceSupport>true</StackTraceSupport>
+	</PropertyGroup>
+
+	<PropertyGroup>
 		<!-- GC Tuning for optimal performance -->
 		<ServerGarbageCollection>true</ServerGarbageCollection>
 		<ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
@@ -59,13 +68,10 @@
     <PackageReference Include="Silk.NET.Windowing" Version="2.22.0" />
     <PackageReference Include="SkiaSharp" Version="3.119.1" />
 	<PackageReference Include="Collections.Pooled.V2" Version="2.2.2" />
-	<PackageReference Include="LiteDB" Version="5.0.21" /> <!-- Doesn't support AOT -->
 	<PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.1.0" />
 	<PackageReference Include="Svg.Skia" Version="3.2.1" />
-	<PackageReference Include="TwitchLib.Api" Version="3.10.2" />
 	<PackageReference Include="Velopack" Version="0.0.1298" />
 	<PackageReference Include="VmmSharpEx" Version="3.110.12" />
-	<PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="10.0.1" />
 	<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	<PackageReference Include="Open.Nat.V2" Version="3.1.1" />
   </ItemGroup>

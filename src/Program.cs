@@ -21,17 +21,15 @@ global using MessageBoxImage = LoneEftDmaRadar.UI.Misc.MessageBoxImage;
 global using MessageBoxOptions = LoneEftDmaRadar.UI.Misc.MessageBoxOptions;
 global using MessageBoxResult = LoneEftDmaRadar.UI.Misc.MessageBoxResult;
 global using RateLimiter = LoneEftDmaRadar.Misc.RateLimiter;
-using LoneEftDmaRadar.Misc.JSON;
-using LoneEftDmaRadar.Misc.Services;
 using LoneEftDmaRadar.Tarkov;
 using LoneEftDmaRadar.UI;
 using LoneEftDmaRadar.UI.Maps;
 using LoneEftDmaRadar.UI.Misc;
 using LoneEftDmaRadar.UI.Skia;
-using LoneEftDmaRadar.Web.EftApiTech;
 using LoneEftDmaRadar.Web.TarkovDev.Data;
-using LoneEftDmaRadar.Web.TarkovDev.Profiles;
 using Microsoft.Extensions.DependencyInjection;
+using Silk.NET.Input.Glfw;
+using Silk.NET.Windowing.Glfw;
 using Velopack;
 using Velopack.Sources;
 
@@ -65,24 +63,14 @@ namespace LoneEftDmaRadar
         /// HttpClientFactory for creating HttpClients.
         /// </summary>
         public static IHttpClientFactory HttpClientFactory { get; }
-        /// <summary>
-        /// Default JSON Options for this App Domain.
-        /// </summary>
-        public static JsonSerializerOptions JsonOptions { get; } = new()
-        {
-            Converters = { Vector2JsonConverter.Instance, Vector3JsonConverter.Instance },
-            WriteIndented = true,
-            PropertyNameCaseInsensitive = true,
-            AllowTrailingCommas = true,
-            NumberHandling = JsonNumberHandling.AllowReadingFromString,
-            ReadCommentHandling = JsonCommentHandling.Skip
-        };
 
         static Program()
         {
+            GlfwWindowing.RegisterPlatform();
+            GlfwInput.RegisterPlatform();
+            VelopackApp.Build().Run();
             try
             {
-                VelopackApp.Build().Run();
                 IsInstalled = new UpdateManager(".").IsInstalled;
                 _mutex = new Mutex(true, MUTEX_ID, out bool singleton);
                 if (!singleton)
@@ -154,7 +142,6 @@ namespace LoneEftDmaRadar
             {
                 SKPaints.PaintBitmap.ColorFilter = SKPaints.GetDarkModeColorFilter(0.7f);
                 SKPaints.PaintBitmapAlpha.ColorFilter = SKPaints.GetDarkModeColorFilter(0.7f);
-                RuntimeHelpers.RunClassConstructor(typeof(LocalCache).TypeHandle);
             });
 
             // Wait for all tasks
@@ -179,8 +166,6 @@ namespace LoneEftDmaRadar
             var services = new ServiceCollection();
             services.AddHttpClient(); // Add default HttpClientFactory
             TarkovDevGraphQLApi.Configure(services);
-            TarkovDevProfileProvider.Configure(services);
-            EftApiTechProvider.Configure(services);
             return services.BuildServiceProvider();
         }
 

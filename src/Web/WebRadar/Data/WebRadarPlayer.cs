@@ -27,43 +27,41 @@ SOFTWARE.
 */
 
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
-using MessagePack;
 
 namespace LoneEftDmaRadar.Web.WebRadar.Data
 {
-    [MessagePackObject]
-    public readonly struct WebRadarPlayer
+    public struct WebRadarPlayer
     {
         /// <summary>
         /// Player Name.
         /// </summary>
-        [Key(0)]
-        public readonly string Name { get; init; }
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
         /// <summary>
         /// Player Type (PMC, Scav,etc.)
         /// </summary>
-        [Key(1)]
-        public readonly WebPlayerType Type { get; init; }
+        [JsonPropertyName("type")]
+        public WebPlayerType Type { get; set; }
         /// <summary>
         /// True if player is active, otherwise False.
         /// </summary>
-        [Key(2)]
-        public readonly bool IsActive { get; init; }
+        [JsonPropertyName("isActive")]
+        public bool IsActive { get; set; }
         /// <summary>
         /// True if player is alive, otherwise False.
         /// </summary>
-        [Key(3)]
-        public readonly bool IsAlive { get; init; }
+        [JsonPropertyName("isAlive")]
+        public bool IsAlive { get; set; }
         /// <summary>
         /// Unity World Position.
         /// </summary>
-        [Key(4)]
-        public readonly Vector3 Position { get; init; }
+        [JsonPropertyName("position")]
+        public Vector3 Position { get; set; }
         /// <summary>
         /// Unity World Rotation.
         /// </summary>
-        [Key(5)]
-        public readonly Vector2 Rotation { get; init; }
+        [JsonPropertyName("rotation")]
+        public Vector2 Rotation { get; set; }
 
         /// <summary>
         /// Create a WebRadarPlayer from a Full Player Object.

@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.Misc.JSON;
 using LoneEftDmaRadar.Web.TarkovDev.Data;
 using System.Collections.Frozen;
 
@@ -233,7 +234,7 @@ namespace LoneEftDmaRadar.Tarkov
                     if (!file.Exists)
                         return null;
                     using var dataStream = File.OpenRead(file.FullName);
-                    return await JsonSerializer.DeserializeAsync<TarkovDevTypes.DataElement>(dataStream, Program.JsonOptions) ??
+                    return await JsonSerializer.DeserializeAsync(dataStream, AppJsonContext.Default.DataElement) ??
                         throw new InvalidOperationException($"Failed to deserialize {nameof(dataStream)}");
                 }
                 catch
@@ -254,9 +255,7 @@ namespace LoneEftDmaRadar.Tarkov
             {
                 var data = await TarkovDevGraphQLApi.GetTarkovDataAsync();
                 ArgumentNullException.ThrowIfNull(data, nameof(data));
-                var jsonOptions = new JsonSerializerOptions(Program.JsonOptions);
-                jsonOptions.WriteIndented = false;
-                var dataJson = JsonSerializer.Serialize(data, jsonOptions);
+                var dataJson = JsonSerializer.Serialize(data, AppJsonContext.Default.DataElement);
                 await File.WriteAllTextAsync(_tempDataFile.FullName, dataJson);
                 if (_dataFile.Exists)
                 {

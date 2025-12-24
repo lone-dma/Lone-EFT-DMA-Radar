@@ -27,6 +27,7 @@ SOFTWARE.
 */
 
 using ImGuiNET;
+using LoneEftDmaRadar.Misc.JSON;
 using LoneEftDmaRadar.Tarkov;
 using LoneEftDmaRadar.UI.ColorPicker;
 using LoneEftDmaRadar.UI.Hotkeys;
@@ -200,11 +201,6 @@ namespace LoneEftDmaRadar.UI.Panels
                 if (ImGui.IsItemHovered())
                     ImGui.SetTooltip("3D view showing players in your field of view");
 
-                bool infoWidget = Program.Config.InfoWidget.Enabled;
-                if (ImGui.Checkbox("Player Info Widget", ref infoWidget))
-                {
-                    Program.Config.InfoWidget.Enabled = infoWidget;
-                }
                 if (ImGui.IsItemHovered())
                     ImGui.SetTooltip("Displays a list of nearby players with details");
 
@@ -226,14 +222,6 @@ namespace LoneEftDmaRadar.UI.Panels
                 if (ImGui.IsItemHovered())
                     ImGui.SetTooltip("Show mines, sniper zones, and other hazards");
 
-                bool connectGroups = Program.Config.UI.ConnectGroups;
-                if (ImGui.Checkbox("Connect Groups", ref connectGroups))
-                {
-                    Program.Config.UI.ConnectGroups = connectGroups;
-                }
-                if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Draw lines between grouped players");
-
                 ImGui.EndTabItem();
             }
         }
@@ -243,14 +231,6 @@ namespace LoneEftDmaRadar.UI.Panels
             if (ImGui.BeginTabItem("Players"))
             {
                 ImGui.SeparatorText("Player Display");
-
-                bool hideNames = Program.Config.UI.HideNames;
-                if (ImGui.Checkbox("Hide Names", ref hideNames))
-                {
-                    Program.Config.UI.HideNames = hideNames;
-                }
-                if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Hide player names on the radar");
 
                 bool teammateAimlines = Program.Config.UI.TeammateAimlines;
                 if (ImGui.Checkbox("Teammate Aimlines", ref teammateAimlines))
@@ -454,7 +434,7 @@ namespace LoneEftDmaRadar.UI.Panels
             try
             {
                 var backupFile = Path.Combine(Program.ConfigPath.FullName, $"{EftDmaConfig.Filename}.userbak");
-                File.WriteAllText(backupFile, JsonSerializer.Serialize(Program.Config, Program.JsonOptions));
+                File.WriteAllText(backupFile, JsonSerializer.Serialize(Program.Config, AppJsonContext.Default.EftDmaConfig));
                 MessageBox.Show(RadarWindow.Handle, $"Backed up to {backupFile}", "Backup Config", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
@@ -479,13 +459,9 @@ namespace LoneEftDmaRadar.UI.Panels
         {
             // Update Paints
             SKPaints.TextOutline.StrokeWidth = 2f * newScale;
-            SKPaints.PaintConnectorGroup.StrokeWidth = 2.25f * newScale;
-            SKPaints.PaintMouseoverGroup.StrokeWidth = 1.66f * newScale;
             SKPaints.PaintLocalPlayer.StrokeWidth = 1.66f * newScale;
             SKPaints.PaintTeammate.StrokeWidth = 1.66f * newScale;
             SKPaints.PaintPMC.StrokeWidth = 1.66f * newScale;
-            SKPaints.PaintWatchlist.StrokeWidth = 1.66f * newScale;
-            SKPaints.PaintStreamer.StrokeWidth = 1.66f * newScale;
             SKPaints.PaintScav.StrokeWidth = 1.66f * newScale;
             SKPaints.PaintRaider.StrokeWidth = 1.66f * newScale;
             SKPaints.PaintBoss.StrokeWidth = 1.66f * newScale;

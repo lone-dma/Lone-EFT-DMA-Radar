@@ -47,7 +47,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         public override string Name
         {
             get => "BTR";
-            set { }
         }
         public BtrPlayer(ulong btrView, ulong playerBase) : base(playerBase)
         {
