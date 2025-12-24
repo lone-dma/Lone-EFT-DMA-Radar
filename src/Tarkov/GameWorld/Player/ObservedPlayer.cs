@@ -217,7 +217,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 throw new NotImplementedException(nameof(PlayerSide));
             if (IsHuman)
             {
-                long.TryParse(AccountID, out long acctIdLong);
+                _ = long.TryParse(AccountID, out long acctIdLong);
                 var cache = LocalCache.GetProfileCollection();
                 if (cache.FindById(acctIdLong) is EftProfileDto dto &&
                     dto.IsCachedRecent)
