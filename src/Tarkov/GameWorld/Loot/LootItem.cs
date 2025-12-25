@@ -235,7 +235,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         public virtual string GetUILabel()
         {
             string label = "";
-            if (Price > 0)
+            if (Price > 0 && !IsImportant)
                 label += $"[{Utilities.FormatNumberKM(Price)}] ";
             label += ShortName;
 
