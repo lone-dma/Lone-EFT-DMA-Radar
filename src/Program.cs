@@ -91,7 +91,7 @@ namespace LoneEftDmaRadar
             try
             {
                 // Show loading window during initialization
-                var loadingWindow = new LoadingWindow();
+                using var loadingWindow = new LoadingWindow();
                 loadingWindow.Show();
 
                 // Run initialization on a background thread while loading window pumps messages on main thread

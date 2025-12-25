@@ -248,14 +248,6 @@ namespace LoneEftDmaRadar.UI.Panels
                 if (ImGui.IsItemHovered())
                     ImGui.SetTooltip("Show dynamic aim lines for AI players");
 
-                bool markSusPlayers = Program.Config.UI.MarkSusPlayers;
-                if (ImGui.Checkbox("Mark Suspicious Players", ref markSusPlayers))
-                {
-                    Program.Config.UI.MarkSusPlayers = markSusPlayers;
-                }
-                if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Highlight players with suspicious stats");
-
                 ImGui.EndTabItem();
             }
         }
