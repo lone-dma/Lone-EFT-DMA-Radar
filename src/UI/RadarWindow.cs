@@ -60,7 +60,6 @@ namespace LoneEftDmaRadar.UI
         private static SKSurface _skSurface = null!;
         private static GRContext _grContext = null!;
         private static GRBackendRenderTarget _skBackendRenderTarget = null!;
-        private static volatile bool _purgeSkResources = false;
         private static readonly PeriodicTimer _fpsTimer = new(TimeSpan.FromSeconds(1));
         private static int _fpsCounter = 0;
         private static int _statusOrder = 1;
@@ -309,10 +308,6 @@ namespace LoneEftDmaRadar.UI
             try
             {
                 Interlocked.Increment(ref _fpsCounter);
-                if (Interlocked.Exchange(ref _purgeSkResources, false) == true)
-                {
-                    _grContext.PurgeResources();
-                }
 
                 // --- SCENE RENDER (Skia) ---
                 // Render Skia FIRST, before ImGui.NewFrame() is called
@@ -965,14 +960,6 @@ namespace LoneEftDmaRadar.UI
         public static void ZoomOut(int amt)
         {
             Program.Config.UI.Zoom = Math.Min(200, Program.Config.UI.Zoom + amt);
-        }
-
-        /// <summary>
-        /// Purge SKResources to free up memory.
-        /// </summary>
-        public static void PurgeSKResources()
-        {
-            _purgeSkResources = true;
         }
 
         private static async Task RunFpsTimerAsync()
