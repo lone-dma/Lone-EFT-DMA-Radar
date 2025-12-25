@@ -90,6 +90,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// Player's Current Health Status
         /// </summary>
         public Enums.ETagStatus HealthStatus { get; private set; } = Enums.ETagStatus.Healthy;
+        /// <summary>
+        /// True if the Player is a Teammate.
+        /// </summary>
+        public bool IsTeammate => _teammates.ContainsKey(Id);
 
         internal ObservedPlayer(ulong playerBase) : base(playerBase)
         {
@@ -133,20 +137,18 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 else
                 {
                     Name = $"PScav{Id}";
-                    Type = PlayerType.PScav;
+                    Type = IsTeammate ?
+                        PlayerType.Teammate : PlayerType.PScav;
                 }
             }
             else if (IsPmc)
             {
-                Name = $"PMC{Id}";
-                Type = PlayerType.PMC;
+                Name = $"{PlayerSide}{Id}";
+                Type = IsTeammate ?
+                    PlayerType.Teammate : PlayerType.PMC;
             }
             else
                 throw new NotImplementedException(nameof(PlayerSide));
-            if (IsHuman && _teammates.TryGetValue(Id, out _)) // Teammate check (if raid restarted,etc.)
-            {
-                Type = PlayerType.Teammate;
-            }
             Equipment = new PlayerEquipment(this);
         }
 
