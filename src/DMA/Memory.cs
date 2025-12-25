@@ -314,13 +314,15 @@ namespace LoneEftDmaRadar.DMA
 
         private static void Memory_RaidStarted(object sender, EventArgs e)
         {
+            GC.Collect();
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
         }
 
         private static void MemDMA_RaidStopped(object sender, EventArgs e)
         {
-            GCSettings.LatencyMode = GCLatencyMode.Interactive;
             Game = null;
+            GCSettings.LatencyMode = GCLatencyMode.Interactive;
+            GC.Collect();
         }
 
         /// <summary>

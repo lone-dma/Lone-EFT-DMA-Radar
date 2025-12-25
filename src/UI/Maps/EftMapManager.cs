@@ -106,5 +106,14 @@ namespace LoneEftDmaRadar.UI.Maps
                 return null;
             }
         }
+
+        /// <summary>
+        /// Cleans up loaded map resources if loaded. Otherwise no-op.
+        /// </summary>
+        public static void Cleanup()
+        {
+            Map?.Dispose();
+            Map = null;
+        }
     }
 }

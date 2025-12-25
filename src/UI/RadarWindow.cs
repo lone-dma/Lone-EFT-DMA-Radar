@@ -349,6 +349,7 @@ namespace LoneEftDmaRadar.UI
             }
             else
             {
+                EftMapManager.Cleanup();
                 DrawStatusMessage(canvas, isStarting, isReady);
             }
         }
