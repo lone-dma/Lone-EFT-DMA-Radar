@@ -178,9 +178,8 @@ namespace LoneEftDmaRadar
                 string json = File.ReadAllText(file.FullName);
                 return JsonSerializer.Deserialize(json, AppJsonContext.Default.EftDmaConfig);
             }
-            catch (Exception ex)
+            catch
             {
-                Logging.WriteLine(ex.ToString());
                 return null; // Ignore errors, return null to indicate failure
             }
         }

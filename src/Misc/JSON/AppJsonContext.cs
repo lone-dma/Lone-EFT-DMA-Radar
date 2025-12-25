@@ -30,7 +30,7 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Hazards;
 using LoneEftDmaRadar.UI.ColorPicker;
 using LoneEftDmaRadar.UI.Loot;
 using LoneEftDmaRadar.UI.Maps;
-using LoneEftDmaRadar.Web.TarkovDev.Data;
+using LoneEftDmaRadar.Web.TarkovDev;
 using VmmSharpEx.Extensions.Input;
 
 namespace LoneEftDmaRadar.Misc.JSON

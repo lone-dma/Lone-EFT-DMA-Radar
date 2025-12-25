@@ -26,7 +26,7 @@ using LoneEftDmaRadar.UI;
 using LoneEftDmaRadar.UI.Maps;
 using LoneEftDmaRadar.UI.Misc;
 using LoneEftDmaRadar.UI.Skia;
-using LoneEftDmaRadar.Web.TarkovDev.Data;
+using LoneEftDmaRadar.Web.TarkovDev;
 using Microsoft.Extensions.DependencyInjection;
 using Silk.NET.Input.Glfw;
 using Silk.NET.Windowing.Glfw;

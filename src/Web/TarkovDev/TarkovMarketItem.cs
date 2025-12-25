@@ -29,7 +29,7 @@ SOFTWARE.
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.UI.Loot;
 
-namespace LoneEftDmaRadar.Web.TarkovDev.Data
+namespace LoneEftDmaRadar.Web.TarkovDev
 {
     /// <summary>
     /// Class JSON Representation of Tarkov Market Data.

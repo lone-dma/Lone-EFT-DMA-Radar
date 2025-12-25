@@ -31,7 +31,7 @@ using Silk.NET.Input;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 
-namespace LoneEftDmaRadar;
+namespace LoneEftDmaRadar.UI;
 
 public sealed class ImGuiController : IDisposable
 {

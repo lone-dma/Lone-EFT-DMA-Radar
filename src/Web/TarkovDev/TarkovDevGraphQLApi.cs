@@ -32,7 +32,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Authentication;
 
-namespace LoneEftDmaRadar.Web.TarkovDev.Data
+namespace LoneEftDmaRadar.Web.TarkovDev
 {
     internal static class TarkovDevGraphQLApi
     {

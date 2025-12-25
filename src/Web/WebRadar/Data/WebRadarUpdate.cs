@@ -21,6 +21,6 @@
         /// All Players currently on the map.
         /// </summary>
         [JsonPropertyName("players")]
-        public WebRadarPlayer[] Players { get; set; } = null;
+        public IEnumerable<WebRadarPlayer> Players { get; set; } = null;
     }
 }

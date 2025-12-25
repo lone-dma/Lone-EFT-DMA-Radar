@@ -27,7 +27,7 @@ SOFTWARE.
 */
 
 using LoneEftDmaRadar.Misc.JSON;
-using LoneEftDmaRadar.Web.TarkovDev.Data;
+using LoneEftDmaRadar.Web.TarkovDev;
 using System.Collections.Frozen;
 
 namespace LoneEftDmaRadar.Tarkov

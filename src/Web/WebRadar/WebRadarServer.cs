@@ -137,7 +137,7 @@ namespace LoneEftDmaRadar.Web.WebRadar
                         {
                             update.InGame = true;
                             update.MapID = Memory.MapID;
-                            update.Players = players.Select(p => WebRadarPlayer.Create(p)).ToArray();
+                            update.Players = players.Select(p => WebRadarPlayer.Create(p));
                         }
                         else
                         {
