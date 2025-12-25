@@ -26,7 +26,6 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Misc.Workers;
 using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
@@ -175,7 +174,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             while (true)
             {
                 ct.ThrowIfCancellationRequested();
-                ResourceJanitor.Run();
                 Memory.ThrowIfProcessNotRunning();
                 try
                 {
