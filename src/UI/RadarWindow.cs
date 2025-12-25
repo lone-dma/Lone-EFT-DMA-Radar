@@ -238,16 +238,34 @@ namespace LoneEftDmaRadar.UI
             _skSurface?.Dispose();
             _skBackendRenderTarget?.Dispose();
 
+            var size = _window.Size;
+            if (size.X <= 0 || size.Y <= 0 || _grContext is null)
+            {
+                _skSurface = null!;
+                _skBackendRenderTarget = null!;
+                return;
+            }
+
+            const GetPName SampleBuffersPName = (GetPName)0x80A8; // GL_SAMPLE_BUFFERS
+            const GetPName SamplesPName = (GetPName)0x80A9;       // GL_SAMPLES
+            const GetPName StencilBitsPName = (GetPName)0x0D57;   // GL_STENCIL_BITS
+
+            _gl.GetInteger(SampleBuffersPName, out int sampleBuffers);
+            _gl.GetInteger(SamplesPName, out int samples);
+            if (sampleBuffers == 0)
+                samples = 0;
+            _gl.GetInteger(StencilBitsPName, out int stencilBits);
+
             var fbInfo = new GRGlFramebufferInfo(
                 0, // default framebuffer
                 (uint)InternalFormat.Rgba8
             );
 
             _skBackendRenderTarget = new GRBackendRenderTarget(
-                _window.Size.X,
-                _window.Size.Y,
-                0,
-                0,
+                size.X,
+                size.Y,
+                samples,
+                stencilBits,
                 fbInfo
             );
 
