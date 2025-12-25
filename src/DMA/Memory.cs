@@ -28,6 +28,7 @@ SOFTWARE.
 
 global using LoneEftDmaRadar.DMA;
 using Collections.Pooled;
+using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.GameWorld;
 using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
@@ -233,6 +234,7 @@ namespace LoneEftDmaRadar.DMA
                 try
                 {
                     _vmm.ForceFullRefresh();
+                    ResourceJanitor.Run();
                     LoadProcess();
                     LoadModules();
                     Starting = true;
