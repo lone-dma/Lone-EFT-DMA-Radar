@@ -76,6 +76,12 @@ namespace SDK
             public const uint PlayerView = 0x18; // object
             public const uint MovementController = 0xD8; // object
             public const uint HealthController = 0xE8; // object
+            public const uint HandsController = 0x120; // object
+        }
+
+        public readonly partial struct ObservedPlayerHandsController
+        {
+            public const uint _item = 0x58; // object
         }
 
         public readonly partial struct InventoryController

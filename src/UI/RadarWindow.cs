@@ -338,7 +338,7 @@ namespace LoneEftDmaRadar.UI
                 _gl.Viewport(0, 0, (uint)fbSize.X, (uint)fbSize.Y);
                 _gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
                 var canvas = _skSurface.Canvas;
-                
+
                 // Save the initial canvas state
                 canvas.Save();
                 try
@@ -351,7 +351,7 @@ namespace LoneEftDmaRadar.UI
                     // Always restore canvas to initial state, even if DrawRadarScene throws
                     canvas.RestoreToCount(0);
                 }
-                
+
                 canvas.Flush();
                 _grContext.Flush();
 
@@ -369,7 +369,7 @@ namespace LoneEftDmaRadar.UI
                 _imgui.Update((float)delta);
                 DrawImGuiUI();
                 _imgui.Render();
-                
+
             }
             catch (Exception ex)
             {
@@ -654,6 +654,13 @@ namespace LoneEftDmaRadar.UI
             if (AimviewWidget.IsOpen && InRaid)
             {
                 AimviewWidget.Draw();
+            }
+
+
+            // Player Info Widget
+            if (PlayerInfoWidget.IsOpen && InRaid)
+            {
+                PlayerInfoWidget.Draw();
             }
         }
 
@@ -952,6 +959,13 @@ namespace LoneEftDmaRadar.UI
         {
             if (isKeyDown)
                 Program.Config.AimviewWidget.Enabled = !Program.Config.AimviewWidget.Enabled;
+        }
+
+        [Hotkey("Toggle Player Info Widget")]
+        private static void ToggleInfo_HotkeyStateChanged(bool isKeyDown)
+        {
+            if (isKeyDown)
+                Program.Config.InfoWidget.Enabled = !Program.Config.InfoWidget.Enabled;
         }
 
         [Hotkey("Toggle Show Meds")]

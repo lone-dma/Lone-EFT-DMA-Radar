@@ -201,6 +201,11 @@ namespace LoneEftDmaRadar.UI.Panels
                 if (ImGui.IsItemHovered())
                     ImGui.SetTooltip("3D view showing players in your field of view");
 
+                bool infoWidget = Program.Config.InfoWidget.Enabled;
+                if (ImGui.Checkbox("Player Info Widget", ref infoWidget))
+                {
+                    Program.Config.InfoWidget.Enabled = infoWidget;
+                }
                 if (ImGui.IsItemHovered())
                     ImGui.SetTooltip("Displays a list of nearby players with details");
 

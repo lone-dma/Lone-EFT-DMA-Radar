@@ -95,6 +95,12 @@ namespace LoneEftDmaRadar
         public AimviewWidgetConfig AimviewWidget { get; set; } = new();
 
         /// <summary>
+        /// Widgets Configuration.
+        /// </summary>
+        [JsonPropertyName("infoWidget")]
+        public InfoWidgetConfig InfoWidget { get; private set; } = new();
+
+        /// <summary>
         /// Quest Helper Cfg
         /// </summary>
         [JsonPropertyName("questHelper")]
@@ -422,6 +428,16 @@ namespace LoneEftDmaRadar
     {
         /// <summary>
         /// True if the Aimview Widget is enabled.
+        /// </summary>
+        [JsonPropertyName("enabled")]
+        public bool Enabled { get; set; } = true;
+    }
+
+
+    public sealed class InfoWidgetConfig
+    {
+        /// <summary>
+        /// True if the Info Widget is enabled.
         /// </summary>
         [JsonPropertyName("enabled")]
         public bool Enabled { get; set; } = true;
