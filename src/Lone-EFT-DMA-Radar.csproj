@@ -13,6 +13,11 @@
 	<ApplicationIcon>..\Resources\lone-icon.ico</ApplicationIcon>
   </PropertyGroup>
 
+	<!-- SignalR AOT Compatibility -->
+	<ItemGroup>
+		<RuntimeHostConfigurationOption Include="Microsoft.AspNetCore.SignalR.Hub.IsCustomAwaitableSupported" Value="false" Trim="true" />
+	</ItemGroup>
+
 	<PropertyGroup>
 		<!-- GC Tuning for optimal performance -->
 		<ServerGarbageCollection>false</ServerGarbageCollection>
