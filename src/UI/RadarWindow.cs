@@ -236,7 +236,9 @@ namespace LoneEftDmaRadar.UI
         private static void CreateSkiaSurface()
         {
             _skSurface?.Dispose();
+            _skSurface = null;
             _skBackendRenderTarget?.Dispose();
+            _skBackendRenderTarget = null;
 
             var size = _window.Size;
             if (size.X <= 0 || size.Y <= 0 || _grContext is null)
@@ -302,19 +304,21 @@ namespace LoneEftDmaRadar.UI
                 Program.Config.UI.WindowSize = new SKSize(_window.Size.X, _window.Size.Y);
             }
 
-            // Only save maximized if it's regular maximized (not fullscreen)
-            Program.Config.UI.WindowMaximized = (_window.WindowState == WindowState.Maximized &&
-                                                  _window.WindowBorder == WindowBorder.Resizable);
-
+            Program.Config.UI.WindowMaximized = _window.WindowState == WindowState.Maximized;
             Program.Config.Save();
 
             // Cleanup resources
             AimviewWidget.Cleanup();
 
-            _imgui?.Dispose();
-            _skSurface?.Dispose();
-            _skBackendRenderTarget?.Dispose();
-            _grContext?.Dispose();
+            var grContext = Interlocked.Exchange(ref _grContext, null);
+            var skBackendRenderTarget = Interlocked.Exchange(ref _skBackendRenderTarget, null);
+            var skSurface = Interlocked.Exchange(ref _skSurface, null);
+            var imgui = Interlocked.Exchange(ref _imgui, null);
+
+            imgui?.Dispose();
+            skSurface?.Dispose();
+            skBackendRenderTarget?.Dispose();
+            grContext?.Dispose();
         }
 
         #endregion
@@ -323,35 +327,61 @@ namespace LoneEftDmaRadar.UI
 
         private static void OnRender(double delta)
         {
+            if (_grContext is null || _skSurface is null)
+                return;
             try
             {
                 Interlocked.Increment(ref _fpsCounter);
 
                 // --- SCENE RENDER (Skia) ---
-                // Render Skia FIRST, before ImGui.NewFrame() is called
-                // This prevents Skia's GL flush from corrupting ImGui's texture state
+                var fbSize = _window.FramebufferSize;
+                _gl.Viewport(0, 0, (uint)fbSize.X, (uint)fbSize.Y);
+                _gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
                 var canvas = _skSurface.Canvas;
-                canvas.Clear(SKColors.Black);
-                DrawRadarScene(canvas);
+                
+                // Save the initial canvas state
+                canvas.Save();
+                try
+                {
+                    canvas.Clear(SKColors.Black);
+                    DrawRadarScene(canvas);
+                }
+                finally
+                {
+                    // Always restore canvas to initial state, even if DrawRadarScene throws
+                    canvas.RestoreToCount(0);
+                }
+                
                 canvas.Flush();
                 _grContext.Flush();
+
+                // Purge unused resources to prevent accumulation (pass false to allow unlocked resources to be purged)
+                _grContext.PurgeUnlockedResources(false);
 
                 // Render AimviewWidget to its FBO (during Skia phase, before ImGui)
                 AimviewWidget.RenderToFbo();
 
                 // Restore viewport to full window after FBO rendering
-                _gl.Viewport(0, 0, (uint)_window.Size.X, (uint)_window.Size.Y);
+                _gl.Viewport(0, 0, (uint)fbSize.X, (uint)fbSize.Y);
                 _gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 
                 // --- UI RENDER (ImGui) ---
-                // Now start ImGui frame AFTER Skia has flushed
                 _imgui.Update((float)delta);
                 DrawImGuiUI();
                 _imgui.Render();
+                
             }
             catch (Exception ex)
             {
                 Logging.WriteLine($"***** CRITICAL RENDER ERROR: {ex}");
+            }
+            finally
+            {
+                try
+                {
+                    _grContext.ResetContext();
+                }
+                catch { }
             }
         }
 
@@ -983,7 +1013,7 @@ namespace LoneEftDmaRadar.UI
 
         private static async Task RunFpsTimerAsync()
         {
-            while (await _fpsTimer.WaitForNextTickAsync())
+            while (await _fpsTimer.WaitForNextTickAsync()) // 1 Second Interval
             {
                 _statusOrder = (_statusOrder >= 3) ? 1 : _statusOrder + 1;
                 _fps = Interlocked.Exchange(ref _fpsCounter, 0);

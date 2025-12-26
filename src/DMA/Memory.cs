@@ -314,7 +314,6 @@ namespace LoneEftDmaRadar.DMA
 
         private static void Memory_RaidStarted(object sender, EventArgs e)
         {
-            GC.Collect();
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
         }
 
@@ -322,7 +321,6 @@ namespace LoneEftDmaRadar.DMA
         {
             Game = null;
             GCSettings.LatencyMode = GCLatencyMode.Interactive;
-            GC.Collect();
         }
 
         /// <summary>
