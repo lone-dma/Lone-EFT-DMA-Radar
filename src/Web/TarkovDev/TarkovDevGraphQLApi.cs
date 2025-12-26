@@ -147,10 +147,6 @@ namespace LoneEftDmaRadar.Web.TarkovDev
                             position { x, y, z }
                         }
                     }
-                    playerLevels {
-                        exp
-                        level
-                    }
                     items {
                         id
                         name

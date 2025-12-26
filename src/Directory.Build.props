@@ -3,4 +3,19 @@
     <NoWarn>$(NoWarn);NU1701</NoWarn>
 	<NoWarn>$(NoWarn);IDE0290</NoWarn>
   </PropertyGroup>
+
+	<PropertyGroup>
+		<WarningsAsErrors>
+			SYSLIB1031;
+			SYSLIB1032;
+			SYSLIB1033;
+			SYSLIB1034;
+			SYSLIB1035;
+			SYSLIB1036;
+			SYSLIB1037;
+			SYSLIB1038;
+			IL2026;
+			IL3050;
+		</WarningsAsErrors>
+	</PropertyGroup>
 </Project>

@@ -132,6 +132,8 @@ namespace LoneEftDmaRadar.Misc.JSON
     [JsonSerializable(typeof(List<TarkovDevTypes.TaskElement.ObjectiveElement.TaskMapElement>))]
     [JsonSerializable(typeof(List<TarkovMarketItem>))]
     [JsonSerializable(typeof(List<GenericWorldHazard>))]
+    // Misc
+    [JsonSerializable(typeof(JsonDocument))]
     public partial class AppJsonContext : JsonSerializerContext
     {
     }
