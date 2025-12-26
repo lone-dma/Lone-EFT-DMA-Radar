@@ -752,6 +752,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             if (obs is not null)
             {
                 // This is outside of the previous conditionals to always show equipment even if they're dead,etc.
+                lines.Add($"Hands: {obs.Equipment.InHands?.ShortName ?? "<Empty>"}");
                 lines.Add($"Value: {Utilities.FormatNumberKM(obs.Equipment.Value)}");
                 foreach (var item in obs.Equipment.Items.OrderBy(e => e.Key))
                 {

@@ -113,20 +113,14 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         public int GridCount => _item.Slots == 0 ? 1 : _item.Slots;
 
         /// <summary>
-        /// Custom filter for this item (if set).
-        /// </summary>
-        public LootFilterEntry CustomFilter => _item.CustomFilter;
-
-        /// <summary>
         /// True if the item is important via the UI.
         /// </summary>
-        public bool Important => CustomFilter?.Important ?? false;
+        public bool Important => _item?.Important ?? false;
 
         /// <summary>
         /// True if the item is blacklisted via the UI.
         /// </summary>
-        public bool Blacklisted => CustomFilter?.Blacklisted ?? false;
-
+        public bool Blacklisted => _item?.Blacklisted ?? false;
         public bool IsWishlisted => _item.IsWishlisted;
         public bool IsMeds => _item.IsMed;
         public bool IsFood => _item.IsFood;
@@ -135,6 +129,11 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         public bool IsCurrency => _item.IsCurrency;
         public bool IsQuestHelperItem => _item.IsQuestHelperItem;
         public bool IsQuestItem { get; init; }
+
+        /// <summary>
+        /// Checks if an item is important via several means.
+        /// </summary>
+        public bool IsImportant => _item.IsImportant;
 
         /// <summary>
         /// Checks if an item exceeds regular loot price threshold.
@@ -159,19 +158,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
                 if (Blacklisted)
                     return false;
                 return Price >= Program.Config.Loot.MinValueValuable;
-            }
-        }
-
-        /// <summary>
-        /// Checks if an item is important via several means.
-        /// </summary>
-        public bool IsImportant
-        {
-            get
-            {
-                if (Blacklisted)
-                    return false;
-                return _item.Important || (Config.Loot.ShowWishlist && IsWishlisted) || (Program.Config.QuestHelper.Enabled && IsQuestHelperItem);
             }
         }
 
@@ -258,7 +244,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
                 return new(SKPaints.PaintFood, SKPaints.TextFood);
             if (LootFilter.ShowQuestItems && IsQuestItem)
                 return new(SKPaints.PaintQuestItem, SKPaints.TextQuestItem);
-            string filterColor = CustomFilter?.Color;
+            string filterColor = _item.CustomFilter?.Color;
 
             if (!string.IsNullOrEmpty(filterColor))
             {

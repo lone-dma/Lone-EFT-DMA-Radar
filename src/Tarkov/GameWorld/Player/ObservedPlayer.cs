@@ -63,6 +63,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         public ulong InventoryControllerAddr { get; }
         /// <summary>
+        /// Hands Controller field address.
+        /// </summary>
+        public ulong HandsControllerAddr { get; }
+        /// <summary>
         /// ObservedPlayerController for non-clientplayer players.
         /// </summary>
         private ulong ObservedPlayerController { get; }
@@ -104,6 +108,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 Memory.ReadValue<ulong>(ObservedPlayerController + Offsets.ObservedPlayerController.PlayerView),
                 nameof(ObservedPlayerController));
             InventoryControllerAddr = ObservedPlayerController + Offsets.ObservedPlayerController.InventoryController;
+            HandsControllerAddr = ObservedPlayerController + Offsets.ObservedPlayerController.HandsController;
             ObservedHealthController = Memory.ReadPtr(ObservedPlayerController + Offsets.ObservedPlayerController.HealthController);
             ArgumentOutOfRangeException.ThrowIfNotEqual(this,
                 Memory.ReadValue<ulong>(ObservedHealthController + Offsets.ObservedHealthController._player),

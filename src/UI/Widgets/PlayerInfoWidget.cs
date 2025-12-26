@@ -28,6 +28,7 @@ SOFTWARE.
 
 using Collections.Pooled;
 using ImGuiNET;
+using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
 using LoneEftDmaRadar.UI.Skia;
@@ -76,6 +77,7 @@ namespace LoneEftDmaRadar.UI.Widgets
             // Filter and sort players: only hostile humans, sorted by distance
             var localPos = localPlayer.Position;
             using var filteredPlayers = allPlayers
+                .OfType<ObservedPlayer>()
                 .Where(p => p.IsHumanHostileActive)
                 .OrderBy(p => Vector3.DistanceSquared(localPos, p.Position))
                 .ToPooledList();
@@ -112,11 +114,11 @@ namespace LoneEftDmaRadar.UI.Widgets
             if (ImGui.BeginTable("PlayersTable", 5, tableFlags))
             {
                 // New compact column layout
-                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthFixed, 140f);
-                ImGui.TableSetupColumn("Secure", ImGuiTableColumnFlags.WidthFixed, 35f);
-                ImGui.TableSetupColumn("In Hands", ImGuiTableColumnFlags.WidthFixed, 100f);
+                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthFixed, 65f);
+                ImGui.TableSetupColumn("In Hands", ImGuiTableColumnFlags.WidthFixed, 150f);
+                ImGui.TableSetupColumn("Secure", ImGuiTableColumnFlags.WidthFixed, 45f);
                 ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthFixed, 45f);
-                ImGui.TableSetupColumn("Dist", ImGuiTableColumnFlags.WidthFixed, 40f);
+                ImGui.TableSetupColumn("Dist", ImGuiTableColumnFlags.WidthFixed, 35f);
                 ImGui.TableHeadersRow();
 
                 foreach (var player in filteredPlayers.Span)
@@ -125,25 +127,25 @@ namespace LoneEftDmaRadar.UI.Widgets
 
                     var rowColor = GetTextColor(player);
 
-                    // Column 0: Name (placeholder-safe)
+                    // Column 0: Name
                     ImGui.TableNextColumn();
-                    ImGui.TextColored(rowColor, player?.Name ?? "--");
+                    ImGui.TextColored(rowColor, player.Name ?? "--");
 
-                    // Column 1: Secure (placeholder)
+                    // Column 1: In Hands
                     ImGui.TableNextColumn();
-                    ImGui.TextColored(rowColor, "--");
+                    ImGui.TextColored(rowColor, player.Equipment?.InHands?.ShortName ?? "--");
 
-                    // Column 2: In Hands (placeholder)
+                    // Column 2: Secure
                     ImGui.TableNextColumn();
-                    ImGui.TextColored(rowColor, "--");
+                    ImGui.TextColored(rowColor, player.Equipment?.SecuredContainer?.ShortName ?? "--");
 
-                    // Column 3: Value (placeholder)
+                    // Column 3: Value
                     ImGui.TableNextColumn();
-                    ImGui.TextColored(rowColor, "--");
+                    ImGui.TextColored(rowColor, Utilities.FormatNumberKM(player.Equipment?.Value ?? 0).ToString() ?? "--");
 
-                    // Column 4: Dist (placeholder)
+                    // Column 4: Dist
                     ImGui.TableNextColumn();
-                    ImGui.TextColored(rowColor, "--");
+                    ImGui.TextColored(rowColor, ((int)Vector3.Distance(player.Position, localPlayer.Position)).ToString());
                 }
 
                 ImGui.EndTable();
