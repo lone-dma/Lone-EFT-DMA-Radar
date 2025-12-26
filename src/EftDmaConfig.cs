@@ -98,7 +98,7 @@ namespace LoneEftDmaRadar
         /// Widgets Configuration.
         /// </summary>
         [JsonPropertyName("infoWidget")]
-        public InfoWidgetConfig InfoWidget { get; private set; } = new();
+        public InfoWidgetConfig InfoWidget { get; set; } = new();
 
         /// <summary>
         /// Quest Helper Cfg
