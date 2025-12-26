@@ -31,7 +31,7 @@ using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.UI.Maps;
 using LoneEftDmaRadar.UI.Skia;
-using LoneEftDmaRadar.Web.TarkovDev.Data;
+using LoneEftDmaRadar.Web.TarkovDev;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
 {
@@ -117,11 +117,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
             using var lines = new PooledList<string>();
             if (Player is AbstractPlayer player)
             {
-                var name = Program.Config.UI.HideNames && player.IsHuman ? "<Hidden>" : player.Name;
-                lines.Add($"{player.Type.ToString()}:{name}");
-                string g = null;
-                if (player.GroupID != -1) g = $"G:{player.GroupID} ";
-                if (g is not null) lines.Add(g);
+                lines.Add($"{player.Type.ToString()}:{player.Name}");
                 if (Player is ObservedPlayer obs) // show equipment info
                 {
                     lines.Add($"Value: {Utilities.FormatNumberKM(obs.Equipment.Value)}");

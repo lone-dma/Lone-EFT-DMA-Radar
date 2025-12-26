@@ -31,7 +31,7 @@ using Silk.NET.Input;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 
-namespace LoneEftDmaRadar;
+namespace LoneEftDmaRadar.UI;
 
 public sealed class ImGuiController : IDisposable
 {
@@ -55,7 +55,7 @@ public sealed class ImGuiController : IDisposable
     private int _windowWidth;
     private int _windowHeight;
 
-    private readonly List<char> _pressedChars = [];
+    private readonly ConcurrentQueue<char> _pressedChars = new();
 
     /// <summary>
     /// Creates a new ImGuiController.
@@ -143,7 +143,7 @@ public sealed class ImGuiController : IDisposable
 
     private void OnKeyChar(IKeyboard keyboard, char character)
     {
-        _pressedChars.Add(character);
+        _pressedChars.Enqueue(character);
     }
 
     private void OnMouseMove(IMouse mouse, Vector2 position)
@@ -195,7 +195,7 @@ public sealed class ImGuiController : IDisposable
         RenderDrawData(ImGui.GetDrawData());
     }
 
-    private void CreateDeviceResources()
+    private unsafe void CreateDeviceResources()
     {
         _vao = _gl.GenVertexArray();
         _gl.BindVertexArray(_vao);
@@ -204,32 +204,32 @@ public sealed class ImGuiController : IDisposable
         _ebo = _gl.GenBuffer();
 
         const string vertexShaderSource = """
-            #version 330 core
-            layout (location = 0) in vec2 Position;
-            layout (location = 1) in vec2 UV;
-            layout (location = 2) in vec4 Color;
-            uniform mat4 ProjMtx;
-            out vec2 Frag_UV;
-            out vec4 Frag_Color;
-            void main()
-            {
-                Frag_UV = UV;
-                Frag_Color = Color;
-                gl_Position = ProjMtx * vec4(Position.xy, 0, 1);
-            }
-            """;
+        #version 330 core
+        layout (location = 0) in vec2 Position;
+        layout (location = 1) in vec2 UV;
+        layout (location = 2) in vec4 Color;
+        uniform mat4 ProjMtx;
+        out vec2 Frag_UV;
+        out vec4 Frag_Color;
+        void main()
+        {
+            Frag_UV = UV;
+            Frag_Color = Color;
+            gl_Position = ProjMtx * vec4(Position.xy, 0, 1);
+        }
+        """;
 
         const string fragmentShaderSource = """
-            #version 330 core
-            in vec2 Frag_UV;
-            in vec4 Frag_Color;
-            uniform sampler2D Texture;
-            layout (location = 0) out vec4 Out_Color;
-            void main()
-            {
-                Out_Color = Frag_Color * texture(Texture, Frag_UV.st);
-            }
-            """;
+        #version 330 core
+        in vec2 Frag_UV;
+        in vec4 Frag_Color;
+        uniform sampler2D Texture;
+        layout (location = 0) out vec4 Out_Color;
+        void main()
+        {
+            Out_Color = Frag_Color * texture(Texture, Frag_UV.st);
+        }
+        """;
 
         var vertexShader = CompileShader(ShaderType.VertexShader, vertexShaderSource);
         var fragmentShader = CompileShader(ShaderType.FragmentShader, fragmentShaderSource);
@@ -241,10 +241,7 @@ public sealed class ImGuiController : IDisposable
 
         _gl.GetProgram(_shaderProgram, ProgramPropertyARB.LinkStatus, out var linkStatus);
         if (linkStatus == 0)
-        {
-            var infoLog = _gl.GetProgramInfoLog(_shaderProgram);
-            throw new InvalidOperationException($"Error linking shader program: {infoLog}");
-        }
+            throw new InvalidOperationException($"Error linking shader program: {_gl.GetProgramInfoLog(_shaderProgram)}");
 
         _gl.DeleteShader(vertexShader);
         _gl.DeleteShader(fragmentShader);
@@ -255,8 +252,42 @@ public sealed class ImGuiController : IDisposable
         _attribLocationVtxUV = (uint)_gl.GetAttribLocation(_shaderProgram, "UV");
         _attribLocationVtxColor = (uint)_gl.GetAttribLocation(_shaderProgram, "Color");
 
+        _gl.BindBuffer(BufferTargetARB.ArrayBuffer, _vbo);
+        _gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, _ebo);
+
+        _gl.EnableVertexAttribArray(_attribLocationVtxPos);
+        _gl.EnableVertexAttribArray(_attribLocationVtxUV);
+        _gl.EnableVertexAttribArray(_attribLocationVtxColor);
+
+        _gl.VertexAttribPointer(
+            _attribLocationVtxPos,
+            2,
+            VertexAttribPointerType.Float,
+            false,
+            (uint)sizeof(ImDrawVert),
+            (void*)0);
+
+        _gl.VertexAttribPointer(
+            _attribLocationVtxUV,
+            2,
+            VertexAttribPointerType.Float,
+            false,
+            (uint)sizeof(ImDrawVert),
+            (void*)8);
+
+        _gl.VertexAttribPointer(
+            _attribLocationVtxColor,
+            4,
+            VertexAttribPointerType.UnsignedByte,
+            true,
+            (uint)sizeof(ImDrawVert),
+            (void*)16);
+
         _gl.BindVertexArray(0);
+        _gl.BindBuffer(BufferTargetARB.ArrayBuffer, 0);
+        _gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, 0);
     }
+
 
     private uint CompileShader(ShaderType type, string source)
     {
@@ -276,6 +307,9 @@ public sealed class ImGuiController : IDisposable
 
     private unsafe void RecreateFontDeviceTexture()
     {
+        if (_fontTexture != 0)
+            _gl.DeleteTexture(_fontTexture);
+
         var io = ImGui.GetIO();
         io.Fonts.GetTexDataAsRGBA32(out nint pixels, out int width, out int height, out int _);
 
@@ -352,14 +386,6 @@ public sealed class ImGuiController : IDisposable
         _gl.BindVertexArray(_vao);
         _gl.BindBuffer(BufferTargetARB.ArrayBuffer, _vbo);
         _gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, _ebo);
-
-        // Setup vertex attributes
-        _gl.EnableVertexAttribArray(_attribLocationVtxPos);
-        _gl.EnableVertexAttribArray(_attribLocationVtxUV);
-        _gl.EnableVertexAttribArray(_attribLocationVtxColor);
-        _gl.VertexAttribPointer(_attribLocationVtxPos, 2, VertexAttribPointerType.Float, false, (uint)sizeof(ImDrawVert), (void*)0);
-        _gl.VertexAttribPointer(_attribLocationVtxUV, 2, VertexAttribPointerType.Float, false, (uint)sizeof(ImDrawVert), (void*)8);
-        _gl.VertexAttribPointer(_attribLocationVtxColor, 4, VertexAttribPointerType.UnsignedByte, true, (uint)sizeof(ImDrawVert), (void*)16);
 
         var clipOff = drawData.DisplayPos;
         var clipScale = drawData.FramebufferScale;
@@ -548,5 +574,7 @@ public sealed class ImGuiController : IDisposable
         _gl.DeleteVertexArray(_vao);
         _gl.DeleteTexture(_fontTexture);
         _gl.DeleteProgram(_shaderProgram);
+
+        ImGui.DestroyContext();
     }
 }

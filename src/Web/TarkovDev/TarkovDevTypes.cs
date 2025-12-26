@@ -30,7 +30,7 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Hazards;
 using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
 using System.Collections.Frozen;
 
-namespace LoneEftDmaRadar.Web.TarkovDev.Data
+namespace LoneEftDmaRadar.Web.TarkovDev
 {
     public static class TarkovDevTypes
     {

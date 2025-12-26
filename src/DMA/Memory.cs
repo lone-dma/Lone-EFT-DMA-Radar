@@ -28,7 +28,6 @@ SOFTWARE.
 
 global using LoneEftDmaRadar.DMA;
 using Collections.Pooled;
-using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.GameWorld;
 using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
@@ -36,6 +35,7 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
+using System.Runtime;
 using VmmSharpEx;
 using VmmSharpEx.Extensions;
 using VmmSharpEx.Options;
@@ -141,6 +141,7 @@ namespace LoneEftDmaRadar.DMA
                             options: MessageBoxOptions.DefaultDesktopOnly);
                     }
                     ProcessStopped += MemDMA_ProcessStopped;
+                    RaidStarted += Memory_RaidStarted;
                     RaidStopped += MemDMA_RaidStopped;
                     // Start Memory Thread after successful startup
                     new Thread(MemoryPrimaryWorker)
@@ -234,7 +235,6 @@ namespace LoneEftDmaRadar.DMA
                 try
                 {
                     _vmm.ForceFullRefresh();
-                    ResourceJanitor.Run();
                     LoadProcess();
                     LoadModules();
                     Starting = true;
@@ -312,10 +312,15 @@ namespace LoneEftDmaRadar.DMA
             _pid = default;
         }
 
+        private static void Memory_RaidStarted(object sender, EventArgs e)
+        {
+            GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
+        }
 
         private static void MemDMA_RaidStopped(object sender, EventArgs e)
         {
             Game = null;
+            GCSettings.LatencyMode = GCLatencyMode.Interactive;
         }
 
         /// <summary>

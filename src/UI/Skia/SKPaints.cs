@@ -61,31 +61,6 @@ namespace LoneEftDmaRadar.UI.Skia
             IsAntialias = true,
         };
 
-        public static SKPaint PaintConnectorGroup { get; } = new()
-        {
-            Color = SKColors.LawnGreen.WithAlpha(60),
-            StrokeWidth = 2.25f,
-            Style = SKPaintStyle.Stroke,
-            IsAntialias = true,
-        };
-
-        public static SKPaint PaintMouseoverGroup { get; } = new()
-        {
-            Color = SKColors.LawnGreen,
-            StrokeWidth = 1.66f,
-            Style = SKPaintStyle.Stroke,
-            IsAntialias = true,
-            StrokeJoin = SKStrokeJoin.Round,
-            StrokeCap = SKStrokeCap.Round
-        };
-
-        public static SKPaint TextMouseoverGroup { get; } = new()
-        {
-            Color = SKColors.LawnGreen,
-            IsStroke = false,
-            IsAntialias = true,
-        };
-
         public static SKPaint PaintLocalPlayer { get; } = new()
         {
             Color = SKColors.Green,
@@ -133,40 +108,6 @@ namespace LoneEftDmaRadar.UI.Skia
         public static SKPaint TextPMC { get; } = new()
         {
             Color = SKColors.Red,
-            IsStroke = false,
-            IsAntialias = true,
-        };
-
-        public static SKPaint PaintWatchlist { get; } = new()
-        {
-            Color = SKColors.HotPink,
-            StrokeWidth = 1.66f,
-            Style = SKPaintStyle.Stroke,
-            IsAntialias = true,
-            StrokeJoin = SKStrokeJoin.Round,
-            StrokeCap = SKStrokeCap.Round
-        };
-
-        public static SKPaint TextWatchlist { get; } = new()
-        {
-            Color = SKColors.HotPink,
-            IsStroke = false,
-            IsAntialias = true,
-        };
-
-        public static SKPaint PaintStreamer { get; } = new()
-        {
-            Color = SKColors.MediumPurple,
-            StrokeWidth = 1.66f,
-            Style = SKPaintStyle.Stroke,
-            IsAntialias = true,
-            StrokeJoin = SKStrokeJoin.Round,
-            StrokeCap = SKStrokeCap.Round
-        };
-
-        public static SKPaint TextStreamer { get; } = new()
-        {
-            Color = SKColors.MediumPurple,
             IsStroke = false,
             IsAntialias = true,
         };
@@ -502,20 +443,6 @@ namespace LoneEftDmaRadar.UI.Skia
         public static SKPaint PaintAimviewWidgetPMC { get; } = new()
         {
             Color = SKColors.Red,
-            StrokeWidth = AimviewWidget.AimviewBaseStrokeSize,
-            Style = SKPaintStyle.Stroke
-        };
-
-        public static SKPaint PaintAimviewWidgetWatchlist { get; } = new()
-        {
-            Color = SKColors.HotPink,
-            StrokeWidth = AimviewWidget.AimviewBaseStrokeSize,
-            Style = SKPaintStyle.Stroke
-        };
-
-        public static SKPaint PaintAimviewWidgetStreamer { get; } = new()
-        {
-            Color = SKColors.MediumPurple,
             StrokeWidth = AimviewWidget.AimviewBaseStrokeSize,
             Style = SKPaintStyle.Stroke
         };

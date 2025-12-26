@@ -61,7 +61,6 @@ namespace LoneEftDmaRadar.UI.Widgets
         private static int _currentHeight;
 
         // Flag to track if we need to render this frame
-        private static bool _needsRender;
         private static int _pendingWidth;
         private static int _pendingHeight;
 
@@ -95,10 +94,8 @@ namespace LoneEftDmaRadar.UI.Widgets
         /// </summary>
         public static void RenderToFbo()
         {
-            if (!_needsRender || _surface is null || _fbo == 0)
+            if (_surface is null || _fbo == 0)
                 return;
-
-            _needsRender = false;
 
             int width = _pendingWidth;
             int height = _pendingHeight;
@@ -137,13 +134,12 @@ namespace LoneEftDmaRadar.UI.Widgets
             {
                 Logging.WriteLine($"CRITICAL AIMVIEW PANEL RENDER ERROR: {ex}");
             }
-
-            // Flush Skia to the FBO
-            canvas.Flush();
-            _grContext.Flush();
-
-            // Unbind FBO - return to default framebuffer
-            _gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            finally
+            {
+                // Flush Skia to the FBO
+                canvas.Flush();
+                _grContext.Flush();
+            }
         }
 
         /// <summary>
@@ -175,7 +171,6 @@ namespace LoneEftDmaRadar.UI.Widgets
             EnsureFbo(width, height);
 
             // Request render for next frame
-            _needsRender = true;
             _pendingWidth = width;
             _pendingHeight = height;
 
@@ -329,8 +324,6 @@ namespace LoneEftDmaRadar.UI.Widgets
                 PlayerType.AIRaider => SKPaints.PaintAimviewWidgetRaider,
                 PlayerType.AIBoss => SKPaints.PaintAimviewWidgetBoss,
                 PlayerType.PScav => SKPaints.PaintAimviewWidgetPScav,
-                PlayerType.SpecialPlayer => SKPaints.PaintAimviewWidgetWatchlist,
-                PlayerType.Streamer => SKPaints.PaintAimviewWidgetStreamer,
                 _ => SKPaints.PaintAimviewWidgetPMC
             };
         }

@@ -132,9 +132,8 @@ namespace LoneEftDmaRadar.UI.Maps
         /// <summary>
         /// Map ID(s) for this Map.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("mapID")]
-        public List<string> MapID { get; private set; }
+        public List<string> MapID { get; set; }
         /// <summary>
         /// Bitmap 'X' Coordinate of map 'Origin Location' (where Unity X is 0).
         /// </summary>
@@ -153,22 +152,19 @@ namespace LoneEftDmaRadar.UI.Maps
         /// <summary>
         /// How much to scale up the original SVG Image.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("svgScale")]
-        public float SvgScale { get; private set; }
+        public float SvgScale { get; set; }
         /// <summary>
         /// TRUE if the map drawing should not dim layers, otherwise FALSE if dimming is permitted.
         /// This is a global setting that applies to all layers.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("disableDimming")]
-        public bool DisableDimming { get; private set; }
+        public bool DisableDimming { get; set; }
         /// <summary>
         /// Contains the Map Layers to load for the current Map Configuration.
         /// </summary>
-        [JsonInclude]
         [JsonPropertyName("mapLayers")]
-        public List<Layer> MapLayers { get; private set; }
+        public List<Layer> MapLayers { get; set; }
 
         /// <summary>
         /// A single layer of a Multi-Layered Map.
@@ -179,28 +175,24 @@ namespace LoneEftDmaRadar.UI.Maps
             /// Minimum height (Unity Y Coord) for this map layer.
             /// NULL: No minimum height.
             /// </summary>
-            [JsonInclude]
             [JsonPropertyName("minHeight")]
-            public float? MinHeight { get; private set; }
+            public float? MinHeight { get; set; }
             /// <summary>
             /// Maximum height (Unity Y Coord) for this map layer.
             /// NULL: No maximum height.
             /// </summary>
-            [JsonInclude]
             [JsonPropertyName("maxHeight")]
-            public float? MaxHeight { get; private set; }
+            public float? MaxHeight { get; set; }
             /// <summary>
             /// TRUE if when this layer is in the foreground, the lower layers cannot be dimmed. Otherwise FALSE.
             /// </summary>
-            [JsonInclude]
             [JsonPropertyName("cannotDimLowerLayers")]
-            public bool CannotDimLowerLayers { get; private set; }
+            public bool CannotDimLowerLayers { get; set; }
             /// <summary>
             /// Relative File path to this map layer's PNG Image.
             /// </summary>
-            [JsonInclude]
             [JsonPropertyName("filename")]
-            public string Filename { get; private set; }
+            public string Filename { get; set; }
         }
     }
 }

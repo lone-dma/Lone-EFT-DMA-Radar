@@ -32,7 +32,7 @@ using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.UI.Loot;
 using LoneEftDmaRadar.UI.Maps;
 using LoneEftDmaRadar.UI.Skia;
-using LoneEftDmaRadar.Web.TarkovDev.Data;
+using LoneEftDmaRadar.Web.TarkovDev;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
 {
@@ -235,7 +235,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
         public virtual string GetUILabel()
         {
             string label = "";
-            if (Price > 0)
+            if (Price > 0 && !IsImportant)
                 label += $"[{Utilities.FormatNumberKM(Price)}] ";
             label += ShortName;
 

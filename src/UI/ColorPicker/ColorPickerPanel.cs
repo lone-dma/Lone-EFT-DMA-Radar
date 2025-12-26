@@ -69,8 +69,6 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                 [ColorPickerOption.LocalPlayer] = SKColors.Green.ToString(),
                 [ColorPickerOption.FriendlyPlayer] = SKColors.LimeGreen.ToString(),
                 [ColorPickerOption.PMCPlayer] = SKColors.Red.ToString(),
-                [ColorPickerOption.WatchlistPlayer] = SKColors.HotPink.ToString(),
-                [ColorPickerOption.StreamerPlayer] = SKColors.MediumPurple.ToString(),
                 [ColorPickerOption.HumanScavPlayer] = SKColors.White.ToString(),
                 [ColorPickerOption.ScavPlayer] = SKColors.Yellow.ToString(),
                 [ColorPickerOption.RaiderPlayer] = SKColor.Parse("ffc70f").ToString(),
@@ -204,8 +202,6 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                 ColorPickerOption.HumanScavPlayer => "Player Scav",
                 ColorPickerOption.BossPlayer => "Boss",
                 ColorPickerOption.RaiderPlayer => "Raider/Guard",
-                ColorPickerOption.WatchlistPlayer => "Watchlist",
-                ColorPickerOption.StreamerPlayer => "Streamer",
                 ColorPickerOption.FocusedPlayer => "Focused",
                 ColorPickerOption.RegularLoot => "Regular Loot",
                 ColorPickerOption.ValuableLoot => "Valuable Loot",
@@ -235,32 +231,32 @@ namespace LoneEftDmaRadar.UI.ColorPicker
 
         private static Vector3 GetDefaultColor(ColorPickerOption option)
         {
-            return option switch
+            SKColor color = option switch
             {
-                ColorPickerOption.LocalPlayer => new Vector3(0, 0.5f, 0),
-                ColorPickerOption.FriendlyPlayer => new Vector3(0.196f, 0.804f, 0.196f),
-                ColorPickerOption.PMCPlayer => new Vector3(1, 0, 0),
-                ColorPickerOption.ScavPlayer => new Vector3(1, 1, 0),
-                ColorPickerOption.HumanScavPlayer => new Vector3(1, 1, 1),
-                ColorPickerOption.BossPlayer => new Vector3(1, 0, 1),
-                ColorPickerOption.RaiderPlayer => new Vector3(1, 0.78f, 0.06f),
-                ColorPickerOption.WatchlistPlayer => new Vector3(1, 0.41f, 0.71f),
-                ColorPickerOption.StreamerPlayer => new Vector3(0.58f, 0.44f, 0.86f),
-                ColorPickerOption.FocusedPlayer => new Vector3(1, 0.5f, 0.31f),
-                ColorPickerOption.RegularLoot => new Vector3(0.96f, 0.96f, 0.96f),
-                ColorPickerOption.ValuableLoot => new Vector3(0.25f, 0.88f, 0.82f),
-                ColorPickerOption.WishlistLoot => new Vector3(0, 1, 0),
-                ColorPickerOption.ContainerLoot => new Vector3(1, 1, 0.8f),
-                ColorPickerOption.MedsFilterLoot => new Vector3(1, 0.63f, 0.48f),
-                ColorPickerOption.FoodFilterLoot => new Vector3(0.39f, 0.58f, 0.93f),
-                ColorPickerOption.BackpacksFilterLoot => new Vector3(0, 0.69f, 0.17f),
-                ColorPickerOption.Corpse => new Vector3(0.75f, 0.75f, 0.75f),
-                ColorPickerOption.DeathMarker => new Vector3(0, 0, 0),
-                ColorPickerOption.QuestHelperItems => new Vector3(0.6f, 0.8f, 0.2f),
-                ColorPickerOption.QuestHelperZones => new Vector3(1, 0.08f, 0.58f),
-                ColorPickerOption.Explosives => new Vector3(1, 0.27f, 0),
-                _ => Vector3.One
+                ColorPickerOption.LocalPlayer => SKColors.Green,
+                ColorPickerOption.FriendlyPlayer => SKColors.LimeGreen,
+                ColorPickerOption.PMCPlayer => SKColors.Red,
+                ColorPickerOption.ScavPlayer => SKColors.Yellow,
+                ColorPickerOption.HumanScavPlayer => SKColors.White,
+                ColorPickerOption.BossPlayer => SKColors.Fuchsia,
+                ColorPickerOption.RaiderPlayer => SKColor.Parse("ffc70f"),
+                ColorPickerOption.FocusedPlayer => SKColors.Coral,
+                ColorPickerOption.RegularLoot => SKColors.WhiteSmoke,
+                ColorPickerOption.ValuableLoot => SKColors.Turquoise,
+                ColorPickerOption.WishlistLoot => SKColors.Lime,
+                ColorPickerOption.ContainerLoot => SKColor.Parse("FFFFCC"),
+                ColorPickerOption.MedsFilterLoot => SKColors.LightSalmon,
+                ColorPickerOption.FoodFilterLoot => SKColors.CornflowerBlue,
+                ColorPickerOption.BackpacksFilterLoot => SKColor.Parse("00b02c"),
+                ColorPickerOption.Corpse => SKColors.Silver,
+                ColorPickerOption.DeathMarker => SKColors.Black,
+                ColorPickerOption.QuestHelperItems => SKColors.YellowGreen,
+                ColorPickerOption.QuestHelperZones => SKColors.DeepPink,
+                ColorPickerOption.Explosives => SKColors.OrangeRed,
+                _ => SKColors.White
             };
+
+            return new Vector3(color.Red / 255f, color.Green / 255f, color.Blue / 255f);
         }
 
         private static void ApplyColor(ColorPickerOption option, Vector3 color)
@@ -315,16 +311,6 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                     SKPaints.PaintRaider.Color = skColor;
                     SKPaints.TextRaider.Color = skColor;
                     SKPaints.PaintAimviewWidgetRaider.Color = skColor;
-                    break;
-                case ColorPickerOption.WatchlistPlayer:
-                    SKPaints.PaintWatchlist.Color = skColor;
-                    SKPaints.TextWatchlist.Color = skColor;
-                    SKPaints.PaintAimviewWidgetWatchlist.Color = skColor;
-                    break;
-                case ColorPickerOption.StreamerPlayer:
-                    SKPaints.PaintStreamer.Color = skColor;
-                    SKPaints.TextStreamer.Color = skColor;
-                    SKPaints.PaintAimviewWidgetStreamer.Color = skColor;
                     break;
                 case ColorPickerOption.FocusedPlayer:
                     SKPaints.PaintFocused.Color = skColor;

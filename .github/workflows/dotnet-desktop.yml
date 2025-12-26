@@ -77,9 +77,9 @@ jobs:
           dotnet publish src/Lone-EFT-DMA-Radar.csproj `
             -c Release `
             -r win-x64 `
-            --no-self-contained `
-            /p:PublishSingleFile=true `
-            /p:DebugType=none `
+            --self-contained `
+            /p:DebugType=None `
+            /p:DebugSymbols=false `
             /p:Version=${{ steps.nbgv.outputs.SemVer2 }} `
             /p:FileVersion=${{ steps.nbgv.outputs.AssemblyFileVersion }} `
             /p:AssemblyVersion=${{ steps.nbgv.outputs.AssemblyVersion }} `

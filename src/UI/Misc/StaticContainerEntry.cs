@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Web.TarkovDev.Data;
+using LoneEftDmaRadar.Web.TarkovDev;
 
 namespace LoneEftDmaRadar.UI.Misc
 {

@@ -29,7 +29,7 @@ SOFTWARE.
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.UI.Maps;
 using LoneEftDmaRadar.UI.Skia;
-using LoneEftDmaRadar.Web.TarkovDev.Data;
+using LoneEftDmaRadar.Web.TarkovDev;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Loot
 {

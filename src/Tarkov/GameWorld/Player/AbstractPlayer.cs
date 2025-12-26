@@ -32,7 +32,6 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
 using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
-using LoneEftDmaRadar.UI;
 using LoneEftDmaRadar.UI.Maps;
 using LoneEftDmaRadar.UI.Skia;
 using System.Collections.Frozen;
@@ -48,24 +47,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
     /// </summary>
     public abstract class AbstractPlayer : IWorldEntity, IMapEntity, IMouseoverEntity
     {
-        #region Static Interfaces
-
         public static implicit operator ulong(AbstractPlayer x) => x.Base;
-        protected static readonly ConcurrentDictionary<string, int> _groups = new(StringComparer.OrdinalIgnoreCase);
-        protected static int _lastGroupNumber;
-
-        static AbstractPlayer()
-        {
-            Memory.RaidStopped += MemDMA_RaidStopped;
-        }
-
-        private static void MemDMA_RaidStopped(object sender, EventArgs e)
-        {
-            _groups.Clear();
-            _lastGroupNumber = default;
-        }
-
-        #endregion
 
         #region Cached Skia Paths
 
@@ -234,17 +216,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// <summary>
         /// Player nickName.
         /// </summary>
-        public virtual string Name { get; set; }
-
-        /// <summary>
-        /// Account UUID for Human Controlled Players.
-        /// </summary>
-        public virtual string AccountID { get; }
-
-        /// <summary>
-        /// Group that the player belongs to.
-        /// </summary>
-        public virtual int GroupID { get; protected set; } = -1;
+        public virtual string Name { get; protected set; }
 
         /// <summary>
         /// Player's Faction.
@@ -633,31 +605,20 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                     var observed = this as ObservedPlayer;
                     string important = (observed is not null && observed.Equipment.CarryingImportantLoot) ?
                         "!!" : null; // Flag important loot
-                    if (!Program.Config.UI.HideNames) // show full names & info
+                    string name = null;
+                    if (IsError)
+                        name = "ERROR"; // In case POS stops updating, let us know!
+                    else
+                        name = Name;
+                    string health = null; string level = null;
+                    if (observed is not null)
                     {
-                        string name = null;
-                        if (IsError)
-                            name = "ERROR"; // In case POS stops updating, let us know!
-                        else
-                            name = Name;
-                        string health = null; string level = null;
-                        if (observed is not null)
-                        {
-                            health = observed.HealthStatus is Enums.ETagStatus.Healthy
-                                ? null
-                                : $" ({observed.HealthStatus})"; // Only display abnormal health status
-                            if (observed.Profile?.Level is int levelResult)
-                                level = $"L{levelResult}:";
-                        }
-                        lines.Add($"{important}{level}{name}{health}");
-                        lines.Add($"H: {height:n0} D: {dist:n0}");
+                        health = observed.HealthStatus is Enums.ETagStatus.Healthy
+                            ? null
+                            : $" ({observed.HealthStatus})"; // Only display abnormal health status
                     }
-                    else // just height, distance
-                    {
-                        lines.Add($"{important}{height:n0},{dist:n0}");
-                        if (IsError)
-                            lines[0] = "ERROR"; // In case POS stops updating, let us know!
-                    }
+                    lines.Add($"{important}{level}{name}{health}");
+                    lines.Add($"H: {height:n0} D: {dist:n0}");
 
                     DrawPlayerText(canvas, point, lines);
                 }
@@ -673,9 +634,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         private void DrawPlayerPill(SKCanvas canvas, LocalPlayer localPlayer, SKPoint point)
         {
-            if (this != localPlayer && RadarWindow.MouseoverGroup is int grp && grp == GroupID)
-                _paints.Item1 = SKPaints.PaintMouseoverGroup;
-
             float scale = 1.65f * Program.Config.UI.UIScale;
 
             canvas.Save();
@@ -724,8 +682,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         private void DrawPlayerText(SKCanvas canvas, SKPoint point, IList<string> lines)
         {
-            if (RadarWindow.MouseoverGroup is int grp && grp == GroupID)
-                _paints.Item2 = SKPaints.TextMouseoverGroup;
             point.Offset(9.5f * Program.Config.UI.UIScale, 0);
             foreach (var line in lines)
             {
@@ -760,10 +716,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                     return new ValueTuple<SKPaint, SKPaint>(SKPaints.PaintBoss, SKPaints.TextBoss);
                 case PlayerType.PScav:
                     return new ValueTuple<SKPaint, SKPaint>(SKPaints.PaintPScav, SKPaints.TextPScav);
-                case PlayerType.SpecialPlayer:
-                    return new ValueTuple<SKPaint, SKPaint>(SKPaints.PaintWatchlist, SKPaints.TextWatchlist);
-                case PlayerType.Streamer:
-                    return new ValueTuple<SKPaint, SKPaint>(SKPaints.PaintStreamer, SKPaints.TextStreamer);
                 default:
                     return new ValueTuple<SKPaint, SKPaint>(SKPaints.PaintPMC, SKPaints.TextPMC);
             }
@@ -774,44 +726,28 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             if (this == localPlayer)
                 return;
             using var lines = new PooledList<string>();
-            var name = Program.Config.UI.HideNames && IsHuman ? "<Hidden>" : Name;
             string health = null;
             var obs = this as ObservedPlayer;
             if (obs is not null)
                 health = obs.HealthStatus is Enums.ETagStatus.Healthy
                     ? null
                     : $" ({obs.HealthStatus.ToString()})"; // Only display abnormal health status
-            if (obs is not null && obs.IsStreaming) // Streamer Notice
-                lines.Add("[LIVE TTV - Double Click]");
             string alert = Alerts?.Trim();
             if (!string.IsNullOrEmpty(alert)) // Special Players,etc.
                 lines.Add(alert);
             if (IsHostileActive) // Enemy Players, display information
             {
-                lines.Add($"{name}{health} {AccountID}");
+                lines.Add($"{Name}{health}");
                 var faction = PlayerSide.ToString();
-                string g = null;
-                if (GroupID != -1)
-                    g = $" G:{GroupID} ";
-                lines.Add($"{faction}{g}");
-                // Check Achievs
-                if (obs?.Profile?.HighAchievs is IReadOnlyList<string> highAchievs)
-                {
-                    foreach (var ach in highAchievs)
-                        lines.Add(ach);
-                }
+                lines.Add(faction);
             }
             else if (!IsAlive)
             {
-                lines.Add($"{Type.ToString()}:{name}");
-                string g = null;
-                if (GroupID != -1)
-                    g = $"G:{GroupID} ";
-                if (g is not null) lines.Add(g);
+                lines.Add($"{Type.ToString()}:{Name}");
             }
             else if (IsAIActive)
             {
-                lines.Add(name);
+                lines.Add(Name);
             }
             if (obs is not null)
             {

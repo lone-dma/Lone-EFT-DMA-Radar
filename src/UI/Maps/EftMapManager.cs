@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.Misc.JSON;
 using System.Collections.Frozen;
 using System.IO.Compression;
 
@@ -62,7 +63,7 @@ namespace LoneEftDmaRadar.UI.Maps
                     if (file.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
                     {
                         using var stream = file.Open();
-                        var config = await JsonSerializer.DeserializeAsync<EftMapConfig>(stream);
+                        var config = await JsonSerializer.DeserializeAsync(stream, AppJsonContext.Default.EftMapConfig);
                         foreach (var id in config!.MapID)
                             mapsBuilder.Add(id, config);
                     }
@@ -104,6 +105,15 @@ namespace LoneEftDmaRadar.UI.Maps
                 Logging.WriteLine($"ERROR loading '{mapId}': {ex}");
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Cleans up loaded map resources if loaded. Otherwise no-op.
+        /// </summary>
+        public static void Cleanup()
+        {
+            Map?.Dispose();
+            Map = null;
         }
     }
 }

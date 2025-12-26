@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-namespace LoneEftDmaRadar.Web.TarkovDev.Data
+namespace LoneEftDmaRadar.Web.TarkovDev
 {
     internal static class FleaTax
     {
