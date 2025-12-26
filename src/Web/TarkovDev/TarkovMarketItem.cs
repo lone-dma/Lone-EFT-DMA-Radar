@@ -74,6 +74,19 @@ namespace LoneEftDmaRadar.Web.TarkovDev
         [JsonIgnore]
         public bool Important => CustomFilter?.Important ?? false;
         /// <summary>
+        /// Checks if an item is important via several means.
+        /// </summary>
+        [JsonIgnore]
+        public bool IsImportant
+        {
+            get
+            {
+                if (Blacklisted)
+                    return false;
+                return Important || (Program.Config.Loot.ShowWishlist && IsWishlisted) || (Program.Config.QuestHelper.Enabled && IsQuestHelperItem);
+            }
+        }
+        /// <summary>
         /// True if this item is Blacklisted via the Filters.
         /// </summary>
         [JsonIgnore]

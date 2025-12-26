@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.Misc.JSON;
 using System.Net.Http.Headers;
 
 namespace LoneEftDmaRadar.Misc
@@ -35,11 +36,6 @@ namespace LoneEftDmaRadar.Misc
     /// </summary>
     public static class MiscExtensions
     {
-        private static readonly JsonSerializerOptions _noIndents = new() // DONT REMOVE THIS OPTIONS INSTANCE!!!
-        {
-            WriteIndented = false
-        };
-
         /// <summary>
         /// Removes all unnecessary whitespace from a JSON string, producing a compact, minified representation.
         /// </summary>
@@ -49,7 +45,7 @@ namespace LoneEftDmaRadar.Misc
         public static string MinifyJson(this string json)
         {
             using var doc = System.Text.Json.JsonDocument.Parse(json);
-            return System.Text.Json.JsonSerializer.Serialize(doc, _noIndents);
+            return System.Text.Json.JsonSerializer.Serialize(doc, AppJsonContext.Default.JsonDocument);
         }
 
         /// <summary>
