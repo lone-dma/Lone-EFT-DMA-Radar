@@ -239,7 +239,6 @@ namespace LoneEftDmaRadar.UI.Panels
                 if (ImGui.Checkbox("Filter Enabled", ref filterEnabled))
                 {
                     currentFilterObj.Enabled = filterEnabled;
-                    RefreshLootFilter();
                 }
                 if (ImGui.IsItemHovered())
                     ImGui.SetTooltip("Enable or disable this filter");
@@ -313,7 +312,6 @@ namespace LoneEftDmaRadar.UI.Panels
             if (ImGui.Button("Add Selected Item") && _selectedItemIndex >= 0 && _selectedItemIndex < _filteredItems.Count)
             {
                 AddItemToFilter(_filteredItems[_selectedItemIndex]);
-                RefreshLootFilter();
             }
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip("Add the selected item to this filter");
@@ -343,7 +341,6 @@ namespace LoneEftDmaRadar.UI.Panels
                     if (ImGui.Checkbox($"##enabled{entryIndex}", ref enabled))
                     {
                         entry.Enabled = enabled;
-                        RefreshLootFilter();
                     }
 
                     // Item name
@@ -435,7 +432,6 @@ namespace LoneEftDmaRadar.UI.Panels
                 {
                     _entryColors.Clear();
                     _entryColorHexes.Clear();
-                    RefreshLootFilter();
                 }
             }
         }
