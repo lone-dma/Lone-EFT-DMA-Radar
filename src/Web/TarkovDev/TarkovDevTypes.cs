@@ -59,9 +59,6 @@ namespace LoneEftDmaRadar.Web.TarkovDev
             [JsonPropertyName("maps")]
             public List<MapElement> Maps { get; set; }
 
-            [JsonPropertyName("playerLevels")]
-            public List<PlayerLevelElement> PlayerLevels { get; set; }
-
             [JsonPropertyName("tasks")]
             public List<TaskElement> Tasks { get; set; }
         }
@@ -178,15 +175,6 @@ namespace LoneEftDmaRadar.Web.TarkovDev
 
             [JsonPropertyName("hazards")]
             public List<GenericWorldHazard> Hazards { get; set; } = new();
-        }
-
-        public partial class PlayerLevelElement
-        {
-            [JsonPropertyName("exp")]
-            public int Exp { get; set; }
-
-            [JsonPropertyName("level")]
-            public int Level { get; set; }
         }
 
         public partial class ExtractElement
