@@ -26,22 +26,34 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Misc.Services;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
 using LoneEftDmaRadar.Tarkov.Unity.Collections;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
-using LoneEftDmaRadar.UI.Panels;
-using LoneEftDmaRadar.Web.ProfileApi;
 using VmmSharpEx.Scatter;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
 {
     public class ObservedPlayer : AbstractPlayer
     {
+        #region Static Interface
+
+        private static readonly ConcurrentDictionary<int, byte> _teammates = new();
+
+        static ObservedPlayer()
+        {
+            Memory.RaidStopped += Memory_RaidStopped;
+        }
+
+        private static void Memory_RaidStopped(object sender, EventArgs e)
+        {
+            _teammates.Clear();
+        }
+
+        #endregion
         /// <summary>
-        /// Player's Profile & Stats.
+        /// Player's Unique Id within this Raid Instance.
         /// </summary>
-        public PlayerProfile Profile { get; }
+        public int Id { get; }
         /// <summary>
         /// Player's Current TarkovDevItems.
         /// </summary>
@@ -58,86 +70,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// ObservedHealthController for non-clientplayer players.
         /// </summary>
         private ulong ObservedHealthController { get; }
-        /// <summary>
-        /// Player name.
-        /// </summary>
-        public override string Name
-        {
-            get => Profile?.Name ?? "Unknown";
-            set
-            {
-                if (Profile is PlayerProfile profile)
-                    profile.Name = value;
-            }
-        }
-        /// <summary>
-        /// Type of player unit.
-        /// </summary>
-        public override PlayerType Type
-        {
-            get => Profile?.Type ?? PlayerType.Default;
-            protected set
-            {
-                if (Profile is PlayerProfile profile)
-                    profile.Type = value;
-            }
-        }
-        /// <summary>
-        /// Player Alerts.
-        /// </summary>
-        public override string Alerts
-        {
-            get => Profile?.Alerts;
-            protected set
-            {
-                if (Profile is PlayerProfile profile)
-                    profile.Alerts = value;
-            }
-        }
-        /// <summary>
-        /// Twitch.tv Channel URL for this player (if available).
-        /// </summary>
-        public string TwitchChannelURL => Profile?.TwitchChannelURL;
-        /// <summary>
-        /// True if player is TTV Streaming.
-        /// </summary>
-        public bool IsStreaming => TwitchChannelURL is not null;
-        /// <summary>
-        /// Account UUID for Human Controlled Players.
-        /// </summary>
-        public override string AccountID
-        {
-            get
-            {
-                if (Profile?.AccountID is string id)
-                    return id;
-                return "";
-            }
-        }
-        /// <summary>
-        /// Group that the player belongs to.
-        /// </summary>
-        public override int GroupID
-        {
-            get => Profile?.GroupID ?? -1;
-            protected set
-            {
-                if (Profile is PlayerProfile profile)
-                    profile.GroupID = value;
-            }
-        }
-        /// <summary>
-        /// Player's Faction.
-        /// </summary>
-        public override Enums.EPlayerSide PlayerSide
-        {
-            get => Profile?.PlayerSide ?? Enums.EPlayerSide.Savage;
-            protected set
-            {
-                if (Profile is PlayerProfile profile)
-                    profile.PlayerSide = value;
-            }
-        }
         /// <summary>
         /// Player is Human-Controlled.
         /// </summary>
@@ -158,6 +90,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// Player's Current Health Status
         /// </summary>
         public Enums.ETagStatus HealthStatus { get; private set; } = Enums.ETagStatus.Healthy;
+        /// <summary>
+        /// True if the Player is a Teammate.
+        /// </summary>
+        public bool IsTeammate => _teammates.ContainsKey(Id);
 
         internal ObservedPlayer(ulong playerBase) : base(playerBase)
         {
@@ -183,9 +119,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
 
             bool isAI = Memory.ReadValue<bool>(this + Offsets.ObservedPlayerView.IsAI);
             IsHuman = !isAI;
-            Profile = new PlayerProfile(this, GetAccountID());
-            // Get Group ID
-            GroupID = -1; // isAI ? -1 : GetGroupNumber();
+            Id = GetPlayerId();
             /// Determine Player Type
             PlayerSide = (Enums.EPlayerSide)Memory.ReadValue<int>(this + Offsets.ObservedPlayerView.Side); // Usec,Bear,Scav,etc.
             if (!Enum.IsDefined(PlayerSide)) // Make sure PlayerSide is valid
@@ -202,67 +136,40 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 }
                 else
                 {
-                    Name = $"PScav{GetPlayerId()}";
-                    Type = GroupID != -1 && GroupID == localPlayer.GroupID ?
+                    Name = $"PScav{Id}";
+                    Type = IsTeammate ?
                         PlayerType.Teammate : PlayerType.PScav;
                 }
             }
             else if (IsPmc)
             {
-                Name = $"PMC{GetPlayerId()}";
-                Type = GroupID != -1 && GroupID == localPlayer.GroupID ?
+                Name = $"{PlayerSide}{Id}";
+                Type = IsTeammate ?
                     PlayerType.Teammate : PlayerType.PMC;
             }
             else
                 throw new NotImplementedException(nameof(PlayerSide));
-            if (IsHuman)
-            {
-                _ = long.TryParse(AccountID, out long acctIdLong);
-                var cache = LocalCache.GetProfileCollection();
-                if (cache.FindById(acctIdLong) is EftProfileDto dto &&
-                    dto.IsCachedRecent)
-                {
-                    try
-                    {
-                        var profileData = dto.ToProfileData();
-                        Profile.Data = profileData;
-                        Logging.WriteLine($"[ObservedPlayer] Got Profile (Cached) '{acctIdLong}'!");
-                    }
-                    catch
-                    {
-                        _ = cache.Delete(acctIdLong); // Corrupted cache data, remove it
-                        EFTProfileService.RegisterProfile(Profile); // Re-register for lookup
-                    }
-                }
-                else
-                {
-                    EFTProfileService.RegisterProfile(Profile);
-                }
-                PlayerHistoryPanel.AddToPlayerHistory(this); /// Log To Player History
-            }
-            if (IsHumanHostile) /// Special Players Check on Hostiles Only
-            {
-                var watchlist = Program.Config.PlayerWatchlist;
-                var watchlistEntry = watchlist?.FirstOrDefault(e => e.AcctID == AccountID);
-                if (watchlistEntry is not null) // player is on watchlist
-                {
-                    Type = PlayerType.SpecialPlayer; // Flag watchlist player
-                    UpdateAlerts($"[Watchlist] {watchlistEntry.Reason} @ {watchlistEntry.Timestamp}");
-                }
-            }
             Equipment = new PlayerEquipment(this);
         }
 
         /// <summary>
-        /// Get Player's Account ID.
+        /// If the Player is Human, Toggle Teammate Status.
         /// </summary>
-        /// <returns>Account ID Numeric String.</returns>
-        private string GetAccountID()
+        public void ToggleTeammate()
         {
+            bool isTeammate = Type == PlayerType.Teammate;
             if (!IsHuman)
-                return "AI";
-            var idPTR = Memory.ReadPtr(this + Offsets.ObservedPlayerView.AccountId);
-            return Memory.ReadUnityString(idPTR);
+                return;
+            if (!isTeammate)
+            {
+                _teammates.TryAdd(Id, 0);
+                Type = PlayerType.Teammate;
+            }
+            else
+            {
+                _teammates.TryRemove(Id, out _);
+                Type = PlayerSide == Enums.EPlayerSide.Savage ? PlayerType.PScav : PlayerType.PMC;
+            }
         }
 
         /// <summary>
@@ -279,22 +186,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             {
                 return 0;
             }
-        }
-
-        /// <summary>
-        /// Gets player's Group Number.
-        /// </summary>
-        private int GetGroupNumber()
-        {
-            try
-            {
-                var groupIdPtr = Memory.ReadPtr(this + Offsets.ObservedPlayerView.GroupID);
-                string groupId = Memory.ReadUnityString(groupIdPtr);
-                return _groups.GetOrAdd(
-                    groupId,
-                    _ => Interlocked.Increment(ref _lastGroupNumber));
-            }
-            catch { return -1; } // will return null if Solo / Don't have a team
         }
 
         /// <summary>

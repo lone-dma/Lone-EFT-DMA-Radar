@@ -47,16 +47,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         public override string Name
         {
             get => "AI";
-            set { }
         }
-        /// <summary>
-        /// Account UUID for Human Controlled Players.
-        /// </summary>
-        public override string AccountID { get; }
-        /// <summary>
-        /// Group that the player belongs to.
-        /// </summary>
-        public override int GroupID { get; protected set; } = -1;
         /// <summary>
         /// Player's Faction.
         /// </summary>
@@ -87,29 +78,12 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             if (!Enum.IsDefined<Enums.EPlayerSide>(PlayerSide))
                 throw new ArgumentOutOfRangeException(nameof(PlayerSide));
 
-            GroupID = GetGroupNumber();
             MovementContext = GetMovementContext();
             RotationAddress = ValidateRotationAddr(MovementContext + Offsets.MovementContext._rotation);
             /// Setup Transform
             var ti = Memory.ReadPtrChain(this, false, _transformInternalChain);
             SkeletonRoot = new UnityTransform(ti);
             _ = SkeletonRoot.UpdatePosition();
-        }
-
-        /// <summary>
-        /// Gets player's Group Number.
-        /// </summary>
-        private int GetGroupNumber()
-        {
-            try
-            {
-                var groupIdPtr = Memory.ReadPtr(Info + Offsets.PlayerInfo.GroupId);
-                string groupId = Memory.ReadUnityString(groupIdPtr);
-                return _groups.GetOrAdd(
-                    groupId,
-                    _ => Interlocked.Increment(ref _lastGroupNumber));
-            }
-            catch { return -1; } // will return null if Solo / Don't have a team
         }
 
         /// <summary>

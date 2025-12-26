@@ -188,8 +188,8 @@ namespace LoneEftDmaRadar.UI.Skia
             var translate = SKMatrix.CreateTranslation(tx, ty);
             var transform = SKMatrix.Concat(translate, matrix);
 
-            var path = new SKPath(_arrowBase);
-            path.Transform(transform);
+            var path = new SKPath();
+            path.AddPath(_arrowBase, transform);
             return path;
         }
 
@@ -207,8 +207,8 @@ namespace LoneEftDmaRadar.UI.Skia
             var translate = SKMatrix.CreateTranslation(tx, ty);
             var transform = SKMatrix.Concat(translate, matrix);
 
-            var path = new SKPath(_arrowBase);
-            path.Transform(transform);
+            var path = new SKPath();
+            path.AddPath(_arrowBase, transform);
             return path;
         }
 

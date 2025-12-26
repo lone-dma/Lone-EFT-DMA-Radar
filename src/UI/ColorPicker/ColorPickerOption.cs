@@ -33,8 +33,6 @@ namespace LoneEftDmaRadar.UI.ColorPicker
         LocalPlayer,
         FriendlyPlayer,
         PMCPlayer,
-        WatchlistPlayer,
-        StreamerPlayer,
         HumanScavPlayer,
         ScavPlayer,
         RaiderPlayer,

@@ -53,7 +53,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         public override string Name
         {
             get => "localPlayer";
-            set { }
         }
         /// <summary>
         /// Player is Human-Controlled.

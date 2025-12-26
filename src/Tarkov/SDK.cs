@@ -65,10 +65,8 @@ namespace SDK
             public const uint ObservedPlayerController = 0x28; // object
             public const uint Voice = 0x40; // string
             public const uint Id = 0x7C; // int32_t
-            public const uint GroupID = 0x80; // string
             public const uint Side = 0x94; // object
             public const uint IsAI = 0xA0; // bool
-            public const uint AccountId = 0xC0; // string
             public const uint PlayerBody = 0xD8; // object
         }
 

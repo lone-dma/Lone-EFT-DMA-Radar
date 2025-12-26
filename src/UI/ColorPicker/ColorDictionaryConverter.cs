@@ -70,8 +70,12 @@ namespace LoneEftDmaRadar.UI.ColorPicker
             ConcurrentDictionary<ColorPickerOption, string> value,
             JsonSerializerOptions options)
         {
-            // just hand it back to the default serializer
-            JsonSerializer.Serialize(writer, value, options);
+            writer.WriteStartObject();
+            foreach (var kvp in value)
+            {
+                writer.WriteString(kvp.Key.ToString(), kvp.Value);
+            }
+            writer.WriteEndObject();
         }
     }
 }
