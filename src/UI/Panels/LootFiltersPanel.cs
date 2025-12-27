@@ -608,6 +608,17 @@ namespace LoneEftDmaRadar.UI.Panels
             foreach (var item in TarkovDataManager.AllItems.Values)
                 item.SetFilter(null);
 
+            // Ensure every entry has its ParentFilter populated.
+            // This is required for inheritance (e.g. color) and for any logic that relies on ParentFilter.
+            foreach (var filter in Program.Config.LootFilters.Filters.Values)
+            {
+                if (filter?.Entries is null)
+                    continue;
+
+                foreach (var entry in filter.Entries)
+                    entry.ParentFilter = filter;
+            }
+
             var currentFilters = Program.Config.LootFilters.Filters
                 .Values
                 .Where(x => x.Enabled)
