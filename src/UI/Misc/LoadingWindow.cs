@@ -27,8 +27,10 @@ SOFTWARE.
 */
 
 using ImGuiNET;
+using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
+using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
 
 namespace LoneEftDmaRadar.UI.Misc
@@ -40,6 +42,7 @@ namespace LoneEftDmaRadar.UI.Misc
     {
         private readonly IWindow _window;
         private GL _gl;
+        private IInputContext _input;
         private ImGuiController _imgui;
 
         private float _progress;
@@ -153,18 +156,16 @@ namespace LoneEftDmaRadar.UI.Misc
 
         public void Dispose()
         {
-            if (_disposed)
+            if (Interlocked.Exchange(ref _disposed, true) == true)
                 return;
-
-            _disposed = true;
             _isRunning = false;
 
-            // Dispose ImGui controller first
-            if (_imgui is not null)
-            {
-                _imgui.Dispose();
-                _imgui = null;
-            }
+            // Dispose our controller first
+            _imgui?.Dispose();
+            _imgui = null;
+            // Dispose the input context
+            _input?.Dispose();
+            _input = null;
 
             // Destroy the ImGui context we created
             var ctx = ImGui.GetCurrentContext();
@@ -173,12 +174,7 @@ namespace LoneEftDmaRadar.UI.Misc
                 ImGui.DestroyContext(ctx);
             }
 
-            // Close and dispose the window
-            if (!_window.IsClosing)
-            {
-                _window.Close();
-            }
-
+            _window.Close();
             _window.Reset();
             _window.Dispose();
         }
@@ -194,11 +190,11 @@ namespace LoneEftDmaRadar.UI.Misc
             }
 
             ImGui.CreateContext();
+            _input = _window.CreateInput();
             _imgui = new ImGuiController(
-                _gl,
-                _window,
-                _window.Size.X,
-                _window.Size.Y
+                gl: _gl,
+                view: _window,
+                input: _input
             );
 
             ConfigureStyle();
@@ -283,16 +279,6 @@ namespace LoneEftDmaRadar.UI.Misc
 
         [LibraryImport("dwmapi.dll")]
         private static partial int DwmSetWindowAttribute(nint hwnd, int attr, ref int attrValue, int attrSize);
-
-        [LibraryImport("kernel32.dll", StringMarshalling = StringMarshalling.Utf16)]
-        private static partial nint GetModuleHandleW(string lpModuleName);
-
-        private const uint IMAGE_ICON = 1;
-        private const uint LR_DEFAULTCOLOR = 0x00000000;
-        private const uint WM_SETICON = 0x0080;
-        private const nint ICON_SMALL = 0;
-        private const nint ICON_BIG = 1;
-        private const int IDI_APPLICATION = 32512;
 
         private static void EnableDarkMode(nint hwnd)
         {
