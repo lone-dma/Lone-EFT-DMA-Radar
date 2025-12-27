@@ -271,10 +271,11 @@ namespace LoneEftDmaRadar
     public sealed class UIConfig
     {
         /// <summary>
-        /// Set FPS Limit for the Radar Window (default: 60)
+        /// Set FPS for the Radar Window (default: 60)
         /// </summary>
-        [JsonPropertyName("fpsLimit")]
-        public int FPSLimit { get; set; } = 60;
+        [JsonPropertyName("fps")]
+        public int FPS { get; set; } = 60;
+
         /// <summary>
         /// UI Scale Value (0.5-2.0 , default: 1.0)
         /// </summary>
