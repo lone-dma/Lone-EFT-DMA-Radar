@@ -377,11 +377,7 @@ namespace LoneEftDmaRadar.UI
             }
             finally
             {
-                try
-                {
-                    _grContext.ResetContext();
-                }
-                catch { }
+                _grContext.ResetContext();
             }
         }
 
