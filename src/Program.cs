@@ -37,10 +37,14 @@ namespace LoneEftDmaRadar
 {
     internal partial class Program
     {
-        internal const string Name = "Lone EFT DMA Radar";
+        private const string BaseName = "Lone EFT DMA Radar";
         private const string MUTEX_ID = "0f908ff7-e614-6a93-60a3-cee36c9cea91";
         private static readonly Mutex _mutex;
 
+        /// <summary>
+        /// Application Name with Version.
+        /// </summary>
+        internal static string Name { get; } = $"{BaseName} v{GetSemVer2OrDefault()}";
         /// <summary>
         /// Path to the Configuration Folder in %AppData%
         /// </summary>
@@ -223,6 +227,26 @@ namespace LoneEftDmaRadar
                     button: MessageBoxButton.OK,
                     icon: MessageBoxImage.Warning,
                     options: MessageBoxOptions.DefaultDesktopOnly);
+            }
+        }
+
+        private static string GetSemVer2OrDefault()
+        {
+            try
+            {
+                // Prefer InformationalVersion since it commonly contains SemVer2 (+metadata).
+                var v = Assembly.GetExecutingAssembly()
+                    .GetCustomAttribute<AssemblyVersionAttribute>()
+                    ?.Version;
+
+                if (string.IsNullOrWhiteSpace(v))
+                    return "0.0.0";
+
+                return v.Trim();
+            }
+            catch
+            {
+                return "0.0.0";
             }
         }
 
