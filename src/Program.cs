@@ -234,15 +234,15 @@ namespace LoneEftDmaRadar
         {
             try
             {
-                // Prefer InformationalVersion since it commonly contains SemVer2 (+metadata).
-                var v = Assembly.GetExecutingAssembly()
-                    .GetCustomAttribute<AssemblyVersionAttribute>()
+                string strV = Assembly.GetExecutingAssembly()
+                    .GetCustomAttribute<AssemblyFileVersionAttribute>()
                     ?.Version;
 
-                if (string.IsNullOrWhiteSpace(v))
+                if (string.IsNullOrWhiteSpace(strV))
                     return "0.0.0";
 
-                return v.Trim();
+                var v = new Version(strV);
+                return $"{v.Major}.{v.Minor}.{v.Build}";
             }
             catch
             {
