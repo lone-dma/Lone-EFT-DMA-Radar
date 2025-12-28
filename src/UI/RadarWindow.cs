@@ -66,10 +66,6 @@ namespace LoneEftDmaRadar.UI
         private static int _fpsCounter = 0;
         private static int _statusOrder = 1;
 
-        // Skia resource purging
-        private static long _nextSkiaPurgeTicks = 0;
-        private static readonly long _skiaPurgeIntervalTicks = TimeSpan.FromSeconds(2).Ticks;
-
         // Mouse tracking
         private static bool _mouseDown;
         private static Vector2 _lastMousePosition;
@@ -379,13 +375,8 @@ namespace LoneEftDmaRadar.UI
                 canvas.Flush();
                 _grContext.Flush();
 
-                // Throttle Skia resource purging to avoid GPU resource churn stutters.
-                var nowTicks = Stopwatch.GetTimestamp();
-                if (nowTicks >= _nextSkiaPurgeTicks)
-                {
-                    _grContext.PurgeUnlockedResources(false);
-                    _nextSkiaPurgeTicks = nowTicks + _skiaPurgeIntervalTicks;
-                }
+                // Purge unlocked resources to prevent memory bloat
+                _grContext.PurgeUnlockedResources(false);
 
                 // Render AimviewWidget to its FBO (during Skia phase, before ImGui)
                 AimviewWidget.RenderToFbo();
