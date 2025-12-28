@@ -157,11 +157,10 @@ namespace LoneEftDmaRadar.DMA
                     $"Reason: {ex.Message}\n" +
                     $"{versions}\n\n" +
                     "===TROUBLESHOOTING===\n" +
-                    "1. Reboot both your Game PC / Radar PC (This USUALLY fixes it).\n" +
-                    "2. Reseat all cables/connections and make sure they are secure.\n" +
-                    "3. Changed Hardware/Operating System on Game PC? Reset your DMA Config ('Options' menu in Client) and try again.\n" +
-                    "4. Make sure all Setup Steps are completed (See DMA Setup Guide/FAQ for additional troubleshooting).\n\n" +
-                    "PLEASE REVIEW THE ABOVE BEFORE CONTACTING SUPPORT!");
+                    "1. Cold boot (power off/power on) both your Game PC / Radar PC (This USUALLY fixes it).\n" +
+                    "2. Reseat all cables/connections and make sure they are secure. Try a different USB Port.\n" +
+                    "3. Changed Hardware/Operating System on Game PC? Delete %AppData%\\CFG\\mmap.txt and try again.\n" +
+                    "4. Make sure all Setup Steps are completed (See DMA Setup Guide/Wiki for additional troubleshooting).");
                 }
             });
         }
