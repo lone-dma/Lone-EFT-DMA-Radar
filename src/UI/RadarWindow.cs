@@ -668,9 +668,10 @@ namespace LoneEftDmaRadar.UI
             {
                 LootFiltersPanel.Draw();
                 ImGui.Separator();
-                if (ImGui.Button("Apply"))
+                if (ImGui.Button("Apply & Close"))
                 {
                     LootFiltersPanel.RefreshLootFilter();
+                    isOpen = false; // close the window this frame
                 }
             }
             ImGui.End();
