@@ -42,6 +42,8 @@ namespace LoneEftDmaRadar.UI.Panels
         private static float _scale;
         private static bool _valuesLoaded;
 
+        private static EftDmaConfig Config { get; } = Program.Config;
+
         /// <summary>
         /// Whether the map setup helper panel is open.
         /// </summary>

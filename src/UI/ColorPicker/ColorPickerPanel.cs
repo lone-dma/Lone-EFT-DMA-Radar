@@ -41,6 +41,8 @@ namespace LoneEftDmaRadar.UI.ColorPicker
         private static ColorPickerOption? _selectedOption;
         private static string _hexInput = "#FFFFFF";
 
+        private static EftDmaConfig Config { get; } = Program.Config;
+
         /// <summary>
         /// Whether the color picker panel is open.
         /// </summary>
@@ -53,10 +55,10 @@ namespace LoneEftDmaRadar.UI.ColorPicker
         {
             // Add default colors for any missing entries
             foreach (var defaultColor in GetDefaultColors())
-                Program.Config.RadarColors.TryAdd(defaultColor.Key, defaultColor.Value);
+                Config.RadarColors.TryAdd(defaultColor.Key, defaultColor.Value);
 
             // Apply all colors from config
-            SetAllColors(Program.Config.RadarColors);
+            SetAllColors(Config.RadarColors);
         }
 
         /// <summary>
@@ -221,7 +223,7 @@ namespace LoneEftDmaRadar.UI.ColorPicker
 
         private static Vector3 GetCurrentColor(ColorPickerOption option)
         {
-            if (Program.Config.RadarColors.TryGetValue(option, out var hex))
+            if (Config.RadarColors.TryGetValue(option, out var hex))
             {
                 if (TryParseHex(hex, out var color))
                     return color;
@@ -262,7 +264,7 @@ namespace LoneEftDmaRadar.UI.ColorPicker
         private static void ApplyColor(ColorPickerOption option, Vector3 color)
         {
             string hex = ColorToHex(color);
-            Program.Config.RadarColors[option] = hex;
+            Config.RadarColors[option] = hex;
 
             // Apply to SKPaint
             var skColor = new SKColor(

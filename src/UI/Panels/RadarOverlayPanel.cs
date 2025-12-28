@@ -40,6 +40,8 @@ namespace LoneEftDmaRadar.UI.Panels
         private static string _searchText = string.Empty;
         private static bool _lootOverlayVisible;
 
+        private static EftDmaConfig Config { get; } = Program.Config;
+
         /// <summary>
         /// Hides the loot overlay if it's currently visible.
         /// </summary>
@@ -97,7 +99,7 @@ namespace LoneEftDmaRadar.UI.Panels
                 }
 
                 // Loot button - only show when loot is enabled
-                if (Program.Config.Loot.Enabled)
+                if (Config.Loot.Enabled)
                 {
                     ImGui.SameLine();
                     if (ImGui.Button("Loot"))
@@ -117,7 +119,7 @@ namespace LoneEftDmaRadar.UI.Panels
         /// </summary>
         public static void DrawLootOverlay()
         {
-            if (!Program.Config.Loot.Enabled)
+            if (!Config.Loot.Enabled)
                 return;
 
             // Loot Options Panel - only show if toggled on
@@ -168,20 +170,20 @@ namespace LoneEftDmaRadar.UI.Panels
             ImGui.Text("Valuable Min:");
 
             ImGui.SetNextItemWidth(140);
-            int minValue = Program.Config.Loot.MinValue;
+            int minValue = Config.Loot.MinValue;
             if (ImGui.InputInt("##MinValue", ref minValue, 1000, 10000))
             {
-                Program.Config.Loot.MinValue = Math.Max(0, minValue);
+                Config.Loot.MinValue = Math.Max(0, minValue);
                 Memory.Loot?.RefreshFilter();
             }
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip("Minimum value to display regular loot");
             ImGui.SameLine(150);
             ImGui.SetNextItemWidth(140);
-            int valuableMin = Program.Config.Loot.MinValueValuable;
+            int valuableMin = Config.Loot.MinValueValuable;
             if (ImGui.InputInt("##ValuableMin", ref valuableMin, 1000, 10000))
             {
-                Program.Config.Loot.MinValueValuable = Math.Max(0, valuableMin);
+                Config.Loot.MinValueValuable = Math.Max(0, valuableMin);
                 Memory.Loot?.RefreshFilter();
             }
             if (ImGui.IsItemHovered())
@@ -190,10 +192,10 @@ namespace LoneEftDmaRadar.UI.Panels
             ImGui.Separator();
 
             // Price options on one line
-            bool pricePerSlot = Program.Config.Loot.PricePerSlot;
+            bool pricePerSlot = Config.Loot.PricePerSlot;
             if (ImGui.Checkbox("Price per Slot", ref pricePerSlot))
             {
-                Program.Config.Loot.PricePerSlot = pricePerSlot;
+                Config.Loot.PricePerSlot = pricePerSlot;
                 Memory.Loot?.RefreshFilter();
             }
             if (ImGui.IsItemHovered())
@@ -201,10 +203,10 @@ namespace LoneEftDmaRadar.UI.Panels
             ImGui.SameLine(150);
             ImGui.Text("Mode:");
             ImGui.SameLine();
-            int priceMode = (int)Program.Config.Loot.PriceMode;
+            int priceMode = (int)Config.Loot.PriceMode;
             if (ImGui.RadioButton("Flea", ref priceMode, 0))
             {
-                Program.Config.Loot.PriceMode = LootPriceMode.FleaMarket;
+                Config.Loot.PriceMode = LootPriceMode.FleaMarket;
                 Memory.Loot?.RefreshFilter();
             }
             if (ImGui.IsItemHovered())
@@ -212,7 +214,7 @@ namespace LoneEftDmaRadar.UI.Panels
             ImGui.SameLine();
             if (ImGui.RadioButton("Trader", ref priceMode, 1))
             {
-                Program.Config.Loot.PriceMode = LootPriceMode.Trader;
+                Config.Loot.PriceMode = LootPriceMode.Trader;
                 Memory.Loot?.RefreshFilter();
             }
             if (ImGui.IsItemHovered())
@@ -221,10 +223,10 @@ namespace LoneEftDmaRadar.UI.Panels
             ImGui.Separator();
 
             // Category toggles
-            bool hideCorpses = Program.Config.Loot.HideCorpses;
+            bool hideCorpses = Config.Loot.HideCorpses;
             if (ImGui.Checkbox("Hide Corpses", ref hideCorpses))
             {
-                Program.Config.Loot.HideCorpses = hideCorpses;
+                Config.Loot.HideCorpses = hideCorpses;
                 Memory.Loot?.RefreshFilter();
             }
             if (ImGui.IsItemHovered())

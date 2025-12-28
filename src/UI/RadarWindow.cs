@@ -84,6 +84,7 @@ namespace LoneEftDmaRadar.UI
 
         #region Static Properties
 
+        private static EftDmaConfig Config { get; } = Program.Config;
         public static IntPtr Handle => _window?.Native?.Win32?.Hwnd ?? IntPtr.Zero;
         private static bool Starting => Memory.Starting;
         private static bool Ready => Memory.Ready;
@@ -98,7 +99,7 @@ namespace LoneEftDmaRadar.UI
         private static IReadOnlyCollection<IExitPoint> Exits => Memory.Exits;
         private static QuestManager Quests => Memory.QuestManager;
         private static bool SearchFilterIsSet => !string.IsNullOrEmpty(LootFilter.SearchString);
-        private static bool LootCorpsesVisible => Program.Config.Loot.Enabled && !Program.Config.Loot.HideCorpses && !SearchFilterIsSet;
+        private static bool LootCorpsesVisible => Config.Loot.Enabled && !Config.Loot.HideCorpses && !SearchFilterIsSet;
 
         /// <summary>
         /// Whether map free mode is enabled.
@@ -126,16 +127,16 @@ namespace LoneEftDmaRadar.UI
         {
             var options = WindowOptions.Default;
             options.Size = new Vector2D<int>(
-                (int)Program.Config.UI.WindowSize.Width,
-                (int)Program.Config.UI.WindowSize.Height);
+                (int)Config.UI.WindowSize.Width,
+                (int)Config.UI.WindowSize.Height);
             options.Title = Program.Name;
             options.VSync = false;
-            options.FramesPerSecond = Program.Config.UI.FPS;
+            options.FramesPerSecond = Config.UI.FPS;
             options.PreferredStencilBufferBits = 8;
             options.PreferredBitDepth = new Vector4D<int>(8, 8, 8, 8);
 
             // Restore maximized state from config (not fullscreen)
-            if (Program.Config.UI.WindowMaximized)
+            if (Config.UI.WindowMaximized)
             {
                 options.WindowState = WindowState.Maximized;
             }
@@ -295,7 +296,7 @@ namespace LoneEftDmaRadar.UI
             // Note: Fullscreen (hidden border + maximized) is NOT persisted - only regular maximized
             if (_window.WindowBorder == WindowBorder.Resizable)
             {
-                Program.Config.UI.WindowMaximized = (state == WindowState.Maximized);
+                Config.UI.WindowMaximized = (state == WindowState.Maximized);
             }
         }
 
@@ -304,28 +305,11 @@ namespace LoneEftDmaRadar.UI
             // Save window state - only save size if not maximized/fullscreen
             if (_window.WindowState == WindowState.Normal)
             {
-                Program.Config.UI.WindowSize = new SKSize(_window.Size.X, _window.Size.Y);
+                Config.UI.WindowSize = new SKSize(_window.Size.X, _window.Size.Y);
             }
 
-            Program.Config.UI.WindowMaximized = _window.WindowState == WindowState.Maximized;
-            Program.Config.Save();
-
-            // Cleanup resources
-            AimviewWidget.Cleanup();
-
-            var grContext = Interlocked.Exchange(ref _grContext, null);
-            var skBackendRenderTarget = Interlocked.Exchange(ref _skBackendRenderTarget, null);
-            var skSurface = Interlocked.Exchange(ref _skSurface, null);
-            var input = Interlocked.Exchange(ref _input, null);
-            var gl = Interlocked.Exchange(ref _gl, null);
-            var imgui = Interlocked.Exchange(ref _imgui, null);
-
-            imgui?.Dispose();
-            skSurface?.Dispose();
-            skBackendRenderTarget?.Dispose();
-            grContext?.Dispose();
-            input?.Dispose();
-            gl?.Dispose();
+            Config.UI.WindowMaximized = _window.WindowState == WindowState.Maximized;
+            // CurrentDomain_ProcessExit will execute after this point
         }
 
         #endregion
@@ -437,13 +421,13 @@ namespace LoneEftDmaRadar.UI
                     _mapPanPosition = localPlayerMapPos;
                 }
                 var panPos = _mapPanPosition;
-                mapParams = map.GetParameters(canvasSize, Program.Config.UI.Zoom, ref panPos);
+                mapParams = map.GetParameters(canvasSize, Config.UI.Zoom, ref panPos);
                 _mapPanPosition = panPos;
             }
             else
             {
                 _mapPanPosition = default;
-                mapParams = map.GetParameters(canvasSize, Program.Config.UI.Zoom, ref localPlayerMapPos);
+                mapParams = map.GetParameters(canvasSize, Config.UI.Zoom, ref localPlayerMapPos);
             }
 
             var mapCanvasBounds = new SKRect(0, 0, canvasSize.Width, canvasSize.Height);
@@ -452,7 +436,7 @@ namespace LoneEftDmaRadar.UI
             map.Draw(canvas, localPlayer.Position.Y, mapParams.Bounds, mapCanvasBounds);
 
             // Draw loot
-            if (Program.Config.Loot.Enabled)
+            if (Config.Loot.Enabled)
             {
                 if (FilteredLoot is IEnumerable<LootItem> loot)
                 {
@@ -462,11 +446,11 @@ namespace LoneEftDmaRadar.UI
                     }
                 }
 
-                if (Program.Config.Containers.Enabled && Containers is IEnumerable<StaticLootContainer> containers)
+                if (Config.Containers.Enabled && Containers is IEnumerable<StaticLootContainer> containers)
                 {
                     foreach (var container in containers)
                     {
-                        if (Program.Config.Containers.Selected.ContainsKey(container.ID ?? "NULL"))
+                        if (Config.Containers.Selected.ContainsKey(container.ID ?? "NULL"))
                         {
                             container.Draw(canvas, mapParams, localPlayer);
                         }
@@ -475,7 +459,7 @@ namespace LoneEftDmaRadar.UI
             }
 
             // Draw hazards
-            if (Program.Config.UI.ShowHazards && Hazards is IReadOnlyCollection<IWorldHazard> hazards)
+            if (Config.UI.ShowHazards && Hazards is IReadOnlyCollection<IWorldHazard> hazards)
             {
                 foreach (var hazard in hazards)
                 {
@@ -493,7 +477,7 @@ namespace LoneEftDmaRadar.UI
             }
 
             // Draw exits
-            if (Program.Config.UI.ShowExfils && Exits is IReadOnlyCollection<IExitPoint> exits)
+            if (Config.UI.ShowExfils && Exits is IReadOnlyCollection<IExitPoint> exits)
             {
                 foreach (var exit in exits)
                 {
@@ -502,7 +486,7 @@ namespace LoneEftDmaRadar.UI
             }
 
             // Draw quest locations
-            if (Program.Config.QuestHelper.Enabled && Quests?.LocationConditions?.Values is IEnumerable<QuestLocation> questLocations)
+            if (Config.QuestHelper.Enabled && Quests?.LocationConditions?.Values is IEnumerable<QuestLocation> questLocations)
             {
                 foreach (var loc in questLocations)
                 {
@@ -800,8 +784,8 @@ namespace LoneEftDmaRadar.UI
             if (!ImGui.GetIO().WantCaptureMouse)
             {
                 int delta = (int)(wheel.Y * 5);
-                int newZoom = Program.Config.UI.Zoom - delta;
-                Program.Config.UI.Zoom = Math.Clamp(newZoom, 1, 200);
+                int newZoom = Config.UI.Zoom - delta;
+                Config.UI.Zoom = Math.Clamp(newZoom, 1, 200);
             }
         }
 
@@ -881,16 +865,16 @@ namespace LoneEftDmaRadar.UI
                 .Where(x => x is not LoneEftDmaRadar.Tarkov.GameWorld.Player.LocalPlayer && !x.HasExfild && (!LootCorpsesVisible || x.IsAlive)) ??
                 Enumerable.Empty<AbstractPlayer>();
 
-            var loot = Program.Config.Loot.Enabled ?
+            var loot = Config.Loot.Enabled ?
                 FilteredLoot ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
-            var containers = Program.Config.Loot.Enabled && Program.Config.Containers.Enabled ?
+            var containers = Config.Loot.Enabled && Config.Containers.Enabled ?
                 Containers ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
-            var exits = Program.Config.UI.ShowExfils ?
+            var exits = Config.UI.ShowExfils ?
                 Exits ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
-            var quests = Program.Config.QuestHelper.Enabled ?
+            var quests = Config.QuestHelper.Enabled ?
                 Quests?.LocationConditions?.Values?.OfType<IMouseoverEntity>() ?? Enumerable.Empty<IMouseoverEntity>()
                 : Enumerable.Empty<IMouseoverEntity>();
-            var hazards = Program.Config.UI.ShowHazards ?
+            var hazards = Config.UI.ShowHazards ?
                 Hazards ?? Enumerable.Empty<IMouseoverEntity>()
                 : Enumerable.Empty<IMouseoverEntity>();
 
@@ -931,7 +915,7 @@ namespace LoneEftDmaRadar.UI
                     ZoomOut(HK_ZOOMTICKAMT);
                     break;
                 case Key.F3:
-                    Program.Config.Loot.Enabled = !Program.Config.Loot.Enabled;
+                    Config.Loot.Enabled = !Config.Loot.Enabled;
                     break;
             }
         }
@@ -976,14 +960,14 @@ namespace LoneEftDmaRadar.UI
         private static void ToggleAimviewWidget_HotkeyStateChanged(bool isKeyDown)
         {
             if (isKeyDown)
-                Program.Config.AimviewWidget.Enabled = !Program.Config.AimviewWidget.Enabled;
+                Config.AimviewWidget.Enabled = !Config.AimviewWidget.Enabled;
         }
 
         [Hotkey("Toggle Player Info Widget")]
         private static void ToggleInfo_HotkeyStateChanged(bool isKeyDown)
         {
             if (isKeyDown)
-                Program.Config.InfoWidget.Enabled = !Program.Config.InfoWidget.Enabled;
+                Config.InfoWidget.Enabled = !Config.InfoWidget.Enabled;
         }
 
         [Hotkey("Toggle Show Meds")]
@@ -1010,7 +994,7 @@ namespace LoneEftDmaRadar.UI
         private static void ToggleLoot_HotkeyStateChanged(bool isKeyDown)
         {
             if (isKeyDown)
-                Program.Config.Loot.Enabled = !Program.Config.Loot.Enabled;
+                Config.Loot.Enabled = !Config.Loot.Enabled;
         }
 
         [Hotkey("Zoom Out", HotkeyType.OnIntervalElapsed, HK_ZOOMTICKDELAY)]
@@ -1032,7 +1016,7 @@ namespace LoneEftDmaRadar.UI
         /// </summary>
         public static void ZoomIn(int amt)
         {
-            Program.Config.UI.Zoom = Math.Max(1, Program.Config.UI.Zoom - amt);
+            Config.UI.Zoom = Math.Max(1, Config.UI.Zoom - amt);
         }
 
         /// <summary>
@@ -1040,7 +1024,7 @@ namespace LoneEftDmaRadar.UI
         /// </summary>
         public static void ZoomOut(int amt)
         {
-            Program.Config.UI.Zoom = Math.Min(200, Program.Config.UI.Zoom + amt);
+            Config.UI.Zoom = Math.Min(200, Config.UI.Zoom + amt);
         }
 
         private static async Task RunFpsTimerAsync()

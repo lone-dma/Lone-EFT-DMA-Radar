@@ -58,17 +58,19 @@ namespace LoneEftDmaRadar.UI.Panels
         private static readonly List<string> _filterNames = new();
         private static readonly List<LootFilterEntry> _currentFilterEntries = new();
 
+        private static EftDmaConfig Config { get; } = Program.Config;
+
         /// <summary>
         /// Currently selected filter name.
         /// </summary>
         public static string SelectedFilterName
         {
-            get => Program.Config.LootFilters.Selected;
+            get => Config.LootFilters.Selected;
             set
             {
-                if (Program.Config.LootFilters.Selected != value)
+                if (Config.LootFilters.Selected != value)
                 {
-                    Program.Config.LootFilters.Selected = value;
+                    Config.LootFilters.Selected = value;
                     RefreshCurrentFilterEntries();
                 }
             }
@@ -90,7 +92,7 @@ namespace LoneEftDmaRadar.UI.Panels
         private static void RefreshFilterNames()
         {
             _filterNames.Clear();
-            _filterNames.AddRange(Program.Config.LootFilters.Filters.Keys);
+            _filterNames.AddRange(Config.LootFilters.Filters.Keys);
         }
 
         private static void RefreshFilterIndex()
@@ -107,7 +109,7 @@ namespace LoneEftDmaRadar.UI.Panels
         private static void RefreshCurrentFilterEntries()
         {
             _currentFilterEntries.Clear();
-            if (Program.Config.LootFilters.Filters.TryGetValue(SelectedFilterName, out var filter))
+            if (Config.LootFilters.Filters.TryGetValue(SelectedFilterName, out var filter))
             {
                 foreach (var entry in filter.Entries)
                 {
@@ -119,7 +121,7 @@ namespace LoneEftDmaRadar.UI.Panels
 
         private static UserLootFilter GetCurrentFilter()
         {
-            Program.Config.LootFilters.Filters.TryGetValue(SelectedFilterName, out var filter);
+            Config.LootFilters.Filters.TryGetValue(SelectedFilterName, out var filter);
             return filter;
         }
 
@@ -542,7 +544,7 @@ namespace LoneEftDmaRadar.UI.Panels
                 // Use ImportantLoot color as default for new filters
                 string defaultColor = SKPaints.PaintImportantLoot.Color.ToString();
 
-                if (!Program.Config.LootFilters.Filters.TryAdd(name, new UserLootFilter
+                if (!Config.LootFilters.Filters.TryAdd(name, new UserLootFilter
                 {
                     Enabled = true,
                     Color = defaultColor,
@@ -576,9 +578,9 @@ namespace LoneEftDmaRadar.UI.Panels
 
             try
             {
-                if (Program.Config.LootFilters.Filters.TryGetValue(oldName, out var filter)
-                    && Program.Config.LootFilters.Filters.TryAdd(newName, filter)
-                    && Program.Config.LootFilters.Filters.TryRemove(oldName, out _))
+                if (Config.LootFilters.Filters.TryGetValue(oldName, out var filter)
+                    && Config.LootFilters.Filters.TryAdd(newName, filter)
+                    && Config.LootFilters.Filters.TryRemove(oldName, out _))
                 {
                     RefreshFilterIndex();
                     SelectedFilterName = newName;
@@ -611,16 +613,16 @@ namespace LoneEftDmaRadar.UI.Panels
 
             try
             {
-                if (!Program.Config.LootFilters.Filters.TryRemove(name, out _))
+                if (!Config.LootFilters.Filters.TryRemove(name, out _))
                 {
                     MessageBox.Show(RadarWindow.Handle, "Remove failed.", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
                 // Ensure at least one filter remains
-                if (Program.Config.LootFilters.Filters.IsEmpty)
+                if (Config.LootFilters.Filters.IsEmpty)
                 {
-                    Program.Config.LootFilters.Filters.TryAdd("default", new UserLootFilter
+                    Config.LootFilters.Filters.TryAdd("default", new UserLootFilter
                     {
                         Enabled = true,
                         Entries = new()
@@ -663,7 +665,7 @@ namespace LoneEftDmaRadar.UI.Panels
 
             // Ensure every entry has its ParentFilter populated.
             // This is required for inheritance (e.g. color) and for any logic that relies on ParentFilter.
-            foreach (var filter in Program.Config.LootFilters.Filters.Values)
+            foreach (var filter in Config.LootFilters.Filters.Values)
             {
                 if (filter?.Entries is null)
                     continue;
@@ -672,7 +674,7 @@ namespace LoneEftDmaRadar.UI.Panels
                     entry.ParentFilter = filter;
             }
 
-            var currentFilters = Program.Config.LootFilters.Filters
+            var currentFilters = Config.LootFilters.Filters
                 .Values
                 .Where(x => x.Enabled)
                 .SelectMany(x => x.Entries)

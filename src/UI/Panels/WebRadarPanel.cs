@@ -47,13 +47,15 @@ namespace LoneEftDmaRadar.UI.Panels
         private static string _serverUrl = string.Empty;
         private static bool _uiEnabled = true;
 
+        private static EftDmaConfig Config { get; } = Program.Config;
+
         static WebRadarPanel()
         {
             // Initialize from config
-            _bindAddress = Program.Config.WebRadar.IP ?? "0.0.0.0";
-            _port = Program.Config.WebRadar.Port ?? "55555";
-            _tickRate = Program.Config.WebRadar.TickRate ?? "60";
-            _upnpEnabled = Program.Config.WebRadar.UPnP;
+            _bindAddress = Config.WebRadar.IP ?? "0.0.0.0";
+            _port = Config.WebRadar.Port ?? "55555";
+            _tickRate = Config.WebRadar.TickRate ?? "60";
+            _upnpEnabled = Config.WebRadar.UPnP;
             _password = WebRadarServer.Password;
         }
 
@@ -74,7 +76,7 @@ namespace LoneEftDmaRadar.UI.Panels
             ImGui.SetNextItemWidth(200);
             if (ImGui.InputText("##BindAddress", ref _bindAddress, 64))
             {
-                Program.Config.WebRadar.IP = _bindAddress;
+                Config.WebRadar.IP = _bindAddress;
             }
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip("IP address to bind the server to (0.0.0.0 for all interfaces)");
@@ -87,7 +89,7 @@ namespace LoneEftDmaRadar.UI.Panels
             {
                 if (int.TryParse(_port, out _))
                 {
-                    Program.Config.WebRadar.Port = _port;
+                    Config.WebRadar.Port = _port;
                 }
             }
             if (ImGui.IsItemHovered())
@@ -99,7 +101,7 @@ namespace LoneEftDmaRadar.UI.Panels
             {
                 if (int.TryParse(_tickRate, out _))
                 {
-                    Program.Config.WebRadar.TickRate = _tickRate;
+                    Config.WebRadar.TickRate = _tickRate;
                 }
             }
             if (ImGui.IsItemHovered())
@@ -107,7 +109,7 @@ namespace LoneEftDmaRadar.UI.Panels
 
             if (ImGui.Checkbox("Enable UPnP", ref _upnpEnabled))
             {
-                Program.Config.WebRadar.UPnP = _upnpEnabled;
+                Config.WebRadar.UPnP = _upnpEnabled;
             }
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip("Automatically configure port forwarding on your router");

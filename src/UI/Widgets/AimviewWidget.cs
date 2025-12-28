@@ -456,11 +456,6 @@ namespace LoneEftDmaRadar.UI.Widgets
             }
         }
 
-        public static void Cleanup()
-        {
-            DestroyFbo();
-        }
-
         #endregion
     }
 }
