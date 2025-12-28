@@ -83,6 +83,8 @@ namespace LoneEftDmaRadar
                 ServiceProvider = BuildServiceProvider();
                 HttpClientFactory = ServiceProvider.GetRequiredService<IHttpClientFactory>();
                 SetHighPerformanceMode();
+                AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+                AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
             }
             catch (Exception ex)
             {
@@ -152,13 +154,27 @@ namespace LoneEftDmaRadar
             await Task.WhenAll(tarkovDataManager, eftMapManager, memoryInterface, misc);
 
             loadingWindow.UpdateProgress(100, "Loading Completed!");
-
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
 
+        private static void CurrentDomain_ProcessExit(object sender, EventArgs e) => OnShutdown();
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
+            if (e.ExceptionObject is Exception ex)
+            {
+                Logging.WriteLine($"*** UNHANDLED EXCEPTION (Terminating: {e.IsTerminating}): {ex}");
+            }
+            if (e.IsTerminating)
+            {
+                OnShutdown();
+            }
+        }
+
+        private static void OnShutdown()
+        {
+            Logging.WriteLine("Saving Config and Closing DMA Connection...");
             Config.Save();
+            Memory.Close();
+            Logging.WriteLine("Exiting...");
         }
 
         /// <summary>
