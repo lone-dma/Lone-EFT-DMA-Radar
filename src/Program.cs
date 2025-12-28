@@ -196,14 +196,15 @@ namespace LoneEftDmaRadar
         {
             /// Prepare Process for High Performance Mode
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
-            SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS | EXECUTION_STATE.ES_SYSTEM_REQUIRED |
-                                           EXECUTION_STATE.ES_DISPLAY_REQUIRED);
-            var highPerformanceGuid = new Guid("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c");
+            if (SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS | EXECUTION_STATE.ES_SYSTEM_REQUIRED | EXECUTION_STATE.ES_DISPLAY_REQUIRED) == 0)
+                Logging.WriteLine($"WARNING: Unable to set Thread Execution State. This may cause performance issues. ERROR {Marshal.GetLastWin32Error()}");
+            Guid highPerformanceGuid = new("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c");
             if (PowerSetActiveScheme(IntPtr.Zero, ref highPerformanceGuid) != 0)
-                Logging.WriteLine("WARNING: Unable to set High Performance Power Plan");
-            const uint timerResolutionMs = 5;
-            if (TimeBeginPeriod(timerResolutionMs) != 0)
-                Logging.WriteLine($"WARNING: Unable to set timer resolution to {timerResolutionMs}ms. This may cause performance issues.");
+                Logging.WriteLine($"WARNING: Unable to set High Performance Power Plan. This may cause performance issues. ERROR {Marshal.GetLastWin32Error()}");
+            if (TimeBeginPeriod(5) != 0)
+                Logging.WriteLine($"WARNING: Unable to set timer resolution to 5ms. This may cause performance issues. ERROR {Marshal.GetLastWin32Error()}");
+            if (AvSetMmThreadCharacteristicsW("Games", out _) == 0)
+                Logging.WriteLine($"WARNING: Unable to set Multimedia thread characteristics to 'Games'. This may cause performance issues. ERROR {Marshal.GetLastWin32Error()}");
         }
 
         private static async Task CheckForUpdatesAsync()
@@ -266,7 +267,7 @@ namespace LoneEftDmaRadar
             }
         }
 
-        [LibraryImport("kernel32.dll")]
+        [LibraryImport("kernel32.dll", SetLastError = true)]
         private static partial EXECUTION_STATE SetThreadExecutionState(EXECUTION_STATE esFlags);
 
         [Flags]
@@ -280,10 +281,13 @@ namespace LoneEftDmaRadar
             // ES_USER_PRESENT = 0x00000004
         }
 
-        [LibraryImport("powrprof.dll")]
+        [LibraryImport("avrt.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+        private static partial IntPtr AvSetMmThreadCharacteristicsW(string taskName, out uint taskIndex);
+
+        [LibraryImport("powrprof.dll", SetLastError = true)]
         private static partial uint PowerSetActiveScheme(IntPtr userRootPowerKey, ref Guid schemeGuid);
 
-        [LibraryImport("winmm.dll", EntryPoint = "timeBeginPeriod")]
+        [LibraryImport("winmm.dll", EntryPoint = "timeBeginPeriod", SetLastError = true)]
         private static partial uint TimeBeginPeriod(uint uMilliseconds);
 
         #endregion
