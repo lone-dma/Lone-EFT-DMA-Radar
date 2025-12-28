@@ -319,14 +319,26 @@ namespace LoneEftDmaRadar.UI.Panels
             ImGui.SeparatorText("Filter Entries");
 
             // Entries table
-            if (ImGui.BeginTable("FilterEntriesTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.ScrollY, new Vector2(0, 200)))
+            var tableFlags = ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable;
+            if (ImGui.BeginTable("FilterEntriesTable", 5, tableFlags, new Vector2(0, 200)))
             {
                 ImGui.TableSetupColumn("Enabled", ImGuiTableColumnFlags.WidthFixed, 60);
                 ImGui.TableSetupColumn("Item", ImGuiTableColumnFlags.WidthStretch);
                 ImGui.TableSetupColumn("Type", ImGuiTableColumnFlags.WidthFixed, 100);
-                ImGui.TableSetupColumn("Color", ImGuiTableColumnFlags.WidthFixed, 100);
-                ImGui.TableSetupColumn("Remove", ImGuiTableColumnFlags.WidthFixed, 60);
+                ImGui.TableSetupColumn("Color", ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.NoSort, 100);
+                ImGui.TableSetupColumn("Remove", ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.NoSort, 60);
                 ImGui.TableHeadersRow();
+
+                // Apply sorting to the underlying list when requested by ImGui.
+                unsafe
+                {
+                    var sortSpecs = ImGui.TableGetSortSpecs();
+                    if (sortSpecs.NativePtr != null && sortSpecs.SpecsDirty)
+                    {
+                        ApplyEntriesSort(currentFilterObj, sortSpecs);
+                        sortSpecs.SpecsDirty = false;
+                    }
+                }
 
                 var entriesToRemove = new List<LootFilterEntry>();
                 int entryIndex = 0;
@@ -433,6 +445,47 @@ namespace LoneEftDmaRadar.UI.Panels
                     _entryColors.Clear();
                     _entryColorHexes.Clear();
                 }
+            }
+        }
+
+        private static void ApplyEntriesSort(UserLootFilter currentFilterObj, ImGuiTableSortSpecsPtr sortSpecs)
+        {
+            if (sortSpecs.SpecsCount <= 0)
+                return;
+
+            // Currently only respect the primary sort column.
+            unsafe
+            {
+                var spec = sortSpecs.Specs;
+                bool asc = spec.SortDirection == ImGuiSortDirection.Ascending;
+
+                Comparison<LootFilterEntry> comparison = spec.ColumnIndex switch
+                {
+                    0 => (a, b) => (a.Enabled ? 1 : 0).CompareTo(b.Enabled ? 1 : 0),
+                    1 => (a, b) => string.Compare(GetItemName(a.ItemID), GetItemName(b.ItemID), StringComparison.OrdinalIgnoreCase),
+                    2 => (a, b) => ((int)a.Type).CompareTo((int)b.Type),
+                    _ => null
+                };
+
+                if (comparison is null)
+                    return;
+
+                if (!asc)
+                {
+                    var inner = comparison;
+                    comparison = (a, b) => -inner(a, b);
+                }
+
+                _currentFilterEntries.Sort(comparison);
+
+                // Keep the backing config list in the same order so the sort persists.
+                if (currentFilterObj?.Entries is not null)
+                {
+                    currentFilterObj.Entries.Sort(comparison);
+                }
+
+                _entryColors.Clear();
+                _entryColorHexes.Clear();
             }
         }
 
