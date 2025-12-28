@@ -66,6 +66,10 @@ namespace LoneEftDmaRadar.UI
         private static int _fpsCounter = 0;
         private static int _statusOrder = 1;
 
+        // Skia resource purging
+        private static long _nextSkiaPurgeTicks = 0;
+        private static readonly long _skiaPurgeIntervalTicks = TimeSpan.FromSeconds(2).Ticks;
+
         // Mouse tracking
         private static bool _mouseDown;
         private static Vector2 _lastMousePosition;
@@ -244,7 +248,7 @@ namespace LoneEftDmaRadar.UI
             _skBackendRenderTarget?.Dispose();
             _skBackendRenderTarget = null;
 
-            var size = _window.Size;
+            var size = _window.FramebufferSize;
             if (size.X <= 0 || size.Y <= 0 || _grContext is null)
             {
                 _skSurface = null!;
@@ -352,6 +356,11 @@ namespace LoneEftDmaRadar.UI
                 var fbSize = _window.FramebufferSize;
                 _gl.Viewport(0, 0, (uint)fbSize.X, (uint)fbSize.Y);
                 _gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+
+                // Explicitly clear the backbuffer to avoid blending against stale pixels.
+                _gl.ClearColor(0f, 0f, 0f, 1f);
+                _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.StencilBufferBit | ClearBufferMask.DepthBufferBit);
+
                 var canvas = _skSurface.Canvas;
 
                 // Save the initial canvas state
@@ -370,8 +379,13 @@ namespace LoneEftDmaRadar.UI
                 canvas.Flush();
                 _grContext.Flush();
 
-                // Purge unused resources to prevent accumulation (pass false to allow unlocked resources to be purged)
-                _grContext.PurgeUnlockedResources(false);
+                // Throttle Skia resource purging to avoid GPU resource churn stutters.
+                var nowTicks = Stopwatch.GetTimestamp();
+                if (nowTicks >= _nextSkiaPurgeTicks)
+                {
+                    _grContext.PurgeUnlockedResources(false);
+                    _nextSkiaPurgeTicks = nowTicks + _skiaPurgeIntervalTicks;
+                }
 
                 // Render AimviewWidget to its FBO (during Skia phase, before ImGui)
                 AimviewWidget.RenderToFbo();
