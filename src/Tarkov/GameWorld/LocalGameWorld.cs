@@ -387,7 +387,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 Config.Cache.Groups[raidId] = groups = new();
 
             var humanPlayers = _rgtPlayers
-                .Where(p => p.IsPmc && p.Position.IsNormal() && Vector3.Distance(p.Position, Vector3.Zero) < 1f)
+                .Where(p => p.IsPmc && p.Position.IsNormal() && Vector3.Distance(p.Position, Vector3.Zero) > 1f)
                 .OfType<ObservedPlayer>()
                 .ToList();
 
