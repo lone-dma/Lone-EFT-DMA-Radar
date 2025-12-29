@@ -53,27 +53,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// Raid ID the LocalPlayer is currently in.
         /// </summary>
         public int RaidId { get; }
-        /// <summary>
-        /// Check if the Raid has started for the LocalPlayer.
-        /// Does not throw.
-        /// </summary>
-        /// <returns>True if the Raid has started, otherwise false.</returns>
-        public bool IsInRaid
-        {
-            get
-            {
-                try
-                {
-                    if (_hands is VmmPointer hands && hands.IsValidUser)
-                    {
-                        string handsType = ObjectClass.ReadName(hands);
-                        return !string.IsNullOrWhiteSpace(handsType) && handsType != "ClientEmptyHandsController";
-                    }
-                }
-                catch { }
-                return false;
-            }
-        }
 
         /// <summary>
         /// Player name.
@@ -94,6 +73,25 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 throw new ArgumentOutOfRangeException(nameof(classType));
             IsHuman = true;
             RaidId = GetRaidId();
+        }
+
+        /// <summary>
+        /// Check if the Raid has started for the LocalPlayer.
+        /// Does not throw.
+        /// </summary>
+        /// <returns>True if the Raid has started, otherwise false.</returns>
+        public bool CheckIsRaidStarted()
+        {
+            try
+            {
+                if (_hands is VmmPointer hands && hands.IsValidUser)
+                {
+                    string handsType = ObjectClass.ReadName(hands);
+                    return !string.IsNullOrWhiteSpace(handsType) && handsType != "ClientEmptyHandsController";
+                }
+            }
+            catch { }
+            return false;
         }
 
         /// <summary>
