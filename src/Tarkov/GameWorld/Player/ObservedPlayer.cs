@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
@@ -200,6 +200,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         public void AssignTeammate()
         {
             Type = PlayerType.Teammate;
+            GroupId = -100;
             Logging.WriteLine($"Player '{Name}' assigned as Teammate.");
         }
 
