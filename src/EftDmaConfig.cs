@@ -46,11 +46,6 @@ namespace LoneEftDmaRadar
         public EftDmaConfig() { }
 
         /// <summary>
-        /// Misc Config
-        /// </summary>
-        [JsonPropertyName("misc")]
-        public MiscConfig Misc { get; set; } = new();
-        /// <summary>
         /// DMA Config
         /// </summary>
         [JsonPropertyName("dma")]
@@ -61,6 +56,12 @@ namespace LoneEftDmaRadar
         /// </summary>
         [JsonPropertyName("ui")]
         public UIConfig UI { get; set; } = new();
+
+        /// <summary>
+        /// Misc Config
+        /// </summary>
+        [JsonPropertyName("misc")]
+        public MiscConfig Misc { get; set; } = new();
 
         /// <summary>
         /// Web Radar Config
