@@ -357,13 +357,13 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 {
                     string handsType = ObjectClass.ReadName(hands);
                     RaidStarted = !string.IsNullOrWhiteSpace(handsType) && handsType != "ClientEmptyHandsController";
+                    if (RaidStarted)
+                    {
+                        Logging.WriteLine("[PreRaidStartChecks] Raid has started!");
+                    }
                     if (!RaidStarted && !localPlayer.IsScav && Config.Misc.AutoGroups)
                     {
                         RefreshGroups(localPlayer, ct);
-                    }
-                    else
-                    {
-                        Logging.WriteLine("[PreRaidStartChecks] Raid has started!");
                     }
                 }
             }
