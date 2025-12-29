@@ -263,6 +263,16 @@ namespace LoneEftDmaRadar.UI.Panels
                 if (ImGui.IsItemHovered())
                     ImGui.SetTooltip("Draw lines between grouped players");
 
+                ImGui.SeparatorText("Misc");
+
+                bool autoGroups = Config.Misc.AutoGroups;
+                if (ImGui.Checkbox("Auto Groups", ref autoGroups))
+                {
+                    Config.Misc.AutoGroups = autoGroups;
+                }
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Best-effort: automatically infer groups before raid start based on proximity");
+
                 ImGui.EndTabItem();
             }
         }
