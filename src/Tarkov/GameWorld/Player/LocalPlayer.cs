@@ -31,6 +31,7 @@ using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.Tarkov.Unity.Collections;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using VmmSharpEx;
+using VmmSharpEx.Extensions;
 using VmmSharpEx.Scatter;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
@@ -84,7 +85,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         {
             try
             {
-                if (_hands is VmmPointer hands && hands.IsValidUser)
+                ulong hands = _hands;
+                if (hands.IsValidUserVA())
                 {
                     string handsType = ObjectClass.ReadName(hands);
                     return !string.IsNullOrWhiteSpace(handsType) && handsType != "ClientEmptyHandsController";
