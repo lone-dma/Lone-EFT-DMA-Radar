@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Misc.Workers;
 using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
@@ -386,7 +387,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 Config.Cache.Groups[raidId] = groups = new();
 
             var humanPlayers = _rgtPlayers
-                .Where(p => p.IsPmc && p.Position != Vector3.Zero)
+                .Where(p => p.IsPmc && p.Position.IsNormal() && Vector3.Distance(p.Position, Vector3.Zero) < 1f)
                 .OfType<ObservedPlayer>()
                 .ToList();
 
