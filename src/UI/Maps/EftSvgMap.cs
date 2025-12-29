@@ -262,7 +262,7 @@ namespace LoneEftDmaRadar.UI.Maps
             /// <summary>
             /// Ordering: base layers first, then ascending MinHeight, then ascending MaxHeight.
             /// </summary>
-            public int CompareTo(RasterLayer? other)
+            public int CompareTo(RasterLayer other)
             {
                 if (other is null) return -1;
                 if (IsBaseLayer && !other.IsBaseLayer)

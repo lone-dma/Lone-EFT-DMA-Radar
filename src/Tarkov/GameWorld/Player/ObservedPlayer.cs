@@ -156,7 +156,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 throw new NotImplementedException(nameof(PlayerSide));
             Equipment = new PlayerEquipment(this);
             GroupId = TryGetGroup(Id);
-            if (GroupId == -100)
+            if (GroupId == TeammateGroupId)
             {
                 Type = PlayerType.Teammate;
             }
@@ -174,13 +174,13 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             {
                 _teammates.TryAdd(Id, 0);
                 Type = PlayerType.Teammate;
-                GroupId = -100;
+                GroupId = TeammateGroupId;
             }
             else
             {
                 _teammates.TryRemove(Id, out _);
                 Type = PlayerSide == Enums.EPlayerSide.Savage ? PlayerType.PScav : PlayerType.PMC;
-                GroupId = -1;
+                GroupId = SoloGroupId;
             }
         }
 
@@ -200,7 +200,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         public void AssignTeammate()
         {
             Type = PlayerType.Teammate;
-            GroupId = -100;
+            GroupId = TeammateGroupId;
             Logging.WriteLine($"Player '{Name}' assigned as Teammate.");
         }
 
@@ -227,20 +227,20 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// <returns></returns>
         private int TryGetGroup(int id)
         {
-            if (!Program.Config.Misc.AutoGroups)
-                return -1;
+            if (!Config.Misc.AutoGroups)
+                return SoloGroupId;
             if (!IsPmc)
-                return -1;
+                return SoloGroupId;
             if (Memory.LocalPlayer is not LocalPlayer localPlayer)
-                return -1;
-            if (Program.Config.Cache.Groups.TryGetValue(localPlayer.RaidId, out var groups))
+                return SoloGroupId;
+            if (Config.Cache.Groups.TryGetValue(localPlayer.RaidId, out var groups))
             {
                 if (groups.TryGetValue(id, out var group))
                 {
                     return group;
                 }
             }
-            return -1;
+            return SoloGroupId;
         }
 
         /// <summary>

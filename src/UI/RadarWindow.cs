@@ -519,7 +519,7 @@ namespace LoneEftDmaRadar.UI
             {
                 foreach (var player in allPlayers)
                 {
-                    if (player.IsHumanHostileActive && player.GroupId != -1)
+                    if (player.IsHumanHostileActive && player.GroupId != AbstractPlayer.SoloGroupId)
                     {
                         if (!groupedByGrp.TryGetValue(player.GroupId, out var list))
                         {
@@ -874,7 +874,7 @@ namespace LoneEftDmaRadar.UI
             {
                 case AbstractPlayer player:
                     _mouseOverItem = player;
-                    MouseoverGroup = (player.IsHumanHostile && player.GroupId != -1) ? player.GroupId : null;
+                    MouseoverGroup = (player.IsHumanHostile && player.GroupId != AbstractPlayer.SoloGroupId) ? player.GroupId : null;
                     if (LootCorpsesVisible && player.LootObject is LootCorpse playerCorpse)
                     {
                         _mouseOverItem = playerCorpse;
@@ -884,7 +884,7 @@ namespace LoneEftDmaRadar.UI
                 case LootCorpse corpseObj:
                     _mouseOverItem = corpseObj;
                     var corpse = corpseObj.Player;
-                    MouseoverGroup = (corpse?.IsHumanHostile == true && corpse.GroupId != -1) ? corpse.GroupId : null;
+                    MouseoverGroup = (corpse?.IsHumanHostile == true && corpse.GroupId != AbstractPlayer.SoloGroupId) ? corpse.GroupId : null;
                     break;
 
                 case LootItem loot:
