@@ -406,7 +406,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
 
             // Group hostile players within threshold distance using transitive clustering
             var ungrouped = new HashSet<ObservedPlayer>(hostilePlayers);
-            int groupId = groups.Values.Where(v => v >= 0).DefaultIfEmpty(-1).Max() + 1; // Start after existing max group ID (excluding -1)
+            int groupId = groups.Values.Where(v => v >= 0).DefaultIfEmpty(0).Max() + 1; // Start after existing max group ID
 
             while (ungrouped.Count > 0)
             {
