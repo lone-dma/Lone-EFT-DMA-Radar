@@ -237,7 +237,7 @@ namespace LoneEftDmaRadar.UI.Maps
                 // Rasterize at higher resolution for better quality when zoomed in
                 int width = (int)Math.Ceiling(RawWidth * RasterScale);
                 int height = (int)Math.Ceiling(RawHeight * RasterScale);
-                
+
                 var imageInfo = new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Premul);
                 using var surface = SKSurface.Create(imageInfo);
                 var canvas = surface.Canvas;

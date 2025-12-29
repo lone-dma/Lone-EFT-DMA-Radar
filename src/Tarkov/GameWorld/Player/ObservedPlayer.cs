@@ -155,6 +155,11 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             else
                 throw new NotImplementedException(nameof(PlayerSide));
             Equipment = new PlayerEquipment(this);
+            GroupId = TryGetGroup(Id);
+            if (GroupId == -100)
+            {
+                Type = PlayerType.Teammate;
+            }
         }
 
         /// <summary>
@@ -178,6 +183,25 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         }
 
         /// <summary>
+        /// Assign this Player to a Group.
+        /// </summary>
+        /// <param name="groupId"></param>
+        public void AssignGroup(int groupId)
+        {
+            GroupId = groupId;
+            Logging.WriteLine($"Player '{Name}' assigned to Group {GroupId}.");
+        }
+
+        /// <summary>
+        /// Assign this Player as a Teammate to <see cref="LocalPlayer"/>.
+        /// </summary>
+        public void AssignTeammate()
+        {
+            Type = PlayerType.Teammate;
+            Logging.WriteLine($"Player '{Name}' assigned as Teammate.");
+        }
+
+        /// <summary>
         /// Get the Player's ID.
         /// </summary>
         /// <returns>Player Id or 0 if failed.</returns>
@@ -191,6 +215,27 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             {
                 return 0;
             }
+        }
+
+        /// <summary>
+        /// Tries to get an existing Group Id (if possible).
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        private int TryGetGroup(int id)
+        {
+            if (!IsPmc)
+                return -1;
+            if (Memory.LocalPlayer is not LocalPlayer localPlayer)
+                return -1;
+            if (Program.Config.Cache.Groups.TryGetValue(localPlayer.RaidId, out var groups))
+            {
+                if (groups.TryGetValue(id, out var group))
+                {
+                    return group;
+                }
+            }
+            return -1;
         }
 
         /// <summary>

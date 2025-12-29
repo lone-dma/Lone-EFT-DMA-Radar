@@ -61,6 +61,31 @@ namespace LoneEftDmaRadar.UI.Skia
             IsAntialias = true,
         };
 
+        public static SKPaint PaintConnectorGroup { get; } = new()
+        {
+            Color = SKColors.LawnGreen.WithAlpha(60),
+            StrokeWidth = 2.25f,
+            Style = SKPaintStyle.Stroke,
+            IsAntialias = true,
+        };
+
+        public static SKPaint PaintMouseoverGroup { get; } = new()
+        {
+            Color = SKColors.LawnGreen,
+            StrokeWidth = 1.66f,
+            Style = SKPaintStyle.Stroke,
+            IsAntialias = true,
+            StrokeJoin = SKStrokeJoin.Round,
+            StrokeCap = SKStrokeCap.Round
+        };
+
+        public static SKPaint TextMouseoverGroup { get; } = new()
+        {
+            Color = SKColors.LawnGreen,
+            IsStroke = false,
+            IsAntialias = true,
+        };
+
         public static SKPaint PaintLocalPlayer { get; } = new()
         {
             Color = SKColors.Green,

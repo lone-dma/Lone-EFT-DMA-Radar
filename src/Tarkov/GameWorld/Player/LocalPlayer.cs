@@ -30,6 +30,7 @@ using Collections.Pooled;
 using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.Tarkov.Unity.Collections;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
+using VmmSharpEx;
 using VmmSharpEx.Scatter;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
@@ -46,6 +47,17 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// Will failover to root position if there is no Look Pos.
         /// </remarks>
         public Vector3 LookPosition => _lookRaycastTransform?.Position ?? this.Position;
+
+        /// <summary>
+        /// Raid ID the LocalPlayer is currently in.
+        /// </summary>
+        public int RaidId { get; }
+
+        private VmmPointer _hands;
+        /// <summary>
+        /// Hands item pointer.
+        /// </summary>
+        public ulong Hands => _hands;
 
         /// <summary>
         /// Player name.
@@ -65,6 +77,23 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             if (!(classType == "LocalPlayer" || classType == "ClientPlayer"))
                 throw new ArgumentOutOfRangeException(nameof(classType));
             IsHuman = true;
+            RaidId = GetRaidId();
+        }
+
+        /// <summary>
+        /// Get the Raid ID the LocalPlayer is currently in.
+        /// </summary>
+        /// <returns>Id or -1 if failed.</returns>
+        private int GetRaidId()
+        {
+            try
+            {
+                return Memory.ReadValue<int>(this + Offsets.Player.RaidId);
+            }
+            catch
+            {
+                return -1;
+            }
         }
 
         public override void OnRealtimeLoop(VmmScatter scatter)
@@ -77,8 +106,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                         transformInternal: Memory.ReadPtrChain(Memory.ReadPtr(this + Offsets.Player._playerLookRaycastTransform), true, 0x10),
                         useCache: false);
                     scatter.PrepareReadArray<UnityTransform.TrsX>(_lookRaycastTransform.VerticesAddr, _lookRaycastTransform.Count);
+                    scatter.PrepareReadValue<ulong>(this + Offsets.Player._handsController);
                     scatter.Completed += (sender, s) =>
                     {
+                        _ = s.ReadPtr(this + Offsets.Player._handsController, out _hands);
                         try
                         {
                             if (s.ReadPooled<UnityTransform.TrsX>(_lookRaycastTransform.VerticesAddr, _lookRaycastTransform.Count) is IMemoryOwner<UnityTransform.TrsX> vertices)

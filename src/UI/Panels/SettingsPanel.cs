@@ -255,6 +255,14 @@ namespace LoneEftDmaRadar.UI.Panels
                 if (ImGui.IsItemHovered())
                     ImGui.SetTooltip("Show dynamic aim lines for AI players");
 
+                bool connectGroups = Program.Config.UI.ConnectGroups;
+                if (ImGui.Checkbox("Connect Groups", ref connectGroups))
+                {
+                    Program.Config.UI.ConnectGroups = connectGroups;
+                }
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Draw lines between grouped players");
+
                 ImGui.EndTabItem();
             }
         }
@@ -481,6 +489,8 @@ namespace LoneEftDmaRadar.UI.Panels
             SKPaints.PaintQuestZone.StrokeWidth = 0.25f * newScale;
             SKPaints.PaintQuestItem.StrokeWidth = 0.25f * newScale;
             SKPaints.PaintWishlistItem.StrokeWidth = 0.25f * newScale;
+            SKPaints.PaintConnectorGroup.StrokeWidth = 2.25f * newScale;
+            SKPaints.PaintMouseoverGroup.StrokeWidth = 1.66f * newScale;
 
             // Fonts
             SKFonts.UIRegular.Size = 12f * newScale;

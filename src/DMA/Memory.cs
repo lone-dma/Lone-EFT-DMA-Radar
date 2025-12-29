@@ -324,6 +324,22 @@ namespace LoneEftDmaRadar.DMA
             if (!_vmm.PidGetFromName(GAME_PROCESS_NAME, out uint pid))
                 throw new InvalidOperationException($"Unable to find '{GAME_PROCESS_NAME}'");
             _pid = pid;
+            SetCache(pid);
+        }
+
+        /// <summary>
+        /// Check if the Cache is old and reset if needed.
+        /// </summary>
+        /// <param name="pid"></param>
+        private static void SetCache(uint pid)
+        {
+            if (Program.Config.Cache.PID != pid)
+            {
+                Program.Config.Cache = new PersistentCache()
+                {
+                    PID = pid
+                };
+            }
         }
 
         /// <summary>
