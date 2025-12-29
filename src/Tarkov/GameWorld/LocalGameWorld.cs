@@ -36,7 +36,6 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Player;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
 using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
-using VmmSharpEx.Extensions;
 using VmmSharpEx.Options;
 
 namespace LoneEftDmaRadar.Tarkov.GameWorld
@@ -121,6 +120,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 _explosivesManager = new(localGameWorld);
                 Hazards = GetHazards(MapID);
                 Exits = GetExits(MapID, _rgtPlayers.LocalPlayer.IsPmc);
+                RaidStarted = _rgtPlayers.LocalPlayer.IsInRaid;
             }
             catch
             {
@@ -353,18 +353,14 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 return;
             try
             {
-                if (localPlayer.Hands is ulong hands && hands.IsValidUserVA())
+                RaidStarted = localPlayer.IsInRaid;
+                if (RaidStarted)
                 {
-                    string handsType = ObjectClass.ReadName(hands);
-                    RaidStarted = !string.IsNullOrWhiteSpace(handsType) && handsType != "ClientEmptyHandsController";
-                    if (RaidStarted)
-                    {
-                        Logging.WriteLine("[PreRaidStartChecks] Raid has started!");
-                    }
-                    if (!RaidStarted && !localPlayer.IsScav && Config.Misc.AutoGroups)
-                    {
-                        RefreshGroups(localPlayer, ct);
-                    }
+                    Logging.WriteLine("[PreRaidStartChecks] Raid has started!");
+                }
+                if (Config.Misc.AutoGroups && !RaidStarted && !localPlayer.IsScav)
+                {
+                    RefreshGroups(localPlayer, ct);
                 }
             }
             catch (OperationCanceledException)
