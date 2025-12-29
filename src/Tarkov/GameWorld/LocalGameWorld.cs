@@ -120,7 +120,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 _explosivesManager = new(localGameWorld);
                 Hazards = GetHazards(MapID);
                 Exits = GetExits(MapID, _rgtPlayers.LocalPlayer.IsPmc);
-                RaidStarted = _rgtPlayers.LocalPlayer.IsInRaid;
+                RaidStarted = _rgtPlayers.LocalPlayer.CheckIsRaidStarted();
             }
             catch
             {
@@ -353,7 +353,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 return;
             try
             {
-                RaidStarted = localPlayer.IsInRaid;
+                RaidStarted = localPlayer.CheckIsRaidStarted();
                 if (RaidStarted)
                 {
                     Logging.WriteLine("[PreRaidStartChecks] Raid has started!");
