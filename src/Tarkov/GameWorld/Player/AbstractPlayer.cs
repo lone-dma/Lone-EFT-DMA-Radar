@@ -48,7 +48,17 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
     /// </summary>
     public abstract class AbstractPlayer : IWorldEntity, IMapEntity, IMouseoverEntity
     {
+        /// <summary>
+        /// Group ID for Solo Players.
+        /// </summary>
+        public const int SoloGroupId = -1;
+        /// <summary>
+        /// Group ID for Teammates of <see cref="LocalPlayer"/>.
+        /// </summary>
+        public const int TeammateGroupId = -100;
         public static implicit operator ulong(AbstractPlayer x) => x.Base;
+
+        protected static EftDmaConfig Config { get; } = Program.Config;
 
         #region Cached Skia Paths
 
@@ -155,9 +165,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         public bool IsActive { get; private set; }
 
         /// <summary>
-        /// Player's Group Id. -1 if solo.
+        /// Player's Group Id (Default: Solo).
         /// </summary>
-        public int GroupId { get; protected set; } = -1;
+        public int GroupId { get; protected set; } = SoloGroupId;
 
         /// <summary>
         /// Type of player unit.
@@ -642,7 +652,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         {
             if (this != localPlayer && RadarWindow.MouseoverGroup is int grp && grp == GroupId)
                 _paints.Item1 = SKPaints.PaintMouseoverGroup;
-            float scale = 1.65f * Program.Config.UI.UIScale;
+            float scale = 1.65f * Config.UI.UIScale;
 
             canvas.Save();
             canvas.Translate(point.X, point.Y);
@@ -654,11 +664,11 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             canvas.DrawPath(_playerPill, SKPaints.ShapeOutline); // outline
             canvas.DrawPath(_playerPill, _paints.Item1);
 
-            var aimlineLength = this == localPlayer || (IsFriendly && Program.Config.UI.TeammateAimlines) ?
-                Program.Config.UI.AimLineLength : 0;
+            var aimlineLength = this == localPlayer || (IsFriendly && Config.UI.TeammateAimlines) ?
+                Config.UI.AimLineLength : 0;
             if (!IsFriendly &&
-                !(IsAI && !Program.Config.UI.AIAimlines) &&
-                this.IsFacingTarget(localPlayer, Program.Config.UI.MaxDistance)) // Hostile Player, check if aiming at a friendly (High Alert)
+                !(IsAI && !Config.UI.AIAimlines) &&
+                this.IsFacingTarget(localPlayer, Config.UI.MaxDistance)) // Hostile Player, check if aiming at a friendly (High Alert)
                 aimlineLength = 9999;
 
             if (aimlineLength > 0)
@@ -676,7 +686,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         private static void DrawDeathMarker(SKCanvas canvas, SKPoint point)
         {
-            float scale = Program.Config.UI.UIScale;
+            float scale = Config.UI.UIScale;
 
             canvas.Save();
             canvas.Translate(point.X, point.Y);
@@ -692,7 +702,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         {
             if (RadarWindow.MouseoverGroup is int grp && grp == GroupId)
                 _paints.Item2 = SKPaints.TextMouseoverGroup;
-            point.Offset(9.5f * Program.Config.UI.UIScale, 0);
+            point.Offset(9.5f * Config.UI.UIScale, 0);
             foreach (var line in lines)
             {
                 if (string.IsNullOrEmpty(line?.Trim()))

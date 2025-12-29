@@ -50,6 +50,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
 
         public static implicit operator ulong(LocalGameWorld x) => x.Base;
 
+        private static EftDmaConfig Config { get; } = Program.Config;
+
         /// <summary>
         /// LocalGameWorld Address.
         /// </summary>
@@ -332,7 +334,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             var ct = e.CancellationToken;
             ValidatePlayerTransforms(); // Check for transform anomalies
             Loot.Refresh(ct);
-            if (Program.Config.Loot.ShowWishlist)
+            if (Config.Loot.ShowWishlist)
                 Memory.LocalPlayer?.RefreshWishlist(ct);
             RefreshEquipment(ct);
             RefreshQuestHelper(ct);
@@ -354,7 +356,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 {
                     string handsType = ObjectClass.ReadName(hands);
                     RaidStarted = !string.IsNullOrWhiteSpace(handsType) && handsType != "ClientEmptyHandsController";
-                    if (!RaidStarted && !localPlayer.IsScav && Program.Config.Misc.AutoGroups)
+                    if (!RaidStarted && !localPlayer.IsScav && Config.Misc.AutoGroups)
                     {
                         RefreshGroups(localPlayer, ct);
                     }
@@ -378,10 +380,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         private void RefreshGroups(LocalPlayer localPlayer, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
-            const float groupDistanceThreshold = 10f;
+            const float groupDistanceThreshold = 15f; // 10 was missing some groups
             int raidId = localPlayer.RaidId;
-            if (!Program.Config.Cache.Groups.TryGetValue(raidId, out var groups))
-                Program.Config.Cache.Groups[raidId] = groups = new();
+            if (!Config.Cache.Groups.TryGetValue(raidId, out var groups))
+                Config.Cache.Groups[raidId] = groups = new();
 
             var humanPlayers = _rgtPlayers
                 .Where(p => p.IsPmc && p.Position != Vector3.Zero)
@@ -397,7 +399,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
 
             foreach (var player in nearLocalPlayer)
             {
-                groups[player.Id] = -100; // -100 indicates teammate
+                groups[player.Id] = AbstractPlayer.TeammateGroupId;
                 player.AssignTeammate();
             }
             var hostilePlayers = humanPlayers
@@ -435,7 +437,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                     });
                 } while (toAdd.Any());
 
-                // Assign group ID to all members if group has 2+ players, otherwise leave -1 (solo)
+                // Assign group ID to all members if group has 2+ players, otherwise leave as default (solo)
                 if (group.Count > 1)
                 {
                     group.ForEach(p =>
@@ -463,7 +465,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
 
         private void RefreshQuestHelper(CancellationToken ct)
         {
-            if (Program.Config.QuestHelper.Enabled)
+            if (Config.QuestHelper.Enabled)
             {
                 QuestManager.Refresh(ct);
             }
