@@ -122,6 +122,9 @@ namespace LoneEftDmaRadar.UI.Maps
             canvas.Translate(-mapBounds.Left, -mapBounds.Top);
             // Apply configured vector scaling
             canvas.Scale(Config.SvgScale, Config.SvgScale);
+            // Compensate for raster scale (image is RasterScale times larger)
+            float invRasterScale = 1f / RasterLayer.RasterScale;
+            canvas.Scale(invRasterScale, invRasterScale);
 
             var front = visible[^1];
             foreach (var layer in visible)
@@ -207,6 +210,12 @@ namespace LoneEftDmaRadar.UI.Maps
             public readonly float RawHeight;
 
             /// <summary>
+            /// Rasterization scale factor for higher quality when zoomed in.
+            /// 2x provides good quality for most zoom levels without excessive memory usage.
+            /// </summary>
+            internal const float RasterScale = 2f;
+
+            /// <summary>
             /// The pre-rasterized bitmap image for this layer.
             /// </summary>
             public SKImage Image => _image;
@@ -225,14 +234,15 @@ namespace LoneEftDmaRadar.UI.Maps
                 RawWidth = cullRect.Width;
                 RawHeight = cullRect.Height;
 
-                // Rasterize the vector picture to a bitmap image
-                int width = (int)Math.Ceiling(RawWidth);
-                int height = (int)Math.Ceiling(RawHeight);
+                // Rasterize at higher resolution for better quality when zoomed in
+                int width = (int)Math.Ceiling(RawWidth * RasterScale);
+                int height = (int)Math.Ceiling(RawHeight * RasterScale);
                 
                 var imageInfo = new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Premul);
                 using var surface = SKSurface.Create(imageInfo);
                 var canvas = surface.Canvas;
                 canvas.Clear(SKColors.Transparent);
+                canvas.Scale(RasterScale, RasterScale);
                 canvas.DrawPicture(picture);
                 _image = surface.Snapshot();
             }
