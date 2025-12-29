@@ -61,6 +61,7 @@ namespace LoneEftDmaRadar.Misc.JSON
     [JsonSerializable(typeof(LootFilterConfig))]
     [JsonSerializable(typeof(AimviewWidgetConfig))]
     [JsonSerializable(typeof(QuestHelperConfig))]
+    [JsonSerializable(typeof(PersistentCache))]
     // Loot filter types
     [JsonSerializable(typeof(UserLootFilter))]
     [JsonSerializable(typeof(LootFilterEntry))]
@@ -76,6 +77,7 @@ namespace LoneEftDmaRadar.Misc.JSON
     [JsonSerializable(typeof(ConcurrentDictionary<ColorPickerOption, string>))]
     [JsonSerializable(typeof(ConcurrentDictionary<string, byte>))]
     [JsonSerializable(typeof(ConcurrentDictionary<string, UserLootFilter>))]
+    [JsonSerializable(typeof(ConcurrentDictionary<int, ConcurrentDictionary<int, int>>))]
     // SkiaSharp types
     [JsonSerializable(typeof(SKSize))]
     [JsonSerializable(typeof(SKRect))]

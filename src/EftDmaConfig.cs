@@ -112,6 +112,12 @@ namespace LoneEftDmaRadar
         [JsonPropertyName("lootFilters")]
         public LootFilterConfig LootFilters { get; set; } = new();
 
+        /// <summary>
+        /// Persistent Cache Access.
+        /// </summary>
+        [JsonPropertyName("cache")]
+        public PersistentCache Cache { get; set; } = new();
+
         #region Config Interface
 
         /// <summary>
@@ -313,6 +319,12 @@ namespace LoneEftDmaRadar
         public bool ShowHazards { get; set; } = true;
 
         /// <summary>
+        /// Connects grouped players together via a semi-transparent line.
+        /// </summary>
+        [JsonPropertyName("connectGroups")]
+        public bool ConnectGroups { get; set; } = true;
+
+        /// <summary>
         /// Max game distance to render targets in Aimview,
         /// and to display dynamic aimlines between two players.
         /// </summary>
@@ -489,5 +501,23 @@ namespace LoneEftDmaRadar
         /// </summary>
         [JsonPropertyName("blacklistedQuests")]
         public ConcurrentDictionary<string, byte> BlacklistedQuests { get; set; } = new();
+    }
+
+    /// <summary>
+    /// Persistent Cache that stores data between sessions for the same Process ID.
+    /// </summary>
+    public sealed class PersistentCache
+    {
+        /// <summary>
+        /// Process Id this cache is tied to.
+        /// </summary>
+        [JsonPropertyName("pid")]
+        public uint PID { get; set; }
+
+        /// <summary>
+        /// Key: RaidId | Value: Dictionary: Key: PlayerId | Value: GroupId
+        /// </summary>
+        [JsonPropertyName("groups")]
+        public ConcurrentDictionary<int, ConcurrentDictionary<int, int>> Groups { get; set; } = new();
     }
 }

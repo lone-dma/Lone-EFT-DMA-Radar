@@ -32,6 +32,7 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
 using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
+using LoneEftDmaRadar.UI;
 using LoneEftDmaRadar.UI.Maps;
 using LoneEftDmaRadar.UI.Skia;
 using System.Collections.Frozen;
@@ -152,6 +153,11 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// True if the Player is Active (in the player list).
         /// </summary>
         public bool IsActive { get; private set; }
+
+        /// <summary>
+        /// Player's Group Id. -1 if solo.
+        /// </summary>
+        public int GroupId { get; protected set; } = -1;
 
         /// <summary>
         /// Type of player unit.
@@ -634,6 +640,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         private void DrawPlayerPill(SKCanvas canvas, LocalPlayer localPlayer, SKPoint point)
         {
+            if (this != localPlayer && RadarWindow.MouseoverGroup is int grp && grp == GroupId)
+                _paints.Item1 = SKPaints.PaintMouseoverGroup;
             float scale = 1.65f * Program.Config.UI.UIScale;
 
             canvas.Save();
@@ -682,6 +690,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// </summary>
         private void DrawPlayerText(SKCanvas canvas, SKPoint point, IList<string> lines)
         {
+            if (RadarWindow.MouseoverGroup is int grp && grp == GroupId)
+                _paints.Item2 = SKPaints.TextMouseoverGroup;
             point.Offset(9.5f * Program.Config.UI.UIScale, 0);
             foreach (var line in lines)
             {

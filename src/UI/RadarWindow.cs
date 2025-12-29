@@ -26,6 +26,7 @@ SOFTWARE.
  *
 */
 
+using Collections.Pooled;
 using ImGuiNET;
 using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
 using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
@@ -100,6 +101,10 @@ namespace LoneEftDmaRadar.UI
         private static QuestManager Quests => Memory.QuestManager;
         private static bool SearchFilterIsSet => !string.IsNullOrEmpty(LootFilter.SearchString);
         private static bool LootCorpsesVisible => Config.Loot.Enabled && !Config.Loot.HideCorpses && !SearchFilterIsSet;
+        /// <summary>
+        /// Currently 'Moused Over' Group.
+        /// </summary>
+        public static int? MouseoverGroup { get; private set; }
 
         /// <summary>
         /// Whether map free mode is enabled.
@@ -494,12 +499,55 @@ namespace LoneEftDmaRadar.UI
                 }
             }
 
+            // Draw group connectors
+            if (Program.Config.UI.ConnectGroups && allPlayers is not null)
+            {
+                DrawGroupConnectors(canvas, allPlayers, map, mapParams);
+            }
+
             // Draw local player on top
             localPlayer.Draw(canvas, mapParams, localPlayer);
 
             // Draw mouseover
             closestToMouse?.DrawMouseover(canvas, mapParams, localPlayer);
         }
+
+        private static void DrawGroupConnectors(SKCanvas canvas, IEnumerable<AbstractPlayer> allPlayers, IEftMap map, EftMapParams mapParams)
+        {
+            using var groupedByGrp = new PooledDictionary<int, PooledList<SKPoint>>(capacity: 16);
+            try
+            {
+                foreach (var player in allPlayers)
+                {
+                    if (player.IsHumanHostileActive && player.GroupId != -1)
+                    {
+                        if (!groupedByGrp.TryGetValue(player.GroupId, out var list))
+                        {
+                            list = new PooledList<SKPoint>(capacity: 5);
+                            groupedByGrp[player.GroupId] = list;
+                        }
+                        list.Add(player.Position.ToMapPos(map.Config).ToZoomedPos(mapParams));
+                    }
+                }
+
+                foreach (var grp in groupedByGrp.Values)
+                {
+                    for (int i = 0; i < grp.Count; i++)
+                    {
+                        for (int j = i + 1; j < grp.Count; j++)
+                        {
+                            canvas.DrawLine(grp[i].X, grp[i].Y, grp[j].X, grp[j].Y, SKPaints.PaintConnectorGroup);
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                foreach (var list in groupedByGrp.Values)
+                    list.Dispose();
+            }
+        }
+
 
         private static void DrawStatusMessage(SKCanvas canvas, bool isStarting, bool isReady)
         {
@@ -826,6 +874,7 @@ namespace LoneEftDmaRadar.UI
             {
                 case AbstractPlayer player:
                     _mouseOverItem = player;
+                    MouseoverGroup = (player.IsHumanHostile && player.GroupId != -1) ? player.GroupId : null;
                     if (LootCorpsesVisible && player.LootObject is LootCorpse playerCorpse)
                     {
                         _mouseOverItem = playerCorpse;
@@ -835,16 +884,19 @@ namespace LoneEftDmaRadar.UI
                 case LootCorpse corpseObj:
                     _mouseOverItem = corpseObj;
                     var corpse = corpseObj.Player;
+                    MouseoverGroup = (corpse?.IsHumanHostile == true && corpse.GroupId != -1) ? corpse.GroupId : null;
                     break;
 
                 case LootItem loot:
                     _mouseOverItem = loot;
+                    MouseoverGroup = null;
                     break;
 
                 case IExitPoint:
                 case QuestLocation:
                 case IWorldHazard:
                     _mouseOverItem = closest;
+                    MouseoverGroup = null;
                     break;
 
                 default:
@@ -856,6 +908,7 @@ namespace LoneEftDmaRadar.UI
         private static void ClearMouseoverRefs()
         {
             _mouseOverItem = null;
+            MouseoverGroup = null;
         }
 
         private static IEnumerable<IMouseoverEntity> GetMouseoverItems()
