@@ -367,6 +367,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                     }
                 }
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 Logging.WriteLine($"[PreRaidStartChecks] ERROR: {ex}");
