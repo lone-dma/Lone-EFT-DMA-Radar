@@ -174,11 +174,13 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             {
                 _teammates.TryAdd(Id, 0);
                 Type = PlayerType.Teammate;
+                GroupId = -100;
             }
             else
             {
                 _teammates.TryRemove(Id, out _);
                 Type = PlayerSide == Enums.EPlayerSide.Savage ? PlayerType.PScav : PlayerType.PMC;
+                GroupId = -1;
             }
         }
 
@@ -224,6 +226,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// <returns></returns>
         private int TryGetGroup(int id)
         {
+            if (!Program.Config.Misc.AutoGroups)
+                return -1;
             if (!IsPmc)
                 return -1;
             if (Memory.LocalPlayer is not LocalPlayer localPlayer)

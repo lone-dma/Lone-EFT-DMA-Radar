@@ -46,6 +46,11 @@ namespace LoneEftDmaRadar
         public EftDmaConfig() { }
 
         /// <summary>
+        /// Misc Config
+        /// </summary>
+        [JsonPropertyName("misc")]
+        public MiscConfig Misc { get; set; } = new();
+        /// <summary>
         /// DMA Config
         /// </summary>
         [JsonPropertyName("dma")]
@@ -519,5 +524,14 @@ namespace LoneEftDmaRadar
         /// </summary>
         [JsonPropertyName("groups")]
         public ConcurrentDictionary<int, ConcurrentDictionary<int, int>> Groups { get; set; } = new();
+    }
+
+    public sealed class MiscConfig
+    {
+        /// <summary>
+        /// Enables the 'Auto Groups' feature that attempts to automatically group players together (best-effort).
+        /// </summary>
+        [JsonPropertyName("autoGroups")]
+        public bool AutoGroups { get; set; } = true;
     }
 }

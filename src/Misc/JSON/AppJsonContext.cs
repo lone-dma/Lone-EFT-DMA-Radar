@@ -62,6 +62,7 @@ namespace LoneEftDmaRadar.Misc.JSON
     [JsonSerializable(typeof(AimviewWidgetConfig))]
     [JsonSerializable(typeof(QuestHelperConfig))]
     [JsonSerializable(typeof(PersistentCache))]
+    [JsonSerializable(typeof(MiscConfig))]
     // Loot filter types
     [JsonSerializable(typeof(UserLootFilter))]
     [JsonSerializable(typeof(LootFilterEntry))]

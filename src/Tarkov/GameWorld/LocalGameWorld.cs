@@ -354,7 +354,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 {
                     string handsType = ObjectClass.ReadName(hands);
                     RaidStarted = !string.IsNullOrWhiteSpace(handsType) && handsType != "ClientEmptyHandsController";
-                    if (!RaidStarted && !localPlayer.IsScav)
+                    if (!RaidStarted && !localPlayer.IsScav && Program.Config.Misc.AutoGroups)
                     {
                         RefreshGroups(localPlayer, ct);
                     }
