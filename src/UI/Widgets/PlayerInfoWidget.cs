@@ -134,7 +134,7 @@ namespace LoneEftDmaRadar.UI.Widgets
 
                     // Column 1: Group
                     ImGui.TableNextColumn();
-                    ImGui.TextColored(rowColor, player.GroupId == AbstractPlayer.SoloGroupId ? 
+                    ImGui.TextColored(rowColor, player.GroupId == AbstractPlayer.SoloGroupId ?
                         "--" : player.GroupId.ToString());
 
                     // Column 2: In Hands

@@ -38,6 +38,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
     public sealed class LocalPlayer : ClientPlayer
     {
         private UnityTransform _lookRaycastTransform;
+        private VmmPointer _hands;
 
         /// <summary>
         /// Local Player's 'Look' position.
@@ -52,12 +53,27 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// Raid ID the LocalPlayer is currently in.
         /// </summary>
         public int RaidId { get; }
-
-        private VmmPointer _hands;
         /// <summary>
-        /// Hands item pointer.
+        /// Check if the Raid has started for the LocalPlayer.
+        /// Does not throw.
         /// </summary>
-        public ulong Hands => _hands;
+        /// <returns>True if the Raid has started, otherwise false.</returns>
+        public bool IsInRaid
+        {
+            get
+            {
+                try
+                {
+                    if (_hands is VmmPointer hands && hands.IsValidUser)
+                    {
+                        string handsType = ObjectClass.ReadName(hands);
+                        return !string.IsNullOrWhiteSpace(handsType) && handsType != "ClientEmptyHandsController";
+                    }
+                }
+                catch { }
+                return false;
+            }
+        }
 
         /// <summary>
         /// Player name.

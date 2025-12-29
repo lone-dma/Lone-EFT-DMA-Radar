@@ -227,11 +227,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// <returns></returns>
         private int TryGetGroup(int id)
         {
-            if (!Config.Misc.AutoGroups)
-                return SoloGroupId;
-            if (!IsPmc)
-                return SoloGroupId;
-            if (Memory.LocalPlayer is not LocalPlayer localPlayer)
+            if (!Config.Misc.AutoGroups || !IsPmc || Memory.LocalPlayer is not LocalPlayer localPlayer)
                 return SoloGroupId;
             if (Config.Cache.Groups.TryGetValue(localPlayer.RaidId, out var groups))
             {
