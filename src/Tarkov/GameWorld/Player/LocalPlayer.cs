@@ -51,29 +51,19 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         public Vector3 LookPosition => _lookRaycastTransform?.Position ?? this.Position;
 
         /// <summary>
-        /// Raid ID the LocalPlayer is currently in.
-        /// </summary>
-        public int RaidId { get; }
-
-        /// <summary>
         /// Player name.
         /// </summary>
-        public override string Name
-        {
-            get => "localPlayer";
-        }
+        public override string Name => "localPlayer";
         /// <summary>
         /// Player is Human-Controlled.
         /// </summary>
-        public override bool IsHuman { get; }
+        public override bool IsHuman => true;
 
         public LocalPlayer(ulong playerBase) : base(playerBase)
         {
             string classType = ObjectClass.ReadName(this);
             if (!(classType == "LocalPlayer" || classType == "ClientPlayer"))
                 throw new ArgumentOutOfRangeException(nameof(classType));
-            IsHuman = true;
-            RaidId = GetRaidId();
         }
 
         /// <summary>
@@ -99,16 +89,17 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// <summary>
         /// Get the Raid ID the LocalPlayer is currently in.
         /// </summary>
-        /// <returns>Id or -1 if failed.</returns>
-        private int GetRaidId()
+        /// <returns>Id or null if failed.</returns>
+        public int? GetRaidId()
         {
             try
             {
                 return Memory.ReadValue<int>(this + Offsets.Player.RaidId);
             }
-            catch
+            catch (Exception ex)
             {
-                return -1;
+                Logging.WriteLine($"[LocalPlayer] ERROR Getting Raid Id: {ex}");
+                return null;
             }
         }
 
