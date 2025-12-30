@@ -755,15 +755,15 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
             string alert = Alerts?.Trim();
             if (!string.IsNullOrEmpty(alert)) // Special Players,etc.
                 lines.Add(alert);
+            string group = this.GroupId == -1 ?
+                null : $"G:{this.GroupId}";
             if (IsHostileActive) // Enemy Players, display information
             {
-                lines.Add($"{Name}{health}");
-                var faction = PlayerSide.ToString();
-                lines.Add(faction);
+                lines.Add($"{Name}{health} {group}");
             }
             else if (!IsAlive)
             {
-                lines.Add($"{Type.ToString()}:{Name}");
+                lines.Add($"{Type.ToString()}:{Name} {group}");
             }
             else if (IsAIActive)
             {
