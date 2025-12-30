@@ -4,6 +4,7 @@
   "y": 483.0,
   "scale": 1.09,
   "svgScale": 5.00,
+  "disableDimming" : true,
   "mapLayers": [
     {
       "minHeight": null,
