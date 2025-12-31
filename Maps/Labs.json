@@ -1,9 +1,9 @@
 {
 	"mapID": [ "laboratory" ],
-	"x": 2356,
-	"y": -1841,
-	"scale": 8.3,
-	"svgScale": 2.00,
+	"x": 589,
+	"y": -460.25,
+	"scale": 2.075,
+	"svgScale": 4.00,
 	"mapLayers": [
 		{
 			"minHeight": null,
