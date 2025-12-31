@@ -183,7 +183,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 try
                 {
                     var instance = GetLocalGameWorld(ct);
-                    Logging.WriteLine("Raid has started!");
+                    Logging.WriteLine("GameWorld Detected!");
                     return instance;
                 }
                 catch (OperationCanceledException)
