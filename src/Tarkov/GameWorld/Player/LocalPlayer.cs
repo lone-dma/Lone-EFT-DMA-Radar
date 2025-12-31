@@ -78,9 +78,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 ulong hands = _hands;
                 if (hands.IsValidUserVA())
                 {
-                    string handsType = ObjectClass.ReadName(
-                        objectClass: hands,
-                        useCache: false);
+                    string handsType = ObjectClass.ReadNameEnsure(hands);
                     return !string.IsNullOrWhiteSpace(handsType) && handsType != "ClientEmptyHandsController";
                 }
             }
