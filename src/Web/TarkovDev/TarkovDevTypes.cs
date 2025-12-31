@@ -26,8 +26,8 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Tarkov.GameWorld.Hazards;
-using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
+using LoneEftDmaRadar.Tarkov.World.Hazards;
+using LoneEftDmaRadar.Tarkov.World.Quests;
 using System.Collections.Frozen;
 
 namespace LoneEftDmaRadar.Web.TarkovDev

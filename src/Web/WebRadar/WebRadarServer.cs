@@ -28,7 +28,7 @@ SOFTWARE.
 
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Misc.JSON;
-using LoneEftDmaRadar.Tarkov.GameWorld.Player;
+using LoneEftDmaRadar.Tarkov.World.Player;
 using LoneEftDmaRadar.UI;
 using LoneEftDmaRadar.Web.WebRadar.Data;
 using Microsoft.AspNetCore.Builder;

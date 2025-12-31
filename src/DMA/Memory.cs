@@ -28,13 +28,13 @@ SOFTWARE.
 
 global using LoneEftDmaRadar.DMA;
 using Collections.Pooled;
-using LoneEftDmaRadar.Tarkov.GameWorld;
-using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
-using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
-using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
-using LoneEftDmaRadar.Tarkov.GameWorld.Player;
-using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
+using LoneEftDmaRadar.Tarkov.World;
+using LoneEftDmaRadar.Tarkov.World.Exits;
+using LoneEftDmaRadar.Tarkov.World.Explosives;
+using LoneEftDmaRadar.Tarkov.World.Loot;
+using LoneEftDmaRadar.Tarkov.World.Player;
+using LoneEftDmaRadar.Tarkov.World.Quests;
 using System.Runtime;
 using VmmSharpEx;
 using VmmSharpEx.Extensions;
@@ -70,7 +70,7 @@ namespace LoneEftDmaRadar.DMA
         public static IReadOnlyCollection<IExitPoint> Exits => Game?.Exits;
         public static LocalPlayer LocalPlayer => Game?.LocalPlayer;
         public static LootManager Loot => Game?.Loot;
-        public static LocalGameWorld Game { get; private set; }
+        public static GameWorld Game { get; private set; }
         public static QuestManager QuestManager => Game?.QuestManager;
 
         internal static async Task ModuleInitAsync()
@@ -255,7 +255,7 @@ namespace LoneEftDmaRadar.DMA
                 try
                 {
                     var ct = _cts.Token;
-                    using (var game = Game = LocalGameWorld.CreateGameInstance(ct))
+                    using (var game = Game = GameWorld.CreateGameInstance(ct))
                     {
                         OnRaidStarted();
                         game.Start();

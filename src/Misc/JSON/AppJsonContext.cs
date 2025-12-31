@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Tarkov.GameWorld.Hazards;
+using LoneEftDmaRadar.Tarkov.World.Hazards;
 using LoneEftDmaRadar.UI.ColorPicker;
 using LoneEftDmaRadar.UI.Loot;
 using LoneEftDmaRadar.UI.Maps;

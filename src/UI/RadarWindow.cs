@@ -28,12 +28,12 @@ SOFTWARE.
 
 using Collections.Pooled;
 using ImGuiNET;
-using LoneEftDmaRadar.Tarkov.GameWorld.Exits;
-using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
-using LoneEftDmaRadar.Tarkov.GameWorld.Hazards;
-using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
-using LoneEftDmaRadar.Tarkov.GameWorld.Player;
-using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
+using LoneEftDmaRadar.Tarkov.World.Exits;
+using LoneEftDmaRadar.Tarkov.World.Explosives;
+using LoneEftDmaRadar.Tarkov.World.Hazards;
+using LoneEftDmaRadar.Tarkov.World.Loot;
+using LoneEftDmaRadar.Tarkov.World.Player;
+using LoneEftDmaRadar.Tarkov.World.Quests;
 using LoneEftDmaRadar.UI.ColorPicker;
 using LoneEftDmaRadar.UI.Hotkeys;
 using LoneEftDmaRadar.UI.Hotkeys.Internal;
@@ -914,7 +914,7 @@ namespace LoneEftDmaRadar.UI
         private static IEnumerable<IMouseoverEntity> GetMouseoverItems()
         {
             var players = AllPlayers?
-                .Where(x => x is not LoneEftDmaRadar.Tarkov.GameWorld.Player.LocalPlayer && !x.HasExfild && (!LootCorpsesVisible || x.IsAlive)) ??
+                .Where(x => x is not LoneEftDmaRadar.Tarkov.World.Player.LocalPlayer && !x.HasExfild && (!LootCorpsesVisible || x.IsAlive)) ??
                 Enumerable.Empty<AbstractPlayer>();
 
             var loot = Config.Loot.Enabled ?

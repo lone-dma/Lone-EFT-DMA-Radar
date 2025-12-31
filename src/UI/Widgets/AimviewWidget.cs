@@ -27,9 +27,9 @@ SOFTWARE.
 */
 
 using ImGuiNET;
-using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
-using LoneEftDmaRadar.Tarkov.GameWorld.Player;
-using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
+using LoneEftDmaRadar.Tarkov.World.Loot;
+using LoneEftDmaRadar.Tarkov.World.Player;
+using LoneEftDmaRadar.Tarkov.World.Player.Helpers;
 using LoneEftDmaRadar.UI.Skia;
 using Silk.NET.OpenGL;
 
