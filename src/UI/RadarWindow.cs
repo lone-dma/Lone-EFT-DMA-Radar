@@ -180,7 +180,7 @@ namespace LoneEftDmaRadar.UI
                 _window.GLContext!.TryGetProcAddress(name, out var addr) ? addr : 0);
 
             _grContext = GRContext.CreateGl(glInterface);
-            _grContext.SetResourceCacheLimit(512 * 1024 * 1024); // 512 MB
+            _grContext.SetResourceCacheLimit(Config.UI.GrResourceCacheLimitMB * 1024 * 1024);
 
             CreateSkiaSurface();
 
