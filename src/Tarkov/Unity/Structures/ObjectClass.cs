@@ -1,4 +1,6 @@
-﻿namespace LoneEftDmaRadar.Tarkov.Unity.Structures
+﻿using VmmSharpEx;
+
+namespace LoneEftDmaRadar.Tarkov.Unity.Structures
 {
 
     /// <summary>
@@ -23,6 +25,24 @@
         {
             var namePtr = Memory.ReadPtrChain(objectClass, useCache, To_NamePtr);
             return Memory.ReadUtf8String(namePtr, length, useCache);
+        }
+
+        /// <summary>
+        /// Read the Class Name from any ObjectClass that implements UnityComponent.
+        /// Ensures a stable/valid string is returned by reading it 3 times and comparing the results.
+        /// </summary>
+        /// <param name="objectClass">ObjectClass address.</param>
+        /// <returns>Name (string) of the object class given.</returns>
+        public static string ReadNameEnsure(ulong objectClass, int length = 128)
+        {
+            string n1 = ReadName(objectClass, length, false);
+            Thread.SpinWait(5);
+            string n2 = ReadName(objectClass, length, false);
+            Thread.SpinWait(5);
+            string n3 = ReadName(objectClass, length, false);
+            if (n1 == n2 && n1 == n3 && n2 == n3)
+                return n1;
+            throw new VmmException("Memory Read Failed!");
         }
     }
 }
