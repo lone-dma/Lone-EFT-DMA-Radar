@@ -39,7 +39,6 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
     public sealed class LocalPlayer : ClientPlayer
     {
         private UnityTransform _lookRaycastTransform;
-        private VmmPointer _hands;
 
         /// <summary>
         /// Local Player's 'Look' position.
@@ -75,10 +74,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         {
             try
             {
-                ulong hands = _hands;
-                hands.ThrowIfInvalidUserVA();
+                ulong handsController = Memory.ReadPtr(this + Offsets.Player._handsController, false);
                 string handsType = ObjectClass.ReadName(
-                    objectClass: hands,
+                    objectClass: handsController,
                     useCache: false);
                 ArgumentNullException.ThrowIfNull(handsType, nameof(handsType));
                 if (!handsType.Contains("Controller"))
@@ -119,10 +117,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                         transformInternal: Memory.ReadPtrChain(Memory.ReadPtr(this + Offsets.Player._playerLookRaycastTransform), true, 0x10),
                         useCache: false);
                     scatter.PrepareReadArray<UnityTransform.TrsX>(_lookRaycastTransform.VerticesAddr, _lookRaycastTransform.Count);
-                    scatter.PrepareReadPtr(this + Offsets.Player._handsController);
                     scatter.Completed += (sender, s) =>
                     {
-                        _ = s.ReadPtr(this + Offsets.Player._handsController, out _hands);
                         try
                         {
                             if (s.ReadPooled<UnityTransform.TrsX>(_lookRaycastTransform.VerticesAddr, _lookRaycastTransform.Count) is IMemoryOwner<UnityTransform.TrsX> vertices)
