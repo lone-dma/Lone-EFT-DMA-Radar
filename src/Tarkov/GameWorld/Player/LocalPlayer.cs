@@ -78,7 +78,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                 ulong hands = _hands;
                 if (hands.IsValidUserVA())
                 {
-                    string handsType = ObjectClass.ReadName(hands);
+                    string handsType = ObjectClass.ReadName(
+                        objectClass: hands,
+                        useCache: false);
                     return !string.IsNullOrWhiteSpace(handsType) && handsType != "ClientEmptyHandsController";
                 }
             }
@@ -113,7 +115,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
                         transformInternal: Memory.ReadPtrChain(Memory.ReadPtr(this + Offsets.Player._playerLookRaycastTransform), true, 0x10),
                         useCache: false);
                     scatter.PrepareReadArray<UnityTransform.TrsX>(_lookRaycastTransform.VerticesAddr, _lookRaycastTransform.Count);
-                    scatter.PrepareReadValue<ulong>(this + Offsets.Player._handsController);
+                    scatter.PrepareReadPtr(this + Offsets.Player._handsController);
                     scatter.Completed += (sender, s) =>
                     {
                         _ = s.ReadPtr(this + Offsets.Player._handsController, out _hands);
