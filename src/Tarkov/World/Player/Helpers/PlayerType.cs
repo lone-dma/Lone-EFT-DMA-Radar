@@ -26,16 +26,40 @@ SOFTWARE.
  *
 */
 
-namespace LoneEftDmaRadar.Tarkov.Unity
+namespace LoneEftDmaRadar.Tarkov.World.Player.Helpers
 {
     /// <summary>
-    /// Defines an Entity that has a 3D World Position.
+    /// Defines Player Unit Type (Player,PMC,Scav,etc.)
     /// </summary>
-    public interface IWorldEntity
+    public enum PlayerType
     {
         /// <summary>
-        /// Entity's Unity Position in Game World.
+        /// Default value if a type cannot be established.
         /// </summary>
-        ref readonly Vector3 Position { get; }
+        Default,
+        /// <summary>
+        /// Teammate of LocalPlayer.
+        /// </summary>
+        Teammate,
+        /// <summary>
+        /// Hostile/Enemy PMC.
+        /// </summary>
+        PMC,
+        /// <summary>
+        /// Normal AI Bot Scav.
+        /// </summary>
+        AIScav,
+        /// <summary>
+        /// Difficult AI Raider.
+        /// </summary>
+        AIRaider,
+        /// <summary>
+        /// Difficult AI Boss.
+        /// </summary>
+        AIBoss,
+        /// <summary>
+        /// Player controlled Scav.
+        /// </summary>
+        PScav
     }
 }

@@ -26,16 +26,21 @@ SOFTWARE.
  *
 */
 
-namespace LoneEftDmaRadar.Tarkov.Unity
+using LoneEftDmaRadar.Tarkov.Unity;
+using LoneEftDmaRadar.UI.Maps;
+using VmmSharpEx.Scatter;
+
+namespace LoneEftDmaRadar.Tarkov.World.Explosives
 {
-    /// <summary>
-    /// Defines an Entity that has a 3D World Position.
-    /// </summary>
-    public interface IWorldEntity
+    public interface IExplosiveItem : IWorldEntity, IMapEntity
     {
         /// <summary>
-        /// Entity's Unity Position in Game World.
+        /// Base address of the explosive item.
         /// </summary>
-        ref readonly Vector3 Position { get; }
+        ulong Addr { get; }
+        /// <summary>
+        /// Sync the state of the explosive item.
+        /// </summary>
+        void OnRefresh(VmmScatter scatter);
     }
 }

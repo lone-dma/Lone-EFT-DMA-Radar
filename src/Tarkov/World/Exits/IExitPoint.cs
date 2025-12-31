@@ -26,16 +26,16 @@ SOFTWARE.
  *
 */
 
-namespace LoneEftDmaRadar.Tarkov.Unity
+using LoneEftDmaRadar.Tarkov.Unity;
+using LoneEftDmaRadar.UI.Maps;
+using LoneEftDmaRadar.UI.Skia;
+
+namespace LoneEftDmaRadar.Tarkov.World.Exits
 {
     /// <summary>
-    /// Defines an Entity that has a 3D World Position.
+    /// Defines a contract for a point that can be used to exit the map.
     /// </summary>
-    public interface IWorldEntity
+    public interface IExitPoint : IWorldEntity, IMapEntity, IMouseoverEntity
     {
-        /// <summary>
-        /// Entity's Unity Position in Game World.
-        /// </summary>
-        ref readonly Vector3 Position { get; }
     }
 }

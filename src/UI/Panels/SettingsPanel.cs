@@ -394,7 +394,7 @@ namespace LoneEftDmaRadar.UI.Panels
 
                 ImGui.SeparatorText("Active Quests");
 
-                if (Memory.QuestManager?.Quests is IReadOnlyDictionary<string, Tarkov.GameWorld.Quests.QuestEntry> quests)
+                if (Memory.QuestManager?.Quests is IReadOnlyDictionary<string, Tarkov.World.Quests.QuestEntry> quests)
                 {
                     ImGui.BeginChild("QuestList", new Vector2(0, 200), ImGuiChildFlags.Borders);
                     foreach (var quest in quests.Values.OrderBy(x => x.Name))

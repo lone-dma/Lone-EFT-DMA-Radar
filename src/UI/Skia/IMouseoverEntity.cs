@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Tarkov.GameWorld.Player;
+using LoneEftDmaRadar.Tarkov.World.Player;
 using LoneEftDmaRadar.UI.Maps;
 
 namespace LoneEftDmaRadar.UI.Skia
