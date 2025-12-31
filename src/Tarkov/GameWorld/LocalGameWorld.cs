@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Lone EFT DMA Radar
  * Brought to you by Lone (Lone DMA)
  * 
@@ -390,9 +390,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
             // Build new assignments in a local dict
             var newGroups = new ConcurrentDictionary<int, int>();
 
-            // Collect all valid human players
+            // Collect all valid human pmc players
             var players = _rgtPlayers
-                .Where(p => p.Position.IsNormal() && Vector3.Distance(p.Position, Vector3.Zero) > 1f)
+                .Where(p => p.IsPmc && p.Position.IsNormal() && Vector3.Distance(p.Position, Vector3.Zero) > 1f)
                 .OfType<ObservedPlayer>()
                 .ToList();
 
