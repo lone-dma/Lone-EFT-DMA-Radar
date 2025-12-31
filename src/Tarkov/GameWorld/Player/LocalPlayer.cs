@@ -70,20 +70,26 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld.Player
         /// Check if the Raid has started for the LocalPlayer.
         /// Does not throw.
         /// </summary>
-        /// <returns>True if the Raid has started, otherwise false.</returns>
-        public bool CheckIsRaidStarted()
+        /// <returns>True if the Raid has started, otherwise false. NULL if an error occurred.</returns>
+        public bool? CheckIsRaidStarted()
         {
             try
             {
                 ulong hands = _hands;
-                if (hands.IsValidUserVA())
-                {
-                    string handsType = ObjectClass.ReadNameEnsure(hands);
-                    return !string.IsNullOrWhiteSpace(handsType) && handsType != "ClientEmptyHandsController";
-                }
+                hands.ThrowIfInvalidUserVA();
+                string handsType = ObjectClass.ReadName(
+                    objectClass: hands,
+                    useCache: false);
+                ArgumentNullException.ThrowIfNull(handsType, nameof(handsType));
+                if (!handsType.Contains("Controller"))
+                    throw new ArgumentException("HandsController type invalid.", nameof(handsType));
+                return handsType != "ClientEmptyHandsController";
             }
-            catch { }
-            return false;
+            catch (Exception ex)
+            {
+                Logging.WriteLine($"[LocalPlayer] ERROR Checking IsRaidStarted: {ex}");
+                return null;
+            }
         }
 
         /// <summary>

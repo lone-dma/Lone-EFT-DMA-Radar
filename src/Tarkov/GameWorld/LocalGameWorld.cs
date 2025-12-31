@@ -33,7 +33,6 @@ using LoneEftDmaRadar.Tarkov.GameWorld.Explosives;
 using LoneEftDmaRadar.Tarkov.GameWorld.Hazards;
 using LoneEftDmaRadar.Tarkov.GameWorld.Loot;
 using LoneEftDmaRadar.Tarkov.GameWorld.Player;
-using LoneEftDmaRadar.Tarkov.GameWorld.Player.Helpers;
 using LoneEftDmaRadar.Tarkov.GameWorld.Quests;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using VmmSharpEx.Options;
@@ -120,7 +119,7 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 _explosivesManager = new(localGameWorld);
                 Hazards = GetHazards(MapID);
                 Exits = GetExits(MapID, _rgtPlayers.LocalPlayer.IsPmc);
-                RaidStarted = _rgtPlayers.LocalPlayer.CheckIsRaidStarted();
+                RaidStarted = _rgtPlayers.LocalPlayer.CheckIsRaidStarted() ?? false;
             }
             catch
             {
@@ -353,7 +352,8 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 return;
             try
             {
-                RaidStarted = localPlayer.CheckIsRaidStarted();
+                RaidStarted = localPlayer.CheckIsRaidStarted() ??
+                    throw new InvalidOperationException("Unable to get Hands Data!");
                 if (RaidStarted)
                 {
                     Logging.WriteLine("[PreRaidStartChecks] Raid has started!");
