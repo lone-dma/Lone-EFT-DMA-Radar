@@ -3,10 +3,10 @@
     "factory4_day",
     "factory4_night"
   ],
-  "x": 64.7,
-  "y": 67.5,
-  "scale": 0.994,
-  "svgScale": 36.00,
+  "x": 388.2,
+  "y": 405,
+  "scale": 5.964,
+  "svgScale": 6.00,
   "mapLayers": [
     {
 		"minHeight": null,

@@ -35,23 +35,8 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
 {
     public class ObservedPlayer : AbstractPlayer
     {
-        #region Static Interface
-
-        private static readonly ConcurrentDictionary<int, byte> _teammates = new();
-
-        static ObservedPlayer()
-        {
-            Memory.RaidStopped += Memory_RaidStopped;
-        }
-
-        private static void Memory_RaidStopped(object sender, EventArgs e)
-        {
-            _teammates.Clear();
-        }
-
-        #endregion
         /// <summary>
-        /// Player's Unique Id within this Raid Instance.
+        /// Player's Unique Id within this Raid Instance [Human Players Only].
         /// </summary>
         public int Id { get; }
         /// <summary>
@@ -94,10 +79,6 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         /// Player's Current Health Status
         /// </summary>
         public Enums.ETagStatus HealthStatus { get; private set; } = Enums.ETagStatus.Healthy;
-        /// <summary>
-        /// True if the Player is a Teammate.
-        /// </summary>
-        public bool IsTeammate => _teammates.ContainsKey(Id);
 
         internal ObservedPlayer(ulong playerBase) : base(playerBase)
         {
@@ -124,7 +105,8 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
 
             bool isAI = Memory.ReadValue<bool>(this + Offsets.ObservedPlayerView.IsAI);
             IsHuman = !isAI;
-            Id = GetPlayerId();
+            Id = IsHuman ?
+                GetPlayerId() : -1;
             /// Determine Player Type
             PlayerSide = (Enums.EPlayerSide)Memory.ReadValue<int>(this + Offsets.ObservedPlayerView.Side); // Usec,Bear,Scav,etc.
             if (!Enum.IsDefined(PlayerSide)) // Make sure PlayerSide is valid
@@ -142,15 +124,13 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
                 else
                 {
                     Name = $"PScav{Id}";
-                    Type = IsTeammate ?
-                        PlayerType.Teammate : PlayerType.PScav;
+                    Type = PlayerType.PScav;
                 }
             }
             else if (IsPmc)
             {
                 Name = $"{PlayerSide}{Id}";
-                Type = IsTeammate ?
-                    PlayerType.Teammate : PlayerType.PMC;
+                Type = PlayerType.PMC;
             }
             else
                 throw new NotImplementedException(nameof(PlayerSide));
@@ -170,18 +150,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
             bool isTeammate = Type == PlayerType.Teammate;
             if (!IsHuman)
                 return;
-            if (!isTeammate)
-            {
-                _teammates.TryAdd(Id, 0);
-                Type = PlayerType.Teammate;
-                GroupId = TeammateGroupId;
-            }
-            else
-            {
-                _teammates.TryRemove(Id, out _);
-                Type = PlayerSide == Enums.EPlayerSide.Savage ? PlayerType.PScav : PlayerType.PMC;
-                GroupId = SoloGroupId;
-            }
+            AssignTeammate(!isTeammate);
         }
 
         /// <summary>
@@ -191,33 +160,33 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         public void AssignGroup(int groupId)
         {
             GroupId = groupId;
-            Logging.WriteLine($"Player '{Name}' assigned to Group {GroupId}.");
         }
 
         /// <summary>
         /// Assign this Player as a Teammate to <see cref="LocalPlayer"/>.
         /// </summary>
-        public void AssignTeammate()
+        /// <param name="isTeammate">True if the Player is a Teammate, otherwise false.</param>
+        public void AssignTeammate(bool isTeammate)
         {
-            Type = PlayerType.Teammate;
-            GroupId = TeammateGroupId;
-            Logging.WriteLine($"Player '{Name}' assigned as Teammate.");
+            if (isTeammate)
+            {
+                Type = PlayerType.Teammate;
+                GroupId = TeammateGroupId;
+            }
+            else
+            {
+                Type = PlayerSide == Enums.EPlayerSide.Savage ? PlayerType.PScav : PlayerType.PMC;
+                GroupId = SoloGroupId;
+            }
         }
 
         /// <summary>
         /// Get the Player's ID.
         /// </summary>
-        /// <returns>Player Id or 0 if failed.</returns>
+        /// <returns>Player Id.</returns>
         private int GetPlayerId()
         {
-            try
-            {
-                return Memory.ReadValue<int>(this + Offsets.ObservedPlayerView.Id);
-            }
-            catch
-            {
-                return 0;
-            }
+            return Memory.ReadValueEnsure<int>(this + Offsets.ObservedPlayerView.Id);
         }
 
         /// <summary>
@@ -227,19 +196,12 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         /// <returns></returns>
         private int TryGetGroup(int id)
         {
-            if (!Config.Misc.AutoGroups ||
-                !IsPmc ||
-                Memory.LocalPlayer is not LocalPlayer localPlayer ||
-                localPlayer.GetRaidId() is not int raidId)
+            if (Config.Misc.AutoGroups && IsHuman && IsPmc &&
+                Memory.LocalPlayer is LocalPlayer localPlayer &&
+                Config.Cache.Groups.TryGetValue(localPlayer.RaidId, out var groups) &&
+                groups.TryGetValue(id, out var group))
             {
-                return SoloGroupId;
-            }
-            if (Config.Cache.Groups.TryGetValue(raidId, out var groups))
-            {
-                if (groups.TryGetValue(id, out var group))
-                {
-                    return group;
-                }
+                return group;
             }
             return SoloGroupId;
         }

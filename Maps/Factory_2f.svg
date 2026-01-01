@@ -1,72 +1,80 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 27.3.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Discord.gg-_x40_marazm" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-	 x="0px" y="0px" viewBox="0 0 141.2 130.8" style="enable-background:new 0 0 141.2 130.8;" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:#363636;}
-	.st1{fill:#777777;}
-	.st2{fill:#987F00;}
-	.st3{fill:none;stroke:#000000;stroke-width:0.2;}
-</style>
-<g id="Second_Floor">
-	<g id="Floor-2">
-		<path class="st0" d="M42.8,33.4h1v-1.3h2.9v14.2h-4.9V33.4C41.8,33.4,42.8,33.4,42.8,33.4z"/>
-		<path class="st0" d="M125.9,51.2h-2.1v1.3h-10v18.5h2.1v-1.3h10L125.9,51.2L125.9,51.2z M123.8,59v4.5h-7.9V59H123.8z"/>
-		<path class="st0" d="M107.7,73.3v10.1h-5.8V73.3H107.7z"/>
-		<path class="st0" d="M111.6,25.3h-9.7v5h-0.4v-5.8h-3.2v6.6h-0.2V18.6H86.2v2h-2.6v-2h-8.1v12.5h-0.2v-6.5h-3.2v4.2V31h-0.3v-3.4
-			H51.8V33h20.1v-0.2h0.3v0.3h3.2v-1h0.2v1h22.5v-1h0.2v1h3.2v-1.7h0.4v0.8h1.8v-2.7h7.9L111.6,25.3L111.6,25.3z M89.9,22.1v9h-6.2
-			v-9h1.2v0.2h-1v4.2h2.9v-4.2H86v-0.2h2L89.9,22.1L89.9,22.1z"/>
-		<path class="st0" d="M101.5,84.1l0-9.4h-2.9l0,9.3h1.5v0.4h-0.6v3.3h-0.2v-3.3H90V92h0.8v0.2H90v3.3h0.8v0.3H90v7.1h5.2V102h0.3
-			v0.9h5.7v-12h-0.2v-0.2h0.2v-6.3H101v-0.3L101.5,84.1L101.5,84.1z M100.1,90.7v0.2h-0.5v1.4h-1.2v3.2h1.2v4.7h-4.1v0.9h-0.3v-5.3
-			h-3.5v-0.3h0.4v-3.3h-0.4V92h7.5v-3.3h0.2v2.1C99.4,90.7,100.1,90.7,100.1,90.7z"/>
-	</g>
-	<g id="Obstacles-2">
-		<path class="st1" d="M92.9,21.3V32h-0.8V21.3H92.9z"/>
-		<path class="st1" d="M95.8,21v9.9H95V21H95.8z"/>
-		<path class="st1" d="M98.1,21.8v8.6h-0.4v-8.6C97.7,21.8,98.1,21.8,98.1,21.8z"/>
-		<path class="st1" d="M81.4,20.9v4.7h-0.6v-4.7H81.4z"/>
-		<path class="st1" d="M81.4,28.2v4.7h-0.6v-4.7H81.4z"/>
-		<path class="st1" d="M78.5,28.2v4.7H78v-4.7H78.5z"/>
-		<path class="st1" d="M78.5,20.9v4.7H78v-4.7H78.5z"/>
-		<path class="st1" d="M76,21.7v7.8h-0.4v-7.8H76z"/>
-		<path class="st1" d="M83.7,24.7v1.7h-0.4v-1.7H83.7z"/>
-	</g>
-	<g id="Stairs-2">
-		<g id="Stairs-2-down">
-			<path id="stair-62" class="st2" d="M111.5,28v-2.7h4.2V28"/>
-			<path id="stair-63" class="st2" d="M53.9,24.7v2.9h-1.3v-2.9"/>
-			<path id="stair-130" class="st2" d="M68.9,24.7v2.9h-1.3v-2.9"/>
-			<path id="stair-131" class="st2" d="M98.6,84.1v-1.4l-3.7,0v1.4L98.6,84.1z"/>
-			<path id="stair-132" class="st2" d="M101.8,83.4v1.2h5.5v-1.2H101.8z"/>
-			<path id="stair-140" class="st2" d="M46.6,33.3v-1.3h-2.9v1.3H46.6z"/>
-			<path id="stair-141" class="st2" d="M46.6,47.7v-1.3h-2.9v1.3H46.6z"/>
-			<path id="stair-155" class="st2" d="M120.3,52.5h3.4v-1.2h-3.4V52.5z"/>
-			<path id="stair-226" class="st2" d="M115.7,71h3.6v-1.2h-3.6V71z"/>
-			<path id="stair-135" class="st2" d="M76.2,12v3.2h-1.4V12H76.2z"/>
-			<path id="stair-134" class="st2" d="M98.3,92.3h-5.8v3.1h5.8V92.3z M97.2,93.8V94h-3.6v-0.2H97.2z"/>
-			<path class="st2" d="M85.1,24.4c0.1,0.1,0.3,0.1,0.4,0.1c0.1,0,0,0.2,0,0.2c0.1,0.3-0.1,0.5-0.2,0.8c-0.1,0.2,0,0.4-0.2,0.5
-				c-0.1,0-0.2,0.2-0.4,0.1c-0.1,0-0.1-0.1-0.2-0.2s-0.1-0.2-0.2-0.3c0-0.1,0.1-0.5,0.1-0.6s0-0.5,0.2-0.7
-				C84.7,24.3,85,24.4,85.1,24.4L85.1,24.4z"/>
-		</g>
-		<g id="Stairs-2-up">
-			<path id="stair-127" class="st2" d="M101.5,30.3V24h-3.2v6.4H101.5z M100,28.8h-0.2v-3.3h0.2V28.8z"/>
-			<path id="stair-128" class="st2" d="M75.4,30.3V24h-3.2v6.4H75.4z M73.8,28.8h-0.2v-3.3h0.2V28.8z"/>
-			<path id="stair-69" class="st2" d="M29.9,18.2h-6.1v2.7h6.1V18.2z M28.8,19.5v0.1H25v-0.1H28.8z"/>
-			<path id="stair-96" class="st2" d="M71.8,14.2h-5.8v2.7h5.8V14.2z M70.6,15.5v0.1H67v-0.1H70.6z"/>
-			<path id="stair-97" class="st2" d="M47.8,52.1h-6v2.7h6V52.1z M46.6,53.4v0.1h-3.7v-0.1H46.6z"/>
-			<path id="stair-100" class="st2" d="M47.8,70.3h-6v2.7h6V70.3z M46.6,71.6v0.1h-3.7v-0.1H46.6z"/>
-			<path id="stair-101" class="st2" d="M119.4,96.7v-5.8h-2.7v5.8H119.4z M118.1,95.6h-0.1V92h0.1V95.6z"/>
-			<path id="stair-129" class="st2" d="M97.7,46.7h-6.1v2.7h6.1V46.7z M96.5,48v0.1h-3.7V48H96.5z"/>
-		</g>
-	</g>
-	<g id="Wall-2">
-		<path class="st3" d="M109.4,28h0.5v-2.8"/>
-		<path class="st3" d="M108,28h-5.6v-2.8"/>
-		<path class="st3" d="M85.3,23.3h1.4"/>
-		<path class="st3" d="M85.3,24.4h1.4"/>
-		<path class="st3" d="M85.3,25.6h1.4"/>
-		<path class="st3" d="M86.2,20.6h3.7v-0.5"/>
-		<path class="st3" d="M89.9,19.1v-0.5"/>
-	</g>
-</g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Discord.gg-_x40_marazm" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 898.46 836.06">
+  <!-- Generator: Adobe Illustrator 30.1.0, SVG Export Plug-In . SVG Version: 2.1.1 Build 136)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #777;
+      }
+
+      .st1 {
+        fill: none;
+        stroke: #000;
+        stroke-width: 1.2px;
+      }
+
+      .st2 {
+        fill: #987f00;
+      }
+
+      .st3 {
+        fill: #363636;
+      }
+    </style>
+  </defs>
+  <g id="Second_Floor">
+    <g id="Floor-2">
+      <path class="st3" d="M280.03,228.43h6v-7.8h17.4v85.2h-29.4v-77.4h6Z"/>
+      <path class="st3" d="M778.63,335.23h-12.6v7.8h-60v111h12.6v-7.8h60v-111h0ZM766.03,382.03v27h-47.4v-27h47.4Z"/>
+      <path class="st3" d="M669.43,467.83v60.6h-34.8v-60.6h34.8Z"/>
+      <path class="st3" d="M692.83,179.83h-58.2v30h-2.4v-34.8h-19.2v39.6h-1.2v-75h-71.4v12h-15.6v-12h-48.6v75h-1.2v-39h-19.2v38.4h-1.8v-20.4h-120v32.4h120.6v-1.2h1.8v1.8h19.2v-6h1.2v6h135v-6h1.2v6h19.2v-10.2h2.4v4.8h10.8v-16.2h47.4v-25.2h0ZM562.63,160.63v54h-37.2v-54h7.2v1.2h-6v25.2h17.4v-25.2h-4.8v-1.2h23.4Z"/>
+      <path class="st3" d="M632.23,532.63v-56.4h-17.4v55.8h9v2.4h-3.6v19.8h-1.2v-19.8h-55.8v45.6h4.8v1.2h-4.8v19.8h4.8v1.8h-4.8v42.6h31.2v-5.4h1.8v5.4h34.2v-72h-1.2v-1.2h1.2v-37.8h-1.2v-1.8h3ZM623.83,572.23v1.2h-3v8.4h-7.2v19.2h7.2v28.2h-24.6v5.4h-1.8v-31.8h-21v-1.8h2.4v-19.8h-2.4v-1.2h45v-19.8h1.2v12.6c0-.6,4.2-.6,4.2-.6Z"/>
+    </g>
+    <g id="Obstacles-2">
+      <path class="st0" d="M580.63,155.83v64.2h-4.8v-64.2h4.8Z"/>
+      <path class="st0" d="M598.03,154.03v59.4h-4.8v-59.4h4.8Z"/>
+      <path class="st0" d="M611.83,158.83v51.6h-2.4v-51.6h2.4Z"/>
+      <path class="st0" d="M511.63,153.43v28.2h-3.6v-28.2s3.6,0,3.6,0Z"/>
+      <path class="st0" d="M511.63,197.23v28.2h-3.6v-28.2h3.6Z"/>
+      <path class="st0" d="M494.23,197.23v28.2h-3v-28.2h3Z"/>
+      <path class="st0" d="M494.23,153.43v28.2h-3v-28.2s3,0,3,0Z"/>
+      <path class="st0" d="M479.23,158.23v46.8h-2.4v-46.8h2.4Z"/>
+      <path class="st0" d="M525.43,176.23v10.2h-2.4v-10.2h2.4Z"/>
+    </g>
+    <g id="Stairs-2">
+      <g id="Stairs-2-down">
+        <path id="stair-62" class="st2" d="M692.23,196.03v-16.2h25.2v16.2"/>
+        <path id="stair-63" class="st2" d="M346.63,176.23v17.4h-7.8v-17.4"/>
+        <path id="stair-130" class="st2" d="M436.63,176.23v17.4h-7.8v-17.4"/>
+        <path id="stair-131" class="st2" d="M614.83,532.63v-8.4h-22.2v8.4h22.2Z"/>
+        <path id="stair-132" class="st2" d="M634.03,528.43v7.2h33v-7.2h-33Z"/>
+        <path id="stair-140" class="st2" d="M302.83,227.83v-7.8h-17.4v7.8h17.4Z"/>
+        <path id="stair-141" class="st2" d="M302.83,314.23v-7.8h-17.4v7.8h17.4Z"/>
+        <path id="stair-155" class="st2" d="M745.03,343.03h20.4v-7.2h-20.4v7.2Z"/>
+        <path id="stair-226" class="st2" d="M717.43,454.03h21.6v-7.2h-21.6v7.2Z"/>
+        <path id="stair-135" class="st2" d="M480.43,100.03v19.2h-8.4v-19.2h8.4Z"/>
+        <path id="stair-134" class="st2" d="M613.03,581.83h-34.8v18.6h34.8v-18.6ZM606.43,590.83v1.2h-21.6v-1.2h21.6Z"/>
+        <path class="st2" d="M533.83,174.43c.6.6,1.8.6,2.4.6s0,1.2,0,1.2c.6,1.8-.6,3-1.2,4.8-.6,1.2,0,2.4-1.2,3-.6,0-1.2,1.2-2.4.6-.6,0-.6-.6-1.2-1.2s-.6-1.2-1.2-1.8c0-.6.6-3,.6-3.6s0-3,1.2-4.2c.6,0,2.4.6,3,.6h0Z"/>
+      </g>
+      <g id="Stairs-2-up">
+        <path id="stair-127" class="st2" d="M632.23,209.83v-37.8h-19.2v38.4h19.2v-.6ZM623.23,200.83h-1.2v-19.8h1.2v19.8Z"/>
+        <path id="stair-128" class="st2" d="M475.63,209.83v-37.8h-19.2v38.4h19.2v-.6ZM466.03,200.83h-1.2v-19.8h1.2v19.8Z"/>
+        <path id="stair-69" class="st2" d="M202.63,137.23h-36.6v16.2h36.6v-16.2ZM196.03,145.03v.6h-22.8v-.6h22.8Z"/>
+        <path id="stair-96" class="st2" d="M454.03,113.23h-34.8v16.2h34.8v-16.2ZM446.83,121.03v.6h-21.6v-.6h21.6Z"/>
+        <path id="stair-97" class="st2" d="M310.03,340.63h-36v16.2h36v-16.2ZM302.83,348.43v.6h-22.2v-.6h22.2Z"/>
+        <path id="stair-100" class="st2" d="M310.03,449.83h-36v16.2h36v-16.2ZM302.83,457.63v.6h-22.2v-.6h22.2Z"/>
+        <path id="stair-101" class="st2" d="M739.63,608.23v-34.8h-16.2v34.8h16.2ZM731.83,601.63h-.6v-21.6h.6v21.6Z"/>
+        <path id="stair-129" class="st2" d="M609.43,308.23h-36.6v16.2h36.6v-16.2ZM602.23,316.03v.6h-22.2v-.6h22.2Z"/>
+      </g>
+    </g>
+    <g id="Wall-2">
+      <path class="st1" d="M679.63,196.03h3v-16.8"/>
+      <path class="st1" d="M671.23,196.03h-33.6v-16.8"/>
+      <path class="st1" d="M535.03,167.83h8.4"/>
+      <path class="st1" d="M535.03,174.43h8.4"/>
+      <path class="st1" d="M535.03,181.63h8.4"/>
+      <path class="st1" d="M540.43,151.63h22.2v-3"/>
+      <path class="st1" d="M562.63,142.63v-3"/>
+    </g>
+  </g>
 </svg>

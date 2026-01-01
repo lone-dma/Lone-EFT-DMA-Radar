@@ -289,20 +289,6 @@ namespace LoneEftDmaRadar
         public int FPS { get; set; } = 60;
 
         /// <summary>
-        /// GRContext Resource Cache Limit in MB (default: 512MB).
-        /// Set by <see cref="GRContext.SetResourceCacheLimit"/>.
-        /// </summary>
-        [JsonPropertyName("grResourceCacheLimitMB")]
-        public long GrResourceCacheLimitMB { get; set; } = 512;
-
-        /// <summary>
-        /// Rasterization scale factor for higher map quality when zoomed in.
-        /// 2x provides good quality for most zoom levels without excessive memory usage.
-        /// </summary>
-        [JsonPropertyName("mapRasterScale")]
-        public float MapRasterScale { get; set; } = 2f;
-
-        /// <summary>
         /// UI Scale Value (0.5-2.0 , default: 1.0)
         /// </summary>
         [JsonPropertyName("scale")]

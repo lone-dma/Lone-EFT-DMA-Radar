@@ -180,18 +180,15 @@ namespace LoneEftDmaRadar.UI
                 _window.GLContext!.TryGetProcAddress(name, out var addr) ? addr : 0);
 
             _grContext = GRContext.CreateGl(glInterface);
-            _grContext.SetResourceCacheLimit(Config.UI.GrResourceCacheLimitMB * 1024 * 1024);
+            _grContext.SetResourceCacheLimit(512 * 1024 * 1024);
 
             CreateSkiaSurface();
 
-            // --- ImGui ---
-            ImGui.CreateContext();
-
-            // Pass the existing input context to ImGuiController to share it
+            // ImGuiController will setup ImGui context
             _imgui = new ImGuiController(
                 gl: _gl,
                 view: _window,
-                input: _input  // Share the input context
+                input: _input
             );
 
             // Set IniFilename AFTER context and controller are created, then load settings
@@ -206,9 +203,6 @@ namespace LoneEftDmaRadar.UI
                     ImGui.LoadIniSettingsFromDisk(path);
                 }
             }
-
-            // Configure style AFTER ImGuiController is fully initialized
-            // to prevent flicker from font texture recreation
             ImGui.StyleColorsDark();
 
             // Setup mouse events on the shared input context
@@ -258,15 +252,17 @@ namespace LoneEftDmaRadar.UI
                 return;
             }
 
-            const GetPName SampleBuffersPName = (GetPName)0x80A8; // GL_SAMPLE_BUFFERS
-            const GetPName SamplesPName = (GetPName)0x80A9;       // GL_SAMPLES
-            const GetPName StencilBitsPName = (GetPName)0x0D57;   // GL_STENCIL_BITS
-
-            _gl.GetInteger(SampleBuffersPName, out int sampleBuffers);
-            _gl.GetInteger(SamplesPName, out int samples);
+            _gl.GetInteger(GetPName.SampleBuffers, out int sampleBuffers);
+            _gl.GetInteger(GetPName.Samples, out int samples);
             if (sampleBuffers == 0)
                 samples = 0;
-            _gl.GetInteger(StencilBitsPName, out int stencilBits);
+            _gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0); // bind default framebuffer
+            _gl.GetFramebufferAttachmentParameter(
+                FramebufferTarget.Framebuffer,
+                FramebufferAttachment.StencilAttachment,
+                FramebufferAttachmentParameterName.StencilSize,
+                out int stencilBits
+            );
 
             var fbInfo = new GRGlFramebufferInfo(
                 0, // default framebuffer

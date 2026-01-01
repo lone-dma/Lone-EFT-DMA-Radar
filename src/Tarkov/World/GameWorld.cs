@@ -388,22 +388,19 @@ namespace LoneEftDmaRadar.Tarkov.World
 
             const float groupDistanceThreshold = 15f;
 
-            if (localPlayer.GetRaidId() is not int raidId)
-                return;
-
             // Build new assignments in a local dict
             var newGroups = new ConcurrentDictionary<int, int>();
 
             // Collect all valid human pmc players
             var players = _rgtPlayers
-                .Where(p => p.IsPmc && p.Position.IsNormal() && Vector3.Distance(p.Position, Vector3.Zero) > 1f)
+                .Where(p => p.IsHuman && p.IsPmc && p.Position.IsNormal())
                 .OfType<ObservedPlayer>()
                 .ToList();
 
             if (players.Count == 0)
             {
                 // No players - replace with empty dict
-                Config.Cache.Groups[raidId] = newGroups;
+                Config.Cache.Groups[localPlayer.RaidId] = newGroups;
                 return;
             }
 
@@ -476,26 +473,37 @@ namespace LoneEftDmaRadar.Tarkov.World
                     foreach (var p in component)
                     {
                         newGroups[p.Id] = AbstractPlayer.TeammateGroupId;
-                        p.AssignTeammate();
+                        p.AssignTeammate(true);
                     }
                     continue;
                 }
 
-                // Hostile clusters must have at least 2 players
+                // Hostile clusters - assign group ID (solo players get SoloGroupId)
                 if (component.Count < 2)
+                {
+                    // Solo hostile player
+                    foreach (var p in component)
+                    {
+                        newGroups[p.Id] = AbstractPlayer.SoloGroupId;
+                        p.AssignTeammate(false);
+                        p.AssignGroup(AbstractPlayer.SoloGroupId);
+                    }
                     continue;
+                }
 
+                // Multi-player hostile group
                 int groupId = nextGroupId++;
 
                 foreach (var p in component)
                 {
                     newGroups[p.Id] = groupId;
+                    p.AssignTeammate(false);
                     p.AssignGroup(groupId);
                 }
             }
 
             // Atomic replacement - swap the entire dict reference
-            Config.Cache.Groups[raidId] = newGroups;
+            Config.Cache.Groups[localPlayer.RaidId] = newGroups;
         }
 
         private void RefreshEquipment(CancellationToken ct)
