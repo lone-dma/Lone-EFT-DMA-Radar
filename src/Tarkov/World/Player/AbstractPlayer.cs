@@ -355,24 +355,6 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
 
         #region Methods
 
-        private readonly Lock _alertsLock = new();
-        /// <summary>
-        /// Update the Alerts for this Player Object.
-        /// </summary>
-        /// <param nickName="alert">Alert to set.</param>
-        public void UpdateAlerts(string alert)
-        {
-            if (alert is null)
-                return;
-            lock (_alertsLock)
-            {
-                if (Alerts is null)
-                    Alerts = alert;
-                else
-                    Alerts = $"{alert} | {Alerts}";
-            }
-        }
-
         /// <summary>
         /// Validates the Rotation Address.
         /// </summary>

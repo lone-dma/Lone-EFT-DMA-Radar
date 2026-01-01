@@ -55,12 +55,17 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         /// Player is Human-Controlled.
         /// </summary>
         public override bool IsHuman => true;
+        /// <summary>
+        /// Raid Id the LocalPlayer is currently in.
+        /// </summary>
+        public int RaidId { get; }
 
         public LocalPlayer(ulong playerBase) : base(playerBase)
         {
             string classType = ObjectClass.ReadName(this);
             if (!(classType == "LocalPlayer" || classType == "ClientPlayer"))
                 throw new ArgumentOutOfRangeException(nameof(classType));
+            RaidId = GetRaidId();
         }
 
         /// <summary>
@@ -91,18 +96,10 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         /// <summary>
         /// Get the Raid ID the LocalPlayer is currently in.
         /// </summary>
-        /// <returns>Id or null if failed.</returns>
-        public int? GetRaidId()
+        /// <returns>Unique raid id.</returns>
+        private int GetRaidId()
         {
-            try
-            {
-                return Memory.ReadValue<int>(this + Offsets.Player.RaidId);
-            }
-            catch (Exception ex)
-            {
-                Logging.WriteLine($"[LocalPlayer] ERROR Getting Raid Id: {ex}");
-                return null;
-            }
+            return Memory.ReadValueEnsure<int>(this + Offsets.Player.RaidId);
         }
 
         public override void OnRealtimeLoop(VmmScatter scatter)

@@ -154,31 +154,6 @@ namespace LoneEftDmaRadar.UI.Misc
             Dispose();
         }
 
-        public void Dispose()
-        {
-            if (Interlocked.Exchange(ref _disposed, true) == true)
-                return;
-            _isRunning = false;
-
-            // Dispose our controller first
-            _imgui?.Dispose();
-            _imgui = null;
-            // Dispose the input context
-            _input?.Dispose();
-            _input = null;
-
-            // Destroy the ImGui context we created
-            var ctx = ImGui.GetCurrentContext();
-            if (ctx != IntPtr.Zero)
-            {
-                ImGui.DestroyContext(ctx);
-            }
-
-            _window.Close();
-            _window.Reset();
-            _window.Dispose();
-        }
-
         private void OnLoad()
         {
             _gl = GL.GetApi(_window);
@@ -189,18 +164,22 @@ namespace LoneEftDmaRadar.UI.Misc
                 EnableDarkMode(win32.Hwnd);
             }
 
-            ImGui.CreateContext();
             _input = _window.CreateInput();
             _imgui = new ImGuiController(
                 gl: _gl,
                 view: _window,
                 input: _input
             );
+            unsafe
+            {
+                // Disable .ini file saving by setting IniFilename to null
+                ImGuiNET.ImGuiNative.igGetIO()->IniFilename = (byte*)null;
+            }
 
             ConfigureStyle();
         }
 
-        private void ConfigureStyle()
+        private static void ConfigureStyle()
         {
             var style = ImGui.GetStyle();
             style.WindowRounding = 0f;
@@ -271,6 +250,24 @@ namespace LoneEftDmaRadar.UI.Misc
         private void OnClosing()
         {
             _isRunning = false;
+        }
+
+        public void Dispose()
+        {
+            if (Interlocked.Exchange(ref _disposed, true) == true)
+                return;
+            _isRunning = false;
+
+            // Dispose our controller first
+            _imgui?.Dispose(); // Controller will clean up ImGui context
+            _imgui = null;
+            // Dispose the input context
+            _input?.Dispose();
+            _input = null;
+
+            _window.Close();
+            _window.Reset();
+            _window.Dispose();
         }
 
         #region Win32 Interop
