@@ -1,6 +1,6 @@
 ﻿/*
  * Lone EFT DMA Radar
- * Brought to you by Lone (Lone DMA)
+ * Bought to you by Lone (Lone DMA)
  * 
 MIT License
 
@@ -34,12 +34,17 @@ using System.IO.Compression;
 namespace LoneEftDmaRadar.UI.Maps
 {
     /// <summary>
-    /// SVG map implementation that pre-rasterizes layers to SKImage bitmaps for fast rendering.
-    /// Each layer is converted from vector to bitmap at load time, then drawn as a texture each frame.
+    /// SVG map implementation with tiling/mip map system for optimized rendering.
+    /// Uses high-resolution tiles when zoomed in and lower-resolution images when zoomed out.
     /// </summary>
     public sealed class EftSvgMap : IEftMap
     {
-        private readonly RasterLayer[] _layers;
+        /// <summary>
+        /// Number of mip levels to generate (0 = full res, 1 = half, 2 = quarter, etc.)
+        /// </summary>
+        private const int MipLevelCount = 4;
+
+        private readonly MipMapLayer[] _layers;
 
         /// <summary>Raw map ID.</summary>
         public string ID { get; }
@@ -48,7 +53,7 @@ namespace LoneEftDmaRadar.UI.Maps
 
         /// <summary>
         /// Construct a new map by loading each SVG layer from the supplied zip archive
-        /// and pre-rasterizing them to SKImage bitmaps for fast rendering.
+        /// and creating a mip-mapped tiled representation for efficient rendering.
         /// </summary>
         /// <param name="zip">Archive containing the SVG layer files.</param>
         /// <param name="id">External map identifier.</param>
@@ -59,7 +64,7 @@ namespace LoneEftDmaRadar.UI.Maps
             ID = id;
             Config = config;
 
-            var loaded = new List<RasterLayer>();
+            var loaded = new List<MipMapLayer>();
             try
             {
                 foreach (var layerCfg in config.MapLayers)
@@ -73,8 +78,8 @@ namespace LoneEftDmaRadar.UI.Maps
                     if (svg.Load(stream) is null || svg.Picture is null)
                         throw new InvalidOperationException($"Failed to load SVG '{layerCfg.Filename}'.");
 
-                    // Pre-rasterize the SVG to a bitmap for fast drawing
-                    loaded.Add(new RasterLayer(svg.Picture, config.RasterScale, layerCfg));
+                    // Create mip-mapped tiled layer
+                    loaded.Add(new MipMapLayer(svg.Picture, config.RasterScale, layerCfg));
                 }
 
                 _layers = loaded.Order().ToArray();
@@ -87,12 +92,7 @@ namespace LoneEftDmaRadar.UI.Maps
         }
 
         /// <summary>
-        /// Draw visible layers into the target canvas.
-        /// Applies:
-        ///  - Height filtering
-        ///  - Map bounds → window bounds transform
-        ///  - Configured SVG rasterScale
-        ///  - Optional dimming of non-top layers
+        /// Draw visible layers into the target canvas using appropriate mip level based on zoom.
         /// </summary>
         /// <param name="canvas">Destination Skia canvas.</param>
         /// <param name="playerHeight">Current player Y height for layer filtering.</param>
@@ -102,7 +102,7 @@ namespace LoneEftDmaRadar.UI.Maps
         {
             if (_layers.Length == 0) return;
 
-            using var visible = new PooledList<RasterLayer>(capacity: 8);
+            using var visible = new PooledList<MipMapLayer>(capacity: 8);
             foreach (var layer in _layers)
             {
                 if (layer.IsHeightInRange(playerHeight))
@@ -115,6 +115,10 @@ namespace LoneEftDmaRadar.UI.Maps
             float scaleX = windowBounds.Width / mapBounds.Width;
             float scaleY = windowBounds.Height / mapBounds.Height;
 
+            // Determine mip level based on zoom (how much of the map we're showing)
+            var baseLayer = _layers[0];
+            int mipLevel = SelectMipLevel(Program.Config.UI.Zoom);
+
             canvas.Save();
             // Map coordinate system -> window region
             canvas.Translate(windowBounds.Left, windowBounds.Top);
@@ -124,31 +128,44 @@ namespace LoneEftDmaRadar.UI.Maps
             var front = visible[^1];
             foreach (var layer in visible)
             {
-                bool dim = !Config.DisableDimming &&        // Make sure dimming is enabled globally
-                           layer != front &&                // Make sure the current layer is not in front
-                           !front.CannotDimLowerLayers;     // Don't dim the lower layers if the front layer has dimming disabled upon lower layers
+                bool dim = !Config.DisableDimming &&
+                           layer != front &&
+                           !front.CannotDimLowerLayers;
 
-                var paint = dim ? 
+                var paint = dim ?
                     SKPaints.PaintBitmapAlpha : SKPaints.PaintBitmap;
-                canvas.DrawImage(
-                    image: layer.Image, 
-                    x: 0, 
-                    y: 0, 
-                    paint: paint);
+
+                layer.Draw(canvas, mapBounds, mipLevel, paint);
             }
 
             canvas.Restore();
         }
 
         /// <summary>
-        /// Compute per-frame map parameters (bounds and scaling factors) based on the
-        /// current zoom and player-centered position. Returns the rectangle of the map
-        /// (in map coordinates) that should be displayed and the X/Y zoom rasterScale factors.
+        /// Select the appropriate mip level based on zoom.
+        /// Lower zoom (zoomed in) = higher detail (lower mip level).
+        /// Higher zoom (zoomed out) = lower detail (higher mip level).
         /// </summary>
-        /// <param name="canvasSize">Size of the rendering canvas.</param>
-        /// <param name="zoom">Zoom percentage (e.g. 100 = 1:1).</param>
-        /// <param name="localPlayerMapPos">Player map-space position (center target); value may be adjusted externally.</param>
-        /// <returns>Computed parameters for rendering this frame.</returns>
+        private static int SelectMipLevel(int zoom)
+        {
+            // mip 0 (full res) [Zoomed In]
+            // mip 1 (half res)
+            // mip 2 (quarter res)
+            // mip 3 (eighth res) [Zoomed Out]
+
+            if (zoom <= 50)
+                return 0;
+            if (zoom <= 80)
+                return 1;
+            if (zoom <= 120)
+                return 2;
+            return 3;
+        }
+
+        /// <summary>
+        /// Compute per-frame map parameters (bounds and scaling factors) based on the
+        /// current zoom and player-centered position.
+        /// </summary>
         public EftMapParams GetParameters(SKSize canvasSize, int zoom, ref Vector2 localPlayerMapPos)
         {
             if (_layers.Length == 0)
@@ -164,8 +181,8 @@ namespace LoneEftDmaRadar.UI.Maps
 
             var baseLayer = _layers[0];
 
-            float fullWidth = baseLayer.RawWidth * Config.RasterScale;
-            float fullHeight = baseLayer.RawHeight * Config.RasterScale;
+            float fullWidth = baseLayer.FullWidth;
+            float fullHeight = baseLayer.FullHeight;
 
             var zoomWidth = fullWidth * (0.01f * zoom);
             var zoomHeight = fullHeight * (0.01f * zoom);
@@ -187,7 +204,7 @@ namespace LoneEftDmaRadar.UI.Maps
         }
 
         /// <summary>
-        /// Dispose all raster layers (releasing their SKImage resources).
+        /// Dispose all mip map layers.
         /// </summary>
         public void Dispose()
         {
@@ -196,28 +213,61 @@ namespace LoneEftDmaRadar.UI.Maps
         }
 
         /// <summary>
-        /// Internal wrapper for a single pre-rasterized map layer.
-        /// Converts SKPicture to SKImage at construction for fast bitmap drawing.
+        /// A single map layer with multiple mip levels for efficient rendering at different zoom levels.
+        /// The highest resolution level (mip 0) uses tiles for memory efficiency when zoomed in.
+        /// Lower resolution levels use single images for fast rendering when zoomed out.
         /// </summary>
-        private sealed class RasterLayer : IComparable<RasterLayer>, IDisposable
+        private sealed class MipMapLayer : IComparable<MipMapLayer>, IDisposable
         {
-            private readonly SKImage _image;
+            /// <summary>
+            /// Represents a single mip level as a rasterized image.
+            /// </summary>
+            private sealed class MipLevel : IDisposable
+            {
+                /// <summary>Rasterized image for this mip level.</summary>
+                public readonly SKImage Image;
+                /// <summary>Width of this mip level in pixels.</summary>
+                public readonly int Width;
+                /// <summary>Height of this mip level in pixels.</summary>
+                public readonly int Height;
+                /// <summary>Scale factor from SVG to this mip level.</summary>
+                public readonly float Scale;
+
+                public MipLevel(SKPicture picture, int width, int height, float scale)
+                {
+                    Width = width;
+                    Height = height;
+                    Scale = scale;
+
+                    var imageInfo = new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Premul);
+                    using var surface = SKSurface.Create(imageInfo);
+                    var canvas = surface.Canvas;
+                    canvas.Clear(SKColors.Transparent);
+                    canvas.Scale(scale, scale);
+                    canvas.DrawPicture(picture);
+                    Image = surface.Snapshot();
+                }
+
+                public void Dispose()
+                {
+                    Image?.Dispose();
+                }
+            }
+
+            private readonly MipLevel[] _mipLevels;
             public readonly bool IsBaseLayer;
             public readonly bool CannotDimLowerLayers;
             public readonly float? MinHeight;
             public readonly float? MaxHeight;
             public readonly float RawWidth;
             public readonly float RawHeight;
+            public readonly float FullWidth;
+            public readonly float FullHeight;
 
             /// <summary>
-            /// The pre-rasterized bitmap image for this layer.
+            /// Create a mip-mapped layer with multiple resolution levels.
             /// </summary>
-            public SKImage Image => _image;
-
-            /// <summary>
-            /// Create a raster layer by converting the SKPicture to an SKImage bitmap.
-            /// </summary>
-            public RasterLayer(SKPicture picture, float rasterScale, EftMapConfig.Layer cfgLayer)
+            public MipMapLayer(SKPicture picture, float rasterScale, EftMapConfig.Layer cfgLayer)
             {
                 IsBaseLayer = cfgLayer.MinHeight is null && cfgLayer.MaxHeight is null;
                 CannotDimLowerLayers = cfgLayer.CannotDimLowerLayers;
@@ -228,21 +278,45 @@ namespace LoneEftDmaRadar.UI.Maps
                 RawWidth = cullRect.Width;
                 RawHeight = cullRect.Height;
 
-                int width = (int)Math.Ceiling(RawWidth * rasterScale);
-                int height = (int)Math.Ceiling(RawHeight * rasterScale);
+                // Full resolution dimensions
+                int fullWidth = (int)Math.Ceiling(RawWidth * rasterScale);
+                int fullHeight = (int)Math.Ceiling(RawHeight * rasterScale);
+                FullWidth = fullWidth;
+                FullHeight = fullHeight;
 
-                var imageInfo = new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Premul);
-                using var surface = SKSurface.Create(imageInfo);
-                var canvas = surface.Canvas;
-                canvas.Clear(SKColors.Transparent);
-                canvas.Scale(rasterScale, rasterScale);
-                canvas.DrawPicture(picture);
-                _image = surface.Snapshot();
+                // Generate mip levels - all as single images (no tiling)
+                _mipLevels = new MipLevel[MipLevelCount];
+                for (int level = 0; level < MipLevelCount; level++)
+                {
+                    float levelScale = rasterScale / (1 << level); // Divide by 2^level
+                    int levelWidth = Math.Max(1, fullWidth >> level);
+                    int levelHeight = Math.Max(1, fullHeight >> level);
+
+                    _mipLevels[level] = new MipLevel(picture, levelWidth, levelHeight, levelScale);
+                }
+            }
+
+            /// <summary>
+            /// Draw this layer using the specified mip level.
+            /// </summary>
+            public void Draw(SKCanvas canvas, SKRect mapBounds, int mipLevel, SKPaint paint)
+            {
+                mipLevel = Math.Clamp(mipLevel, 0, _mipLevels.Length - 1);
+                var mip = _mipLevels[mipLevel];
+
+                if (mip.Image is null)
+                    return;
+
+                // Scale from mip level coordinates to full resolution coordinates
+                float scale = FullWidth / mip.Width;
+                canvas.Save();
+                canvas.Scale(scale, scale);
+                canvas.DrawImage(mip.Image, 0, 0, paint);
+                canvas.Restore();
             }
 
             /// <summary>
             /// Determines whether the provided height is inside this layer's vertical range.
-            /// Base layers always return true.
             /// </summary>
             public bool IsHeightInRange(float h)
             {
@@ -255,7 +329,7 @@ namespace LoneEftDmaRadar.UI.Maps
             /// <summary>
             /// Ordering: base layers first, then ascending MinHeight, then ascending MaxHeight.
             /// </summary>
-            public int CompareTo(RasterLayer other)
+            public int CompareTo(MipMapLayer other)
             {
                 if (other is null) return -1;
                 if (IsBaseLayer && !other.IsBaseLayer)
@@ -273,8 +347,12 @@ namespace LoneEftDmaRadar.UI.Maps
                 return thisMax.CompareTo(otherMax);
             }
 
-            /// <summary>Dispose the rasterized image.</summary>
-            public void Dispose() => _image.Dispose();
+            /// <summary>Dispose all mip levels.</summary>
+            public void Dispose()
+            {
+                foreach (var mip in _mipLevels)
+                    mip.Dispose();
+            }
         }
     }
 }
