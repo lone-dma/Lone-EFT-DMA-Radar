@@ -52,7 +52,7 @@ namespace LoneEftDmaRadar.UI.Skia
 
         public static SKPaint PaintBitmap { get; } = new()
         {
-            IsAntialias = true,
+            IsAntialias = true
         };
 
         public static SKPaint PaintBitmapAlpha { get; } = new()

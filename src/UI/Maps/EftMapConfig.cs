@@ -150,10 +150,10 @@ namespace LoneEftDmaRadar.UI.Maps
         [JsonPropertyName("scale")]
         public float Scale { get; set; }
         /// <summary>
-        /// How much to scale up the original SVG Image.
+        /// How much to scale up the original SVG Image during rasterization.
         /// </summary>
-        [JsonPropertyName("svgScale")]
-        public float SvgScale { get; set; }
+        [JsonPropertyName("rasterScale")]
+        public float RasterScale { get; set; }
         /// <summary>
         /// TRUE if the map drawing should not dim layers, otherwise FALSE if dimming is permitted.
         /// This is a global setting that applies to all layers.

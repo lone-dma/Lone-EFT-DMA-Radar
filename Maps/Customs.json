@@ -3,7 +3,7 @@
 	"x": 372.9,
 	"y": 265.6,
 	"scale": 0.992,
-	"svgScale" : 4.00,
+	"rasterScale" : 1.50,
 	"disableDimming" : true,
 	"mapLayers": [
 		{

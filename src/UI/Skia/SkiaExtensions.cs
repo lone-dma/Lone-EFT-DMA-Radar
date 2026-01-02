@@ -156,8 +156,8 @@ namespace LoneEftDmaRadar.UI.Skia
         public static Vector2 ToMapPos(this Vector3 vector, EftMapConfig map) =>
             new()
             {
-                X = (map.X * map.SvgScale) + (vector.X * (map.Scale * map.SvgScale)),
-                Y = (map.Y * map.SvgScale) - (vector.Z * (map.Scale * map.SvgScale))
+                X = (map.X * map.RasterScale) + (vector.X * (map.Scale * map.RasterScale)),
+                Y = (map.Y * map.RasterScale) - (vector.Z * (map.Scale * map.RasterScale))
             };
 
         /// <summary>
