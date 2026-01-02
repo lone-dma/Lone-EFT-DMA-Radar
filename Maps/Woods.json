@@ -3,7 +3,7 @@
   "x": 834.6,
   "y": 469.6,
   "scale": 1.048,
-  "svgScale": 4.5,
+  "rasterScale": 1.00,
   "mapLayers": [
     {
       "minHeight": null,

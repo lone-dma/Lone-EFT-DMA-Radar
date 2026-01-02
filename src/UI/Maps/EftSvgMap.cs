@@ -74,7 +74,7 @@ namespace LoneEftDmaRadar.UI.Maps
                         throw new InvalidOperationException($"Failed to load SVG '{layerCfg.Filename}'.");
 
                     // Pre-rasterize the SVG to a bitmap for fast drawing
-                    loaded.Add(new RasterLayer(svg.Picture, layerCfg));
+                    loaded.Add(new RasterLayer(svg.Picture, config.RasterScale, layerCfg));
                 }
 
                 _layers = loaded.Order().ToArray();
@@ -91,7 +91,7 @@ namespace LoneEftDmaRadar.UI.Maps
         /// Applies:
         ///  - Height filtering
         ///  - Map bounds → window bounds transform
-        ///  - Configured SVG scale
+        ///  - Configured SVG rasterScale
         ///  - Optional dimming of non-top layers
         /// </summary>
         /// <param name="canvas">Destination Skia canvas.</param>
@@ -120,11 +120,6 @@ namespace LoneEftDmaRadar.UI.Maps
             canvas.Translate(windowBounds.Left, windowBounds.Top);
             canvas.Scale(scaleX, scaleY);
             canvas.Translate(-mapBounds.Left, -mapBounds.Top);
-            // Apply configured vector scaling
-            canvas.Scale(Config.SvgScale, Config.SvgScale);
-            // Compensate for raster scale (image is RasterScale times larger)
-            float invRasterScale = 1f / RasterLayer.RasterScale;
-            canvas.Scale(invRasterScale, invRasterScale);
 
             var front = visible[^1];
             foreach (var layer in visible)
@@ -133,8 +128,13 @@ namespace LoneEftDmaRadar.UI.Maps
                            layer != front &&                // Make sure the current layer is not in front
                            !front.CannotDimLowerLayers;     // Don't dim the lower layers if the front layer has dimming disabled upon lower layers
 
-                var paint = dim ? SKPaints.PaintBitmapAlpha : SKPaints.PaintBitmap;
-                canvas.DrawImage(layer.Image, 0, 0, paint);
+                var paint = dim ? 
+                    SKPaints.PaintBitmapAlpha : SKPaints.PaintBitmap;
+                canvas.DrawImage(
+                    image: layer.Image, 
+                    x: 0, 
+                    y: 0, 
+                    paint: paint);
             }
 
             canvas.Restore();
@@ -143,7 +143,7 @@ namespace LoneEftDmaRadar.UI.Maps
         /// <summary>
         /// Compute per-frame map parameters (bounds and scaling factors) based on the
         /// current zoom and player-centered position. Returns the rectangle of the map
-        /// (in map coordinates) that should be displayed and the X/Y zoom scale factors.
+        /// (in map coordinates) that should be displayed and the X/Y zoom rasterScale factors.
         /// </summary>
         /// <param name="canvasSize">Size of the rendering canvas.</param>
         /// <param name="zoom">Zoom percentage (e.g. 100 = 1:1).</param>
@@ -164,8 +164,8 @@ namespace LoneEftDmaRadar.UI.Maps
 
             var baseLayer = _layers[0];
 
-            float fullWidth = baseLayer.RawWidth * Config.SvgScale;
-            float fullHeight = baseLayer.RawHeight * Config.SvgScale;
+            float fullWidth = baseLayer.RawWidth * Config.RasterScale;
+            float fullHeight = baseLayer.RawHeight * Config.RasterScale;
 
             var zoomWidth = fullWidth * (0.01f * zoom);
             var zoomHeight = fullHeight * (0.01f * zoom);
@@ -210,12 +210,6 @@ namespace LoneEftDmaRadar.UI.Maps
             public readonly float RawHeight;
 
             /// <summary>
-            /// Rasterization scale factor for higher quality when zoomed in.
-            /// 2x provides good quality for most zoom levels without excessive memory usage.
-            /// </summary>
-            internal const float RasterScale = 2.0f;
-
-            /// <summary>
             /// The pre-rasterized bitmap image for this layer.
             /// </summary>
             public SKImage Image => _image;
@@ -223,7 +217,7 @@ namespace LoneEftDmaRadar.UI.Maps
             /// <summary>
             /// Create a raster layer by converting the SKPicture to an SKImage bitmap.
             /// </summary>
-            public RasterLayer(SKPicture picture, EftMapConfig.Layer cfgLayer)
+            public RasterLayer(SKPicture picture, float rasterScale, EftMapConfig.Layer cfgLayer)
             {
                 IsBaseLayer = cfgLayer.MinHeight is null && cfgLayer.MaxHeight is null;
                 CannotDimLowerLayers = cfgLayer.CannotDimLowerLayers;
@@ -234,15 +228,14 @@ namespace LoneEftDmaRadar.UI.Maps
                 RawWidth = cullRect.Width;
                 RawHeight = cullRect.Height;
 
-                // Rasterize at higher resolution for better quality when zoomed in
-                int width = (int)Math.Ceiling(RawWidth * RasterScale);
-                int height = (int)Math.Ceiling(RawHeight * RasterScale);
+                int width = (int)Math.Ceiling(RawWidth * rasterScale);
+                int height = (int)Math.Ceiling(RawHeight * rasterScale);
 
                 var imageInfo = new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Premul);
                 using var surface = SKSurface.Create(imageInfo);
                 var canvas = surface.Canvas;
                 canvas.Clear(SKColors.Transparent);
-                canvas.Scale(RasterScale, RasterScale);
+                canvas.Scale(rasterScale, rasterScale);
                 canvas.DrawPicture(picture);
                 _image = surface.Snapshot();
             }
