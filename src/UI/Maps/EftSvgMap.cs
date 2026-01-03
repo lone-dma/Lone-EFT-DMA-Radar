@@ -39,9 +39,7 @@ namespace LoneEftDmaRadar.UI.Maps
     /// </summary>
     public sealed class EftSvgMap : IEftMap
     {
-        private static readonly SKSamplingOptions _sampling = new(
-            SKFilterMode.Linear, // Linear smoothes edges more and looks soft, Nearest is sharper but more aliasing
-            SKMipmapMode.None);
+        private static readonly SKSamplingOptions _sampling = new(SKCubicResampler.Mitchell); // Slightly sharper than Linear but performs well still
         private readonly RasterLayer[] _layers;
 
         /// <summary>Raw map ID.</summary>
