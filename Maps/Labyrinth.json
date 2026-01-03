@@ -3,7 +3,7 @@
 	"x": 256,
 	"y": 374,
 	"scale": 5,
-    "rasterScale": 2.50,
+	"rasterScale" : 2.00,
 	"mapLayers": [
 		{
 			"minHeight": null,
