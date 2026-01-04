@@ -165,7 +165,7 @@ namespace LoneEftDmaRadar.UI
         {
             _gl = GL.GetApi(_window);
 
-            // Apply dark mode and window icon (Windows only)
+            // ApplyCustomImGuiStyle dark mode and window icon (Windows only)
             if (_window.Native?.Win32 is { } win32)
             {
                 EnableDarkMode(win32.Hwnd);
@@ -185,10 +185,15 @@ namespace LoneEftDmaRadar.UI
             CreateSkiaSurface();
 
             // ImGuiController will setup ImGui context
+            // Use the onConfigureIO callback to configure fonts BEFORE the atlas is built
             _imgui = new ImGuiController(
                 gl: _gl,
                 view: _window,
-                input: _input
+                input: _input,
+                onConfigureIO: () =>
+                {
+                    ConfigureImGuiFonts(13f);
+                }
             );
 
             // Set IniFilename AFTER context and controller are created, then load settings
@@ -203,7 +208,8 @@ namespace LoneEftDmaRadar.UI
                     ImGui.LoadIniSettingsFromDisk(path);
                 }
             }
-            ImGui.StyleColorsDark();
+
+            ApplyCustomImGuiStyle();
 
             // Setup mouse events on the shared input context
             foreach (var mouse in _input.Mice)
@@ -1140,6 +1146,174 @@ namespace LoneEftDmaRadar.UI
                 SendMessageW(hwnd, WM_SETICON, ICON_BIG, hIconBig);
         }
 
+        #endregion
+
+        #region Styling
+        /// <summary>
+        /// Configures custom fonts. Must be called before font atlas is built.
+        /// </summary>
+        private static unsafe void ConfigureImGuiFonts(float basePixelSize)
+        {
+            var io = ImGui.GetIO();
+            var fontBytes = LoadEmbeddedFontBytes();
+
+            if (fontBytes is null || fontBytes.Length == 0)
+                return; // Fall back to default font
+
+            io.Fonts.Clear();
+
+            var cfg = new ImFontConfigPtr(ImGuiNET.ImGuiNative.ImFontConfig_ImFontConfig());
+            cfg.OversampleH = 3;
+            cfg.OversampleV = 2;
+            cfg.PixelSnapH = true;
+
+            fixed (byte* pFont = fontBytes)
+            {
+                io.Fonts.AddFontFromMemoryTTF((nint)pFont, fontBytes.Length, basePixelSize, cfg);
+            }
+
+            cfg.Destroy();
+
+            static byte[] LoadEmbeddedFontBytes()
+            {
+                try
+                {
+                    using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LoneEftDmaRadar.NeoSansStdRegular.otf");
+                    if (stream is null)
+                        return null;
+
+                    var bytes = new byte[stream.Length];
+                    stream.ReadExactly(bytes);
+                    return bytes;
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Applies a custom ImGui style/theme.
+        /// </summary>
+        private static void ApplyCustomImGuiStyle()
+        {
+            ImGui.StyleColorsDark();
+
+            var style = ImGui.GetStyle();
+
+            // HUD / Radar style: rounded, calm contrast, minimal borders
+            style.WindowRounding = 10f;
+            style.ChildRounding = 10f;
+            style.PopupRounding = 10f;
+            style.FrameRounding = 8f;
+            style.ScrollbarRounding = 12f;
+            style.GrabRounding = 10f;
+            style.TabRounding = 10f;
+
+            // Comfortable spacing for menus, not too chunky
+            style.WindowPadding = new Vector2(12, 10);
+            style.FramePadding = new Vector2(8, 5);
+            style.ItemSpacing = new Vector2(8, 6);
+            style.ItemInnerSpacing = new Vector2(6, 4);
+            style.ScrollbarSize = 14f;
+            style.GrabMinSize = 12f;
+
+            // Subtle borders (avoid boxy look)
+            style.WindowBorderSize = 0.0f;
+            style.ChildBorderSize = 0.0f;
+            style.PopupBorderSize = 1.0f;
+            style.FrameBorderSize = 0.0f;
+
+            style.WindowTitleAlign = new Vector2(0.5f, 0.5f);
+            style.ButtonTextAlign = new Vector2(0.5f, 0.5f);
+            style.WindowMenuButtonPosition = ImGuiDir.None;
+
+            // Slight translucency helps the map feel like the primary layer
+            style.Alpha = 0.96f;
+
+            var colors = style.Colors;
+
+            // Dark HUD palette (blue/gray) + teal accent
+            Vector4 bg = new(0.06f, 0.07f, 0.09f, 1.00f);
+            Vector4 bg2 = new(0.09f, 0.10f, 0.12f, 1.00f);
+            Vector4 frame = new(0.12f, 0.13f, 0.16f, 1.00f);
+            Vector4 frameHover = new(0.16f, 0.17f, 0.21f, 1.00f);
+            Vector4 frameActive = new(0.18f, 0.20f, 0.24f, 1.00f);
+
+            Vector4 text = new(0.95f, 0.96f, 0.98f, 1.00f);
+            Vector4 textDisabled = new(0.55f, 0.58f, 0.62f, 1.00f);
+
+            Vector4 border = new(0.20f, 0.22f, 0.27f, 0.85f);
+
+            Vector4 accent = new(0.12f, 0.78f, 0.71f, 1.00f);
+            Vector4 accentHover = new(0.18f, 0.86f, 0.78f, 1.00f);
+            Vector4 accentActive = new(0.10f, 0.66f, 0.60f, 1.00f);
+
+            // Text
+            colors[(int)ImGuiCol.Text] = text;
+            colors[(int)ImGuiCol.TextDisabled] = textDisabled;
+
+            // Windows
+            colors[(int)ImGuiCol.WindowBg] = new Vector4(bg.X, bg.Y, bg.Z, 0.92f);
+            colors[(int)ImGuiCol.ChildBg] = new Vector4(0f, 0f, 0f, 0f);
+            colors[(int)ImGuiCol.PopupBg] = new Vector4(bg2.X, bg2.Y, bg2.Z, 0.98f);
+
+            // Borders
+            colors[(int)ImGuiCol.Border] = border;
+            colors[(int)ImGuiCol.BorderShadow] = new Vector4(0f, 0f, 0f, 0f);
+
+            // Frames / Inputs
+            colors[(int)ImGuiCol.FrameBg] = new Vector4(frame.X, frame.Y, frame.Z, 0.95f);
+            colors[(int)ImGuiCol.FrameBgHovered] = new Vector4(frameHover.X, frameHover.Y, frameHover.Z, 0.95f);
+            colors[(int)ImGuiCol.FrameBgActive] = new Vector4(frameActive.X, frameActive.Y, frameActive.Z, 1.00f);
+
+            // Titles / Menu bar
+            colors[(int)ImGuiCol.TitleBg] = new Vector4(bg2.X, bg2.Y, bg2.Z, 0.95f);
+            colors[(int)ImGuiCol.TitleBgActive] = new Vector4(bg2.X, bg2.Y, bg2.Z, 0.98f);
+            colors[(int)ImGuiCol.TitleBgCollapsed] = new Vector4(bg2.X, bg2.Y, bg2.Z, 0.75f);
+            colors[(int)ImGuiCol.MenuBarBg] = new Vector4(bg2.X, bg2.Y, bg2.Z, 0.92f);
+
+            // Scrollbar
+            colors[(int)ImGuiCol.ScrollbarBg] = new Vector4(bg.X, bg.Y, bg.Z, 0.70f);
+            colors[(int)ImGuiCol.ScrollbarGrab] = new Vector4(0.30f, 0.33f, 0.40f, 0.70f);
+            colors[(int)ImGuiCol.ScrollbarGrabHovered] = new Vector4(0.38f, 0.42f, 0.50f, 0.80f);
+            colors[(int)ImGuiCol.ScrollbarGrabActive] = new Vector4(0.45f, 0.50f, 0.60f, 0.90f);
+
+            // Check / Slider
+            colors[(int)ImGuiCol.CheckMark] = accent;
+            colors[(int)ImGuiCol.SliderGrab] = new Vector4(accent.X, accent.Y, accent.Z, 0.75f);
+            colors[(int)ImGuiCol.SliderGrabActive] = accentActive;
+
+            // Buttons (teal only on interaction)
+            colors[(int)ImGuiCol.Button] = new Vector4(frame.X, frame.Y, frame.Z, 0.75f);
+            colors[(int)ImGuiCol.ButtonHovered] = new Vector4(accent.X, accent.Y, accent.Z, 0.35f);
+            colors[(int)ImGuiCol.ButtonActive] = new Vector4(accent.X, accent.Y, accent.Z, 0.55f);
+
+            // Headers (tree nodes, selectable, etc.)
+            colors[(int)ImGuiCol.Header] = new Vector4(frame.X, frame.Y, frame.Z, 0.55f);
+            colors[(int)ImGuiCol.HeaderHovered] = new Vector4(accent.X, accent.Y, accent.Z, 0.30f);
+            colors[(int)ImGuiCol.HeaderActive] = new Vector4(accent.X, accent.Y, accent.Z, 0.45f);
+
+            // Separators
+            colors[(int)ImGuiCol.Separator] = new Vector4(border.X, border.Y, border.Z, 0.60f);
+            colors[(int)ImGuiCol.SeparatorHovered] = new Vector4(accentHover.X, accentHover.Y, accentHover.Z, 0.70f);
+            colors[(int)ImGuiCol.SeparatorActive] = accent;
+
+            // Resize grip (keep subtle)
+            colors[(int)ImGuiCol.ResizeGrip] = new Vector4(accent.X, accent.Y, accent.Z, 0.12f);
+            colors[(int)ImGuiCol.ResizeGripHovered] = new Vector4(accentHover.X, accentHover.Y, accentHover.Z, 0.30f);
+            colors[(int)ImGuiCol.ResizeGripActive] = new Vector4(accentActive.X, accentActive.Y, accentActive.Z, 0.45f);
+
+            // Tabs (if supported by your ImGui.NET version)
+            colors[(int)ImGuiCol.Tab] = new Vector4(frame.X, frame.Y, frame.Z, 0.60f);
+            colors[(int)ImGuiCol.TabHovered] = new Vector4(accent.X, accent.Y, accent.Z, 0.25f);
+
+            // Selection
+            colors[(int)ImGuiCol.TextSelectedBg] = new Vector4(accent.X, accent.Y, accent.Z, 0.35f);
+            colors[(int)ImGuiCol.DragDropTarget] = new Vector4(accentHover.X, accentHover.Y, accentHover.Z, 0.90f);
+            colors[(int)ImGuiCol.ModalWindowDimBg] = new Vector4(0f, 0f, 0f, 0.65f);
+        }
         #endregion
 
     }
