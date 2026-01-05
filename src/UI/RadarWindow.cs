@@ -47,88 +47,25 @@ using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
-using Silk.NET.Windowing.Glfw;
 
 namespace LoneEftDmaRadar.UI
 {
     internal static partial class RadarWindow
     {
-        #region Fields
+        #region Initialization
 
         private static IWindow _window = null!;
         private static GL _gl = null!;
         private static IInputContext _input = null!;
-
-        private static ImGuiController _imgui = null!;
         private static SKSurface _skSurface = null!;
         private static GRContext _grContext = null!;
         private static GRBackendRenderTarget _skBackendRenderTarget = null!;
-        private static readonly PeriodicTimer _fpsTimer = new(TimeSpan.FromSeconds(1));
-        private static int _fpsCounter = 0;
-        private static int _statusOrder = 1;
-
-        // Mouse tracking
-        private static bool _mouseDown;
-        private static Vector2 _lastMousePosition;
-        private static IMouseoverEntity _mouseOverItem;
-        private static DateTime _lastClickTime;
-        private const double DoubleClickThresholdMs = 300;
-
-        // UI State (moved from RadarUIState)
-        private static int _fps;
-        private static bool _isLootFiltersOpen;
-        private static bool _isWebRadarOpen;
-        private static bool _isMapFreeEnabled;
-        private static Vector2 _mapPanPosition;
-
-        #endregion
-
-        #region Static Properties
+        private static readonly RateLimiter _purgeRL = new(TimeSpan.FromSeconds(1));
 
         private static EftDmaConfig Config { get; } = Program.Config;
         public static IntPtr Handle => _window?.Native?.Win32?.Hwnd ?? IntPtr.Zero;
-        private static bool Starting => Memory.Starting;
-        private static bool Ready => Memory.Ready;
-        private static bool InRaid => Memory.InRaid;
-        private static string MapID => Memory.MapID ?? "null";
-        private static LocalPlayer LocalPlayer => Memory.LocalPlayer;
-        private static IEnumerable<LootItem> FilteredLoot => Memory.Loot?.FilteredLoot;
-        private static IEnumerable<StaticLootContainer> Containers => Memory.Loot?.StaticContainers;
-        private static IReadOnlyCollection<AbstractPlayer> AllPlayers => Memory.Players;
-        private static IReadOnlyCollection<IExplosiveItem> Explosives => Memory.Explosives;
-        private static IReadOnlyCollection<IWorldHazard> Hazards => Memory.Game?.Hazards;
-        private static IReadOnlyCollection<IExitPoint> Exits => Memory.Exits;
-        private static QuestManager Quests => Memory.QuestManager;
-        private static bool SearchFilterIsSet => !string.IsNullOrEmpty(LootFilter.SearchString);
-        private static bool LootCorpsesVisible => Config.Loot.Enabled && !Config.Loot.HideCorpses && !SearchFilterIsSet;
-        /// <summary>
-        /// Currently 'Moused Over' Group.
-        /// </summary>
-        public static int? MouseoverGroup { get; private set; }
 
-        /// <summary>
-        /// Whether map free mode is enabled.
-        /// </summary>
-        public static bool IsMapFreeEnabled
-        {
-            get => _isMapFreeEnabled;
-            set => _isMapFreeEnabled = value;
-        }
-
-        /// <summary>
-        /// Map pan position when in free mode.
-        /// </summary>
-        public static Vector2 MapPanPosition
-        {
-            get => _mapPanPosition;
-            set => _mapPanPosition = value;
-        }
-
-        #endregion
-
-        #region Initialization
-
-        internal static void Initialize()
+        internal static void Run()
         {
             var options = WindowOptions.Default;
             options.Size = new Vector2D<int>(
@@ -146,7 +83,6 @@ namespace LoneEftDmaRadar.UI
                 options.WindowState = WindowState.Maximized;
             }
 
-            GlfwWindowing.Use();
             _window = Window.Create(options);
 
             _window.Load += OnLoad;
@@ -158,7 +94,7 @@ namespace LoneEftDmaRadar.UI
             // Start FPS timer
             _ = RunFpsTimerAsync();
 
-            _window.Run();
+            _window.Run(); // Blocking call
         }
 
         private static void OnLoad()
@@ -235,11 +171,6 @@ namespace LoneEftDmaRadar.UI
             LootFiltersPanel.Initialize();
 
             // Initialize widgets
-            InitializeWidgets();
-        }
-
-        private static void InitializeWidgets()
-        {
             AimviewWidget.Initialize(_gl, _grContext);
         }
 
@@ -291,39 +222,47 @@ namespace LoneEftDmaRadar.UI
             );
         }
 
-        private static void OnResize(Vector2D<int> size)
-        {
-            _gl.Viewport(size);
-            CreateSkiaSurface();
-        }
-
-        private static void OnStateChanged(WindowState state)
-        {
-            // Track maximized state for persistence
-            // Note: Fullscreen (hidden border + maximized) is NOT persisted - only regular maximized
-            if (_window.WindowBorder == WindowBorder.Resizable)
-            {
-                Config.UI.WindowMaximized = (state == WindowState.Maximized);
-            }
-        }
-
-        private static void OnClosing()
-        {
-            // Save window state - only save size if not maximized/fullscreen
-            if (_window.WindowState == WindowState.Normal)
-            {
-                Config.UI.WindowSize = new SKSize(_window.Size.X, _window.Size.Y);
-            }
-
-            Config.UI.WindowMaximized = _window.WindowState == WindowState.Maximized;
-            // CurrentDomain_ProcessExit will execute after this point
-        }
 
         #endregion
 
-        #region Render Loop
+        #region Radar Operation
 
-        private static readonly RateLimiter _purgeRL = new(TimeSpan.FromSeconds(1));
+        private static bool Starting => Memory.Starting;
+        private static bool Ready => Memory.Ready;
+        private static bool InRaid => Memory.InRaid;
+        private static string MapID => Memory.MapID ?? "null";
+        private static LocalPlayer LocalPlayer => Memory.LocalPlayer;
+        private static IEnumerable<LootItem> FilteredLoot => Memory.Loot?.FilteredLoot;
+        private static IEnumerable<StaticLootContainer> Containers => Memory.Loot?.StaticContainers;
+        private static IReadOnlyCollection<AbstractPlayer> AllPlayers => Memory.Players;
+        private static IReadOnlyCollection<IExplosiveItem> Explosives => Memory.Explosives;
+        private static IReadOnlyCollection<IWorldHazard> Hazards => Memory.Game?.Hazards;
+        private static IReadOnlyCollection<IExitPoint> Exits => Memory.Exits;
+        private static QuestManager Quests => Memory.QuestManager;
+        private static bool SearchFilterIsSet => !string.IsNullOrEmpty(LootFilter.SearchString);
+        private static bool LootCorpsesVisible => Config.Loot.Enabled && !Config.Loot.HideCorpses && !SearchFilterIsSet;
+        /// <summary>
+        /// Currently 'Moused Over' Group.
+        /// </summary>
+        public static int? MouseoverGroup { get; private set; }
+
+        /// <summary>
+        /// Whether map free mode is enabled.
+        /// </summary>
+        public static bool IsMapFreeEnabled
+        {
+            get => _isMapFreeEnabled;
+            set => _isMapFreeEnabled = value;
+        }
+
+        /// <summary>
+        /// Map pan position when in free mode.
+        /// </summary>
+        public static Vector2 MapPanPosition
+        {
+            get => _mapPanPosition;
+            set => _mapPanPosition = value;
+        }
 
         /// <summary>
         /// Main Render Loop.
@@ -606,6 +545,43 @@ namespace LoneEftDmaRadar.UI
             }
         }
 
+        private static IEnumerable<IMouseoverEntity> GetMouseoverItems()
+        {
+            var players = AllPlayers?
+                .Where(x => x is not LoneEftDmaRadar.Tarkov.World.Player.LocalPlayer && !x.HasExfild && (!LootCorpsesVisible || x.IsAlive)) ??
+                Enumerable.Empty<AbstractPlayer>();
+
+            var loot = Config.Loot.Enabled ?
+                FilteredLoot ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
+            var containers = Config.Loot.Enabled && Config.Containers.Enabled ?
+                Containers ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
+            var exits = Config.UI.ShowExfils ?
+                Exits ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
+            var quests = Config.QuestHelper.Enabled ?
+                Quests?.LocationConditions?.Values?.OfType<IMouseoverEntity>() ?? Enumerable.Empty<IMouseoverEntity>()
+                : Enumerable.Empty<IMouseoverEntity>();
+            var hazards = Config.UI.ShowHazards ?
+                Hazards ?? Enumerable.Empty<IMouseoverEntity>()
+                : Enumerable.Empty<IMouseoverEntity>();
+
+            if (SearchFilterIsSet)
+                players = players.Where(x => x.LootObject is null || !loot.Contains(x.LootObject));
+
+            var result = loot.Concat(containers).Concat(players).Concat(exits).Concat(quests).Concat(hazards);
+
+            using var enumerator = result.GetEnumerator();
+            if (!enumerator.MoveNext())
+                return null;
+
+            return result;
+        }
+
+        #endregion
+
+        #region ImGui Menus
+
+        private static ImGuiController _imgui = null!;
+
         private static void DrawImGuiUI(ref Vector2D<int> fbSize, double delta)
         {
             _gl.Viewport(0, 0, (uint)fbSize.X, (uint)fbSize.Y);
@@ -747,7 +723,50 @@ namespace LoneEftDmaRadar.UI
 
         #endregion
 
-        #region Input Handling
+        #region UI State and Events
+
+        private static readonly PeriodicTimer _fpsTimer = new(TimeSpan.FromSeconds(1));
+        private static int _fpsCounter = 0;
+        private static int _statusOrder = 1;
+        private static bool _mouseDown;
+        private static Vector2 _lastMousePosition;
+        private static IMouseoverEntity _mouseOverItem;
+        private static DateTime _lastClickTime;
+        private const double DoubleClickThresholdMs = 300;
+        private static int _fps;
+        private static bool _isLootFiltersOpen;
+        private static bool _isWebRadarOpen;
+        private static bool _isMapFreeEnabled;
+        private static Vector2 _mapPanPosition;
+
+
+        private static void OnResize(Vector2D<int> size)
+        {
+            _gl.Viewport(size);
+            CreateSkiaSurface();
+        }
+
+        private static void OnStateChanged(WindowState state)
+        {
+            // Track maximized state for persistence
+            // Note: Fullscreen (hidden border + maximized) is NOT persisted - only regular maximized
+            if (_window.WindowBorder == WindowBorder.Resizable)
+            {
+                Config.UI.WindowMaximized = (state == WindowState.Maximized);
+            }
+        }
+
+        private static void OnClosing()
+        {
+            // Save window state - only save size if not maximized/fullscreen
+            if (_window.WindowState == WindowState.Normal)
+            {
+                Config.UI.WindowSize = new SKSize(_window.Size.X, _window.Size.Y);
+            }
+
+            Config.UI.WindowMaximized = _window.WindowState == WindowState.Maximized;
+            // CurrentDomain_ProcessExit will execute after this point
+        }
 
         private static void OnMouseDown(IMouse mouse, MouseButton button)
         {
@@ -905,48 +924,26 @@ namespace LoneEftDmaRadar.UI
                     ClearMouseoverRefs();
                     break;
             }
+
+            static void ClearMouseoverRefs()
+            {
+                _mouseOverItem = null;
+                MouseoverGroup = null;
+            }
         }
 
-        private static void ClearMouseoverRefs()
+        private static async Task RunFpsTimerAsync()
         {
-            _mouseOverItem = null;
-            MouseoverGroup = null;
-        }
-
-        private static IEnumerable<IMouseoverEntity> GetMouseoverItems()
-        {
-            var players = AllPlayers?
-                .Where(x => x is not LoneEftDmaRadar.Tarkov.World.Player.LocalPlayer && !x.HasExfild && (!LootCorpsesVisible || x.IsAlive)) ??
-                Enumerable.Empty<AbstractPlayer>();
-
-            var loot = Config.Loot.Enabled ?
-                FilteredLoot ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
-            var containers = Config.Loot.Enabled && Config.Containers.Enabled ?
-                Containers ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
-            var exits = Config.UI.ShowExfils ?
-                Exits ?? Enumerable.Empty<IMouseoverEntity>() : Enumerable.Empty<IMouseoverEntity>();
-            var quests = Config.QuestHelper.Enabled ?
-                Quests?.LocationConditions?.Values?.OfType<IMouseoverEntity>() ?? Enumerable.Empty<IMouseoverEntity>()
-                : Enumerable.Empty<IMouseoverEntity>();
-            var hazards = Config.UI.ShowHazards ?
-                Hazards ?? Enumerable.Empty<IMouseoverEntity>()
-                : Enumerable.Empty<IMouseoverEntity>();
-
-            if (SearchFilterIsSet)
-                players = players.Where(x => x.LootObject is null || !loot.Contains(x.LootObject));
-
-            var result = loot.Concat(containers).Concat(players).Concat(exits).Concat(quests).Concat(hazards);
-
-            using var enumerator = result.GetEnumerator();
-            if (!enumerator.MoveNext())
-                return null;
-
-            return result;
+            while (await _fpsTimer.WaitForNextTickAsync()) // 1 Second Interval
+            {
+                _statusOrder = (_statusOrder >= 3) ? 1 : _statusOrder + 1;
+                _fps = Interlocked.Exchange(ref _fpsCounter, 0);
+            }
         }
 
         #endregion
 
-        #region Helpers
+        #region Hotkeys
 
         private const int HK_ZOOMTICKAMT = 5;
         private const int HK_ZOOMTICKDELAY = 120;
@@ -1081,18 +1078,9 @@ namespace LoneEftDmaRadar.UI
             Config.UI.Zoom = Math.Min(200, Config.UI.Zoom + amt);
         }
 
-        private static async Task RunFpsTimerAsync()
-        {
-            while (await _fpsTimer.WaitForNextTickAsync()) // 1 Second Interval
-            {
-                _statusOrder = (_statusOrder >= 3) ? 1 : _statusOrder + 1;
-                _fps = Interlocked.Exchange(ref _fpsCounter, 0);
-            }
-        }
-
         #endregion
 
-        #region Win32 Interop
+        #region Fonts & Styling
 
         private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
 
@@ -1146,9 +1134,7 @@ namespace LoneEftDmaRadar.UI
                 SendMessageW(hwnd, WM_SETICON, ICON_BIG, hIconBig);
         }
 
-        #endregion
 
-        #region Styling
         /// <summary>
         /// Configures custom fonts. Must be called before font atlas is built.
         /// </summary>

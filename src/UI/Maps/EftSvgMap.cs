@@ -129,13 +129,13 @@ namespace LoneEftDmaRadar.UI.Maps
                            layer != front &&                // Make sure the current layer is not in front
                            !front.CannotDimLowerLayers;     // Don't dim the lower layers if the front layer has dimming disabled upon lower layers
 
-                var paint = dim ? 
+                var paint = dim ?
                     SKPaints.PaintBitmapAlpha : SKPaints.PaintBitmap;
 
                 canvas.DrawImage(
-                    image: layer.Image, 
-                    x: 0, 
-                    y: 0, 
+                    image: layer.Image,
+                    x: 0,
+                    y: 0,
                     sampling: _sampling,
                     paint: paint);
             }
