@@ -27,6 +27,7 @@ SOFTWARE.
 */
 
 using LoneEftDmaRadar.Misc.JSON;
+using LoneEftDmaRadar.Tarkov.World.Player;
 using LoneEftDmaRadar.UI;
 using LoneEftDmaRadar.UI.ColorPicker;
 using LoneEftDmaRadar.UI.Loot;
@@ -521,12 +522,32 @@ namespace LoneEftDmaRadar
         public uint PID { get; set; }
 
         /// <summary>
-        /// Key: RaidId | Value: Dictionary: Key: PlayerId | Value: GroupId
+        /// Key: RaidId | Value: RaidCache instance
         /// </summary>
-        [JsonPropertyName("groups")]
-        public ConcurrentDictionary<int, ConcurrentDictionary<int, int>> Groups { get; set; } = new();
+        [JsonPropertyName("raidCache")]
+        public ConcurrentDictionary<int, RaidCache> RaidCache { get; set; } = new();
     }
 
+    /// <summary>
+    /// Persistent Cache for a single Raid.
+    /// </summary>
+    public sealed class RaidCache
+    {
+        /// <summary>
+        /// Key: Player Id | Value: Special AI Role
+        /// </summary>
+        [JsonPropertyName("specialAi")]
+        public ConcurrentDictionary<int, AIRole> SpecialAi { get; set; } = new();
+        /// <summary>
+        /// Key: Player Id | Value: Group Id
+        /// </summary>
+        [JsonPropertyName("groups")]
+        public ConcurrentDictionary<int, int> Groups { get; set; } = new();
+    }
+
+    /// <summary>
+    /// Misc Config.
+    /// </summary>
     public sealed class MiscConfig
     {
         /// <summary>

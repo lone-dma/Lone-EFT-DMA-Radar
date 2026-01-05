@@ -34,6 +34,7 @@ using LoneEftDmaRadar.Tarkov.World.Explosives;
 using LoneEftDmaRadar.Tarkov.World.Hazards;
 using LoneEftDmaRadar.Tarkov.World.Loot;
 using LoneEftDmaRadar.Tarkov.World.Player;
+using LoneEftDmaRadar.Tarkov.World.Player.Helpers;
 using LoneEftDmaRadar.Tarkov.World.Quests;
 using VmmSharpEx.Options;
 
@@ -362,9 +363,13 @@ namespace LoneEftDmaRadar.Tarkov.World
                 {
                     Logging.WriteLine("[PreRaidStartChecks] Raid has started!");
                 }
-                if (Config.Misc.AutoGroups && !RaidStarted && !localPlayer.IsScav)
+                if (!RaidStarted && !localPlayer.IsScav)
                 {
-                    RefreshGroups(localPlayer, ct);
+                    RefreshSpecialAi(ct);
+                    if (Config.Misc.AutoGroups)
+                    {
+                        RefreshGroups(localPlayer, ct);
+                    }
                 }
             }
             catch (OperationCanceledException)
@@ -374,6 +379,55 @@ namespace LoneEftDmaRadar.Tarkov.World
             catch (Exception ex)
             {
                 Logging.WriteLine($"[PreRaidStartChecks] ERROR: {ex}");
+            }
+        }
+
+        /// <summary>
+        /// Refreshes AI Types for all Special AI players, including but not limited to:
+        /// Santa, Guards, etc.
+        /// </summary>
+        private void RefreshSpecialAi(CancellationToken ct)
+        {
+            ct.ThrowIfCancellationRequested();
+            const float guardDistanceThreshold = 15f;
+
+            var aiPlayers = _rgtPlayers.Where(p => p.IsAI && p.Position.IsNormal())
+                .OfType<ObservedPlayer>()
+                .ToList();
+
+            var bossPositions = aiPlayers
+                .Where(p => p.Type == PlayerType.AIBoss)
+                .Select(p => p.Position)
+                .ToList();
+
+            // Iterate all AI
+            foreach (var ai in aiPlayers)
+            {
+                ct.ThrowIfCancellationRequested();
+                if (ai.GetSpecialAiRole() is AIRole specialRole) // Santa, etc.
+                {
+                    ai.AssignSpecialAiRole(specialRole);
+                }
+                else if (ai.Type == PlayerType.AIScav || ai.Name == "Guard") // Guards
+                {
+                    bool isGuard = false;
+                    foreach (var bossPos in bossPositions)
+                    {
+                        if (Vector3.Distance(ai.Position, bossPos) <= guardDistanceThreshold)
+                        {
+                            isGuard = true;
+                            break;
+                        }
+                    }
+                    if (isGuard)
+                    {
+                        ai.AssignSpecialAiRole(new("Guard", PlayerType.AIRaider));
+                    }
+                    else
+                    {
+                        ai.AssignSpecialAiRole(null);
+                    }
+                }
             }
         }
 
@@ -400,7 +454,7 @@ namespace LoneEftDmaRadar.Tarkov.World
             if (players.Count == 0)
             {
                 // No players - replace with empty dict
-                Config.Cache.Groups[localPlayer.RaidId] = newGroups;
+                Config.Cache.RaidCache[localPlayer.RaidId].Groups = newGroups;
                 return;
             }
 
@@ -503,7 +557,7 @@ namespace LoneEftDmaRadar.Tarkov.World
             }
 
             // Atomic replacement - swap the entire dict reference
-            Config.Cache.Groups[localPlayer.RaidId] = newGroups;
+            Config.Cache.RaidCache[localPlayer.RaidId].Groups = newGroups;
         }
 
         private void RefreshEquipment(CancellationToken ct)
