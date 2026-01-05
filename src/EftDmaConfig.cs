@@ -522,7 +522,8 @@ namespace LoneEftDmaRadar
         public uint PID { get; set; }
 
         /// <summary>
-        /// Key: RaidId | Value: RaidCache instance
+        /// Cache information per Raid.
+        /// Key: Raid Id | Value: RaidCache instance
         /// </summary>
         [JsonPropertyName("raidCache")]
         public ConcurrentDictionary<int, RaidCache> RaidCache { get; set; } = new();
@@ -534,16 +535,19 @@ namespace LoneEftDmaRadar
     public sealed class RaidCache
     {
         /// <summary>
+        /// Defines players that are assigned special AI roles.
         /// Key: Player Id | Value: Special AI Role
         /// </summary>
         [JsonPropertyName("specialAi")]
         public ConcurrentDictionary<int, AIRole> SpecialAi { get; set; } = new();
         /// <summary>
+        /// Defines player groups.
         /// Key: Player Id | Value: Group Id
         /// </summary>
         [JsonPropertyName("groups")]
         public ConcurrentDictionary<int, int> Groups { get; set; } = new();
         /// <summary>
+        /// Defines players that have been 'focused' by the user (Right-Click on radar icon).
         /// Key: Player Id | Value: no-op
         /// </summary>
         [JsonPropertyName("focused")]
