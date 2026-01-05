@@ -29,16 +29,36 @@ SOFTWARE.
 using LoneEftDmaRadar.Tarkov.Unity.Collections;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.Tarkov.World.Player.Helpers;
+using LoneEftDmaRadar.Web.TarkovDev;
 using VmmSharpEx.Scatter;
 
 namespace LoneEftDmaRadar.Tarkov.World.Player
 {
     public class ObservedPlayer : AbstractPlayer
     {
+        private readonly RaidCache _raidCache;
         /// <summary>
         /// Player's Unique Id within this Raid Instance [Human Players Only].
         /// </summary>
         public int Id { get; }
+        private string _specialName; // Backing field for special roles
+        /// <summary>
+        /// Player's In-Game Name as displayed on the Radar.
+        /// </summary>
+        public override string Name
+        {
+            get => _specialName ?? base.Name;
+            protected set => base.Name = value;
+        }
+        private PlayerType? _specialType; // Backing field for special roles
+        /// <summary>
+        /// Player's Type.
+        /// </summary>
+        public override PlayerType Type
+        {
+            get => _specialType ?? base.Type;
+            protected set => base.Type = value;
+        }
         /// <summary>
         /// Player's Current TarkovDevItems.
         /// </summary>
@@ -105,21 +125,30 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
 
             bool isAI = Memory.ReadValue<bool>(this + Offsets.ObservedPlayerView.IsAI);
             IsHuman = !isAI;
-            Id = IsHuman ?
-                GetPlayerId() : -1;
+            Id = GetPlayerId();
             /// Determine Player Type
             PlayerSide = (Enums.EPlayerSide)Memory.ReadValue<int>(this + Offsets.ObservedPlayerView.Side); // Usec,Bear,Scav,etc.
             if (!Enum.IsDefined(PlayerSide)) // Make sure PlayerSide is valid
                 throw new ArgumentOutOfRangeException(nameof(PlayerSide));
+            _ = Config.Cache?.RaidCache?.TryGetValue(localPlayer.RaidId, out _raidCache); // Populate Raid Cache Access
             if (IsScav)
             {
                 if (isAI)
                 {
-                    var voicePtr = Memory.ReadPtr(this + Offsets.ObservedPlayerView.Voice);
-                    string voice = Memory.ReadUnityString(voicePtr);
-                    var role = GetAIRoleInfo(voice);
-                    Name = role.Name;
-                    Type = role.Type;
+                    if (_raidCache is RaidCache raidCache &&
+                        raidCache.SpecialAi.TryGetValue(Id, out var specialRole))
+                    {
+                        Name = specialRole.Name;
+                        Type = specialRole.Type;
+                    }
+                    else
+                    {
+                        var voicePtr = Memory.ReadPtr(this + Offsets.ObservedPlayerView.Voice);
+                        string voice = Memory.ReadUnityString(voicePtr);
+                        var role = GetAIRoleInfo(voice);
+                        Name = role.Name;
+                        Type = role.Type;
+                    }
                 }
                 else
                 {
@@ -181,6 +210,52 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         }
 
         /// <summary>
+        /// Assign a Special AI Role for this player.
+        /// Usually done during pre-raid checks for Santa/Guards/etc.
+        /// </summary>
+        /// <param name="name">New special role to be set. Set to <see langword="null"/> to revert to original role.</param>
+        public void AssignSpecialAiRole(AIRole? role)
+        {
+            if (role is AIRole value)
+            {
+                _specialName = value.Name;
+                _specialType = value.Type;
+                if (_raidCache is RaidCache raidCache)
+                {
+                    raidCache.SpecialAi.TryAdd(Id, value);
+                }
+            }
+            else
+            {
+                _specialName = null;
+                _specialType = null;
+                if (_raidCache is RaidCache raidCache)
+                {
+                    _ = raidCache.SpecialAi.TryRemove(Id, out _);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Check's if this AI Unit is a "special" role based on special checks.
+        /// </summary>
+        /// <returns><see cref="AIRole"/> value if a special unit, otherwise <see langword="null"/>.</returns>
+        public AIRole? GetSpecialAiRole()
+        {
+            if (!IsAI || Equipment?.Items?.Values is not IEnumerable<TarkovMarketItem> items)
+                return null;
+            if (items.Any(i => i.BsgId == "61b9e1aaef9a1b5d6a79899a")) // Santa's Bag
+            {
+                return new("Santa", PlayerType.AIBoss);
+            }
+            else if (items.Any(i => i.BsgId == "63626d904aa74b8fe30ab426")) // Zryachiy's balaclava
+            {
+                return new("Zryachiy", PlayerType.AIBoss);
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Get the Player's ID.
         /// </summary>
         /// <returns>Player Id.</returns>
@@ -197,9 +272,8 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         private int TryGetGroup(int id)
         {
             if (Config.Misc.AutoGroups && IsHuman && IsPmc &&
-                Memory.LocalPlayer is LocalPlayer localPlayer &&
-                Config.Cache.Groups.TryGetValue(localPlayer.RaidId, out var groups) &&
-                groups.TryGetValue(id, out var group))
+                _raidCache is RaidCache raidCache &&
+                raidCache.Groups.TryGetValue(id, out var group))
             {
                 return group;
             }

@@ -66,6 +66,8 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
             if (!(classType == "LocalPlayer" || classType == "ClientPlayer"))
                 throw new ArgumentOutOfRangeException(nameof(classType));
             RaidId = GetRaidId();
+            if (!Config.Cache.RaidCache.ContainsKey(RaidId))
+                Config.Cache.RaidCache[RaidId] = new();
         }
 
         /// <summary>

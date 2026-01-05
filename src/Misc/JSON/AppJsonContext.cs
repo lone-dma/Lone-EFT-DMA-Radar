@@ -27,6 +27,7 @@ SOFTWARE.
 */
 
 using LoneEftDmaRadar.Tarkov.World.Hazards;
+using LoneEftDmaRadar.Tarkov.World.Player;
 using LoneEftDmaRadar.UI.ColorPicker;
 using LoneEftDmaRadar.UI.Loot;
 using LoneEftDmaRadar.UI.Maps;
@@ -62,7 +63,10 @@ namespace LoneEftDmaRadar.Misc.JSON
     [JsonSerializable(typeof(AimviewWidgetConfig))]
     [JsonSerializable(typeof(QuestHelperConfig))]
     [JsonSerializable(typeof(PersistentCache))]
+    [JsonSerializable(typeof(RaidCache))]
     [JsonSerializable(typeof(MiscConfig))]
+    // Player Types
+    [JsonSerializable(typeof(AIRole))]
     // Loot filter types
     [JsonSerializable(typeof(UserLootFilter))]
     [JsonSerializable(typeof(LootFilterEntry))]
@@ -78,7 +82,9 @@ namespace LoneEftDmaRadar.Misc.JSON
     [JsonSerializable(typeof(ConcurrentDictionary<ColorPickerOption, string>))]
     [JsonSerializable(typeof(ConcurrentDictionary<string, byte>))]
     [JsonSerializable(typeof(ConcurrentDictionary<string, UserLootFilter>))]
-    [JsonSerializable(typeof(ConcurrentDictionary<int, ConcurrentDictionary<int, int>>))]
+    [JsonSerializable(typeof(ConcurrentDictionary<int, RaidCache>))]
+    [JsonSerializable(typeof(ConcurrentDictionary<int, int>))]
+    [JsonSerializable(typeof(ConcurrentDictionary<int, AIRole>))]
     // SkiaSharp types
     [JsonSerializable(typeof(SKSize))]
     [JsonSerializable(typeof(SKRect))]
