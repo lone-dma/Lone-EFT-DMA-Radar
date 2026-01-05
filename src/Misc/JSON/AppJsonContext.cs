@@ -85,6 +85,7 @@ namespace LoneEftDmaRadar.Misc.JSON
     [JsonSerializable(typeof(ConcurrentDictionary<int, RaidCache>))]
     [JsonSerializable(typeof(ConcurrentDictionary<int, int>))]
     [JsonSerializable(typeof(ConcurrentDictionary<int, AIRole>))]
+    [JsonSerializable(typeof(ConcurrentDictionary<int, byte>))]
     // SkiaSharp types
     [JsonSerializable(typeof(SKSize))]
     [JsonSerializable(typeof(SKRect))]

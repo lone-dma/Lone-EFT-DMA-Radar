@@ -543,6 +543,11 @@ namespace LoneEftDmaRadar
         /// </summary>
         [JsonPropertyName("groups")]
         public ConcurrentDictionary<int, int> Groups { get; set; } = new();
+        /// <summary>
+        /// Key: Player Id | Value: no-op
+        /// </summary>
+        [JsonPropertyName("focused")]
+        public ConcurrentDictionary<int, byte> Focused { get; set; } = new();
     }
 
     /// <summary>

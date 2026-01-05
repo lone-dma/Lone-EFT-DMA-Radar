@@ -799,7 +799,7 @@ namespace LoneEftDmaRadar.UI
             {
                 if (_mouseOverItem is AbstractPlayer player)
                 {
-                    player.IsFocused = !player.IsFocused;
+                    player.SetFocus(!player.IsFocused);
                 }
             }
 
