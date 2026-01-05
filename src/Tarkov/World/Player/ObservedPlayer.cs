@@ -30,6 +30,7 @@ using LoneEftDmaRadar.Tarkov.Unity.Collections;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.Tarkov.World.Player.Helpers;
 using LoneEftDmaRadar.Web.TarkovDev;
+using System.Collections.Frozen;
 using VmmSharpEx.Scatter;
 
 namespace LoneEftDmaRadar.Tarkov.World.Player
@@ -145,7 +146,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
                     {
                         var voicePtr = Memory.ReadPtr(this + Offsets.ObservedPlayerView.Voice);
                         string voice = Memory.ReadUnityString(voicePtr);
-                        var role = GetAIRoleInfo(voice);
+                        var role = GetAIRoleByVoice(voice);
                         Name = role.Name;
                         Type = role.Type;
                     }
@@ -207,52 +208,6 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
                 Type = PlayerSide == Enums.EPlayerSide.Savage ? PlayerType.PScav : PlayerType.PMC;
                 GroupId = SoloGroupId;
             }
-        }
-
-        /// <summary>
-        /// Assign a Special AI Role for this player.
-        /// Usually done during pre-raid checks for Santa/Guards/etc.
-        /// </summary>
-        /// <param name="name">New special role to be set. Set to <see langword="null"/> to revert to original role.</param>
-        public void AssignSpecialAiRole(AIRole? role)
-        {
-            if (role is AIRole value)
-            {
-                _specialName = value.Name;
-                _specialType = value.Type;
-                if (_raidCache is RaidCache raidCache)
-                {
-                    raidCache.SpecialAi.TryAdd(Id, value);
-                }
-            }
-            else
-            {
-                _specialName = null;
-                _specialType = null;
-                if (_raidCache is RaidCache raidCache)
-                {
-                    _ = raidCache.SpecialAi.TryRemove(Id, out _);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Check's if this AI Unit is a "special" role based on special checks.
-        /// </summary>
-        /// <returns><see cref="AIRole"/> value if a special unit, otherwise <see langword="null"/>.</returns>
-        public AIRole? GetSpecialAiRole()
-        {
-            if (!IsAI || Equipment?.Items?.Values is not IEnumerable<TarkovMarketItem> items)
-                return null;
-            if (items.Any(i => i.BsgId == "61b9e1aaef9a1b5d6a79899a")) // Santa's Bag
-            {
-                return new("Santa", PlayerType.AIBoss);
-            }
-            else if (items.Any(i => i.BsgId == "63626d904aa74b8fe30ab426")) // Zryachiy's balaclava
-            {
-                return new("Zryachiy", PlayerType.AIBoss);
-            }
-            return null;
         }
 
         /// <summary>
@@ -336,5 +291,105 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
             UnityList<byte>.ArrStartOffset + (uint)Bones.HumanBase * 0x8,
             0x10
         ];
+
+        #region AI Player Roles
+
+        private static readonly FrozenDictionary<string, AIRole> _aiRolesByVoice = new Dictionary<string, AIRole>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["BossSanitar"] = new() { Name = "Sanitar", Type = PlayerType.AIBoss },
+            ["BossBully"] = new() { Name = "Reshala", Type = PlayerType.AIBoss },
+            ["BossGluhar"] = new() { Name = "Gluhar", Type = PlayerType.AIBoss },
+            ["SectantPriest"] = new() { Name = "Priest", Type = PlayerType.AIBoss },
+            ["SectantWarrior"] = new() { Name = "Cultist", Type = PlayerType.AIRaider },
+            ["BossKilla"] = new() { Name = "Killa", Type = PlayerType.AIBoss },
+            ["BossTagilla"] = new() { Name = "Tagilla", Type = PlayerType.AIBoss },
+            ["Boss_Partizan"] = new() { Name = "Partisan", Type = PlayerType.AIBoss },
+            ["BossBigPipe"] = new() { Name = "Big Pipe", Type = PlayerType.AIBoss },
+            ["BossBirdEye"] = new() { Name = "Birdeye", Type = PlayerType.AIBoss },
+            ["BossKnight"] = new() { Name = "Knight", Type = PlayerType.AIBoss },
+            ["Arena_Guard_1"] = new() { Name = "Arena Guard", Type = PlayerType.AIScav },
+            ["Arena_Guard_2"] = new() { Name = "Arena Guard", Type = PlayerType.AIScav },
+            ["Boss_Kaban"] = new() { Name = "Kaban", Type = PlayerType.AIBoss },
+            ["Boss_Kollontay"] = new() { Name = "Kollontay", Type = PlayerType.AIBoss },
+            ["Boss_Sturman"] = new() { Name = "Shturman", Type = PlayerType.AIBoss },
+            ["Zombie_Generic"] = new() { Name = "Zombie", Type = PlayerType.AIScav },
+            ["BossZombieTagilla"] = new() { Name = "Zombie Tagilla", Type = PlayerType.AIBoss },
+            ["Zombie_Fast"] = new() { Name = "Zombie", Type = PlayerType.AIScav },
+            ["Zombie_Medium"] = new() { Name = "Zombie", Type = PlayerType.AIScav },
+        }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Lookup AI Info based on Voice Line.
+        /// </summary>
+        /// <returns></returns>
+        private static AIRole GetAIRoleByVoice(string voiceLine)
+        {
+            if (_aiRolesByVoice.TryGetValue(voiceLine, out var role))
+                return role;
+
+            // Fallback pattern matching
+            return voiceLine switch
+            {
+                _ when voiceLine.Contains("scav", StringComparison.OrdinalIgnoreCase) => new() { Name = "Scav", Type = PlayerType.AIScav },
+                _ when voiceLine.Contains("boss", StringComparison.OrdinalIgnoreCase) => new() { Name = "Boss", Type = PlayerType.AIBoss },
+                _ when voiceLine.Contains("usec", StringComparison.OrdinalIgnoreCase) => new() { Name = "Usec", Type = PlayerType.AIRaider },
+                _ when voiceLine.Contains("bear", StringComparison.OrdinalIgnoreCase) => new() { Name = "Bear", Type = PlayerType.AIRaider },
+                _ when voiceLine.Contains("black_division", StringComparison.OrdinalIgnoreCase) => new() { Name = "BD", Type = PlayerType.AIRaider },
+                _ when voiceLine.Contains("vsrf", StringComparison.OrdinalIgnoreCase) => new() { Name = "Vsrf", Type = PlayerType.AIRaider },
+                _ when voiceLine.Contains("civilian", StringComparison.OrdinalIgnoreCase) => new() { Name = "Civ", Type = PlayerType.AIScav },
+                _ => new() { Name = "AI", Type = PlayerType.AIScav }
+            };
+        }
+
+        /// <summary>
+        /// Assign a Special AI Role for this player.
+        /// Usually done during pre-raid checks for Santa/Guards/etc.
+        /// </summary>
+        /// <param name="name">New special role to be set. Set to <see langword="null"/> to revert to original role.</param>
+        public void AssignSpecialAiRole(AIRole? role)
+        {
+            if (role is AIRole value)
+            {
+                _specialName = value.Name;
+                _specialType = value.Type;
+                if (_raidCache is RaidCache raidCache)
+                {
+                    raidCache.SpecialAi.TryAdd(Id, value);
+                }
+            }
+            else
+            {
+                _specialName = null;
+                _specialType = null;
+                if (_raidCache is RaidCache raidCache)
+                {
+                    _ = raidCache.SpecialAi.TryRemove(Id, out _);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Check's if this AI Unit is a "special" role based on special checks.
+        /// </summary>
+        /// <returns><see cref="AIRole"/> value if a special unit, otherwise <see langword="null"/>.</returns>
+        public AIRole? GetSpecialAiRole()
+        {
+            if (!IsAI || Equipment?.Items?.Values is not IEnumerable<TarkovMarketItem> items)
+                return null;
+            if (items.Any(i => i.BsgId == "61b9e1aaef9a1b5d6a79899a")) // Santa's Bag
+            {
+                return new("Santa", PlayerType.AIBoss);
+            }
+            else if (items.Any(i => i.BsgId == "63626d904aa74b8fe30ab426")) // Zryachiy's balaclava
+            {
+                return new("Zryachiy", PlayerType.AIBoss);
+            }
+            return null;
+        }
+
+        #endregion
     }
+
+    public readonly record struct AIRole(string Name, PlayerType Type);
+
 }
