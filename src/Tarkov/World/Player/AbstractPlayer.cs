@@ -212,7 +212,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         /// <summary>
         /// True if player is being focused via Right-Click (UI).
         /// </summary>
-        public bool IsFocused { get; set; }
+        public bool IsFocused { get; protected set; }
 
         /// <summary>
         /// Dead Player's associated loot container object.
@@ -519,6 +519,11 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
             {
                 return false;
             }
+        }
+
+        public virtual void SetFocus(bool isFocused)
+        {
+            IsFocused = isFocused;
         }
 
         #endregion
