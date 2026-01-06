@@ -341,9 +341,10 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
-        /// Lookup AI Info based on Voice Line.
+        /// Get Initial AI Role for this player.
+        /// Checks voice line against known roles, otherwise falls back to pattern matching, and other misc. checks.
         /// </summary>
-        /// <returns></returns>
+        /// <returns><see cref="AIRole"/> for this player.</returns>
         private AIRole GetInitialAIRole(string voiceLine)
         {
             if (!_aiRolesByVoice.TryGetValue(voiceLine, out AIRole role))
