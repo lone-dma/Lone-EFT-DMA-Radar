@@ -408,10 +408,6 @@ namespace LoneEftDmaRadar.Tarkov.World
                 {
                     ai.AssignSpecialAiRole(specialRole);
                 }
-                else if (this.MapID is string map && map == "laboratory" && ai.Type != PlayerType.AIBoss) // Labs Raiders
-                {
-                    ai.AssignSpecialAiRole(new("Raider", PlayerType.AIRaider));
-                }
                 else if (ai.Type == PlayerType.AIScav || ai.Name == "Guard") // Guards
                 {
                     bool isGuard = false;

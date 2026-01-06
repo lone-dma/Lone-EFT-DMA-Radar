@@ -37,6 +37,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
 {
     public class ObservedPlayer : AbstractPlayer
     {
+        private readonly GameWorld _gameWorld;
         private readonly RaidCache _raidCache;
         /// <summary>
         /// Player's Unique Id within this Raid Instance [Human Players Only].
@@ -101,10 +102,10 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         /// </summary>
         public Enums.ETagStatus HealthStatus { get; private set; } = Enums.ETagStatus.Healthy;
 
-        internal ObservedPlayer(ulong playerBase) : base(playerBase)
+        internal ObservedPlayer(ulong playerBase, GameWorld gameWorld) : base(playerBase)
         {
-            var localPlayer = Memory.LocalPlayer;
-            ArgumentNullException.ThrowIfNull(localPlayer, nameof(localPlayer));
+            _gameWorld = gameWorld!;
+            var localPlayer = gameWorld.LocalPlayer!;
             ObservedPlayerController = Memory.ReadPtr(this + Offsets.ObservedPlayerView.ObservedPlayerController);
             ArgumentOutOfRangeException.ThrowIfNotEqual(this,
                 Memory.ReadValue<ulong>(ObservedPlayerController + Offsets.ObservedPlayerController.PlayerView),
@@ -146,7 +147,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
                     {
                         var voicePtr = Memory.ReadPtr(this + Offsets.ObservedPlayerView.Voice);
                         string voice = Memory.ReadUnityString(voicePtr);
-                        var role = GetAIRoleByVoice(voice);
+                        var role = GetInitialAIRole(voice);
                         Name = role.Name;
                         Type = role.Type;
                     }
@@ -343,23 +344,30 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         /// Lookup AI Info based on Voice Line.
         /// </summary>
         /// <returns></returns>
-        private static AIRole GetAIRoleByVoice(string voiceLine)
+        private AIRole GetInitialAIRole(string voiceLine)
         {
-            if (_aiRolesByVoice.TryGetValue(voiceLine, out var role))
-                return role;
-
-            // Fallback pattern matching
-            return voiceLine switch
+            if (!_aiRolesByVoice.TryGetValue(voiceLine, out AIRole role))
             {
-                _ when voiceLine.Contains("scav", StringComparison.OrdinalIgnoreCase) => new() { Name = "Scav", Type = PlayerType.AIScav },
-                _ when voiceLine.Contains("boss", StringComparison.OrdinalIgnoreCase) => new() { Name = "Boss", Type = PlayerType.AIBoss },
-                _ when voiceLine.Contains("usec", StringComparison.OrdinalIgnoreCase) => new() { Name = "Usec", Type = PlayerType.AIRaider },
-                _ when voiceLine.Contains("bear", StringComparison.OrdinalIgnoreCase) => new() { Name = "Bear", Type = PlayerType.AIRaider },
-                _ when voiceLine.Contains("black_division", StringComparison.OrdinalIgnoreCase) => new() { Name = "BD", Type = PlayerType.AIRaider },
-                _ when voiceLine.Contains("vsrf", StringComparison.OrdinalIgnoreCase) => new() { Name = "Vsrf", Type = PlayerType.AIRaider },
-                _ when voiceLine.Contains("civilian", StringComparison.OrdinalIgnoreCase) => new() { Name = "Civ", Type = PlayerType.AIScav },
-                _ => new() { Name = "AI", Type = PlayerType.AIScav }
-            };
+                // Fallback pattern matching
+                role = voiceLine switch
+                {
+                    _ when voiceLine.Contains("scav", StringComparison.OrdinalIgnoreCase) => new() { Name = "Scav", Type = PlayerType.AIScav },
+                    _ when voiceLine.Contains("boss", StringComparison.OrdinalIgnoreCase) => new() { Name = "Boss", Type = PlayerType.AIBoss },
+                    _ when voiceLine.Contains("usec", StringComparison.OrdinalIgnoreCase) => new() { Name = "Usec", Type = PlayerType.AIRaider },
+                    _ when voiceLine.Contains("bear", StringComparison.OrdinalIgnoreCase) => new() { Name = "Bear", Type = PlayerType.AIRaider },
+                    _ when voiceLine.Contains("black_division", StringComparison.OrdinalIgnoreCase) => new() { Name = "BD", Type = PlayerType.AIRaider },
+                    _ when voiceLine.Contains("vsrf", StringComparison.OrdinalIgnoreCase) => new() { Name = "Vsrf", Type = PlayerType.AIRaider },
+                    _ when voiceLine.Contains("civilian", StringComparison.OrdinalIgnoreCase) => new() { Name = "Civ", Type = PlayerType.AIScav },
+                    _ => new() { Name = "AI", Type = PlayerType.AIScav }
+                };
+            }
+
+            // Labs Raider Check
+            if (_gameWorld.MapID == "laboratory" && role.Type != PlayerType.AIBoss)
+            {
+                role = new("Raider", PlayerType.AIRaider);
+            }
+            return role;
         }
 
         /// <summary>

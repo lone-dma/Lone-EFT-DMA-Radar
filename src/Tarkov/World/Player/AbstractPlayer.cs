@@ -111,13 +111,13 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         /// <summary>
         /// Allocates a player.
         /// </summary>
-        public static void Allocate(ConcurrentDictionary<ulong, AbstractPlayer> regPlayers, ulong playerBase)
+        public static void Allocate(ConcurrentDictionary<ulong, AbstractPlayer> regPlayers, ulong playerBase, GameWorld gameWorld)
         {
             try
             {
                 _ = regPlayers.GetOrAdd(
                     playerBase,
-                    addr => AllocateInternal(addr));
+                    addr => AllocateInternal(addr, gameWorld));
             }
             catch (Exception ex)
             {
@@ -125,7 +125,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
             }
         }
 
-        private static AbstractPlayer AllocateInternal(ulong playerBase)
+        private static AbstractPlayer AllocateInternal(ulong playerBase, GameWorld gameWorld)
         {
             AbstractPlayer player;
             var className = ObjectClass.ReadName(playerBase, 64);
@@ -134,7 +134,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
             if (isClientPlayer)
                 player = new ClientPlayer(playerBase);
             else
-                player = new ObservedPlayer(playerBase);
+                player = new ObservedPlayer(playerBase, gameWorld);
             Logging.WriteLine($"Player '{player.Name}' allocated | 0x{playerBase:X}");
             return player;
         }

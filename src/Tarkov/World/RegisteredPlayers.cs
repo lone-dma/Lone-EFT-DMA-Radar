@@ -75,7 +75,7 @@ namespace LoneEftDmaRadar.Tarkov.World
                     if (playerBase == LocalPlayer) // Skip LocalPlayer, already allocated
                         continue;
                     // Add new player
-                    AbstractPlayer.Allocate(_players, playerBase);
+                    AbstractPlayer.Allocate(_players, playerBase, _game);
                 }
                 /// Update Existing Players incl LocalPlayer
                 UpdateExistingPlayers(registered);
@@ -123,7 +123,7 @@ namespace LoneEftDmaRadar.Tarkov.World
         {
             if (_players.TryGetValue(btrPlayerBase, out var existing) && existing is not BtrPlayer)
             {
-                var btr = new BtrPlayer(btrView, btrPlayerBase);
+                var btr = new BtrPlayer(btrView, btrPlayerBase, _game);
                 _players[btrPlayerBase] = btr;
                 Logging.WriteLine("BTR Allocated!");
             }

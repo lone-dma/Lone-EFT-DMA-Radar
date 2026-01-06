@@ -48,7 +48,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         {
             get => "BTR";
         }
-        public BtrPlayer(ulong btrView, ulong playerBase) : base(playerBase)
+        public BtrPlayer(ulong btrView, ulong playerBase, GameWorld gameWorld) : base(playerBase, gameWorld)
         {
             _btrView = btrView;
             _posAddr = _btrView + Offsets.BTRView._previousPosition;
