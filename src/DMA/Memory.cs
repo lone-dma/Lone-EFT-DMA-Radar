@@ -333,6 +333,8 @@ namespace LoneEftDmaRadar.DMA
         /// <param name="pid"></param>
         private static void SetCache(uint pid)
         {
+            // Ensure cache
+            Program.Config.Cache ??= new();
             if (Program.Config.Cache.PID != pid)
             {
                 Program.Config.Cache = new PersistentCache()
