@@ -132,7 +132,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
             PlayerSide = (Enums.EPlayerSide)Memory.ReadValue<int>(this + Offsets.ObservedPlayerView.Side); // Usec,Bear,Scav,etc.
             if (!Enum.IsDefined(PlayerSide)) // Make sure PlayerSide is valid
                 throw new ArgumentOutOfRangeException(nameof(PlayerSide));
-            _ = Config.Cache?.RaidCache?.TryGetValue(localPlayer.RaidId, out _raidCache); // Populate Raid Cache Access
+            _ = Config.Cache?.RaidCache?.TryGetValue(this, out _raidCache); // Populate Raid Cache Access
             if (IsScav)
             {
                 if (isAI)
