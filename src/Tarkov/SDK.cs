@@ -56,7 +56,6 @@ namespace SDK
             public const uint _playerBody = 0x190; // object
             public const uint Corpse = 0x680; // object
             public const uint Location = 0x870; // string
-            public const uint RaidId = 0x8D8; // int32_t
             public const uint Profile = 0x900; // object
             public const uint _handsController = 0x980; // object
             public const uint _playerLookRaycastTransform = 0xA08; // object

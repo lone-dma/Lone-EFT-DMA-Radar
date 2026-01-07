@@ -523,10 +523,10 @@ namespace LoneEftDmaRadar
 
         /// <summary>
         /// Cache information per Raid.
-        /// Key: Raid Id | Value: RaidCache instance
+        /// Key: GameWorld Virtual Address | Value: RaidCache instance
         /// </summary>
         [JsonPropertyName("raidCache")]
-        public ConcurrentDictionary<int, RaidCache> RaidCache { get; set; } = new();
+        public ConcurrentDictionary<ulong, RaidCache> RaidCache { get; set; } = new();
     }
 
     /// <summary>

@@ -82,7 +82,7 @@ namespace LoneEftDmaRadar.Misc.JSON
     [JsonSerializable(typeof(ConcurrentDictionary<ColorPickerOption, string>))]
     [JsonSerializable(typeof(ConcurrentDictionary<string, byte>))]
     [JsonSerializable(typeof(ConcurrentDictionary<string, UserLootFilter>))]
-    [JsonSerializable(typeof(ConcurrentDictionary<int, RaidCache>))]
+    [JsonSerializable(typeof(ConcurrentDictionary<ulong, RaidCache>))]
     [JsonSerializable(typeof(ConcurrentDictionary<int, int>))]
     [JsonSerializable(typeof(ConcurrentDictionary<int, AIRole>))]
     [JsonSerializable(typeof(ConcurrentDictionary<int, byte>))]

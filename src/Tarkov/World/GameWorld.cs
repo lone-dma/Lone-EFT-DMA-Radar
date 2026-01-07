@@ -121,6 +121,7 @@ namespace LoneEftDmaRadar.Tarkov.World
                 Hazards = GetHazards(MapID);
                 Exits = GetExits(MapID, _rgtPlayers.LocalPlayer.IsPmc);
                 RaidStarted = _rgtPlayers.LocalPlayer.CheckIsRaidStarted() ?? false;
+                _ = Config.Cache.RaidCache.GetOrAdd(gameWorld, _ => new());
                 if (RaidStarted)
                 {
                     Logging.WriteLine("[GameWorld] Raid has already started!");
@@ -454,7 +455,7 @@ namespace LoneEftDmaRadar.Tarkov.World
             if (players.Count == 0)
             {
                 // No players - replace with empty dict
-                Config.Cache.RaidCache[localPlayer.RaidId].Groups = newGroups;
+                Config.Cache.RaidCache[this].Groups = newGroups;
                 return;
             }
 
@@ -557,7 +558,7 @@ namespace LoneEftDmaRadar.Tarkov.World
             }
 
             // Atomic replacement - swap the entire dict reference
-            Config.Cache.RaidCache[localPlayer.RaidId].Groups = newGroups;
+            Config.Cache.RaidCache[this].Groups = newGroups;
         }
 
         private void RefreshEquipment(CancellationToken ct)
