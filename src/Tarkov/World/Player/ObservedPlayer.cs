@@ -105,7 +105,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         internal ObservedPlayer(ulong playerBase, GameWorld gameWorld) : base(playerBase)
         {
             _gameWorld = gameWorld!;
-            var localPlayer = gameWorld.LocalPlayer!;
+            _raidCache = Config.Cache.RaidCache!; // Populate Raid Cache Access
             ObservedPlayerController = Memory.ReadPtr(this + Offsets.ObservedPlayerView.ObservedPlayerController);
             ArgumentOutOfRangeException.ThrowIfNotEqual(this,
                 Memory.ReadValue<ulong>(ObservedPlayerController + Offsets.ObservedPlayerController.PlayerView),
@@ -132,13 +132,11 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
             PlayerSide = (Enums.EPlayerSide)Memory.ReadValue<int>(this + Offsets.ObservedPlayerView.Side); // Usec,Bear,Scav,etc.
             if (!Enum.IsDefined(PlayerSide)) // Make sure PlayerSide is valid
                 throw new ArgumentOutOfRangeException(nameof(PlayerSide));
-            _ = Config.Cache?.RaidCache?.TryGetValue(this, out _raidCache); // Populate Raid Cache Access
             if (IsScav)
             {
                 if (isAI)
                 {
-                    if (_raidCache is RaidCache raidCache &&
-                        raidCache.SpecialAi.TryGetValue(Id, out var specialRole))
+                    if (_raidCache.SpecialAi.TryGetValue(Id, out var specialRole))
                     {
                         Name = specialRole.Name;
                         Type = specialRole.Type;
@@ -219,16 +217,13 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         public override void SetFocus(bool isFocused)
         {
             IsFocused = isFocused;
-            if (_raidCache is RaidCache raidCache)
+            if (isFocused)
             {
-                if (isFocused)
-                {
-                    raidCache.Focused.TryAdd(Id, 0);
-                }
-                else
-                {
-                    _ = raidCache.Focused.TryRemove(Id, out _);
-                }
+                _raidCache.Focused.TryAdd(Id, 0);
+            }
+            else
+            {
+                _ = _raidCache.Focused.TryRemove(Id, out _);
             }
         }
 
@@ -382,19 +377,13 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
             {
                 _specialName = value.Name;
                 _specialType = value.Type;
-                if (_raidCache is RaidCache raidCache)
-                {
-                    raidCache.SpecialAi.TryAdd(Id, value);
-                }
+                _raidCache.SpecialAi.TryAdd(Id, value);
             }
             else
             {
                 _specialName = null;
                 _specialType = null;
-                if (_raidCache is RaidCache raidCache)
-                {
-                    _ = raidCache.SpecialAi.TryRemove(Id, out _);
-                }
+                _ = _raidCache.SpecialAi.TryRemove(Id, out _);
             }
         }
 
