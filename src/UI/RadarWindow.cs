@@ -47,6 +47,7 @@ using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
+using System.Net.NetworkInformation;
 
 namespace LoneEftDmaRadar.UI
 {
@@ -390,6 +391,12 @@ namespace LoneEftDmaRadar.UI
                         }
                     }
                 }
+
+                // Draw Loot Pings
+                foreach (var lootPing in _activeLootPings.Values)
+                {
+                    lootPing.Draw(canvas, mapParams, localPlayer);
+                }
             }
 
             // Draw hazards
@@ -676,11 +683,16 @@ namespace LoneEftDmaRadar.UI
                 AimviewWidget.Draw();
             }
 
-
             // Player Info Widget
             if (PlayerInfoWidget.IsOpen && InRaid)
             {
                 PlayerInfoWidget.Draw();
+            }
+
+            // Loot Widget
+            if (LootWidget.IsOpen && InRaid)
+            {
+                LootWidget.Draw();
             }
         }
 
@@ -726,6 +738,7 @@ namespace LoneEftDmaRadar.UI
         #region UI State and Events
 
         private static readonly PeriodicTimer _fpsTimer = new(TimeSpan.FromSeconds(1));
+        private static readonly ConcurrentDictionary<LootItem, PingEffect> _activeLootPings = new();
         private static int _fpsCounter = 0;
         private static int _statusOrder = 1;
         private static bool _mouseDown;
@@ -739,6 +752,54 @@ namespace LoneEftDmaRadar.UI
         private static bool _isMapFreeEnabled;
         private static Vector2 _mapPanPosition;
 
+        public static void PingItem(LootItem item)
+        {
+            var ping = new PingEffect(item);
+            _activeLootPings.TryAdd(item, ping); // Ensure only gets added once using object reference as key
+        }
+
+        private readonly struct PingEffect
+        {
+            // Based on implementation from https://github.com/dma-educational-resources/eft-dma-radar
+            private static readonly long _duration = TimeSpan.FromSeconds(2).Ticks;
+            private readonly LootItem _item;
+            private readonly long _start;
+
+            public PingEffect(LootItem item)
+            {
+                _item = item;
+                _start = Stopwatch.GetTimestamp();
+            }
+
+            public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
+            {
+                var now = Stopwatch.GetTimestamp();
+                var elapsedTicks = now - _start;
+
+                if (elapsedTicks >= _duration)
+                {
+                    _activeLootPings.TryRemove(_item, out _);
+                    return;
+                }
+
+                float progress = (float)elapsedTicks / _duration;
+                float radius = 10 + 50 * progress;
+                float alpha = 1f - progress;
+
+                var center = _item.Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);
+
+                using var paint = new SKPaint
+                {
+                    Style = SKPaintStyle.Stroke,
+                    StrokeWidth = 4 * Config.UI.UIScale,
+                    Color = SKColors.Turquoise.WithAlpha((byte)(alpha * 255)),
+                    IsAntialias = true
+                };
+
+                canvas.DrawCircle(center.X, center.Y, radius, paint);
+                _activeLootPings.TryAdd(_item, this);
+            }
+        }
 
         private static void OnResize(Vector2D<int> size)
         {
