@@ -690,9 +690,9 @@ namespace LoneEftDmaRadar.UI
             }
 
             // Loot Widget
-            if (LootWidget.IsOpen && InRaid)
+            if (LootListWidget.IsOpen && InRaid)
             {
-                LootWidget.Draw();
+                LootListWidget.Draw();
             }
         }
 

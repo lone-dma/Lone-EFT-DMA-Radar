@@ -37,7 +37,7 @@ namespace LoneEftDmaRadar.UI.Widgets
     /// <summary>
     /// Loot Widget that displays a sortable table of filtered loot using ImGui.
     /// </summary>
-    public static class LootWidget
+    public static class LootListWidget
     {
         private const float MinHeight = 100f;
         private const float MaxHeight = 500f;
@@ -52,8 +52,8 @@ namespace LoneEftDmaRadar.UI.Widgets
         /// </summary>
         public static bool IsOpen
         {
-            get => Config.LootWidget.Enabled;
-            set => Config.LootWidget.Enabled = value;
+            get => Config.LootListWidget.Enabled;
+            set => Config.LootListWidget.Enabled = value;
         }
 
         // Data sources
@@ -86,7 +86,7 @@ namespace LoneEftDmaRadar.UI.Widgets
             bool isOpen = IsOpen;
             var windowFlags = ImGuiWindowFlags.None;
 
-            if (!ImGui.Begin("Loot", ref isOpen, windowFlags))
+            if (!ImGui.Begin("Loot List", ref isOpen, windowFlags))
             {
                 IsOpen = isOpen;
                 ImGui.End();
@@ -161,7 +161,7 @@ namespace LoneEftDmaRadar.UI.Widgets
                     ImGui.SameLine();
                     
                     // Column 0: Name
-                    ImGui.Text(item.ShortName ?? "--");
+                    ImGui.Text(item.Name ?? "--");
 
                     // Column 1: Value
                     ImGui.TableNextColumn();
