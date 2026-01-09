@@ -108,6 +108,12 @@ namespace LoneEftDmaRadar
         public InfoWidgetConfig InfoWidget { get; set; } = new();
 
         /// <summary>
+        /// Loot Widget Configuration.
+        /// </summary>
+        [JsonPropertyName("lootWidget")]
+        public LootWidgetConfig LootWidget { get; set; } = new();
+
+        /// <summary>
         /// Quest Helper Cfg
         /// </summary>
         [JsonPropertyName("questHelper")]
@@ -463,6 +469,15 @@ namespace LoneEftDmaRadar
     {
         /// <summary>
         /// True if the Info Widget is enabled.
+        /// </summary>
+        [JsonPropertyName("enabled")]
+        public bool Enabled { get; set; } = true;
+    }
+
+    public sealed class LootWidgetConfig
+    {
+        /// <summary>
+        /// True if the Loot Widget is enabled.
         /// </summary>
         [JsonPropertyName("enabled")]
         public bool Enabled { get; set; } = true;
