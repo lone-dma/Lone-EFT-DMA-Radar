@@ -688,7 +688,7 @@ namespace LoneEftDmaRadar.UI
             }
 
             // Loot Widget
-            if (LootWidget.IsOpen)
+            if (LootWidget.IsOpen && InRaid && Config.Loot.Enabled)
             {
                 LootWidget.Draw();
             }
