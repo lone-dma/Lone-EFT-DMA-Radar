@@ -51,7 +51,7 @@ namespace LoneEftDmaRadar.UI.Panels
 
             if (ImGui.Begin("RadarTopBar", flags))
             {
-                // Map Free Toggle Button
+                // Map mode toggle button
                 bool isMapFree = RadarWindow.IsMapFreeEnabled;
                 if (isMapFree)
                 {
@@ -60,16 +60,16 @@ namespace LoneEftDmaRadar.UI.Panels
                     ImGui.PushStyleColor(ImGuiCol.ButtonActive, new Vector4(0.1f, 0.5f, 0.1f, 1.0f));
                 }
 
-                if (ImGui.Button(isMapFree ? "Map Free: ON" : "Map Free: OFF"))
+                if (ImGui.Button(isMapFree ? "Map Free" : "Map Follow"))
                 {
                     RadarWindow.IsMapFreeEnabled = !isMapFree;
-                    if (isMapFree) // Was on, now turning off
+                    if (isMapFree) // Was free, now switching back to follow
                     {
                         RadarWindow.MapPanPosition = Vector2.Zero;
                     }
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Toggle free map panning (drag to move map)");
+                    ImGui.SetTooltip(isMapFree ? "Free map panning (drag to move map)" : "Follow player (map centered on you)");
 
                 if (isMapFree)
                 {

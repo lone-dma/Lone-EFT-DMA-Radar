@@ -240,6 +240,12 @@ namespace LoneEftDmaRadar.UI.Skia
         #endregion
 
         #region Loot Paints
+
+        public static SKPaint PaintMapPing { get; } = new()
+        {
+            Color = SKColors.Turquoise
+        };
+
         public static SKPaint PaintLoot { get; } = new()
         {
             Color = SKColors.WhiteSmoke,

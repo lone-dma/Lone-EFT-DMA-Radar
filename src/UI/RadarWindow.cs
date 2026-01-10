@@ -393,7 +393,7 @@ namespace LoneEftDmaRadar.UI
                 }
 
                 // Draw Loot Pings
-                foreach (var lootPing in _activeLootPings.Values)
+                foreach (var lootPing in _activeMapPings.Values)
                 {
                     lootPing.Draw(canvas, mapParams, localPlayer);
                 }
@@ -737,7 +737,7 @@ namespace LoneEftDmaRadar.UI
         #region UI State and Events
 
         private static readonly PeriodicTimer _fpsTimer = new(TimeSpan.FromSeconds(1));
-        private static readonly ConcurrentDictionary<LootItem, LootPingEffect> _activeLootPings = new();
+        private static readonly ConcurrentDictionary<IMapEntity, MapPingEffect> _activeMapPings = new();
         private static int _fpsCounter = 0;
         private static int _statusOrder = 1;
         private static bool _mouseDown;
@@ -752,31 +752,31 @@ namespace LoneEftDmaRadar.UI
         private static Vector2 _mapPanPosition;
 
         /// <summary>
-        /// Ping a loot item with an expanding circle effect.
+        /// Ping a map entity with an expanding circle effect.
         /// </summary>
-        /// <param name="item">Item to be pinged.</param>
-        public static void PingItem(LootItem item)
+        /// <param name="entity">Entity to be pinged.</param>
+        public static void PingMapEntity(IMapEntity entity)
         {
-            _ = _activeLootPings.GetOrAdd(item, item =>
+            _ = _activeMapPings.GetOrAdd(entity, e =>
             {
-                return new LootPingEffect(item);
+                return new MapPingEffect(e);
             });
         }
 
-        private readonly struct LootPingEffect : IMapEntity
+        private readonly struct MapPingEffect : IMapEntity
         {
             // Based on implementation from https://github.com/dma-educational-resources/eft-dma-radar
             private static readonly long _duration = TimeSpan.FromSeconds(2).Ticks;
-            private readonly LootItem _item;
+            private readonly IMapEntity _entity;
             private readonly long _start;
 
-            public LootPingEffect(LootItem item)
+            public MapPingEffect(IMapEntity entity)
             {
-                _item = item;
+                _entity = entity;
                 _start = Stopwatch.GetTimestamp();
             }
 
-            public ref readonly Vector3 Position => ref _item.Position;
+            public ref readonly Vector3 Position => ref _entity.Position;
 
             public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
             {
@@ -785,7 +785,7 @@ namespace LoneEftDmaRadar.UI
 
                 if (elapsedTicks >= _duration)
                 {
-                    _activeLootPings.TryRemove(_item, out _);
+                    _activeMapPings.TryRemove(_entity, out _);
                     return;
                 }
 
@@ -793,18 +793,18 @@ namespace LoneEftDmaRadar.UI
                 float radius = 10 + 50 * progress;
                 float alpha = 1f - progress;
 
-                var center = _item.Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);
+                var center = _entity.Position.ToMapPos(mapParams.Map).ToZoomedPos(mapParams);
 
                 using var paint = new SKPaint
                 {
                     Style = SKPaintStyle.Stroke,
                     StrokeWidth = 4 * Config.UI.UIScale,
-                    Color = SKColors.Turquoise.WithAlpha((byte)(alpha * 255)),
+                    Color = SKPaints.PaintMapPing.Color.WithAlpha((byte)(alpha * 255)),
                     IsAntialias = true
                 };
 
                 canvas.DrawCircle(center.X, center.Y, radius, paint);
-                _activeLootPings.TryAdd(_item, this);
+                _activeMapPings.TryAdd(_entity, this);
             }
         }
 
