@@ -83,12 +83,13 @@ namespace LoneEftDmaRadar.UI.Widgets
         /// </summary>
         public static void Draw()
         {
-            if (!IsOpen)
+            if (!IsOpen || !InRaid)
                 return;
 
             var localPlayer = LocalPlayer;
             var filteredLoot = FilteredLoot;
-            var inRaid = InRaid;
+            if (localPlayer is null || filteredLoot is null)
+                return;
 
             // Default (initial) height targets ~10 rows, but the window remains resizable.
             float defaultTableHeight = HeaderHeight + (RowHeight * VisibleRows);
@@ -111,14 +112,7 @@ namespace LoneEftDmaRadar.UI.Widgets
             {
                 if (ImGui.BeginTabItem("Loot List"))
                 {
-                    if (!inRaid || localPlayer is null || filteredLoot is null)
-                    {
-                        ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "Not in raid");
-                    }
-                    else
-                    {
-                        DrawLootListTab(localPlayer, filteredLoot);
-                    }
+                    DrawLootListTab(localPlayer, filteredLoot);
                     ImGui.EndTabItem();
                 }
 
