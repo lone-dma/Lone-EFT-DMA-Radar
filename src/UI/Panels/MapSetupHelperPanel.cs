@@ -199,6 +199,29 @@ namespace LoneEftDmaRadar.UI.Panels
             }
         }
 
+        /// <summary>
+        /// Draw the map setup helper overlay (shows current coordinates on the radar).
+        /// </summary>
+        public static void DrawOverlay()
+        {
+            if (!ShowOverlay)
+                return;
+
+            var io = ImGui.GetIO();
+            ImGui.SetNextWindowPos(new Vector2(io.DisplaySize.X - 310, 10), ImGuiCond.Appearing);
+            ImGui.SetNextWindowSize(new Vector2(300, 80), ImGuiCond.Appearing);
+            ImGui.SetNextWindowBgAlpha(0.8f);
+
+            bool visible = ShowOverlay;
+            if (ImGui.Begin("Map Setup Helper Overlay", ref visible, ImGuiWindowFlags.NoSavedSettings))
+            {
+                ImGui.Text("Current Coordinates:");
+                ImGui.TextColored(new Vector4(0.2f, 0.8f, 0.2f, 1f), Coords);
+            }
+            ImGui.End();
+            ShowOverlay = visible;
+        }
+
         private static void StartScan()
         {
             _isScanning = true;
