@@ -87,7 +87,8 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                 [ColorPickerOption.FoodFilterLoot] = SKColors.CornflowerBlue.ToString(),
                 [ColorPickerOption.BackpacksFilterLoot] = SKColor.Parse("00b02c").ToString(),
                 [ColorPickerOption.Explosives] = SKColors.OrangeRed.ToString(),
-                [ColorPickerOption.QuestHelperZones] = SKColors.DeepPink.ToString()
+                [ColorPickerOption.QuestHelperZones] = SKColors.DeepPink.ToString(),
+                [ColorPickerOption.MapPing] = SKColors.Turquoise.ToString(),
             };
         }
 
