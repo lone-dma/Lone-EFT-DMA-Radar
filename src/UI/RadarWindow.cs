@@ -391,12 +391,6 @@ namespace LoneEftDmaRadar.UI
                         }
                     }
                 }
-
-                // Draw Loot Pings
-                foreach (var lootPing in _activeMapPings.Values)
-                {
-                    lootPing.Draw(canvas, mapParams, localPlayer);
-                }
             }
 
             // Draw hazards
@@ -445,6 +439,12 @@ namespace LoneEftDmaRadar.UI
                         continue;
                     player.Draw(canvas, mapParams, localPlayer);
                 }
+            }
+
+            // Draw Map Pings
+            foreach (var ping in _activeMapPings.Values)
+            {
+                ping.Draw(canvas, mapParams, localPlayer);
             }
 
             // Draw group connectors
@@ -780,6 +780,8 @@ namespace LoneEftDmaRadar.UI
 
             public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
             {
+                if (_entity is LootItem && !Config.Loot.Enabled) // Don't draw ping if loot is disabled
+                    return;
                 var now = Stopwatch.GetTimestamp();
                 var elapsedTicks = now - _start;
 
