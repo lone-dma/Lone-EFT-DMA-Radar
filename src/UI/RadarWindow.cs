@@ -47,7 +47,6 @@ using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
-using System.Net.NetworkInformation;
 
 namespace LoneEftDmaRadar.UI
 {
@@ -597,9 +596,8 @@ namespace LoneEftDmaRadar.UI
             try
             {
                 // Draw overlay controls
-                RadarOverlayPanel.DrawTopBar();
-                RadarOverlayPanel.DrawLootOverlay();
-                RadarOverlayPanel.DrawMapSetupHelper();
+                RadarMenuPanel.Draw();
+                MapSetupHelperPanel.DrawOverlay();
 
                 // Draw main menu bar
                 if (ImGui.BeginMainMenuBar())
@@ -690,9 +688,9 @@ namespace LoneEftDmaRadar.UI
             }
 
             // Loot Widget
-            if (LootListWidget.IsOpen && InRaid)
+            if (LootWidget.IsOpen)
             {
-                LootListWidget.Draw();
+                LootWidget.Draw();
             }
         }
 
@@ -738,7 +736,7 @@ namespace LoneEftDmaRadar.UI
         #region UI State and Events
 
         private static readonly PeriodicTimer _fpsTimer = new(TimeSpan.FromSeconds(1));
-        private static readonly ConcurrentDictionary<LootItem, PingEffect> _activeLootPings = new();
+        private static readonly ConcurrentDictionary<LootItem, LootPingEffect> _activeLootPings = new();
         private static int _fpsCounter = 0;
         private static int _statusOrder = 1;
         private static bool _mouseDown;
@@ -752,24 +750,32 @@ namespace LoneEftDmaRadar.UI
         private static bool _isMapFreeEnabled;
         private static Vector2 _mapPanPosition;
 
+        /// <summary>
+        /// Ping a loot item with an expanding circle effect.
+        /// </summary>
+        /// <param name="item">Item to be pinged.</param>
         public static void PingItem(LootItem item)
         {
-            var ping = new PingEffect(item);
-            _activeLootPings.TryAdd(item, ping); // Ensure only gets added once using object reference as key
+            _ = _activeLootPings.GetOrAdd(item, item =>
+            {
+                return new LootPingEffect(item);
+            });
         }
 
-        private readonly struct PingEffect
+        private readonly struct LootPingEffect : IMapEntity
         {
             // Based on implementation from https://github.com/dma-educational-resources/eft-dma-radar
             private static readonly long _duration = TimeSpan.FromSeconds(2).Ticks;
             private readonly LootItem _item;
             private readonly long _start;
 
-            public PingEffect(LootItem item)
+            public LootPingEffect(LootItem item)
             {
                 _item = item;
                 _start = Stopwatch.GetTimestamp();
             }
+
+            public ref readonly Vector3 Position => ref _item.Position;
 
             public void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer)
             {
@@ -863,9 +869,6 @@ namespace LoneEftDmaRadar.UI
                     player.SetFocus(!player.IsFocused);
                 }
             }
-
-            // Hide loot overlay on mouse down
-            RadarOverlayPanel.HideLootOverlay();
         }
 
         private static void OnMouseUp(IMouse mouse, MouseButton button)
