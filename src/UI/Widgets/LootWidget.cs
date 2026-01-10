@@ -69,6 +69,12 @@ namespace LoneEftDmaRadar.UI.Widgets
         // Search state
         private static string _searchText = string.Empty;
 
+        internal static void Initialize()
+        {
+            _sortColumnId = Config.LootWidget.SortColumn;
+            _sortAscending = Config.LootWidget.SortAscending;
+        }
+
         /// <summary>
         /// Apply loot search filter.
         /// </summary>
@@ -177,9 +183,37 @@ namespace LoneEftDmaRadar.UI.Widgets
             if (ImGui.BeginTable("LootTable", 3, tableFlags, tableSize))
             {
                 ImGui.TableSetupScrollFreeze(0, 1); // Freeze header row
-                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch, 0f, 0);
-                ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.DefaultSort | ImGuiTableColumnFlags.WidthFixed, 60f, 1);
-                ImGui.TableSetupColumn("Dist", ImGuiTableColumnFlags.WidthFixed, 45f, 2);
+
+                var nameFlags = ImGuiTableColumnFlags.WidthStretch;
+                var valueFlags = ImGuiTableColumnFlags.WidthFixed;
+                var distFlags = ImGuiTableColumnFlags.WidthFixed;
+
+                // Apply configured default sort column on first startup.
+                switch (_sortColumnId)
+                {
+                    case 0:
+                        nameFlags |= ImGuiTableColumnFlags.DefaultSort;
+                        break;
+                    case 1:
+                        valueFlags |= ImGuiTableColumnFlags.DefaultSort;
+                        break;
+                    case 2:
+                        distFlags |= ImGuiTableColumnFlags.DefaultSort;
+                        break;
+                }
+
+                // Apply preferred direction (ImGui will use descending for the DefaultSort column when this is present).
+                // Not all ImGui.NET builds expose PreferSortDescending; if it doesn't exist, this line will be removed by build.
+                if (!_sortAscending)
+                {
+                    nameFlags |= ImGuiTableColumnFlags.PreferSortDescending;
+                    valueFlags |= ImGuiTableColumnFlags.PreferSortDescending;
+                    distFlags |= ImGuiTableColumnFlags.PreferSortDescending;
+                }
+
+                ImGui.TableSetupColumn("Name", nameFlags, 0f, 0);
+                ImGui.TableSetupColumn("Value", valueFlags, 60f, 1);
+                ImGui.TableSetupColumn("Dist", distFlags, 45f, 2);
                 ImGui.TableHeadersRow();
 
                 // Handle sorting
@@ -189,8 +223,17 @@ namespace LoneEftDmaRadar.UI.Widgets
                     if (sortSpecs.SpecsCount > 0)
                     {
                         var spec = sortSpecs.Specs;
-                        _sortColumnId = spec.ColumnUserID;
-                        _sortAscending = spec.SortDirection == ImGuiSortDirection.Ascending;
+                        var newColumn = spec.ColumnUserID;
+                        var newAscending = spec.SortDirection == ImGuiSortDirection.Ascending;
+
+                        if (newColumn != _sortColumnId || newAscending != _sortAscending)
+                        {
+                            _sortColumnId = newColumn;
+                            _sortAscending = newAscending;
+
+                            Config.LootWidget.SortColumn = _sortColumnId;
+                            Config.LootWidget.SortAscending = _sortAscending;
+                        }
                     }
                     sortSpecs.SpecsDirty = false;
                 }

@@ -481,6 +481,19 @@ namespace LoneEftDmaRadar
         /// </summary>
         [JsonPropertyName("enabled")]
         public bool Enabled { get; set; } = true;
+
+        /// <summary>
+        /// Loot table sort column user id.
+        /// 0=Name, 1=Value, 2=Dist
+        /// </summary>
+        [JsonPropertyName("sortColumn")]
+        public uint SortColumn { get; set; } = 1;
+
+        /// <summary>
+        /// True if loot table sort direction is ascending.
+        /// </summary>
+        [JsonPropertyName("sortAscending")]
+        public bool SortAscending { get; set; } = false;
     }
 
     /// <summary>
