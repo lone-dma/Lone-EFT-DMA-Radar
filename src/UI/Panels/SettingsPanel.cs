@@ -212,7 +212,7 @@ namespace LoneEftDmaRadar.UI.Panels
                     ImGui.SetTooltip("Displays a list of nearby players with details");
 
                 bool lootWidget = Config.LootWidget.Enabled;
-                if (ImGui.Checkbox("Loot List Widget", ref lootWidget))
+                if (ImGui.Checkbox("Loot Widget", ref lootWidget))
                 {
                     Config.LootWidget.Enabled = lootWidget;
                 }

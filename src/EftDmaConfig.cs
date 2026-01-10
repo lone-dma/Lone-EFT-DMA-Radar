@@ -108,7 +108,7 @@ namespace LoneEftDmaRadar
         public InfoWidgetConfig InfoWidget { get; set; } = new();
 
         /// <summary>
-        /// Loot List Widget Configuration.
+        /// Loot Widget Configuration.
         /// </summary>
         [JsonPropertyName("lootWidget")]
         public LootWidgetConfig LootWidget { get; set; } = new();

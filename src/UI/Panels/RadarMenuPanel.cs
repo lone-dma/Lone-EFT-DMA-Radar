@@ -77,18 +77,6 @@ namespace LoneEftDmaRadar.UI.Panels
                     ImGui.PopStyleColor(3);
                 }
 
-                // Loot button - only show when loot is enabled
-                if (Config.Loot.Enabled)
-                {
-                    ImGui.SameLine();
-                    if (ImGui.Button("Loot"))
-                    {
-                        LootWidget.IsOpen = !LootWidget.IsOpen;
-                    }
-                    if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip("Open loot widget");
-                }
-
                 ImGui.End();
             }
         }

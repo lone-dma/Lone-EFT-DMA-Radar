@@ -1085,6 +1085,13 @@ namespace LoneEftDmaRadar.UI
                 Config.InfoWidget.Enabled = !Config.InfoWidget.Enabled;
         }
 
+        [Hotkey("Toggle Loot Widget")]
+        private static void ToggleLootWidget_HotkeyStateChanged(bool isKeyDown)
+        {
+            if (isKeyDown)
+                Config.LootWidget.Enabled = !Config.LootWidget.Enabled;
+        }
+
         [Hotkey("Toggle Show Meds")]
         private static void ToggleShowMeds_HotkeyStateChanged(bool isKeyDown)
         {
