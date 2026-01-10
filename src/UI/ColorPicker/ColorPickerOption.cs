@@ -49,6 +49,7 @@ namespace LoneEftDmaRadar.UI.ColorPicker
         QuestHelperItems,
         QuestHelperZones,
         Corpse,
-        Explosives
+        Explosives,
+        MapPing
     }
 }

@@ -255,7 +255,7 @@ namespace LoneEftDmaRadar.UI.Widgets
                     {
                         if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                         {
-                            RadarWindow.PingItem(item);
+                            RadarWindow.PingMapEntity(item);
                         }
                     }
                     ImGui.SameLine();
