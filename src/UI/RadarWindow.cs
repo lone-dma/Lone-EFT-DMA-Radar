@@ -172,6 +172,7 @@ namespace LoneEftDmaRadar.UI
 
             // Initialize widgets
             AimviewWidget.Initialize(_gl, _grContext);
+            LootWidget.Initialize();
         }
 
         private static void CreateSkiaSurface()
