@@ -26,7 +26,7 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Maps;
+using LoneEftDmaRadar.UI.Maps;
 
 namespace LoneEftDmaRadar.UI.Skia
 {

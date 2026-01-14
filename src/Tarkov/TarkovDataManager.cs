@@ -169,7 +169,7 @@ namespace LoneEftDmaRadar.Tarkov
         /// <exception cref="InvalidOperationException"></exception>
         private static async Task LoadDefaultDataAsync()
         {
-            const string resource = "LoneEftDmaRadar.DEFAULT_DATA.json";
+            const string resource = "LoneEftDmaRadar.Resources.DEFAULT_DATA.json";
             using var dataStream = Utilities.OpenResource(resource);
             var data = await JsonSerializer.DeserializeAsync(dataStream, AppJsonContext.Default.DataElement)
                 ?? throw new InvalidOperationException($"Failed to deserialize {nameof(dataStream)}");

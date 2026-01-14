@@ -30,14 +30,14 @@ using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Misc.JSON;
 using System.Collections.Frozen;
 
-namespace LoneEftDmaRadar.Maps
+namespace LoneEftDmaRadar.UI.Maps
 {
     /// <summary>
     /// Maintains Map Resources for this application.
     /// </summary>
     internal static class EftMapManager
     {
-        public const string MapsNamespace = "LoneEftDmaRadar.Maps.Resources";
+        public const string MapsNamespace = "LoneEftDmaRadar.Resources.Maps";
         private static FrozenDictionary<string, EftMapConfig> _maps;
 
         /// <summary>

@@ -31,7 +31,7 @@ using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.UI.Skia;
 using Svg.Skia;
 
-namespace LoneEftDmaRadar.Maps
+namespace LoneEftDmaRadar.UI.Maps
 {
     /// <summary>
     /// SVG map implementation that pre-rasterizes layers to SKImage bitmaps for fast rendering.

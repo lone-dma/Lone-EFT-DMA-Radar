@@ -10,7 +10,7 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Platforms>x64</Platforms>
 	<ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
-	<ApplicationIcon>..\Resources\lone-icon.ico</ApplicationIcon>
+	<ApplicationIcon>Resources\lone-icon.ico</ApplicationIcon>
   </PropertyGroup>
 
 	<!-- SignalR AOT Compatibility -->
@@ -54,8 +54,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="..\Resources\**\*.*" />
-		<EmbeddedResource Include="Maps\Resources\**\*.*" />
+		<EmbeddedResource Include="Resources\**\*.*" />
 	</ItemGroup>
 
   <ItemGroup>
@@ -72,10 +71,6 @@
 	<PackageReference Include="VmmSharpEx" Version="3.140.3" />
 	<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	<PackageReference Include="Open.Nat.V2" Version="3.1.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Maps\Resources\" />
   </ItemGroup>
 
 </Project>

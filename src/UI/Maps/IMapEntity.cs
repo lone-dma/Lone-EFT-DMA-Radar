@@ -28,7 +28,7 @@ SOFTWARE.
 using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.Tarkov.World.Player;
 
-namespace LoneEftDmaRadar.Maps
+namespace LoneEftDmaRadar.UI.Maps
 {
     /// <summary>
     /// Defines an entity that can be drawn on the 2D Radar Map.

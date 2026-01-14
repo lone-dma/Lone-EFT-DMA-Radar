@@ -26,28 +26,36 @@ SOFTWARE.
  *
 */
 
-namespace LoneEftDmaRadar.Maps
+namespace LoneEftDmaRadar.UI.Maps
 {
-    /// <summary>
-    /// Contains multiple map parameters used by the GUI.
-    /// </summary>
-    public sealed class EftMapParams
+    public interface IEftMap : IDisposable
     {
         /// <summary>
-        /// Currently loaded Map File.
+        /// Raw Map ID for this Map.
         /// </summary>
-        public EftMapConfig Map { get; init; }
+        string ID { get; }
+
         /// <summary>
-        /// Rectangular 'zoomed' bounds of the Bitmap to display.
+        /// Configuration for this Map.
         /// </summary>
-        public SKRect Bounds { get; init; }
+        EftMapConfig Config { get; }
+
         /// <summary>
-        /// Regular -> Zoomed 'X' Scale correction.
+        /// Draw the Map on the provided Canvas.
         /// </summary>
-        public float XScale { get; init; }
+        /// <param name="canvas"></param>
+        /// <param name="playerHeight"></param>
+        /// <param name="mapBounds"></param>
+        /// <param name="windowBounds"></param>
+        void Draw(SKCanvas canvas, float playerHeight, SKRect mapBounds, SKRect windowBounds);
+
         /// <summary>
-        /// Regular -> Zoomed 'Y' Scale correction.
+        /// Get Parameters for this map.
         /// </summary>
-        public float YScale { get; init; }
+        /// <param name="canvasSize">Size of the canvas.</param>
+        /// <param name="zoom">Zoom level.</param>
+        /// <param name="localPlayerMapPos">Local player map position.</param>
+        /// <returns></returns>
+        EftMapParams GetParameters(SKSize canvasSize, int zoom, ref Vector2 localPlayerMapPos);
     }
 }

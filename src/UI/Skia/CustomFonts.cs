@@ -42,7 +42,7 @@ namespace LoneEftDmaRadar.UI.Skia
             try
             {
                 byte[] neoSansStdRegular;
-                using (var stream = Utilities.OpenResource("LoneEftDmaRadar.NeoSansStdRegular.otf"))
+                using (var stream = Utilities.OpenResource("LoneEftDmaRadar.Resources.NeoSansStdRegular.otf"))
                 {
                     neoSansStdRegular = new byte[stream!.Length];
                     stream.ReadExactly(neoSansStdRegular);
