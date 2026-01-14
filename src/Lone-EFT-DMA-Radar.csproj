@@ -54,11 +54,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="..\Resources\NeoSansStdRegular.otf" />
-		<EmbeddedResource Include="..\Resources\DEFAULT_DATA.json" />
-	</ItemGroup>
-
-	<ItemGroup>
+		<EmbeddedResource Include="..\Resources\**\*.*" />
 		<EmbeddedResource Include="Maps\Resources\**\*.*" />
 	</ItemGroup>
 
