@@ -23,22 +23,39 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
- */
+ *
+*/
 
-using LoneEftDmaRadar.Tarkov.Unity;
-using LoneEftDmaRadar.Tarkov.World.Player;
-
-namespace LoneEftDmaRadar.UI.Maps
+namespace LoneEftDmaRadar.Maps
 {
-    /// <summary>
-    /// Defines an entity that can be drawn on the 2D Radar Map.
-    /// </summary>
-    public interface IMapEntity : IWorldEntity
+    public interface IEftMap : IDisposable
     {
         /// <summary>
-        /// Draw this Entity on the Radar Map.
+        /// Raw Map ID for this Map.
         /// </summary>
-        /// <param name="canvas">SKCanvas instance to draw on.</param>
-        void Draw(SKCanvas canvas, EftMapParams mapParams, LocalPlayer localPlayer);
+        string ID { get; }
+
+        /// <summary>
+        /// Configuration for this Map.
+        /// </summary>
+        EftMapConfig Config { get; }
+
+        /// <summary>
+        /// Draw the Map on the provided Canvas.
+        /// </summary>
+        /// <param name="canvas"></param>
+        /// <param name="playerHeight"></param>
+        /// <param name="mapBounds"></param>
+        /// <param name="windowBounds"></param>
+        void Draw(SKCanvas canvas, float playerHeight, SKRect mapBounds, SKRect windowBounds);
+
+        /// <summary>
+        /// Get Parameters for this map.
+        /// </summary>
+        /// <param name="canvasSize">Size of the canvas.</param>
+        /// <param name="zoom">Zoom level.</param>
+        /// <param name="localPlayerMapPos">Local player map position.</param>
+        /// <returns></returns>
+        EftMapParams GetParameters(SKSize canvasSize, int zoom, ref Vector2 localPlayerMapPos);
     }
 }

@@ -27,9 +27,9 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
+using LoneEftDmaRadar.Maps;
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.World.Player;
-using LoneEftDmaRadar.UI.Maps;
 using LoneEftDmaRadar.UI.Skia;
 using LoneEftDmaRadar.Web.TarkovDev;
 

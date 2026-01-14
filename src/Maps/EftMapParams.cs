@@ -26,16 +26,28 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Maps;
-using LoneEftDmaRadar.Tarkov.Unity;
-using LoneEftDmaRadar.UI.Skia;
-
-namespace LoneEftDmaRadar.Tarkov.World.Exits
+namespace LoneEftDmaRadar.Maps
 {
     /// <summary>
-    /// Defines a contract for a point that can be used to exit the map.
+    /// Contains multiple map parameters used by the GUI.
     /// </summary>
-    public interface IExitPoint : IWorldEntity, IMapEntity, IMouseoverEntity
+    public sealed class EftMapParams
     {
+        /// <summary>
+        /// Currently loaded Map File.
+        /// </summary>
+        public EftMapConfig Map { get; init; }
+        /// <summary>
+        /// Rectangular 'zoomed' bounds of the Bitmap to display.
+        /// </summary>
+        public SKRect Bounds { get; init; }
+        /// <summary>
+        /// Regular -> Zoomed 'X' Scale correction.
+        /// </summary>
+        public float XScale { get; init; }
+        /// <summary>
+        /// Regular -> Zoomed 'Y' Scale correction.
+        /// </summary>
+        public float YScale { get; init; }
     }
 }
