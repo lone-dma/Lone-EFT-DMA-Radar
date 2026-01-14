@@ -26,6 +26,8 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.Misc;
+
 namespace LoneEftDmaRadar.UI.Skia
 {
     internal static class CustomFonts
@@ -40,7 +42,7 @@ namespace LoneEftDmaRadar.UI.Skia
             try
             {
                 byte[] neoSansStdRegular;
-                using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LoneEftDmaRadar.NeoSansStdRegular.otf"))
+                using (var stream = Utilities.OpenResource("LoneEftDmaRadar.NeoSansStdRegular.otf"))
                 {
                     neoSansStdRegular = new byte[stream!.Length];
                     stream.ReadExactly(neoSansStdRegular);

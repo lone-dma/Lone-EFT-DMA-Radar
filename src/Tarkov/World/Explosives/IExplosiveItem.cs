@@ -26,8 +26,8 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.Maps;
 using LoneEftDmaRadar.Tarkov.Unity;
-using LoneEftDmaRadar.UI.Maps;
 using VmmSharpEx.Scatter;
 
 namespace LoneEftDmaRadar.Tarkov.World.Explosives

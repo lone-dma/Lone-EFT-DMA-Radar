@@ -26,18 +26,18 @@ SOFTWARE.
  *
 */
 
+using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Misc.JSON;
 using System.Collections.Frozen;
-using System.IO.Compression;
 
-namespace LoneEftDmaRadar.UI.Maps
+namespace LoneEftDmaRadar.Maps
 {
     /// <summary>
     /// Maintains Map Resources for this application.
     /// </summary>
     internal static class EftMapManager
     {
-        private static ZipArchive _zip;
+        public const string MapsNamespace = "LoneEftDmaRadar.Maps.Resources";
         private static FrozenDictionary<string, EftMapConfig> _maps;
 
         /// <summary>
@@ -51,25 +51,22 @@ namespace LoneEftDmaRadar.UI.Maps
         /// </summary>
         public static async Task ModuleInitAsync()
         {
-            const string mapsPath = "Maps.bin";
             try
             {
                 /// Load Maps
-                var mapsStream = File.OpenRead(mapsPath);
-                var zip = new ZipArchive(mapsStream, ZipArchiveMode.Read, false);
                 var mapsBuilder = new Dictionary<string, EftMapConfig>(StringComparer.OrdinalIgnoreCase);
-                foreach (var file in zip.Entries)
+                var resources = GetMapResourceNames();
+                foreach (var resource in resources)
                 {
-                    if (file.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+                    if (resource.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
                     {
-                        using var stream = file.Open();
+                        using var stream = Utilities.OpenResource(resource);
                         var config = await JsonSerializer.DeserializeAsync(stream, AppJsonContext.Default.EftMapConfig);
                         foreach (var id in config!.MapID)
                             mapsBuilder.Add(id, config);
                     }
                 }
                 _maps = mapsBuilder.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
-                _zip = zip;
             }
             catch (Exception ex)
             {
@@ -77,6 +74,14 @@ namespace LoneEftDmaRadar.UI.Maps
             }
         }
 
+        private static IEnumerable<string> GetMapResourceNames()
+        {
+            return Assembly
+                .GetExecutingAssembly()
+                .GetManifestResourceNames()
+                .Where(name => name.StartsWith(MapsNamespace, StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+        }
 
         /// <summary>
         /// Checks the requested map ID and loads the map if not loaded.
@@ -97,7 +102,7 @@ namespace LoneEftDmaRadar.UI.Maps
                     throw new KeyNotFoundException($"Map ID '{mapId}' not found!");
                 Map?.Dispose();
                 Map = null;
-                Map = new EftSvgMap(_zip, mapId, newMap);
+                Map = new EftSvgMap(mapId, newMap);
                 return Map;
             }
             catch (Exception ex)

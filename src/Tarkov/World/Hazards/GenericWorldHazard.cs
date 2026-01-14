@@ -1,7 +1,7 @@
-﻿using LoneEftDmaRadar.Misc;
+﻿using LoneEftDmaRadar.Maps;
+using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.Tarkov.World.Player;
-using LoneEftDmaRadar.UI.Maps;
 using LoneEftDmaRadar.UI.Skia;
 
 namespace LoneEftDmaRadar.Tarkov.World.Hazards

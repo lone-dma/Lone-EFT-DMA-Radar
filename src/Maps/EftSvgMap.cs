@@ -27,11 +27,11 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
+using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.UI.Skia;
 using Svg.Skia;
-using System.IO.Compression;
 
-namespace LoneEftDmaRadar.UI.Maps
+namespace LoneEftDmaRadar.Maps
 {
     /// <summary>
     /// SVG map implementation that pre-rasterizes layers to SKImage bitmaps for fast rendering.
@@ -51,11 +51,10 @@ namespace LoneEftDmaRadar.UI.Maps
         /// Construct a new map by loading each SVG layer from the supplied zip archive
         /// and pre-rasterizing them to SKImage bitmaps for fast rendering.
         /// </summary>
-        /// <param name="zip">Archive containing the SVG layer files.</param>
         /// <param name="id">External map identifier.</param>
         /// <param name="config">Configuration describing layers and scaling.</param>
         /// <exception cref="InvalidOperationException">Thrown if any SVG fails to load.</exception>
-        public EftSvgMap(ZipArchive zip, string id, EftMapConfig config)
+        public EftSvgMap(string id, EftMapConfig config)
         {
             ID = id;
             Config = config;
@@ -65,10 +64,7 @@ namespace LoneEftDmaRadar.UI.Maps
             {
                 foreach (var layerCfg in config.MapLayers)
                 {
-                    var entry = zip.Entries.First(x =>
-                        x.Name.Equals(layerCfg.Filename, StringComparison.OrdinalIgnoreCase));
-
-                    using var stream = entry.Open();
+                    using var stream = Utilities.OpenResource($"{EftMapManager.MapsNamespace}.{layerCfg.Filename}");
 
                     using var svg = new SKSvg();
                     if (svg.Load(stream) is null || svg.Picture is null)

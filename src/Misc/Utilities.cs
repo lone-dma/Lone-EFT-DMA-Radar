@@ -34,6 +34,20 @@ namespace LoneEftDmaRadar.Misc
     internal static class Utilities
     {
         /// <summary>
+        /// Opens an embedded resource stream from the executing assembly.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static Stream OpenResource(string name)
+        {
+            return Assembly
+                .GetExecutingAssembly()
+                .GetManifestResourceStream(name)
+                ?? throw new InvalidOperationException($"Resource '{name}' not found!");
+        }
+
+        /// <summary>
         /// Get a random password of a specified length.
         /// </summary>
         /// <param name="length">Password length.</param>
