@@ -55,8 +55,7 @@ namespace LoneEftDmaRadar.Maps
             {
                 /// Load Maps
                 var mapsBuilder = new Dictionary<string, EftMapConfig>(StringComparer.OrdinalIgnoreCase);
-                var resources = GetMapResourceNames();
-                foreach (var resource in resources)
+                foreach (var resource in GetMapResourceNames())
                 {
                     if (resource.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
                     {
@@ -79,8 +78,7 @@ namespace LoneEftDmaRadar.Maps
             return Assembly
                 .GetExecutingAssembly()
                 .GetManifestResourceNames()
-                .Where(name => name.StartsWith(MapsNamespace, StringComparison.OrdinalIgnoreCase))
-                .ToArray();
+                .Where(name => name.StartsWith(MapsNamespace, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
