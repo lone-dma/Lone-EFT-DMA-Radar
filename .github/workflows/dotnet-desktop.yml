@@ -101,7 +101,7 @@ jobs:
             --packDir "out" `
             --mainExe "Lone-EFT-DMA-Radar.exe" `
             --packTitle "Lone EFT DMA Radar" `
-            --icon "Resources/lone-icon.ico"
+            --icon "src/Resources/lone-icon.ico"
 
       - name: Upload to GitHub Releases
         env:
