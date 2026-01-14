@@ -28,7 +28,6 @@ SOFTWARE.
 
 using Collections.Pooled;
 using ImGuiNET;
-using LoneEftDmaRadar.Maps;
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.World.Exits;
 using LoneEftDmaRadar.Tarkov.World.Explosives;
@@ -40,6 +39,7 @@ using LoneEftDmaRadar.UI.ColorPicker;
 using LoneEftDmaRadar.UI.Hotkeys;
 using LoneEftDmaRadar.UI.Hotkeys.Internal;
 using LoneEftDmaRadar.UI.Loot;
+using LoneEftDmaRadar.UI.Maps;
 using LoneEftDmaRadar.UI.Panels;
 using LoneEftDmaRadar.UI.Skia;
 using LoneEftDmaRadar.UI.Widgets;
@@ -1239,7 +1239,7 @@ namespace LoneEftDmaRadar.UI
             {
                 try
                 {
-                    using var stream = Utilities.OpenResource("LoneEftDmaRadar.NeoSansStdRegular.otf");
+                    using var stream = Utilities.OpenResource("LoneEftDmaRadar.Resources.NeoSansStdRegular.otf");
                     if (stream is null)
                         return null;
 

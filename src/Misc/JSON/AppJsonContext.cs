@@ -26,11 +26,11 @@ SOFTWARE.
  *
 */
 
-using LoneEftDmaRadar.Maps;
 using LoneEftDmaRadar.Tarkov.World.Hazards;
 using LoneEftDmaRadar.Tarkov.World.Player;
 using LoneEftDmaRadar.UI.ColorPicker;
 using LoneEftDmaRadar.UI.Loot;
+using LoneEftDmaRadar.UI.Maps;
 using LoneEftDmaRadar.Web.TarkovDev;
 using VmmSharpEx.Extensions.Input;
 

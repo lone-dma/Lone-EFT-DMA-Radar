@@ -27,13 +27,13 @@ SOFTWARE.
 */
 
 using Collections.Pooled;
-using LoneEftDmaRadar.Maps;
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.Tarkov.World.Loot;
 using LoneEftDmaRadar.Tarkov.World.Player.Helpers;
 using LoneEftDmaRadar.UI;
+using LoneEftDmaRadar.UI.Maps;
 using LoneEftDmaRadar.UI.Skia;
 using VmmSharpEx.Extensions;
 using VmmSharpEx.Scatter;
