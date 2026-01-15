@@ -66,7 +66,7 @@ namespace LoneEftDmaRadar.UI
         private static EftDmaConfig Config { get; } = Program.Config;
         public static IntPtr Handle => _window?.Native?.Win32?.Hwnd ?? IntPtr.Zero;
 
-        internal static void Run()
+        internal static void Initialize()
         {
             var options = WindowOptions.Default;
             options.Size = new Vector2D<int>(
@@ -92,11 +92,21 @@ namespace LoneEftDmaRadar.UI
             _window.Closing += OnClosing;
             _window.StateChanged += OnStateChanged;
 
+            // Start Dispatcher, and Set Synchronization Context
+            Dispatcher = new SilkDispatcher(_window);
+            var syncContext = new SilkSyncContext(Dispatcher);
+            SynchronizationContext.SetSynchronizationContext(syncContext);
+
             // Start FPS timer
             _ = RunFpsTimerAsync();
 
-            _window.Run(); // Blocking call
         }
+
+        /// <summary>
+        /// Run the Radar Window (Blocking Call until closed).
+        /// </summary>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal static void Run() => _window.Run();
 
         private static void OnLoad()
         {
@@ -753,6 +763,11 @@ namespace LoneEftDmaRadar.UI
         private static Vector2 _mapPanPosition;
 
         /// <summary>
+        /// RadarWindow Dispatcher for marshaling to the UI thread.
+        /// </summary>
+        public static SilkDispatcher Dispatcher { get; private set; } = null!;
+
+        /// <summary>
         /// Ping a map entity with an expanding circle effect.
         /// </summary>
         /// <param name="entity">Entity to be pinged.</param>
@@ -1006,6 +1021,150 @@ namespace LoneEftDmaRadar.UI
             {
                 _statusOrder = (_statusOrder >= 3) ? 1 : _statusOrder + 1;
                 _fps = Interlocked.Exchange(ref _fpsCounter, 0);
+            }
+        }
+
+        /// <summary>
+        /// Cross-thread dispatcher for invoking actions on the main UI thread.
+        /// </summary>
+        public sealed class SilkDispatcher
+        {
+            private readonly ConcurrentQueue<Action> _q1 = new();
+            private readonly ConcurrentQueue<Action> _q2 = new();
+            private ConcurrentQueue<Action> _queue;
+
+            /// <summary>
+            /// Managed thread ID of the UI thread this dispatcher is associated with.
+            /// </summary>
+            public int ThreadId { get; }
+
+            private SilkDispatcher() { }
+
+            public SilkDispatcher(IWindow window)
+            {
+                _queue = _q1;
+                ThreadId = Environment.CurrentManagedThreadId;
+                window.Update += Window_Update;
+            }
+
+            private void Window_Update(double delta) => Pump();
+
+            private void Pump()
+            {
+                if (!_queue.IsEmpty)
+                {
+                    ConcurrentQueue<Action> snapshot;
+                    if (_queue == _q1)
+                    {
+                        snapshot = Interlocked.Exchange(ref _queue, _q2);
+                    }
+                    else
+                    {
+                        snapshot = Interlocked.Exchange(ref _queue, _q1);
+                    }
+                    while (snapshot.TryDequeue(out var action)) // will be empty after dequeueing all
+                        action();
+                }
+            }
+
+            /// <summary>
+            /// Invoke an action on the UI thread, blocking until complete.
+            /// </summary>
+            /// <param name="action"></param>
+            /// <exception cref="TargetInvocationException"></exception>
+            public void Invoke(Action action)
+            {
+                if (Environment.CurrentManagedThreadId == ThreadId) // Fast Path
+                {
+                    action();
+                    return;
+                }
+
+                using var sync = new ManualResetEventSlim();
+                Exception capturedEx = null;
+                _queue.Enqueue(() =>
+                {
+                    try
+                    {
+                        action();
+                    }
+                    catch (Exception ex)
+                    {
+                        capturedEx = ex;
+                    }
+                    finally
+                    {
+                        sync.Set();
+                    }
+                });
+
+                sync.Wait();
+
+                if (capturedEx is not null)
+                    throw new TargetInvocationException(capturedEx);
+            }
+
+            /// <summary>
+            /// Invoke an action on the UI thread asynchronously.
+            /// </summary>
+            /// <param name="action"></param>
+            /// <returns></returns>
+            public Task InvokeAsync(Action action)
+            {
+                if (Environment.CurrentManagedThreadId == ThreadId) // Fast Path
+                {
+                    action();
+                    return Task.CompletedTask;
+                }
+
+                var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+                _queue.Enqueue(() =>
+                {
+                    try
+                    {
+                        action();
+                        tcs.SetResult();
+                    }
+                    catch (Exception ex)
+                    {
+                        tcs.SetException(ex);
+                    }
+                });
+
+                return tcs.Task;
+            }
+        }
+
+        /// <summary>
+        /// Custom SynchronizationContext that posts work to the SilkDispatcher.
+        /// </summary>
+        private sealed class SilkSyncContext : SynchronizationContext
+        {
+            private readonly SilkDispatcher _dispatcher;
+
+            private SilkSyncContext() { }
+
+            public SilkSyncContext(SilkDispatcher dispatcher)
+            {
+                _dispatcher = dispatcher;
+            }
+
+            public override void Post(SendOrPostCallback d, object state)
+            {
+                _ = _dispatcher.InvokeAsync(() => d(state));
+            }
+
+            public override void Send(SendOrPostCallback d, object state)
+            {
+                if (Environment.CurrentManagedThreadId == _dispatcher.ThreadId)
+                {
+                    d(state); // inline if on render thread
+                }
+                else
+                {
+                    _dispatcher.Invoke(() => d(state)); // blocking if off-thread
+                }
             }
         }
 
@@ -1376,6 +1535,5 @@ namespace LoneEftDmaRadar.UI
             colors[(int)ImGuiCol.ModalWindowDimBg] = new Vector4(0f, 0f, 0f, 0.65f);
         }
         #endregion
-
     }
 }

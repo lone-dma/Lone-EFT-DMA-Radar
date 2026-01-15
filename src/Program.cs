@@ -102,7 +102,7 @@ namespace LoneEftDmaRadar
                 using var loadingWindow = new LoadingWindow();
                 loadingWindow.Show();
 
-                // Run initialization on a background thread while loading window pumps messages on main thread
+                // Initialize initialization on a background thread while loading window pumps messages on main thread
                 var initTask = Task.Run(() => ConfigureProgramAsync(loadingWindow));
 
                 // Keep the loading window responsive until initialization completes
@@ -117,7 +117,7 @@ namespace LoneEftDmaRadar
 
                 initTask.GetAwaiter().GetResult(); // Rethrow any exceptions
 
-                // Now start the radar window (this blocks until window closes)
+                RadarWindow.Initialize();
                 RadarWindow.Run();
             }
             catch (Exception ex)
@@ -138,7 +138,7 @@ namespace LoneEftDmaRadar
 
             if (_updater.IsInstalled)
             {
-                _ = Task.Run(CheckForUpdatesAsync); // Run continuations on the thread pool
+                _ = Task.Run(CheckForUpdatesAsync); // Initialize continuations on the thread pool
             }
 
             var tarkovDataManager = TarkovDataManager.ModuleInitAsync();
