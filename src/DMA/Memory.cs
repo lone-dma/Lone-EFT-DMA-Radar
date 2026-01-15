@@ -28,6 +28,7 @@ SOFTWARE.
 
 global using LoneEftDmaRadar.DMA;
 using Collections.Pooled;
+using LoneEftDmaRadar.UI;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.Tarkov.World;
 using LoneEftDmaRadar.Tarkov.World.Exits;
