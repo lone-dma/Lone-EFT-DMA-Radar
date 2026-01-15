@@ -45,6 +45,20 @@ namespace LoneEftDmaRadar.UI.Maps
         /// </summary>
         public static IEftMap Map { get; private set; }
 
+        static EftMapManager()
+        {
+            Memory.RaidStopped += Memory_RaidStopped;
+        }
+
+        private static void Memory_RaidStopped(object sender, EventArgs e)
+        {
+            RadarWindow.Dispatcher.InvokeAsync(() =>
+            {
+                Map?.Dispose();
+                Map = null;
+            });
+        }
+
         /// <summary>
         /// Initialize this Module.
         /// ONLY CALL ONCE!
@@ -108,15 +122,6 @@ namespace LoneEftDmaRadar.UI.Maps
                 Logging.WriteLine($"ERROR loading '{mapId}': {ex}");
                 return null;
             }
-        }
-
-        /// <summary>
-        /// Cleans up loaded map resources if loaded. Otherwise no-op.
-        /// </summary>
-        public static void Cleanup()
-        {
-            Map?.Dispose();
-            Map = null;
         }
     }
 }
