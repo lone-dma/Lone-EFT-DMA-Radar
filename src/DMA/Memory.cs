@@ -228,9 +228,7 @@ namespace LoneEftDmaRadar.DMA
                     _vmm.ForceFullRefresh();
                     LoadProcess();
                     LoadModules();
-                    Program.UpdateState(AppState.ProcessStarting);
                     OnProcessStarting();
-                    Program.UpdateState(AppState.WaitingForRaid);
                     Logging.WriteLine("Process Startup [OK]");
                     break;
                 }
@@ -296,7 +294,6 @@ namespace LoneEftDmaRadar.DMA
         /// <param name="e"></param>
         private static void MemDMA_ProcessStopped(object sender, EventArgs e)
         {
-            Program.UpdateState(AppState.ProcessNotStarted);
             UnityBase = default;
             GOM = default;
             _pid = default;
@@ -304,14 +301,12 @@ namespace LoneEftDmaRadar.DMA
 
         private static void Memory_RaidStarted(object sender, EventArgs e)
         {
-            Program.UpdateState(AppState.InRaid);
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
         }
 
         private static void MemDMA_RaidStopped(object sender, EventArgs e)
         {
             Game = null;
-            Program.UpdateState(AppState.WaitingForRaid);
             GCSettings.LatencyMode = GCLatencyMode.Interactive;
         }
 
@@ -390,6 +385,7 @@ namespace LoneEftDmaRadar.DMA
         /// </summary>
         private static void OnProcessStarting()
         {
+            Program.UpdateState(AppState.ProcessStarting);
             ProcessStarting?.Invoke(null, EventArgs.Empty);
         }
 
@@ -398,6 +394,7 @@ namespace LoneEftDmaRadar.DMA
         /// </summary>
         private static void OnProcessStarted()
         {
+            Program.UpdateState(AppState.WaitingForRaid);
             ProcessStarted?.Invoke(null, EventArgs.Empty);
         }
 
@@ -406,6 +403,7 @@ namespace LoneEftDmaRadar.DMA
         /// </summary>
         private static void OnProcessStopped()
         {
+            Program.UpdateState(AppState.ProcessNotStarted);
             ProcessStopped?.Invoke(null, EventArgs.Empty);
         }
 
@@ -414,6 +412,7 @@ namespace LoneEftDmaRadar.DMA
         /// </summary>
         private static void OnRaidStarted()
         {
+            Program.UpdateState(AppState.InRaid);
             RaidStarted?.Invoke(null, EventArgs.Empty);
         }
 
@@ -422,6 +421,7 @@ namespace LoneEftDmaRadar.DMA
         /// </summary>
         private static void OnRaidStopped()
         {
+            Program.UpdateState(AppState.WaitingForRaid);
             RaidStopped?.Invoke(null, EventArgs.Empty);
         }
 
