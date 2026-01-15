@@ -56,7 +56,7 @@ namespace LoneEftDmaRadar.UI
     {
         #region Initialization
 
-        private static Task _init = null!;
+        private static Task _load = null!;
         private static IWindow _window = null!;
         private static GL _gl = null!;
         private static IInputContext _input = null!;
@@ -156,13 +156,13 @@ namespace LoneEftDmaRadar.UI
             ApplyCustomImGuiStyle();
             SettingsPanel.UpdateUIScale(Config.UI.UIScale);
 
-            _init = InitializeAsync();
+            _load = OnLoadAsync(); // Load remaining modules and UI components asynchronously
         }
 
         /// <summary>
-        /// Initialize async modules and UI components.
+        /// Load async modules and remaining UI components.
         /// </summary>
-        private static async Task InitializeAsync()
+        private static async Task OnLoadAsync()
         {
             SKPaints.PaintBitmap.ColorFilter = SKPaints.GetDarkModeColorFilter(0.7f);
             SKPaints.PaintBitmapAlpha.ColorFilter = SKPaints.GetDarkModeColorFilter(0.7f);
@@ -303,10 +303,10 @@ namespace LoneEftDmaRadar.UI
         private static void OnRender(double delta)
         {
             var state = Program.State;
-            if (_init?.IsCompleted ?? false)
+            if (_load?.IsCompleted ?? false)
             {
-                _init.GetAwaiter().GetResult(); // Observe any exceptions
-                _init = null;
+                _load.GetAwaiter().GetResult(); // Observe any exceptions
+                _load = null;
             }
             if (_grContext is null || _skSurface is null)
                 return;
