@@ -170,6 +170,8 @@ namespace LoneEftDmaRadar.DMA
         private static void MemoryPrimaryWorker()
         {
             Logging.WriteLine("Memory thread starting...");
+            while (RadarWindow.Dispatcher is null)
+                Thread.Sleep(1);
             while (true)
             {
                 try
