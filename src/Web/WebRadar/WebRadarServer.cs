@@ -133,7 +133,7 @@ namespace LoneEftDmaRadar.Web.WebRadar
                 {
                     try
                     {
-                        if (Memory.InRaid && Memory.Players is IReadOnlyCollection<AbstractPlayer> players && players.Count > 0)
+                        if (Program.State == AppState.InRaid && Memory.Players is IReadOnlyCollection<AbstractPlayer> players && players.Count > 0)
                         {
                             update.InGame = true;
                             update.MapID = Memory.MapID;

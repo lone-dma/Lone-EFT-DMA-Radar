@@ -81,7 +81,6 @@ namespace LoneEftDmaRadar.UI.Widgets
         private static IReadOnlyCollection<AbstractPlayer> AllPlayers => Memory.Players;
         private static IEnumerable<LootItem> FilteredLoot => Memory.Loot?.FilteredLoot;
         private static IEnumerable<StaticLootContainer> Containers => Memory.Loot?.StaticContainers;
-        private static bool InRaid => Memory.InRaid;
 
         public static void Initialize(GL gl, GRContext grContext)
         {
@@ -113,7 +112,7 @@ namespace LoneEftDmaRadar.UI.Widgets
 
             try
             {
-                if (InRaid && LocalPlayer is LocalPlayer localPlayer)
+                if (Program.State == AppState.InRaid && LocalPlayer is LocalPlayer localPlayer)
                 {
                     // Update camera matrix
                     UpdateMatrix(localPlayer);

@@ -29,6 +29,7 @@ SOFTWARE.
 using Collections.Pooled;
 using ImGuiNET;
 using LoneEftDmaRadar.Misc;
+using LoneEftDmaRadar.Tarkov;
 using LoneEftDmaRadar.Tarkov.World.Exits;
 using LoneEftDmaRadar.Tarkov.World.Explosives;
 using LoneEftDmaRadar.Tarkov.World.Hazards;
@@ -55,6 +56,7 @@ namespace LoneEftDmaRadar.UI
     {
         #region Initialization
 
+        private static Task _init = null!;
         private static IWindow _window = null!;
         private static GL _gl = null!;
         private static IInputContext _input = null!;
@@ -94,12 +96,7 @@ namespace LoneEftDmaRadar.UI
 
             // Start Dispatcher, and Set Synchronization Context
             Dispatcher = new SilkDispatcher(_window);
-            var syncContext = new SilkSyncContext(Dispatcher);
-            SynchronizationContext.SetSynchronizationContext(syncContext);
-
-            // Start FPS timer
-            _ = RunFpsTimerAsync();
-
+            SynchronizationContext.SetSynchronizationContext(new SilkSyncContext(Dispatcher));
         }
 
         /// <summary>
@@ -157,7 +154,24 @@ namespace LoneEftDmaRadar.UI
             }
 
             ApplyCustomImGuiStyle();
+            SettingsPanel.UpdateUIScale(Config.UI.UIScale);
 
+            _init = InitializeAsync();
+        }
+
+        /// <summary>
+        /// Initialize async modules and UI components.
+        /// </summary>
+        private static async Task InitializeAsync()
+        {
+            SKPaints.PaintBitmap.ColorFilter = SKPaints.GetDarkModeColorFilter(0.7f);
+            SKPaints.PaintBitmapAlpha.ColorFilter = SKPaints.GetDarkModeColorFilter(0.7f);
+            var tarkovDataManager = TarkovDataManager.ModuleInitAsync();
+            var eftMapManager = EftMapManager.ModuleInitAsync();
+            var memoryInterface = Memory.ModuleInitAsync();
+
+            // Wait for all tasks
+            await Task.WhenAll(tarkovDataManager, eftMapManager, memoryInterface);
             // Setup mouse events on the shared input context
             foreach (var mouse in _input.Mice)
             {
@@ -184,6 +198,12 @@ namespace LoneEftDmaRadar.UI
             // Initialize widgets
             AimviewWidget.Initialize(_gl, _grContext);
             LootWidget.Initialize();
+
+            // Start FPS timer
+            _ = RunFpsTimerAsync();
+
+            // Ready
+            Program.UpdateState(AppState.ProcessNotStarted);
         }
 
         private static void CreateSkiaSurface()
@@ -239,9 +259,6 @@ namespace LoneEftDmaRadar.UI
 
         #region Radar Operation
 
-        private static bool Starting => Memory.Starting;
-        private static bool Ready => Memory.Ready;
-        private static bool InRaid => Memory.InRaid;
         private static string MapID => Memory.MapID ?? "null";
         private static LocalPlayer LocalPlayer => Memory.LocalPlayer;
         private static IEnumerable<LootItem> FilteredLoot => Memory.Loot?.FilteredLoot;
@@ -285,6 +302,12 @@ namespace LoneEftDmaRadar.UI
         /// <param name="delta"></param>
         private static void OnRender(double delta)
         {
+            var state = Program.State;
+            if (_init?.IsCompleted ?? false)
+            {
+                _init.GetAwaiter().GetResult(); // Observe any exceptions
+                _init = null;
+            }
             if (_grContext is null || _skSurface is null)
                 return;
             try
@@ -299,11 +322,14 @@ namespace LoneEftDmaRadar.UI
 
                 // Scene Render (Skia)
                 var fbSize = _window.FramebufferSize;
-                DrawRadarScene(ref fbSize);
+                DrawRadarScene(ref fbSize, state);
                 AimviewWidget.Render();
 
-                // UI Render (ImGui)
-                DrawImGuiUI(ref fbSize, delta);
+                if (state > AppState.Initializing)
+                {
+                    // UI Render (ImGui)
+                    DrawImGuiUI(ref fbSize, delta);
+                }
             }
             catch (Exception ex)
             {
@@ -311,7 +337,7 @@ namespace LoneEftDmaRadar.UI
             }
         }
 
-        private static void DrawRadarScene(ref Vector2D<int> fbSize)
+        private static void DrawRadarScene(ref Vector2D<int> fbSize, AppState state)
         {
             _gl.Viewport(0, 0, (uint)fbSize.X, (uint)fbSize.Y);
             _gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
@@ -323,18 +349,14 @@ namespace LoneEftDmaRadar.UI
             var canvas = _skSurface.Canvas;
             try
             {
-                var isStarting = Starting;
-                var isReady = Ready;
-                var inRaid = InRaid;
-
-                if (inRaid && LocalPlayer is LocalPlayer localPlayer && EftMapManager.LoadMap(MapID) is IEftMap map)
+                if (state == AppState.InRaid && LocalPlayer is LocalPlayer localPlayer && EftMapManager.LoadMap(MapID) is IEftMap map)
                 {
                     DrawInRaidRadar(canvas, localPlayer, map);
                 }
                 else
                 {
                     EftMapManager.Cleanup();
-                    DrawStatusMessage(canvas, isStarting, isReady);
+                    DrawStatusMessage(canvas, state);
                 }
             }
             finally
@@ -508,7 +530,7 @@ namespace LoneEftDmaRadar.UI
         }
 
 
-        private static void DrawStatusMessage(SKCanvas canvas, bool isStarting, bool isReady)
+        private static void DrawStatusMessage(SKCanvas canvas, AppState state)
         {
             var bounds = new SKRect(0, 0, _window.Size.X, _window.Size.Y);
 
@@ -516,20 +538,26 @@ namespace LoneEftDmaRadar.UI
             string baseText;
             int dotCount;
 
-            if (!isStarting)
+            switch (state)
             {
-                baseText = "Game Process Not Running!";
-                dotCount = 0;
-            }
-            else if (isStarting && !isReady)
-            {
-                baseText = "Starting Up";
-                dotCount = _statusOrder; // 1..3
-            }
-            else
-            {
-                baseText = "Waiting for Raid Start";
-                dotCount = _statusOrder; // 1..3
+                case AppState.Initializing:
+                    baseText = "Initializing";
+                    dotCount = _statusOrder; // 1..3
+                    break;
+                case AppState.ProcessNotStarted:
+                    baseText = "Game Process Not Running!";
+                    dotCount = 0;
+                    break;
+                case AppState.ProcessStarting:
+                    baseText = "Starting Up";
+                    dotCount = _statusOrder; // 1..3
+                    break;
+                case AppState.WaitingForRaid:
+                    baseText = "Waiting for Raid Start";
+                    dotCount = _statusOrder; // 1..3
+                    break;
+                default:
+                    return;
             }
 
             // Ensure dotCount never exceeds three
@@ -651,6 +679,7 @@ namespace LoneEftDmaRadar.UI
 
         private static void DrawWindows()
         {
+            var state = Program.State;
             // Settings Panel
             if (SettingsPanel.IsOpen)
             {
@@ -688,19 +717,19 @@ namespace LoneEftDmaRadar.UI
             }
 
             // Aimview Widget
-            if (AimviewWidget.IsOpen && InRaid)
+            if (AimviewWidget.IsOpen && state == AppState.InRaid)
             {
                 AimviewWidget.Draw();
             }
 
             // Player Info Widget
-            if (PlayerInfoWidget.IsOpen && InRaid)
+            if (PlayerInfoWidget.IsOpen && state == AppState.InRaid)
             {
                 PlayerInfoWidget.Draw();
             }
 
             // Loot Widget
-            if (LootWidget.IsOpen && InRaid && Config.Loot.Enabled)
+            if (LootWidget.IsOpen && state == AppState.InRaid && Config.Loot.Enabled)
             {
                 LootWidget.Draw();
             }
@@ -942,7 +971,7 @@ namespace LoneEftDmaRadar.UI
 
         private static void ProcessMouseoverData(Vector2 mousePos)
         {
-            if (!InRaid)
+            if (Program.State != AppState.InRaid)
             {
                 ClearMouseoverRefs();
                 return;

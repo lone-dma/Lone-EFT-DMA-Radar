@@ -21,11 +21,7 @@ global using MessageBoxImage = LoneEftDmaRadar.UI.Misc.MessageBoxImage;
 global using MessageBoxOptions = LoneEftDmaRadar.UI.Misc.MessageBoxOptions;
 global using MessageBoxResult = LoneEftDmaRadar.UI.Misc.MessageBoxResult;
 global using RateLimiter = LoneEftDmaRadar.Misc.RateLimiter;
-using LoneEftDmaRadar.Tarkov;
 using LoneEftDmaRadar.UI;
-using LoneEftDmaRadar.UI.Maps;
-using LoneEftDmaRadar.UI.Misc;
-using LoneEftDmaRadar.UI.Skia;
 using LoneEftDmaRadar.Web.TarkovDev;
 using Microsoft.Extensions.DependencyInjection;
 using Silk.NET.Input.Glfw;
@@ -40,7 +36,6 @@ namespace LoneEftDmaRadar
         private const string BaseName = "Lone EFT DMA Radar";
         private const string MUTEX_ID = "0f908ff7-e614-6a93-60a3-cee36c9cea91";
         private static readonly Mutex _mutex;
-        private static readonly UpdateManager _updater;
 
         /// <summary>
         /// Application Name with Version.
@@ -76,17 +71,21 @@ namespace LoneEftDmaRadar
                 _mutex = new Mutex(true, MUTEX_ID, out bool singleton);
                 if (!singleton)
                     throw new InvalidOperationException("The application is already running.");
-                _updater = new UpdateManager(
-                    source: new GithubSource(
-                        repoUrl: "https://github.com/lone-dma/Lone-EFT-DMA-Radar",
-                        accessToken: null,
-                        prerelease: false));
                 Config = EftDmaConfig.Load();
                 ServiceProvider = BuildServiceProvider();
                 HttpClientFactory = ServiceProvider.GetRequiredService<IHttpClientFactory>();
                 SetHighPerformanceMode();
                 AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
                 AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+                var updater = new UpdateManager(
+                    source: new GithubSource(
+                        repoUrl: "https://github.com/lone-dma/Lone-EFT-DMA-Radar",
+                        accessToken: null,
+                        prerelease: false));
+                if (updater.IsInstalled)
+                {
+                    _ = Task.Run(() => CheckForUpdatesAsync(updater)); // Initialize continuations on the thread pool
+                }
             }
             catch (Exception ex)
             {
@@ -94,29 +93,11 @@ namespace LoneEftDmaRadar
                 throw;
             }
         }
+
         static void Main()
         {
             try
             {
-                // Show loading window during initialization
-                using var loadingWindow = new LoadingWindow();
-                loadingWindow.Show();
-
-                // Initialize initialization on a background thread while loading window pumps messages on main thread
-                var initTask = Task.Run(() => ConfigureProgramAsync(loadingWindow));
-
-                // Keep the loading window responsive until initialization completes
-                while (!initTask.IsCompleted)
-                {
-                    loadingWindow.DoEvents();
-                    Thread.Yield();
-                }
-
-                // Close loading window
-                loadingWindow.Close();
-
-                initTask.GetAwaiter().GetResult(); // Rethrow any exceptions
-
                 RadarWindow.Initialize();
                 RadarWindow.Run();
             }
@@ -128,34 +109,6 @@ namespace LoneEftDmaRadar
         }
 
         #region Boilerplate
-
-        /// <summary>
-        /// Configure Program Startup with loading window progress updates.
-        /// </summary>
-        private static async Task ConfigureProgramAsync(LoadingWindow loadingWindow)
-        {
-            loadingWindow.UpdateProgress(10, "Loading, Please Wait...");
-
-            if (_updater.IsInstalled)
-            {
-                _ = Task.Run(CheckForUpdatesAsync); // Initialize continuations on the thread pool
-            }
-
-            var tarkovDataManager = TarkovDataManager.ModuleInitAsync();
-            var eftMapManager = EftMapManager.ModuleInitAsync();
-            var memoryInterface = Memory.ModuleInitAsync();
-
-            var misc = Task.Run(() =>
-            {
-                SKPaints.PaintBitmap.ColorFilter = SKPaints.GetDarkModeColorFilter(0.7f);
-                SKPaints.PaintBitmapAlpha.ColorFilter = SKPaints.GetDarkModeColorFilter(0.7f);
-            });
-
-            // Wait for all tasks
-            await Task.WhenAll(tarkovDataManager, eftMapManager, memoryInterface, misc);
-
-            loadingWindow.UpdateProgress(100, "Loading Completed!");
-        }
 
         private static void CurrentDomain_ProcessExit(object sender, EventArgs e) => OnShutdown();
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -208,11 +161,11 @@ namespace LoneEftDmaRadar
                 Logging.WriteLine($"WARNING: Unable to set Multimedia thread characteristics to 'Games'. This may cause performance issues. ERROR {Marshal.GetLastWin32Error()}");
         }
 
-        private static async Task CheckForUpdatesAsync()
+        private static async Task CheckForUpdatesAsync(UpdateManager updater)
         {
             try
             {
-                var newVersion = await _updater.CheckForUpdatesAsync();
+                var newVersion = await updater.CheckForUpdatesAsync();
                 if (newVersion is not null)
                 {
                     var result = MessageBox.Show(
@@ -224,8 +177,8 @@ namespace LoneEftDmaRadar
 
                     if (result == MessageBoxResult.Yes)
                     {
-                        await _updater.DownloadUpdatesAsync(newVersion);
-                        _updater.ApplyUpdatesAndRestart(newVersion);
+                        await updater.DownloadUpdatesAsync(newVersion);
+                        updater.ApplyUpdatesAndRestart(newVersion);
                     }
                 }
             }
@@ -282,6 +235,26 @@ namespace LoneEftDmaRadar
 
         [LibraryImport("winmm.dll", EntryPoint = "timeBeginPeriod", SetLastError = true)]
         private static partial uint TimeBeginPeriod(uint uMilliseconds);
+
+        #endregion
+
+        #region State Management
+
+        private static volatile AppState _state = AppState.Initializing;
+        /// <summary>
+        /// Current Application State.
+        /// </summary>
+        public static AppState State => _state;
+
+        /// <summary>
+        /// Updates the current application state.
+        /// </summary>
+        /// <param name="newState">New state to be set.</param>
+        /// <returns>Previous <see cref="AppState"/>.</returns>
+        internal static AppState UpdateState(AppState newState)
+        {
+            return Interlocked.Exchange(ref _state, newState);
+        }
 
         #endregion
     }
