@@ -328,11 +328,12 @@ namespace LoneEftDmaRadar.UI
                 // Scene Render (Skia)
                 var fbSize = _window.FramebufferSize;
                 var state = Program.State;
-                DrawRadarScene(ref fbSize, state);
-                AimviewWidget.Render();
+                DrawSkiaScene(ref fbSize, state);
 
                 if (state > AppState.Initializing)
                 {
+                    // Aimview Widget (Skia)
+                    AimviewWidget.Render();
                     // UI Render (ImGui)
                     DrawImGuiUI(ref fbSize, delta);
                 }
@@ -343,7 +344,7 @@ namespace LoneEftDmaRadar.UI
             }
         }
 
-        private static void DrawRadarScene(ref Vector2D<int> fbSize, AppState state)
+        private static void DrawSkiaScene(ref Vector2D<int> fbSize, AppState state)
         {
             _gl.Viewport(0, 0, (uint)fbSize.X, (uint)fbSize.Y);
             _gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
@@ -357,7 +358,7 @@ namespace LoneEftDmaRadar.UI
             {
                 if (state == AppState.InRaid && LocalPlayer is LocalPlayer localPlayer && EftMapManager.LoadMap(MapID) is IEftMap map)
                 {
-                    DrawInRaidRadar(canvas, localPlayer, map);
+                    DrawRadar(canvas, localPlayer, map);
                 }
                 else
                 {
@@ -372,7 +373,7 @@ namespace LoneEftDmaRadar.UI
             }
         }
 
-        private static void DrawInRaidRadar(SKCanvas canvas, LocalPlayer localPlayer, IEftMap map)
+        private static void DrawRadar(SKCanvas canvas, LocalPlayer localPlayer, IEftMap map)
         {
             var closestToMouse = _mouseOverItem;
             var localPlayerPos = localPlayer.Position;
