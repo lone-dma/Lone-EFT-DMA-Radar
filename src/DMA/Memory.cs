@@ -28,7 +28,6 @@ SOFTWARE.
 
 global using LoneEftDmaRadar.DMA;
 using Collections.Pooled;
-using LoneEftDmaRadar.UI;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.Tarkov.World;
 using LoneEftDmaRadar.Tarkov.World.Exits;
@@ -62,9 +61,6 @@ namespace LoneEftDmaRadar.DMA
         public static string MapID => Game?.MapID;
         public static ulong UnityBase { get; private set; }
         public static ulong GOM { get; private set; }
-        public static bool Starting { get; private set; }
-        public static bool Ready { get; private set; }
-        public static bool InRaid => Game?.InRaid ?? false;
 
         public static IReadOnlyCollection<AbstractPlayer> Players => Game?.Players;
         public static IReadOnlyCollection<IExplosiveItem> Explosives => Game?.Explosives;
@@ -171,7 +167,7 @@ namespace LoneEftDmaRadar.DMA
         private static void MemoryPrimaryWorker()
         {
             Logging.WriteLine("Memory thread starting...");
-            while (RadarWindow.Dispatcher is null)
+            while (Program.State == AppState.Initializing)
                 Thread.Sleep(1);
             while (true)
             {
@@ -232,9 +228,9 @@ namespace LoneEftDmaRadar.DMA
                     _vmm.ForceFullRefresh();
                     LoadProcess();
                     LoadModules();
-                    Starting = true;
+                    Program.UpdateState(AppState.ProcessStarting);
                     OnProcessStarting();
-                    Ready = true;
+                    Program.UpdateState(AppState.WaitingForRaid);
                     Logging.WriteLine("Process Startup [OK]");
                     break;
                 }
@@ -300,8 +296,7 @@ namespace LoneEftDmaRadar.DMA
         /// <param name="e"></param>
         private static void MemDMA_ProcessStopped(object sender, EventArgs e)
         {
-            Starting = default;
-            Ready = default;
+            Program.UpdateState(AppState.ProcessNotStarted);
             UnityBase = default;
             GOM = default;
             _pid = default;
@@ -309,12 +304,14 @@ namespace LoneEftDmaRadar.DMA
 
         private static void Memory_RaidStarted(object sender, EventArgs e)
         {
+            Program.UpdateState(AppState.InRaid);
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
         }
 
         private static void MemDMA_RaidStopped(object sender, EventArgs e)
         {
             Game = null;
+            Program.UpdateState(AppState.WaitingForRaid);
             GCSettings.LatencyMode = GCLatencyMode.Interactive;
         }
 

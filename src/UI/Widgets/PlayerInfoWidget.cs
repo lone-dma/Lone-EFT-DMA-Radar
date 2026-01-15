@@ -59,14 +59,13 @@ namespace LoneEftDmaRadar.UI.Widgets
         // Data sources
         private static LocalPlayer LocalPlayer => Memory.LocalPlayer;
         private static IReadOnlyCollection<AbstractPlayer> AllPlayers => Memory.Players;
-        private static bool InRaid => Memory.InRaid;
 
         /// <summary>
         /// Draw the Player Info Widget.
         /// </summary>
         public static void Draw()
         {
-            if (!IsOpen || !InRaid)
+            if (!IsOpen || Program.State != AppState.InRaid)
                 return;
 
             var localPlayer = LocalPlayer;

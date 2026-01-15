@@ -60,7 +60,6 @@ namespace LoneEftDmaRadar.UI.Widgets
         // Data sources
         private static LocalPlayer LocalPlayer => Memory.LocalPlayer;
         private static IEnumerable<LootItem> FilteredLoot => Memory.Loot?.FilteredLoot;
-        private static bool InRaid => Memory.InRaid;
 
         // Sorting state
         private static uint _sortColumnId = 1; // Default: Value
@@ -89,7 +88,7 @@ namespace LoneEftDmaRadar.UI.Widgets
         /// </summary>
         public static void Draw()
         {
-            if (!IsOpen || !InRaid)
+            if (!IsOpen || Program.State != AppState.InRaid)
                 return;
 
             var localPlayer = LocalPlayer;
