@@ -157,6 +157,17 @@ namespace LoneEftDmaRadar.UI
             SettingsPanel.UpdateUIScale(Config.UI.UIScale);
 
             _load = OnLoadAsync(); // Load remaining modules and UI components asynchronously
+            _window.Update += OnLoadAsync_Update;
+        }
+
+        private static void OnLoadAsync_Update(double delta)
+        {
+            if (_load?.IsCompleted ?? false)
+            {
+                _load.GetAwaiter().GetResult(); // Observes any exceptions
+                _load = null;
+                _window.Update -= OnLoadAsync_Update;
+            }
         }
 
         /// <summary>
@@ -302,12 +313,6 @@ namespace LoneEftDmaRadar.UI
         /// <param name="delta"></param>
         private static void OnRender(double delta)
         {
-            var state = Program.State;
-            if (_load?.IsCompleted ?? false)
-            {
-                _load.GetAwaiter().GetResult(); // Observe any exceptions
-                _load = null;
-            }
             if (_grContext is null || _skSurface is null)
                 return;
             try
@@ -322,6 +327,7 @@ namespace LoneEftDmaRadar.UI
 
                 // Scene Render (Skia)
                 var fbSize = _window.FramebufferSize;
+                var state = Program.State;
                 DrawRadarScene(ref fbSize, state);
                 AimviewWidget.Render();
 
