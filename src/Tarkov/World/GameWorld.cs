@@ -690,6 +690,9 @@ namespace LoneEftDmaRadar.Tarkov.World
             return $"GameWorld:{Base:X}";
         }
 
+        /// <summary>
+        /// Contains methods to lookup GameWorld instance.
+        /// </summary>
         private static class Lookup
         {
             public static void Find(CancellationToken ct, out ulong gameWorld, out string map)
@@ -734,7 +737,6 @@ namespace LoneEftDmaRadar.Tarkov.World
 
             /// <summary>
             /// Finds GameWorld using IL2CPP interop.
-            /// Attempts up to 3 times before giving up.
             /// </summary>
             private static GameWorldResult FindViaIL2CPP(CancellationToken ct1, CancellationToken ct2)
             {
@@ -761,7 +763,7 @@ namespace LoneEftDmaRadar.Tarkov.World
             }
 
             /// <summary>
-            /// Finds GameWorld using Unity GameObjectManager with 3 parallel subtasks.
+            /// Finds GameWorld using Unity GameObjectManager with parallel subtasks.
             /// </summary>
             private static GameWorldResult FindViaGOM(CancellationToken ct1, CancellationToken ct2)
             {
