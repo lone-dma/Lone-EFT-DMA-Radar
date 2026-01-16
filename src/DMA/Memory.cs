@@ -352,8 +352,9 @@ namespace LoneEftDmaRadar.DMA
                 IL2CPPLib.Init(_vmm, _pid);
                 GOM = GameObjectManager.GetAddr(unityBase);
             }
-            catch // Use GOM as a failover
+            catch (Exception ex) // Use GOM as a failover
             {
+                Logging.WriteLine($"IL2CPP Init Failed, using GOM if available: {ex}");
                 GOM = GameObjectManager.GetAddr(unityBase);
             }
             UnityBase = unityBase;

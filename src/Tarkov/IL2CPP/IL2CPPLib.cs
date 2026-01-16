@@ -27,7 +27,7 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
             {
                 if (!Initialized)
                     return false;
-                var gamePlayerOwner = Memory.ReadValue<Class>(class_gamePlayerOwner);
+                var gamePlayerOwner = Memory.ReadValue<Class>(Cache.GamePlayerOwner);
                 var myPlayer = Memory.ReadPtr(gamePlayerOwner.static_fields + Offsets.GamePlayerOwner._myPlayer);
                 gameWorld = Memory.ReadPtr(myPlayer + Offsets.Player.GameWorld);
                 /// Get Selected Map
@@ -61,7 +61,8 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
         private static ulong gTypeInfoDefinitionTable;
         private static ulong gMetadataGlobalHeader;
         private static ulong gGlobalMetadata;
-        private static ulong class_gamePlayerOwner;
+
+        private static PersistentCache Cache => Program.Config.Cache;
 
         static IL2CPPLib()
         {
@@ -73,7 +74,6 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
         {
             _vmm = default;
             _pid = default;
-            class_gamePlayerOwner = default;
             Initialized = default;
         }
 
@@ -84,13 +84,19 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
                 Logging.WriteLine("Initializing IL2CPP SDK...");
                 _vmm = vmm;
                 _pid = pid;
+                if (Cache.GamePlayerOwner.IsValidUserVA()) // Load from cache
+                {
+                    Initialized = true;
+                    Logging.WriteLine("IL2CPP SDK Initialized (Cache).");
+                    return;
+                }
                 if (!vmm.Map_GetModuleFromName(pid, "GameAssembly.dll", out var module))
                     throw new InvalidOperationException("Could not find GameAssembly.dll module in target process.");
                 if (vmm.Map_GetEAT(pid, "GameAssembly.dll", out _) is not Vmm.EATEntry[] eat || eat.Length == 0)
                     throw new InvalidOperationException("Could not get GameAssembly.dll export table.");
 
                 Resolve_TypeInfoDefinitionTable(ref module, eat);
-                class_gamePlayerOwner = Class.FindClass("EFT.GamePlayerOwner");
+                Cache.GamePlayerOwner = Class.FindClass("EFT.GamePlayerOwner");
 
                 Initialized = true;
                 Logging.WriteLine("IL2CPP SDK Initialized.");
@@ -792,15 +798,37 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
             {
                 using var ptrs = _vmm.MemReadPooled<ulong>(_pid, gTypeInfoDefinitionTable, gTypeCount) ??
                     throw new InvalidOperationException("Failed to read type definition table.");
+                using var scatter = Memory.CreateScatterMap();
+                var rd1 = scatter.AddRound();
+                var rd2 = scatter.AddRound();
+                ulong result = default;
                 foreach (var ptr in ptrs.Memory.Span)
                 {
-                    var klass = Memory.ReadValue<Class>(ptr);
-                    if (klass.ToString().Equals(name, StringComparison.OrdinalIgnoreCase))
+                    _ = rd1.PrepareReadValue<Class>(ptr);
+                    rd1.Completed += (_, s1) =>
                     {
-                        return ptr;
-                    }
+                        if (s1.ReadValue<Class>(ptr, out var klass))
+                        {
+                            _ = rd2.PrepareRead(klass.namespaze, 128);
+                            _ = rd2.PrepareRead(klass.name, 128);
+                            rd2.Completed += (_, s2) =>
+                            {
+                                if (s2.ReadString(klass.namespaze, 128, Encoding.ASCII) is string ns &&
+                                    s2.ReadString(klass.name, 128, Encoding.ASCII) is string n)
+                                {
+                                    string fullName = string.IsNullOrEmpty(ns) ? n : $"{ns}.{n}";
+                                    if (fullName.Equals(name, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        result = ptr;
+                                    }
+                                }
+                            };
+                        }
+                    };
                 }
-                throw new InvalidOperationException($"Class '{name}' not found.");
+                scatter.Execute();
+                result.ThrowIfInvalidUserVA(nameof(result));
+                return result;
             }
 
             public readonly string GetName() => Memory.ReadAsciiString(name);
@@ -810,6 +838,7 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
                     return string.Empty;
                 return Memory.ReadAsciiString(namespaze);
             }
+
             public Class? GetParent()
             {
                 if (!parent.IsValidUserVA())
