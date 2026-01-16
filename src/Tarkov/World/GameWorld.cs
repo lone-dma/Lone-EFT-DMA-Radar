@@ -28,6 +28,7 @@ SOFTWARE.
 
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Misc.Workers;
+using LoneEftDmaRadar.Tarkov.IL2CPP;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.Tarkov.World.Exits;
 using LoneEftDmaRadar.Tarkov.World.Explosives;
@@ -231,7 +232,14 @@ namespace LoneEftDmaRadar.Tarkov.World
             try
             {
                 /// Get World
-                var gameWorld = GameObjectManager.Get().GetGameWorld(ct, out string map);
+                if (IL2CPPLib.TryGetGameWorld(out ulong gameWorld, out string map))
+                {
+                    Logging.WriteLine($"IL2CPPLib GameWorld Found: {gameWorld}, Map: {map}");
+                }
+                else // Fallback to Unity GameObjectManager
+                {
+                    GameObjectManager.Get().GetGameWorld(ct, out gameWorld, out map);
+                }
                 return new GameWorld(gameWorld, map);
             }
             catch (OperationCanceledException)
