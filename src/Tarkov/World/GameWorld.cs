@@ -756,6 +756,7 @@ namespace LoneEftDmaRadar.Tarkov.World
                     }
                     catch (OperationCanceledException) { throw; }
                     catch { }
+                    Thread.Sleep(10);
                 }
             }
 
