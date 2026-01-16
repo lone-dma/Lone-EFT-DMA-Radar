@@ -577,9 +577,20 @@ namespace LoneEftDmaRadar.DMA
         }
 
         /// <summary>
+        /// Read null terminated ASCII string.
+        /// </summary>
+        public static string ReadAsciiString(ulong addr, int cb = 128, bool useCache = true) // read n bytes (string)
+        {
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(cb, 0x1000, nameof(cb));
+            var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
+            return _vmm.MemReadString(_pid, addr, cb, Encoding.ASCII, flags) ??
+                throw new VmmException("Memory Read Failed!");
+        }
+
+        /// <summary>
         /// Read null terminated UTF8 string.
         /// </summary>
-        public static string ReadUtf8String(ulong addr, int cb, bool useCache = true) // read n bytes (string)
+        public static string ReadUtf8String(ulong addr, int cb = 128, bool useCache = true) // read n bytes (string)
         {
             ArgumentOutOfRangeException.ThrowIfGreaterThan(cb, 0x1000, nameof(cb));
             var flags = useCache ? VmmFlags.NONE : VmmFlags.NOCACHE;
