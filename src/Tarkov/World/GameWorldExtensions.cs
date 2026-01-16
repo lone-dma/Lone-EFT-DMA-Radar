@@ -11,10 +11,11 @@ namespace LoneEftDmaRadar.Tarkov.World
         /// </summary>
         /// <param name="gom"></param>
         /// <param name="ct">Restart radar cancellation token.</param>
+        /// <param name="gameWorld">GameWorld pointer, otherwise null.</param>
         /// <param name="map">Map for the located gameworld, otherwise null.</param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public static ulong GetGameWorld(this GameObjectManager gom, CancellationToken ct, out string map)
+        public static void GetGameWorld(this GameObjectManager gom, CancellationToken ct, out ulong gameWorld, out string map)
         {
             ct.ThrowIfCancellationRequested();
             Logging.WriteLine("Searching for GameWorld...");
@@ -49,8 +50,8 @@ namespace LoneEftDmaRadar.Tarkov.World
                 }
                 if (winner is null)
                     throw new InvalidOperationException("GameWorld not found.");
+                gameWorld = winner.Result.GameWorld;
                 map = winner.Result.Map;
-                return winner.Result.GameWorld;
             }
             finally
             {
