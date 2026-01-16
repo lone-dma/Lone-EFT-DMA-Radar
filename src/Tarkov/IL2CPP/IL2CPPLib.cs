@@ -92,10 +92,10 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
                 }
                 if (!vmm.Map_GetModuleFromName(pid, "GameAssembly.dll", out var module))
                     throw new InvalidOperationException("Could not find GameAssembly.dll module in target process.");
-                if (vmm.Map_GetEAT(pid, "GameAssembly.dll", out _) is not Vmm.EATEntry[] eat || eat.Length == 0)
-                    throw new InvalidOperationException("Could not get GameAssembly.dll export table.");
+                //if (vmm.Map_GetEAT(pid, "GameAssembly.dll", out _) is not Vmm.EATEntry[] eat || eat.Length == 0)
+                //    throw new InvalidOperationException("Could not get GameAssembly.dll export table.");
 
-                Resolve_TypeInfoDefinitionTable(ref module, eat);
+                Resolve_TypeInfoDefinitionTable(ref module);
                 Cache.GamePlayerOwner = Class.FindClass("EFT.GamePlayerOwner");
 
                 Initialized = true;
@@ -109,7 +109,7 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
             }
         }
 
-        private static void Resolve_TypeInfoDefinitionTable(ref Vmm.ModuleEntry module, Vmm.EATEntry[] eat)
+        private static void Resolve_TypeInfoDefinitionTable(ref Vmm.ModuleEntry module)
         {
             try
             {
