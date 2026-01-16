@@ -29,6 +29,7 @@ SOFTWARE.
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Misc.Workers;
 using LoneEftDmaRadar.Tarkov.IL2CPP;
+using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.Tarkov.World.Exits;
 using LoneEftDmaRadar.Tarkov.World.Explosives;
@@ -37,6 +38,7 @@ using LoneEftDmaRadar.Tarkov.World.Loot;
 using LoneEftDmaRadar.Tarkov.World.Player;
 using LoneEftDmaRadar.Tarkov.World.Player.Helpers;
 using LoneEftDmaRadar.Tarkov.World.Quests;
+using VmmSharpEx.Extensions;
 using VmmSharpEx.Options;
 
 namespace LoneEftDmaRadar.Tarkov.World
@@ -231,15 +233,7 @@ namespace LoneEftDmaRadar.Tarkov.World
             ct.ThrowIfCancellationRequested();
             try
             {
-                /// Get World
-                if (IL2CPPLib.TryGetGameWorld(out ulong gameWorld, out string map))
-                {
-                    Logging.WriteLine($"IL2CPPLib GameWorld Found: {gameWorld}, Map: {map}");
-                }
-                else // Fallback to Unity GameObjectManager
-                {
-                    GameObjectManager.Get().GetGameWorld(ct, out gameWorld, out map);
-                }
+                GameWorldLookup.Find(ct, out ulong gameWorld, out string map);
                 return new GameWorld(gameWorld, map);
             }
             catch (OperationCanceledException)
@@ -697,5 +691,232 @@ namespace LoneEftDmaRadar.Tarkov.World
         }
 
         #endregion
+
+        private static class GameWorldLookup
+        {
+            public static void Find(CancellationToken ct, out ulong gameWorld, out string map)
+            {
+                ct.ThrowIfCancellationRequested();
+                Logging.WriteLine("Searching for GameWorld...");
+
+                using var searchCts = new CancellationTokenSource();
+                try
+                {
+                    Task<GameWorldResult> winner = null;
+                    var tasks = new List<Task<GameWorldResult>>()
+                    {
+                        Task.Run(() => FindViaIL2CPP(searchCts.Token, ct)),
+                        Task.Run(() => FindViaGOM(searchCts.Token, ct))
+                    };
+
+                    while (tasks.Count > 0)
+                    {
+                        var finished = Task.WhenAny(tasks).GetAwaiter().GetResult();
+                        ct.ThrowIfCancellationRequested();
+                        tasks.Remove(finished);
+
+                        if (finished.Status == TaskStatus.RanToCompletion)
+                        {
+                            winner = finished;
+                            break;
+                        }
+                    }
+
+                    if (winner is null)
+                        throw new InvalidOperationException("GameWorld not found.");
+
+                    gameWorld = winner.Result.GameWorld;
+                    map = winner.Result.Map;
+                }
+                finally
+                {
+                    searchCts.Cancel();
+                }
+            }
+
+            #region IL2CPP Lookup
+
+            /// <summary>
+            /// Finds GameWorld using IL2CPP interop.
+            /// Attempts up to 3 times before giving up.
+            /// </summary>
+            private static GameWorldResult FindViaIL2CPP(CancellationToken ct1, CancellationToken ct2)
+            {
+                const int maxAttempts = 3;
+                for (int attempt = 0; attempt < maxAttempts; attempt++)
+                {
+                    ct1.ThrowIfCancellationRequested();
+                    ct2.ThrowIfCancellationRequested();
+                    try
+                    {
+                        if (IL2CPPLib.TryGetGameWorld(out ulong gameWorld, out string map))
+                        {
+                            Logging.WriteLine("GameWorld Found! (IL2CPP)");
+                            return new GameWorldResult
+                            {
+                                GameWorld = gameWorld,
+                                Map = map
+                            };
+                        }
+                    }
+                    catch (OperationCanceledException) { throw; }
+                    catch { }
+                }
+                throw new InvalidOperationException("GameWorld not found via IL2CPP.");
+            }
+
+            #endregion
+
+            #region GOM Lookup
+
+            /// <summary>
+            /// Finds GameWorld using Unity GameObjectManager with 3 parallel subtasks.
+            /// </summary>
+            private static GameWorldResult FindViaGOM(CancellationToken ct1, CancellationToken ct2)
+            {
+                var gom = GameObjectManager.Get();
+                var firstObject = Memory.ReadValue<LinkedListObject>(gom.ActiveNodes);
+                var lastObject = Memory.ReadValue<LinkedListObject>(gom.LastActiveNode);
+                firstObject.ThisObject.ThrowIfInvalidUserVA(nameof(firstObject));
+                firstObject.NextObjectLink.ThrowIfInvalidUserVA(nameof(firstObject));
+                lastObject.ThisObject.ThrowIfInvalidUserVA(nameof(lastObject));
+
+                using var gomCts = new CancellationTokenSource();
+                try
+                {
+                    Task<GameWorldResult> winner = null;
+                    var tasks = new List<Task<GameWorldResult>>()
+                    {
+                        Task.Run(() => GOM_ReadShallow(gomCts.Token, ct1, ct2)),
+                        Task.Run(() => GOM_ReadForward(firstObject, lastObject, gomCts.Token, ct1, ct2))
+                    };
+
+                    while (tasks.Count > 1) // Shallow will never exit normally
+                    {
+                        var finished = Task.WhenAny(tasks).GetAwaiter().GetResult();
+                        ct1.ThrowIfCancellationRequested();
+                        ct2.ThrowIfCancellationRequested();
+                        tasks.Remove(finished);
+
+                        if (finished.Status == TaskStatus.RanToCompletion)
+                        {
+                            winner = finished;
+                            break;
+                        }
+                    }
+
+                    if (winner is null)
+                        throw new InvalidOperationException("GameWorld not found via GOM.");
+
+                    return winner.Result;
+                }
+                finally
+                {
+                    gomCts.Cancel();
+                }
+            }
+
+            private static GameWorldResult GOM_ReadShallow(CancellationToken gomCt, CancellationToken ct1, CancellationToken ct2)
+            {
+                const int maxDepth = 10000;
+                while (true)
+                {
+                    gomCt.ThrowIfCancellationRequested();
+                    ct1.ThrowIfCancellationRequested();
+                    ct2.ThrowIfCancellationRequested();
+                    try
+                    {
+                        // This implementation is completely self-contained to keep memory state fresh on re-loops
+                        var gom = GameObjectManager.Get();
+                        var currentObject = Memory.ReadValue<LinkedListObject>(gom.ActiveNodes);
+                        int iterations = 0;
+                        while (currentObject.ThisObject.IsValidUserVA())
+                        {
+                            gomCt.ThrowIfCancellationRequested();
+                            ct1.ThrowIfCancellationRequested();
+                            ct2.ThrowIfCancellationRequested();
+                            if (iterations++ >= maxDepth)
+                                break;
+                            if (ParseGameWorldGameObject(ref currentObject) is GameWorldResult result)
+                            {
+                                Logging.WriteLine("GameWorld Found! (GOM Shallow)");
+                                return result;
+                            }
+
+                            currentObject = Memory.ReadValue<LinkedListObject>(currentObject.NextObjectLink); // Read next object
+                        }
+                    }
+                    catch (OperationCanceledException) { throw; }
+                    catch { }
+                }
+            }
+
+            private static GameWorldResult GOM_ReadForward(LinkedListObject currentObject, LinkedListObject lastObject, CancellationToken gomCt, CancellationToken ct1, CancellationToken ct2)
+            {
+                while (currentObject.ThisObject != lastObject.ThisObject)
+                {
+                    gomCt.ThrowIfCancellationRequested();
+                    ct1.ThrowIfCancellationRequested();
+                    ct2.ThrowIfCancellationRequested();
+                    if (ParseGameWorldGameObject(ref currentObject) is GameWorldResult result)
+                    {
+                        Logging.WriteLine("GameWorld Found! (GOM Forward)");
+                        return result;
+                    }
+
+                    currentObject = Memory.ReadValue<LinkedListObject>(currentObject.NextObjectLink); // Read next object
+                }
+                throw new InvalidOperationException("GameWorld not found.");
+            }
+
+            private static GameWorldResult ParseGameWorldGameObject(ref LinkedListObject gameObject)
+            {
+                try
+                {
+                    gameObject.ThisObject.ThrowIfInvalidUserVA(nameof(gameObject));
+                    var objectNamePtr = Memory.ReadPtr(gameObject.ThisObject + UnitySDK.UnityOffsets.GameObject_NameOffset);
+                    var objectNameStr = Memory.ReadUtf8String(objectNamePtr, 64);
+                    if (objectNameStr.Equals("GameWorld", StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            var gameWorld = Memory.ReadPtrChain(gameObject.ThisObject, true, UnitySDK.UnityOffsets.GameWorldChain);
+                            /// Get Selected Map
+                            var mapPtr = Memory.ReadValue<ulong>(gameWorld + Offsets.GameWorld.LocationId);
+                            if (mapPtr == 0x0) // Offline Mode
+                            {
+                                var localPlayer = Memory.ReadPtr(gameWorld + Offsets.GameWorld.MainPlayer);
+                                mapPtr = Memory.ReadPtr(localPlayer + Offsets.Player.Location);
+                            }
+
+                            string map = Memory.ReadUnityString(mapPtr, 128);
+                            Logging.WriteLine("Detected Map " + map);
+                            if (!TarkovDataManager.MapData.ContainsKey(map)) // Also makes sure we're not in the hideout
+                                throw new ArgumentException("Invalid Map ID!");
+                            return new GameWorldResult()
+                            {
+                                GameWorld = gameWorld,
+                                Map = map
+                            };
+                        }
+                        catch (Exception ex)
+                        {
+                            Logging.WriteLine($"Invalid GameWorld Instance: {ex}");
+                        }
+                    }
+                }
+                catch { }
+                return null;
+            }
+
+
+            #endregion
+
+            private class GameWorldResult
+            {
+                public ulong GameWorld { get; init; }
+                public string Map { get; init; }
+            }
+        }
     }
 }
