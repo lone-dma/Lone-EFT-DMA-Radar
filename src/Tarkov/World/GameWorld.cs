@@ -709,7 +709,7 @@ namespace LoneEftDmaRadar.Tarkov.World
                         Task.Run(() => FindViaGOM(searchCts.Token, ct))
                     };
 
-                    while (tasks.Count > 0)
+                    while (tasks.Count > 1) // IL2CPP will never exit normally
                     {
                         var finished = Task.WhenAny(tasks).GetAwaiter().GetResult();
                         ct.ThrowIfCancellationRequested();
@@ -742,8 +742,7 @@ namespace LoneEftDmaRadar.Tarkov.World
             /// </summary>
             private static GameWorldResult FindViaIL2CPP(CancellationToken ct1, CancellationToken ct2)
             {
-                const int maxAttempts = 3;
-                for (int attempt = 0; attempt < maxAttempts; attempt++)
+                while (true)
                 {
                     ct1.ThrowIfCancellationRequested();
                     ct2.ThrowIfCancellationRequested();
@@ -762,7 +761,6 @@ namespace LoneEftDmaRadar.Tarkov.World
                     catch (OperationCanceledException) { throw; }
                     catch { }
                 }
-                throw new InvalidOperationException("GameWorld not found via IL2CPP.");
             }
 
             #endregion
