@@ -233,7 +233,7 @@ namespace LoneEftDmaRadar.Tarkov.World
             ct.ThrowIfCancellationRequested();
             try
             {
-                GameWorldLookup.Find(ct, out ulong gameWorld, out string map);
+                Lookup.Find(ct, out ulong gameWorld, out string map);
                 return new GameWorld(gameWorld, map);
             }
             catch (OperationCanceledException)
@@ -690,9 +690,7 @@ namespace LoneEftDmaRadar.Tarkov.World
             return $"GameWorld:{Base:X}";
         }
 
-        #endregion
-
-        private static class GameWorldLookup
+        private static class Lookup
         {
             public static void Find(CancellationToken ct, out ulong gameWorld, out string map)
             {
@@ -734,8 +732,6 @@ namespace LoneEftDmaRadar.Tarkov.World
                 }
             }
 
-            #region IL2CPP Lookup
-
             /// <summary>
             /// Finds GameWorld using IL2CPP interop.
             /// Attempts up to 3 times before giving up.
@@ -762,10 +758,6 @@ namespace LoneEftDmaRadar.Tarkov.World
                     catch { }
                 }
             }
-
-            #endregion
-
-            #region GOM Lookup
 
             /// <summary>
             /// Finds GameWorld using Unity GameObjectManager with 3 parallel subtasks.
@@ -907,14 +899,13 @@ namespace LoneEftDmaRadar.Tarkov.World
                 return null;
             }
 
-
-            #endregion
-
             private class GameWorldResult
             {
                 public ulong GameWorld { get; init; }
                 public string Map { get; init; }
             }
         }
+
+        #endregion
     }
 }

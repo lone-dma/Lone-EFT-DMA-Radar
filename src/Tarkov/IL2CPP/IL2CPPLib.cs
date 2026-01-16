@@ -12,6 +12,38 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
         /// </summary>
         public static bool Initialized { get; private set; }
 
+        public static void Init(Vmm vmm, uint pid)
+        {
+            try
+            {
+                Logging.WriteLine("Initializing IL2CPP SDK...");
+                _vmm = vmm;
+                _pid = pid;
+                if (Cache.GamePlayerOwner.IsValidUserVA()) // Load from cache
+                {
+                    Initialized = true;
+                    Logging.WriteLine("IL2CPP SDK Initialized (Cache).");
+                    return;
+                }
+                if (!vmm.Map_GetModuleFromName(pid, "GameAssembly.dll", out var module))
+                    throw new InvalidOperationException("Could not find GameAssembly.dll module in target process.");
+                //if (vmm.Map_GetEAT(pid, "GameAssembly.dll", out _) is not Vmm.EATEntry[] eat || eat.Length == 0)
+                //    throw new InvalidOperationException("Could not get GameAssembly.dll export table.");
+
+                Resolve_TypeInfoDefinitionTable(ref module);
+                Cache.GamePlayerOwner = Class.FindClass("EFT.GamePlayerOwner");
+
+                Initialized = true;
+                Logging.WriteLine("IL2CPP SDK Initialized.");
+                return;
+            }
+            catch
+            {
+                Reset();
+                throw;
+            }
+        }
+
         /// <summary>
         /// Lookup GameWorld using IL2CPP Interop.
         /// </summary>
@@ -75,38 +107,6 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
             _vmm = default;
             _pid = default;
             Initialized = default;
-        }
-
-        public static void Init(Vmm vmm, uint pid)
-        {
-            try
-            {
-                Logging.WriteLine("Initializing IL2CPP SDK...");
-                _vmm = vmm;
-                _pid = pid;
-                if (Cache.GamePlayerOwner.IsValidUserVA()) // Load from cache
-                {
-                    Initialized = true;
-                    Logging.WriteLine("IL2CPP SDK Initialized (Cache).");
-                    return;
-                }
-                if (!vmm.Map_GetModuleFromName(pid, "GameAssembly.dll", out var module))
-                    throw new InvalidOperationException("Could not find GameAssembly.dll module in target process.");
-                //if (vmm.Map_GetEAT(pid, "GameAssembly.dll", out _) is not Vmm.EATEntry[] eat || eat.Length == 0)
-                //    throw new InvalidOperationException("Could not get GameAssembly.dll export table.");
-
-                Resolve_TypeInfoDefinitionTable(ref module);
-                Cache.GamePlayerOwner = Class.FindClass("EFT.GamePlayerOwner");
-
-                Initialized = true;
-                Logging.WriteLine("IL2CPP SDK Initialized.");
-                return;
-            }
-            catch
-            {
-                Reset();
-                throw;
-            }
         }
 
         private static void Resolve_TypeInfoDefinitionTable(ref Vmm.ModuleEntry module)
