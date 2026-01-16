@@ -550,6 +550,12 @@ namespace LoneEftDmaRadar
         public uint PID { get; set; }
 
         /// <summary>
+        /// EFT.GamePlayerOwner Class Def.
+        /// </summary>
+        [JsonPropertyName("gamePlayerOwner")]
+        public ulong GamePlayerOwner { get; set; } = default;
+
+        /// <summary>
         /// Cache information per Raid.
         /// </summary>
         [JsonPropertyName("raidCache_v2")]
