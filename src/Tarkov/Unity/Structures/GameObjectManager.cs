@@ -14,13 +14,14 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
         [FieldOffset(0x28)]
         public readonly ulong ActiveNodes; // 0x28
 
+        private static PersistentCache Cache => Program.Config.Cache;
+
         /// <summary>
-        /// Looks up the Address of the Game Object Manager.
+        /// Initializes the Game Object Manager address.
         /// </summary>
         /// <param name="unityBase">UnityPlayer.dll module base address.</param>
-        /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public static ulong GetAddr(ulong unityBase)
+        public static void Init(ulong unityBase)
         {
             try
             {
@@ -33,14 +34,14 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
                     var gomPtr = Memory.ReadValueEnsure<VmmPointer>(gomSig.AddRVA(7, rva));
                     gomPtr.ThrowIfInvalidUserVA();
                     Logging.WriteLine("GOM Located via Signature.");
-                    return gomPtr;
+                    Cache.GameObjectManager = gomPtr;
                 }
                 catch
                 {
                     var gomPtr = Memory.ReadValueEnsure<VmmPointer>(unityBase + UnitySDK.UnityOffsets.GameObjectManager);
                     gomPtr.ThrowIfInvalidUserVA();
                     Logging.WriteLine("GOM Located via Hardcoded Offset.");
-                    return gomPtr;
+                    Cache.GameObjectManager = gomPtr;
                 }
             }
             catch (Exception ex)
@@ -57,8 +58,8 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
         {
             try
             {
-                Memory.GOM.ThrowIfInvalidUserVA(nameof(Memory.GOM));
-                return Memory.ReadValueEnsure<GameObjectManager>(Memory.GOM);
+                Cache.GameObjectManager.ThrowIfInvalidUserVA(nameof(Cache.GameObjectManager));
+                return Memory.ReadValueEnsure<GameObjectManager>(Cache.GameObjectManager);
             }
             catch (Exception ex)
             {

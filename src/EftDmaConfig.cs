@@ -550,6 +550,12 @@ namespace LoneEftDmaRadar
         public uint PID { get; set; }
 
         /// <summary>
+        /// GameObjectManager Virtual Address.
+        /// </summary>
+        [JsonPropertyName("gameObjectManager")]
+        public ulong GameObjectManager { get; set; } = default;
+
+        /// <summary>
         /// EFT.GamePlayerOwner Class Def.
         /// </summary>
         [JsonPropertyName("gamePlayerOwner")]

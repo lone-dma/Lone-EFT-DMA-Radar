@@ -61,7 +61,6 @@ namespace LoneEftDmaRadar.DMA
 
         public static string MapID => Game?.MapID;
         public static ulong UnityBase { get; private set; }
-        public static ulong GOM { get; private set; }
 
         public static IReadOnlyCollection<AbstractPlayer> Players => Game?.Players;
         public static IReadOnlyCollection<IExplosiveItem> Explosives => Game?.Explosives;
@@ -296,7 +295,6 @@ namespace LoneEftDmaRadar.DMA
         private static void MemDMA_ProcessStopped(object sender, EventArgs e)
         {
             UnityBase = default;
-            GOM = default;
             _pid = default;
         }
 
@@ -350,12 +348,12 @@ namespace LoneEftDmaRadar.DMA
             try
             {
                 IL2CPPLib.Init(_vmm, _pid);
-                GOM = GameObjectManager.GetAddr(unityBase);
+                GameObjectManager.Init(unityBase);
             }
             catch (Exception ex) // Use GOM as a failover
             {
                 Logging.WriteLine($"IL2CPP Init Failed, using GOM if available: {ex}");
-                GOM = GameObjectManager.GetAddr(unityBase);
+                GameObjectManager.Init(unityBase);
             }
             UnityBase = unityBase;
         }
