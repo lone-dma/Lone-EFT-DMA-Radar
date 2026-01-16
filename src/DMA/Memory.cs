@@ -183,7 +183,7 @@ namespace LoneEftDmaRadar.DMA
                 }
                 catch (Exception ex)
                 {
-                    Logging.WriteLine($"FATAL ERROR on Memory Thread: {ex}");
+                    Logging.WriteLine($"*** FATAL ERROR on Memory Thread: {ex}");
                     OnProcessStopped();
                     Thread.Sleep(1000);
                 }
