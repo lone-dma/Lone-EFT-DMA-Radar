@@ -77,17 +77,6 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
             Initialized = default;
         }
 
-        private static T Read<T>(ulong address)
-            where T : unmanaged, allows ref struct
-        {
-            return _vmm.MemReadValue<T>(_pid, address);
-        }
-
-        private static string ReadString(ulong address, int length = 128)
-        {
-            return _vmm.MemReadString(_pid, address, length, Encoding.ASCII);
-        }
-
         public static void Init(Vmm vmm, uint pid)
         {
             try
@@ -126,19 +115,19 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
                 ulong sig = _vmm.FindSignature(_pid, pattern, module.vaBase, module.vaBase + module.cbImageSize);
                 sig.ThrowIfInvalidUserVA(nameof(sig));
 
-                int disp32 = Read<int>(sig + 3);
+                int disp32 = Memory.ReadValue<int>(sig + 3);
                 ulong typeDefPtrAddr = sig.AddRVA(3 + 4, disp32);
-                gTypeInfoDefinitionTable = Read<ulong>(typeDefPtrAddr);
+                gTypeInfoDefinitionTable = Memory.ReadValue<ulong>(typeDefPtrAddr);
                 gTypeInfoDefinitionTable.ThrowIfInvalidUserVA(nameof(gTypeInfoDefinitionTable));
             }
             catch (Exception ex)
             {
                 Logging.WriteLine($"Signature scan failed for TypeInfoDefinitionTable: {ex}. Falling back to static offsets.");
                 ulong staticOffset = module.vaBase + 0x598BAD8;
-                gTypeInfoDefinitionTable = Read<ulong>(staticOffset);
+                gTypeInfoDefinitionTable = Memory.ReadValue<ulong>(staticOffset);
                 gTypeInfoDefinitionTable.ThrowIfInvalidUserVA(nameof(gTypeInfoDefinitionTable));
             }
-            gTypeCount = Read<int>(gTypeInfoDefinitionTable - 0x10) / 8;
+            gTypeCount = Memory.ReadValue<int>(gTypeInfoDefinitionTable - 0x10) / 8;
             ArgumentOutOfRangeException.ThrowIfLessThan(gTypeCount, 1, nameof(gTypeCount));
             ArgumentOutOfRangeException.ThrowIfGreaterThan(gTypeCount, 100000, nameof(gTypeCount));
             Logging.WriteLine($"{nameof(gTypeInfoDefinitionTable)} @ 0x{gTypeInfoDefinitionTable:X} (Type Count: {gTypeCount})");
@@ -434,7 +423,7 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
             [FieldOffset(0x28)] public readonly DynamicArray64 components;
             [FieldOffset(0x58)] public readonly ulong name;
 
-            public readonly string GetName() => ReadString(name);
+            public readonly string GetName() => Memory.ReadAsciiString(name);
 
             public Component GetComponentByName(string klass_name)
             {
@@ -510,7 +499,7 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
                     typeEnum == TypeEnum.IL2CPP_TYPE_BYREF ||
                     typeEnum == TypeEnum.IL2CPP_TYPE_SZARRAY)
                 {
-                    Type nested = Read<Type>(data);
+                    Type nested = Memory.ReadValue<Type>(data);
                     string inner = nested.GetName();
                     if (string.IsNullOrEmpty(inner) || inner.Length > 100)
                         return string.Empty;
@@ -526,14 +515,14 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
                     if (data < 0x10000 || data > 0x7FFFFFFFFFFF)
                         return string.Empty;
 
-                    var header = Read<GlobalMetadataHeader>(gMetadataGlobalHeader);
-                    var type_def = Read<TypeDefinition>(data);
+                    var header = Memory.ReadValue<GlobalMetadataHeader>(gMetadataGlobalHeader);
+                    var type_def = Memory.ReadValue<TypeDefinition>(data);
 
                     ulong name_offset = gGlobalMetadata + (ulong)header.stringOffset + (ulong)type_def.nameIndex;
                     if (name_offset < 0x10000 || name_offset > 0x7FFFFFFFFFFF)
                         return string.Empty;
 
-                    string name = ReadString(name_offset);
+                    string name = Memory.ReadAsciiString(name_offset);
                     if (string.IsNullOrEmpty(name) || name.Length > 100)
                         return string.Empty;
 
@@ -545,24 +534,24 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
                     if (data < 0x10000 || data > 0x7FFFFFFFFFFF)
                         return string.Empty;
 
-                    var gclass = Read<GenericClass>(data);
+                    var gclass = Memory.ReadValue<GenericClass>(data);
                     if (gclass.context == 0 || gclass.type == 0)
                         return string.Empty;
 
-                    Type baseType = Read<Type>(gclass.type);
+                    Type baseType = Memory.ReadValue<Type>(gclass.type);
                     string base_name = baseType.GetName();
                     if (string.IsNullOrEmpty(base_name) || base_name.Length > 100)
                         return string.Empty;
 
-                    ulong contextListPtr = Read<ulong>(gclass.context + 0x8);
+                    ulong contextListPtr = Memory.ReadValue<ulong>(gclass.context + 0x8);
                     if (contextListPtr == 0)
                         return base_name;
 
-                    ulong il2cpp_type_ptr = Read<ulong>(contextListPtr);
+                    ulong il2cpp_type_ptr = Memory.ReadValue<ulong>(contextListPtr);
                     if (il2cpp_type_ptr == 0)
                         return base_name;
 
-                    Type argType = Read<Type>(il2cpp_type_ptr);
+                    Type argType = Memory.ReadValue<Type>(il2cpp_type_ptr);
                     string arg_type = argType.GetName();
                     if (string.IsNullOrEmpty(arg_type) || arg_type.Length > 100)
                         return base_name;
@@ -593,41 +582,41 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
             [FieldOffset(0x4B)] public readonly byte bitflags;
             [FieldOffset(0x4C)] public readonly ushort mod_flags;
 
-            public readonly string GetName() => ReadString(name);
+            public readonly string GetName() => Memory.ReadAsciiString(name);
 
             public Type GetReturnType()
             {
-                return Read<Type>(returntype);
+                return Memory.ReadValue<Type>(returntype);
             }
 
             public readonly string GetParameters()
             {
                 string result = "(";
 
-                int stringOffset = Read<int>(IL2CPPLib.gMetadataGlobalHeader + 0x18);
-                int parameterDefTableOffset = Read<int>(IL2CPPLib.gMetadataGlobalHeader + 0x58);
-                int parameterStart = Read<int>(parameter_info + 0x10);
+                int stringOffset = Memory.ReadValue<int>(IL2CPPLib.gMetadataGlobalHeader + 0x18);
+                int parameterDefTableOffset = Memory.ReadValue<int>(IL2CPPLib.gMetadataGlobalHeader + 0x58);
+                int parameterStart = Memory.ReadValue<int>(parameter_info + 0x10);
 
                 bool hasParameters = false;
 
                 for (uint i = 0; i < param_count; i++)
                 {
                     ulong paramDefAddr = IL2CPPLib.gGlobalMetadata + (ulong)parameterDefTableOffset + 0xC * (i + (uint)parameterStart);
-                    int nameIndex = Read<int>(paramDefAddr);
+                    int nameIndex = Memory.ReadValue<int>(paramDefAddr);
                     if (nameIndex <= 0 || nameIndex > 0x1000000)
                         break;
 
                     ulong paramNamePtr = IL2CPPLib.gGlobalMetadata + (ulong)stringOffset + (ulong)nameIndex;
 
-                    string paramName = ReadString(paramNamePtr);
+                    string paramName = Memory.ReadAsciiString(paramNamePtr);
                     if (string.IsNullOrEmpty(paramName) || paramName.Length > 100)
                         break;
 
-                    ulong paramTypePtr = Read<ulong>(parameters + i * (ulong)IntPtr.Size);
+                    ulong paramTypePtr = Memory.ReadValue<ulong>(parameters + i * (ulong)IntPtr.Size);
                     if (paramTypePtr < 0x10000 || paramTypePtr > 0x7FFFFFFFFFFF)
                         break;
 
-                    Type type = Read<Type>(paramTypePtr);
+                    Type type = Memory.ReadValue<Type>(paramTypePtr);
                     string typeName = type.GetName();
                     if (string.IsNullOrEmpty(typeName) || typeName.Length > 100)
                         break;
@@ -689,26 +678,26 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
                 if (index < 0 || index >= param_count)
                     return string.Empty;
 
-                int stringOffset = Read<int>(IL2CPPLib.gMetadataGlobalHeader + 0x18);
-                int parameterDefTableOffset = Read<int>(IL2CPPLib.gMetadataGlobalHeader + 0x58);
-                int parameterStart = Read<int>(parameter_info + 0x10);
+                int stringOffset = Memory.ReadValue<int>(IL2CPPLib.gMetadataGlobalHeader + 0x18);
+                int parameterDefTableOffset = Memory.ReadValue<int>(IL2CPPLib.gMetadataGlobalHeader + 0x58);
+                int parameterStart = Memory.ReadValue<int>(parameter_info + 0x10);
 
                 ulong paramDefAddr = IL2CPPLib.gGlobalMetadata + (ulong)parameterDefTableOffset + 0xC * ((uint)index + (uint)parameterStart);
-                int nameIndex = Read<int>(paramDefAddr);
+                int nameIndex = Memory.ReadValue<int>(paramDefAddr);
                 if (nameIndex <= 0 || nameIndex > 0x1000000)
                     return string.Empty;
 
                 ulong paramNamePtr = IL2CPPLib.gGlobalMetadata + (ulong)stringOffset + (ulong)nameIndex;
 
-                string paramName = ReadString(paramNamePtr);
+                string paramName = Memory.ReadAsciiString(paramNamePtr);
                 if (string.IsNullOrEmpty(paramName) || paramName.Length > 100)
                     return string.Empty;
 
-                ulong paramTypePtr = Read<ulong>(parameters + (ulong)index * (ulong)IntPtr.Size);
+                ulong paramTypePtr = Memory.ReadValue<ulong>(parameters + (ulong)index * (ulong)IntPtr.Size);
                 if (paramTypePtr < 0x10000 || paramTypePtr > 0x7FFFFFFFFFFF)
                     return string.Empty;
 
-                Type type = Read<Type>(paramTypePtr);
+                Type type = Memory.ReadValue<Type>(paramTypePtr);
                 string typeName = type.GetName();
                 if (string.IsNullOrEmpty(typeName) || typeName.Length > 100)
                     return string.Empty;
@@ -727,11 +716,11 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
             [FieldOffset(0x10)] public readonly ulong token;
             [FieldOffset(0x18)] public readonly ushort offset;
 
-            public readonly string GetName() => ReadString(name);
+            public readonly string GetName() => Memory.ReadAsciiString(name);
 
             public Type GetTypeInfo()
             {
-                return Read<Type>(type);
+                return Memory.ReadValue<Type>(type);
             }
 
             public bool IsStatic()
@@ -793,7 +782,7 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
                 var klasses = new Dictionary<string, ulong>(gTypeCount, StringComparer.OrdinalIgnoreCase);
                 foreach (var ptr in ptrs.Memory.Span)
                 {
-                    var klass = Read<Class>(ptr);
+                    var klass = Memory.ReadValue<Class>(ptr);
                     klasses.TryAdd(klass.ToString(), ptr);
                 }
                 return klasses;
@@ -805,7 +794,7 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
                     throw new InvalidOperationException("Failed to read type definition table.");
                 foreach (var ptr in ptrs.Memory.Span)
                 {
-                    var klass = Read<Class>(ptr);
+                    var klass = Memory.ReadValue<Class>(ptr);
                     if (klass.ToString().Equals(name, StringComparison.OrdinalIgnoreCase))
                     {
                         return ptr;
@@ -814,18 +803,18 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
                 throw new InvalidOperationException($"Class '{name}' not found.");
             }
 
-            public readonly string GetName() => ReadString(name);
+            public readonly string GetName() => Memory.ReadAsciiString(name);
             public readonly string GetNamespace()
             {
                 if (!namespaze.IsValidUserVA())
                     return string.Empty;
-                return ReadString(namespaze);
+                return Memory.ReadAsciiString(namespaze);
             }
             public Class? GetParent()
             {
                 if (!parent.IsValidUserVA())
                     return null;
-                return Read<Class>(parent);
+                return Memory.ReadValue<Class>(parent);
             }
 
             public override string ToString()
@@ -839,7 +828,7 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
             public FieldInfo GetField(int index)
             {
                 ulong addr = fields + (ulong)index * (ulong)FieldInfo.Size;
-                return Read<FieldInfo>(addr);
+                return Memory.ReadValue<FieldInfo>(addr);
             }
 
             public IReadOnlyList<FieldInfo> GetFields()
@@ -854,8 +843,8 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
 
             public MethodInfo GetMethod(int index)
             {
-                ulong methodPtr = Read<ulong>(methods + (ulong)index * (ulong)IntPtr.Size);
-                return Read<MethodInfo>(methodPtr);
+                ulong methodPtr = Memory.ReadValue<ulong>(methods + (ulong)index * (ulong)IntPtr.Size);
+                return Memory.ReadValue<MethodInfo>(methodPtr);
             }
 
             public readonly string GetModifer()
@@ -991,19 +980,19 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
             [FieldOffset(0x18)] public readonly uint type_count;
             [FieldOffset(0x28)] public readonly ulong type_start;
 
-            public readonly string GetName() => ReadString(name);
+            public readonly string GetName() => Memory.ReadAsciiString(name);
 
             public uint GetTypeIndexBase()
             {
-                return Read<uint>(type_start);
+                return Memory.ReadValue<uint>(type_start);
             }
 
             public Class GetClass(int index)
             {
                 uint type_index = GetTypeIndexBase();
                 ulong classPtrPtr = IL2CPPLib.gTypeInfoDefinitionTable + (ulong)((type_index + (uint)index) * (uint)IntPtr.Size);
-                ulong classPtr = Read<ulong>(classPtrPtr);
-                return Read<Class>(classPtr);
+                ulong classPtr = Memory.ReadValue<ulong>(classPtrPtr);
+                return Memory.ReadValue<Class>(classPtr);
             }
 
             public IReadOnlyList<Class> GetAllClasses()
@@ -1052,9 +1041,9 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
             public static Assembly GetAssembly(int index)
             {
                 ulong assemblyPtrPtr = gAssembliesStart + (ulong)(index * 8);
-                ulong assemblyPtr = Read<ulong>(assemblyPtrPtr);
+                ulong assemblyPtr = Memory.ReadValue<ulong>(assemblyPtrPtr);
                 assemblyPtr.ThrowIfInvalidUserVA(nameof(assemblyPtr));
-                return Read<Assembly>(assemblyPtr);
+                return Memory.ReadValue<Assembly>(assemblyPtr);
             }
 
             public static IReadOnlyList<Assembly> GetAllAssemblies()
@@ -1070,7 +1059,7 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
 
             public Image GetImage()
             {
-                return Read<Image>(image);
+                return Memory.ReadValue<Image>(image);
             }
         }
     }
