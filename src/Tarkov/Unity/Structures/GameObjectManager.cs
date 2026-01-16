@@ -57,6 +57,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
         {
             try
             {
+                Memory.GOM.ThrowIfInvalidUserVA(nameof(Memory.GOM));
                 return Memory.ReadValueEnsure<GameObjectManager>(Memory.GOM);
             }
             catch (Exception ex)

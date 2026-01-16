@@ -54,6 +54,7 @@ namespace SDK
         {
             public const uint MovementContext = 0x60; // object
             public const uint _playerBody = 0x190; // object
+            public const uint GameWorld = 0x5F8; // object
             public const uint Corpse = 0x680; // object
             public const uint Location = 0x870; // string
             public const uint Profile = 0x900; // object
@@ -192,6 +193,11 @@ namespace SDK
         public readonly partial struct PlayerBody
         {
             public const uint SkeletonRootJoint = 0x30; // object
+        }
+
+        public readonly partial struct GamePlayerOwner
+        {
+            public const uint _myPlayer = 0x8; // object
         }
     }
 

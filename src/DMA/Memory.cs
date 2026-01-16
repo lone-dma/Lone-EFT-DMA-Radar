@@ -28,6 +28,7 @@ SOFTWARE.
 
 global using LoneEftDmaRadar.DMA;
 using Collections.Pooled;
+using LoneEftDmaRadar.Tarkov.IL2CPP;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.Tarkov.World;
 using LoneEftDmaRadar.Tarkov.World.Exits;
@@ -346,7 +347,15 @@ namespace LoneEftDmaRadar.DMA
         {
             var unityBase = _vmm.ProcessGetModuleBase(_pid, "UnityPlayer.dll");
             unityBase.ThrowIfInvalidUserVA(nameof(unityBase));
-            GOM = GameObjectManager.GetAddr(unityBase);
+            try
+            {
+                IL2CPPLib.Init(_vmm, _pid);
+                GOM = GameObjectManager.GetAddr(unityBase);
+            }
+            catch // Use GOM as a failover
+            {
+                GOM = GameObjectManager.GetAddr(unityBase);
+            }
             UnityBase = unityBase;
         }
 
