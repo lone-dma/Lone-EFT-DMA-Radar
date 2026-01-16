@@ -27,7 +27,7 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
             {
                 if (!Initialized)
                     return false;
-                var gamePlayerOwner = Read<Class>(class_gamePlayerOwner);
+                var gamePlayerOwner = Memory.ReadValue<Class>(class_gamePlayerOwner);
                 var myPlayer = Memory.ReadPtr(gamePlayerOwner.static_fields + Offsets.GamePlayerOwner._myPlayer);
                 gameWorld = Memory.ReadPtr(myPlayer + Offsets.Player.GameWorld);
                 /// Get Selected Map
