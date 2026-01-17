@@ -153,8 +153,7 @@ namespace LoneEftDmaRadar.UI
                 }
             }
 
-            ApplyCustomImGuiStyle();
-            SettingsPanel.UpdateUIScale(Config.UI.UIScale);
+            SettingsPanel.UpdateUIScale(Config.UI.UIScale); // Also calls ApplyCustomImGuiStyle()
 
             _load = OnLoadAsync(); // Load remaining modules and UI components asynchronously
             _window.Update += OnLoadAsync_Update;
