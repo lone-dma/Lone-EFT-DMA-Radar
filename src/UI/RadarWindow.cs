@@ -1451,7 +1451,7 @@ namespace LoneEftDmaRadar.UI
         /// <summary>
         /// Applies a custom ImGui style/theme.
         /// </summary>
-        private static void ApplyCustomImGuiStyle()
+        public static void ApplyCustomImGuiStyle()
         {
             ImGui.StyleColorsDark();
 
@@ -1568,7 +1568,39 @@ namespace LoneEftDmaRadar.UI
             colors[(int)ImGuiCol.TextSelectedBg] = new Vector4(accent.X, accent.Y, accent.Z, 0.35f);
             colors[(int)ImGuiCol.DragDropTarget] = new Vector4(accentHover.X, accentHover.Y, accentHover.Z, 0.90f);
             colors[(int)ImGuiCol.ModalWindowDimBg] = new Vector4(0f, 0f, 0f, 0.65f);
+
+            // Apply scaling after the baseline theme is set.
+            _lastImGuiUiScale = 1f;
+            ApplyImGuiScale(Config.UI.UIScale);
         }
+
+        private static float _lastImGuiUiScale = 1f;
+
+        private static void ApplyImGuiScale(float uiScale)
+        {
+            uiScale = Math.Clamp(uiScale, 0.5f, 2.0f);
+
+            // Scale fonts via global font scale (doesn't rebuild atlas)
+            var io = ImGui.GetIO();
+            io.FontGlobalScale = uiScale;
+
+            // Style sizes are already authored for 1.0; use incremental scaling ratio to avoid compounding.
+            // This is safer than trying to copy/assign full ImGuiStylePtr.
+            float last = _lastImGuiUiScale;
+            if (last <= 0f)
+                last = 1f;
+            float ratio = uiScale / last;
+
+            // Apply only the delta ratio.
+            var style = ImGui.GetStyle();
+            style.ScaleAllSizes(ratio);
+
+            // Guard against invalid window mins.
+            style.WindowMinSize = new Vector2(Math.Max(1f, style.WindowMinSize.X), Math.Max(1f, style.WindowMinSize.Y));
+
+            _lastImGuiUiScale = uiScale;
+        }
+
         #endregion
     }
 }
