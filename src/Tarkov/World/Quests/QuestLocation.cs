@@ -79,7 +79,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Quests
             }
             else // marker is level with player
             {
-                var squareSize = 8 * Program.Config.UI.UIScale;
+                const float squareSize = 8f;
                 canvas.DrawRect(point.X, point.Y,
                     squareSize, squareSize, SKPaints.ShapeOutline);
                 canvas.DrawRect(point.X, point.Y,

@@ -42,8 +42,10 @@ namespace LoneEftDmaRadar.UI.Panels
         /// </summary>
         public static void Draw()
         {
-            // Static position in top-left, below menu bar
-            ImGui.SetNextWindowPos(new Vector2(10, 25), ImGuiCond.Always);
+            // Static position in top-left, below menu bar.
+            // Use ImGui's current frame height so this stays correct when UI scale changes.
+            float topOffset = ImGui.GetFrameHeightWithSpacing();
+            ImGui.SetNextWindowPos(new Vector2(10, 10 + topOffset), ImGuiCond.Always);
             ImGui.SetNextWindowBgAlpha(0.7f);
 
             var flags = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize |

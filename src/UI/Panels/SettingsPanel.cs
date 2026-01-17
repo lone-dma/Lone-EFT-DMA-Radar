@@ -32,7 +32,6 @@ using LoneEftDmaRadar.Tarkov;
 using LoneEftDmaRadar.UI.ColorPicker;
 using LoneEftDmaRadar.UI.Hotkeys;
 using LoneEftDmaRadar.UI.Misc;
-using LoneEftDmaRadar.UI.Skia;
 
 namespace LoneEftDmaRadar.UI.Panels
 {
@@ -172,7 +171,7 @@ namespace LoneEftDmaRadar.UI.Panels
                 if (ImGui.Button("Apply"))
                 {
                     Config.UI.UIScale = _pendingUiScale;
-                    UpdateUIScale(_pendingUiScale);
+                    RadarWindow.ApplyCustomImGuiStyle(); // Refresh ImgUi style with new scale
                 }
                 if (!scaleDirty)
                     ImGui.EndDisabled();
@@ -492,44 +491,6 @@ namespace LoneEftDmaRadar.UI.Panels
             {
                 MessageBox.Show(RadarWindow.Handle, $"Error: {ex.Message}", "Open Config", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-
-        public static void UpdateUIScale(float newScale)
-        {
-            // Update Paints
-            SKPaints.TextOutline.StrokeWidth = 2f * newScale;
-            SKPaints.PaintLocalPlayer.StrokeWidth = 1.66f * newScale;
-            SKPaints.PaintTeammate.StrokeWidth = 1.66f * newScale;
-            SKPaints.PaintPMC.StrokeWidth = 1.66f * newScale;
-            SKPaints.PaintScav.StrokeWidth = 1.66f * newScale;
-            SKPaints.PaintRaider.StrokeWidth = 1.66f * newScale;
-            SKPaints.PaintBoss.StrokeWidth = 1.66f * newScale;
-            SKPaints.PaintFocused.StrokeWidth = 1.66f * newScale;
-            SKPaints.PaintPScav.StrokeWidth = 1.66f * newScale;
-            SKPaints.PaintCorpse.StrokeWidth = 0.25f * newScale;
-            SKPaints.PaintMeds.StrokeWidth = 0.25f * newScale;
-            SKPaints.PaintFood.StrokeWidth = 0.25f * newScale;
-            SKPaints.PaintBackpacks.StrokeWidth = 0.25f * newScale;
-            SKPaints.PaintDeathMarker.StrokeWidth = 3f * newScale;
-            SKPaints.PaintLoot.StrokeWidth = 0.25f * newScale;
-            SKPaints.PaintImportantLoot.StrokeWidth = 0.25f * newScale;
-            SKPaints.PaintContainerLoot.StrokeWidth = 0.25f * newScale;
-            SKPaints.PaintTransparentBacker.StrokeWidth = 0.25f * newScale;
-            SKPaints.PaintExplosives.StrokeWidth = 3f * newScale;
-            SKPaints.PaintExfil.StrokeWidth = 0.25f * newScale;
-            SKPaints.PaintExfilTransit.StrokeWidth = 0.25f * newScale;
-            SKPaints.PaintQuestZone.StrokeWidth = 0.25f * newScale;
-            SKPaints.PaintQuestItem.StrokeWidth = 0.25f * newScale;
-            SKPaints.PaintWishlistItem.StrokeWidth = 0.25f * newScale;
-            SKPaints.PaintConnectorGroup.StrokeWidth = 2.25f * newScale;
-            SKPaints.PaintMouseoverGroup.StrokeWidth = 1.66f * newScale;
-
-            // Fonts
-            SKFonts.UIRegular.Size = 12f * newScale;
-            SKFonts.UILarge.Size = 48f * newScale;
-
-            // Now handle ImGui
-            RadarWindow.ApplyCustomImGuiStyle();
         }
 
         #endregion

@@ -88,12 +88,12 @@ namespace LoneEftDmaRadar.Tarkov.World.Loot
             }
             else // loot is level with player
             {
-                var size = 5 * Program.Config.UI.UIScale;
+                const float size = 5f;
                 canvas.DrawCircle(point, size, SKPaints.ShapeOutline);
                 canvas.DrawCircle(point, size, SKPaints.PaintCorpse);
             }
 
-            point.Offset(7 * Program.Config.UI.UIScale, 3 * Program.Config.UI.UIScale);
+            point.Offset(7f, 3f);
             string important = (Player is ObservedPlayer observed && observed.Equipment.CarryingImportantLoot) ?
                 "!!" : null; // Flag important loot
             string name = $"{important}{Name}";

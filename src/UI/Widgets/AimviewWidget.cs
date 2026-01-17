@@ -99,6 +99,11 @@ namespace LoneEftDmaRadar.UI.Widgets
             int width = _pendingWidth;
             int height = _pendingHeight;
 
+            // Apply global UI scale
+            float scale = Program.Config.UI.UIScale;
+            int scaledWidth = (int)(width / scale);
+            int scaledHeight = (int)(height / scale);
+
             // Bind our FBO for Skia rendering
             _gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);
             _gl.Viewport(0, 0, (uint)width, (uint)height);
@@ -112,6 +117,9 @@ namespace LoneEftDmaRadar.UI.Widgets
 
             try
             {
+                canvas.Save();
+                canvas.Scale(scale, scale);
+
                 if (Program.State == AppState.InRaid && LocalPlayer is LocalPlayer localPlayer)
                 {
                     // Update camera matrix
@@ -120,16 +128,16 @@ namespace LoneEftDmaRadar.UI.Widgets
                     // Draw loot
                     if (Program.Config.Loot.Enabled)
                     {
-                        DrawLoot(canvas, localPlayer, width, height);
+                        DrawLoot(canvas, localPlayer, scaledWidth, scaledHeight);
                         if (Program.Config.Containers.Enabled)
-                            DrawContainers(canvas, localPlayer, width, height);
+                            DrawContainers(canvas, localPlayer, scaledWidth, scaledHeight);
                     }
 
                     // Draw players
-                    DrawPlayers(canvas, localPlayer, width, height);
+                    DrawPlayers(canvas, localPlayer, scaledWidth, scaledHeight);
 
                     // Draw crosshair
-                    DrawCrosshair(canvas, width, height);
+                    DrawCrosshair(canvas, scaledWidth, scaledHeight);
                 }
             }
             catch (Exception ex)
@@ -138,6 +146,7 @@ namespace LoneEftDmaRadar.UI.Widgets
             }
             finally
             {
+                canvas.Restore();
                 // Flush Skia to the FBO
                 canvas.Flush();
                 _grContext.Flush();
@@ -226,9 +235,8 @@ namespace LoneEftDmaRadar.UI.Widgets
             if (players is null)
                 return;
 
-            float scale = Program.Config.UI.UIScale;
-            float minRadius = 1.5f * scale;
-            float maxRadius = 12f * scale;
+            const float minRadius = 1.5f;
+            const float maxRadius = 12f;
 
             foreach (var player in players)
             {
@@ -250,7 +258,7 @@ namespace LoneEftDmaRadar.UI.Widgets
             if (FilteredLoot is not IEnumerable<LootItem> loot)
                 return;
 
-            float boxHalf = 4f * Program.Config.UI.UIScale;
+            const float boxHalf = 4f;
 
             foreach (var item in loot)
             {
@@ -272,7 +280,7 @@ namespace LoneEftDmaRadar.UI.Widgets
             if (Containers is not IEnumerable<StaticLootContainer> containers)
                 return;
 
-            float boxHalf = 4f * Program.Config.UI.UIScale;
+            const float boxHalf = 4f;
 
             foreach (var container in containers)
             {
@@ -295,7 +303,7 @@ namespace LoneEftDmaRadar.UI.Widgets
         private static void DrawBoxAndLabel(SKCanvas canvas, SKPoint center, float half, string label, SKPaint boxPaint, SKPaint textPaint)
         {
             var rect = new SKRect(center.X - half, center.Y - half, center.X + half, center.Y + half);
-            var textPt = new SKPoint(center.X, center.Y + 12.5f * Program.Config.UI.UIScale);
+            var textPt = new SKPoint(center.X, center.Y + 12.5f);
 
             canvas.DrawRect(rect, boxPaint);
             canvas.DrawText(label, textPt, SKTextAlign.Left, SKFonts.AimviewWidgetFont, textPaint);

@@ -71,7 +71,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Exits
             }
             else // exfil is level with player
             {
-                float size = 4.75f * Program.Config.UI.UIScale;
+                const float size = 4.75f;
                 canvas.DrawCircle(point, size, SKPaints.ShapeOutline);
                 canvas.DrawCircle(point, size, paint);
             }

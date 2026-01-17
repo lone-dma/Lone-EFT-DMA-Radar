@@ -187,12 +187,12 @@ namespace LoneEftDmaRadar.Tarkov.World.Loot
             }
             else // loot is level with player
             {
-                var size = 5 * Program.Config.UI.UIScale;
+                const float size = 5f;
                 canvas.DrawCircle(point, size, SKPaints.ShapeOutline);
                 canvas.DrawCircle(point, size, paints.Item1);
             }
 
-            point.Offset(7 * Program.Config.UI.UIScale, 3 * Program.Config.UI.UIScale);
+            point.Offset(7f, 3f);
 
             canvas.DrawText(
                 label,
@@ -275,7 +275,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Loot
                     var paint = new SKPaint
                     {
                         Color = skColor,
-                        StrokeWidth = 3f * Program.Config.UI.UIScale,
+                        StrokeWidth = 3f,
                         Style = SKPaintStyle.Fill,
                         IsAntialias = true
                     };
@@ -289,7 +289,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Loot
                 },
                 (key, existingValue) =>
                 {
-                    existingValue.Item1.StrokeWidth = 3f * Program.Config.UI.UIScale;
+                    existingValue.Item1.StrokeWidth = 3f;
                     return existingValue;
                 });
 
@@ -300,7 +300,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Loot
         {
             foreach (var paint in _paints)
             {
-                paint.Value.Item1.StrokeWidth = 3f * newScale;
+                paint.Value.Item1.StrokeWidth = 3f;
             }
         }
 

@@ -587,7 +587,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         {
             if (this != localPlayer && RadarWindow.MouseoverGroup is int grp && grp == GroupId)
                 _paints.Item1 = SKPaints.PaintMouseoverGroup;
-            float scale = 1.65f * Config.UI.UIScale;
+            const float scale = 1.65f;
 
             canvas.Save();
             canvas.Translate(point.X, point.Y);
@@ -621,7 +621,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         /// </summary>
         private static void DrawDeathMarker(SKCanvas canvas, SKPoint point)
         {
-            float scale = Config.UI.UIScale;
+            float scale = 1f;
 
             canvas.Save();
             canvas.Translate(point.X, point.Y);
@@ -637,7 +637,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         {
             if (RadarWindow.MouseoverGroup is int grp && grp == GroupId)
                 _paints.Item2 = SKPaints.TextMouseoverGroup;
-            point.Offset(9.5f * Config.UI.UIScale, 0);
+            point.Offset(9.5f, 0);
             foreach (var line in lines)
             {
                 if (string.IsNullOrEmpty(line?.Trim()))
