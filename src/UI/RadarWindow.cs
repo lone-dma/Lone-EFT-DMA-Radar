@@ -65,7 +65,7 @@ namespace LoneEftDmaRadar.UI
         private static GRBackendRenderTarget _skBackendRenderTarget = null!;
         private static readonly RateLimiter _purgeRL = new(TimeSpan.FromSeconds(1));
 
-        private static float UIScale => Config.UI.RadarScale;
+        private static float RadarScale => Config.UI.RadarScale;
 
         private static EftDmaConfig Config { get; } = Program.Config;
         public static IntPtr Handle => _window?.Native?.Win32?.Hwnd ?? IntPtr.Zero;
@@ -358,7 +358,7 @@ namespace LoneEftDmaRadar.UI
             try
             {
                 canvas.Save();
-                canvas.Scale(UIScale, UIScale);
+                canvas.Scale(RadarScale, RadarScale);
                 if (state == AppState.InRaid && LocalPlayer is LocalPlayer localPlayer && EftMapManager.LoadMap(MapID) is IEftMap map)
                 {
                     DrawRadar(canvas, localPlayer, map);
@@ -390,7 +390,7 @@ namespace LoneEftDmaRadar.UI
 
             // Get map parameters
             EftMapParams mapParams;
-            var canvasSize = new SKSize(_window.Size.X / UIScale, _window.Size.Y / UIScale);
+            var canvasSize = new SKSize(_window.Size.X / RadarScale, _window.Size.Y / RadarScale);
 
             if (_isMapFreeEnabled)
             {
@@ -542,7 +542,7 @@ namespace LoneEftDmaRadar.UI
 
         private static void DrawStatusMessage(SKCanvas canvas, AppState state)
         {
-            var bounds = new SKRect(0, 0, _window.Size.X / UIScale, _window.Size.Y / UIScale);
+            var bounds = new SKRect(0, 0, _window.Size.X / RadarScale, _window.Size.Y / RadarScale);
 
             // Base text (no trailing dots) and how many dots to draw
             string baseText;
@@ -900,7 +900,7 @@ namespace LoneEftDmaRadar.UI
                 return;
 
             var pos = mouse.Position;
-            var mousePos = new Vector2(pos.X, pos.Y) / UIScale;
+            var mousePos = new Vector2(pos.X, pos.Y) / RadarScale;
 
             if (button == MouseButton.Left)
             {
@@ -950,7 +950,7 @@ namespace LoneEftDmaRadar.UI
                 return;
             }
 
-            var mousePos = new Vector2(position.X, position.Y) / UIScale;
+            var mousePos = new Vector2(position.X, position.Y) / RadarScale;
 
             if (_mouseDown && _isMapFreeEnabled)
             {
