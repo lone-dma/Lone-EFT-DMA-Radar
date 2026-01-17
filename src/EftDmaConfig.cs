@@ -228,15 +228,9 @@ namespace LoneEftDmaRadar
             }
         }
 
-        /// <summary>
-        /// Saves the current configuration to disk asynchronously.
-        /// </summary>
-        /// <returns></returns>
-        public async Task SaveAsync() => await Task.Run(Save);
-
         private static void SaveInternal(EftDmaConfig config)
         {
-            var json = JsonSerializer.Serialize(config, AppJsonContext.Default.EftDmaConfig);
+            var json = JsonSerializer.Serialize(config, AppConfigJsonContext.Default.EftDmaConfig);
             using (var fs = new FileStream(
                 _tempFile.FullName,
                 FileMode.Create,
