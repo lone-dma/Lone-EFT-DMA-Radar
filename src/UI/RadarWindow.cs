@@ -65,7 +65,7 @@ namespace LoneEftDmaRadar.UI
         private static GRBackendRenderTarget _skBackendRenderTarget = null!;
         private static readonly RateLimiter _purgeRL = new(TimeSpan.FromSeconds(1));
 
-        private static float UIScale => Config.UI.UIScale;
+        private static float UIScale => Config.UI.RadarScale;
 
         private static EftDmaConfig Config { get; } = Program.Config;
         public static IntPtr Handle => _window?.Native?.Win32?.Hwnd ?? IntPtr.Zero;
@@ -1575,25 +1575,25 @@ namespace LoneEftDmaRadar.UI
 
             // Apply scaling after the baseline theme is set.
             _lastImGuiUiScale = 1f;
-            ApplyImGuiScale(Config.UI.UIScale);
+            ApplyImGuiScale(Config.UI.MenuScale);
         }
 
         private static float _lastImGuiUiScale = 1f;
 
-        private static void ApplyImGuiScale(float uiScale)
+        private static void ApplyImGuiScale(float menuScale)
         {
-            uiScale = Math.Clamp(uiScale, 0.5f, 2.0f);
+            menuScale = Math.Clamp(menuScale, 0.5f, 2.0f);
 
             // Scale fonts via global font scale (doesn't rebuild atlas)
             var io = ImGui.GetIO();
-            io.FontGlobalScale = uiScale;
+            io.FontGlobalScale = menuScale;
 
             // Style sizes are already authored for 1.0; use incremental scaling ratio to avoid compounding.
             // This is safer than trying to copy/assign full ImGuiStylePtr.
             float last = _lastImGuiUiScale;
             if (last <= 0f)
                 last = 1f;
-            float ratio = uiScale / last;
+            float ratio = menuScale / last;
 
             // Apply only the delta ratio.
             var style = ImGui.GetStyle();
@@ -1602,7 +1602,7 @@ namespace LoneEftDmaRadar.UI
             // Guard against invalid window mins.
             style.WindowMinSize = new Vector2(Math.Max(1f, style.WindowMinSize.X), Math.Max(1f, style.WindowMinSize.Y));
 
-            _lastImGuiUiScale = uiScale;
+            _lastImGuiUiScale = menuScale;
         }
 
         #endregion
