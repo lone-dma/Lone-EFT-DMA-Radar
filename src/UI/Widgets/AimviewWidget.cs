@@ -100,7 +100,7 @@ namespace LoneEftDmaRadar.UI.Widgets
             int height = _pendingHeight;
 
             // Apply global UI scale
-            float scale = Program.Config.UI.UIScale;
+            float scale = Program.Config.UI.RadarScale;
             int scaledWidth = (int)(width / scale);
             int scaledHeight = (int)(height / scale);
 

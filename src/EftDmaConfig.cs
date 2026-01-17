@@ -290,10 +290,18 @@ namespace LoneEftDmaRadar
         public int FPS { get; set; } = 60;
 
         /// <summary>
-        /// UI Scale Value (0.5-2.0 , default: 1.0)
+        /// Radar Scale Value (0.5-2.0 , default: 1.0)
+        /// Applies to the Radar map and Aimview widget.
         /// </summary>
-        [JsonPropertyName("scale")]
-        public float UIScale { get; set; } = 1.0f;
+        [JsonPropertyName("radarScale")]
+        public float RadarScale { get; set; } = 1.0f;
+
+        /// <summary>
+        /// Menu Scale Value (0.5-2.0 , default: 1.0)
+        /// Applies to ImGui menus and windows.
+        /// </summary>
+        [JsonPropertyName("menuScale")]
+        public float MenuScale { get; set; } = 1.0f;
 
         /// <summary>
         /// Size of the Radar Window.

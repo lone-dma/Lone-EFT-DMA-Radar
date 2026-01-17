@@ -42,8 +42,9 @@ namespace LoneEftDmaRadar.UI.Panels
     {
         private static List<StaticContainerEntry> _containerEntries;
 
-        private static float _pendingUiScale;
-        private static bool _pendingUiScaleInitialized;
+        private static float _pendingRadarScale;
+        private static float _pendingMenuScale;
+        private static bool _pendingScalesInitialized;
 
         // Panel-local state for tracking window open/close
         private static bool _isOpen;
@@ -152,28 +153,47 @@ namespace LoneEftDmaRadar.UI.Panels
 
                 ImGui.SeparatorText("Display Settings");
 
-                // UI Scale
-                if (!_pendingUiScaleInitialized)
+                // Initialize pending scales
+                if (!_pendingScalesInitialized)
                 {
-                    _pendingUiScale = Config.UI.UIScale;
-                    _pendingUiScaleInitialized = true;
+                    _pendingRadarScale = Config.UI.RadarScale;
+                    _pendingMenuScale = Config.UI.MenuScale;
+                    _pendingScalesInitialized = true;
                 }
 
-                ImGui.SliderFloat("UI Scale", ref _pendingUiScale, 0.5f, 2.0f, "%.1f");
+                // Radar Scale
+                ImGui.SliderFloat("Radar Scale", ref _pendingRadarScale, 0.5f, 2.0f, "%.1f");
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Scale UI elements (text, icons, widgets)");
+                    ImGui.SetTooltip("Scale the radar map and aimview widget");
 
-                bool scaleDirty = MathF.Abs(_pendingUiScale - Config.UI.UIScale) > 0.0001f;
+                bool radarScaleDirty = MathF.Abs(_pendingRadarScale - Config.UI.RadarScale) > 0.0001f;
 
                 ImGui.SameLine();
-                if (!scaleDirty)
+                if (!radarScaleDirty)
                     ImGui.BeginDisabled();
-                if (ImGui.Button("Apply"))
+                if (ImGui.Button("Apply##RadarScale"))
                 {
-                    Config.UI.UIScale = _pendingUiScale;
-                    RadarWindow.ApplyCustomImGuiStyle(); // Refresh ImgUi style with new scale
+                    Config.UI.RadarScale = _pendingRadarScale;
                 }
-                if (!scaleDirty)
+                if (!radarScaleDirty)
+                    ImGui.EndDisabled();
+
+                // Menu Scale
+                ImGui.SliderFloat("Menu Scale", ref _pendingMenuScale, 0.5f, 2.0f, "%.1f");
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Scale ImGui menus and windows");
+
+                bool menuScaleDirty = MathF.Abs(_pendingMenuScale - Config.UI.MenuScale) > 0.0001f;
+
+                ImGui.SameLine();
+                if (!menuScaleDirty)
+                    ImGui.BeginDisabled();
+                if (ImGui.Button("Apply##MenuScale"))
+                {
+                    Config.UI.MenuScale = _pendingMenuScale;
+                    RadarWindow.ApplyCustomImGuiStyle(); // Refresh ImGui style with new scale
+                }
+                if (!menuScaleDirty)
                     ImGui.EndDisabled();
 
                 // Zoom
