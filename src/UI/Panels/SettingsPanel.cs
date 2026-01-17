@@ -43,6 +43,9 @@ namespace LoneEftDmaRadar.UI.Panels
     {
         private static List<StaticContainerEntry> _containerEntries;
 
+        private static float _pendingUiScale;
+        private static bool _pendingUiScaleInitialized;
+
         // Panel-local state for tracking window open/close
         private static bool _isOpen;
 
@@ -151,14 +154,28 @@ namespace LoneEftDmaRadar.UI.Panels
                 ImGui.SeparatorText("Display Settings");
 
                 // UI Scale
-                float uiScale = Config.UI.UIScale;
-                if (ImGui.SliderFloat("UI Scale", ref uiScale, 0.5f, 2.0f, "%.1f"))
+                if (!_pendingUiScaleInitialized)
                 {
-                    Config.UI.UIScale = uiScale;
-                    UpdateUIScale(uiScale);
+                    _pendingUiScale = Config.UI.UIScale;
+                    _pendingUiScaleInitialized = true;
                 }
+
+                ImGui.SliderFloat("UI Scale", ref _pendingUiScale, 0.5f, 2.0f, "%.1f");
                 if (ImGui.IsItemHovered())
                     ImGui.SetTooltip("Scale UI elements (text, icons, widgets)");
+
+                bool scaleDirty = MathF.Abs(_pendingUiScale - Config.UI.UIScale) > 0.0001f;
+
+                ImGui.SameLine();
+                if (!scaleDirty)
+                    ImGui.BeginDisabled();
+                if (ImGui.Button("Apply"))
+                {
+                    Config.UI.UIScale = _pendingUiScale;
+                    UpdateUIScale(_pendingUiScale);
+                }
+                if (!scaleDirty)
+                    ImGui.EndDisabled();
 
                 // Zoom
                 int zoom = Config.UI.Zoom;
@@ -510,6 +527,9 @@ namespace LoneEftDmaRadar.UI.Panels
             // Fonts
             SKFonts.UIRegular.Size = 12f * newScale;
             SKFonts.UILarge.Size = 48f * newScale;
+
+            // Now handle ImGui
+            RadarWindow.ApplyCustomImGuiStyle();
         }
 
         #endregion
