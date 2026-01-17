@@ -65,6 +65,8 @@ namespace LoneEftDmaRadar.UI
         private static GRBackendRenderTarget _skBackendRenderTarget = null!;
         private static readonly RateLimiter _purgeRL = new(TimeSpan.FromSeconds(1));
 
+        private static float UIScale => Config.UI.UIScale;
+
         private static EftDmaConfig Config { get; } = Program.Config;
         public static IntPtr Handle => _window?.Native?.Win32?.Hwnd ?? IntPtr.Zero;
 
@@ -153,7 +155,7 @@ namespace LoneEftDmaRadar.UI
                 }
             }
 
-            SettingsPanel.UpdateUIScale(Config.UI.UIScale); // Also calls ApplyCustomImGuiStyle()
+            ApplyCustomImGuiStyle();
 
             _load = OnLoadAsync(); // Load remaining modules and UI components asynchronously
             _window.Update += OnLoadAsync_Update;
@@ -355,6 +357,8 @@ namespace LoneEftDmaRadar.UI
             var canvas = _skSurface.Canvas;
             try
             {
+                canvas.Save();
+                canvas.Scale(UIScale, UIScale);
                 if (state == AppState.InRaid && LocalPlayer is LocalPlayer localPlayer && EftMapManager.LoadMap(MapID) is IEftMap map)
                 {
                     DrawRadar(canvas, localPlayer, map);
@@ -366,6 +370,7 @@ namespace LoneEftDmaRadar.UI
             }
             finally
             {
+                canvas.Restore();
                 canvas.Flush();
                 _grContext.Flush();
             }
@@ -385,7 +390,7 @@ namespace LoneEftDmaRadar.UI
 
             // Get map parameters
             EftMapParams mapParams;
-            var canvasSize = new SKSize(_window.Size.X, _window.Size.Y);
+            var canvasSize = new SKSize(_window.Size.X / UIScale, _window.Size.Y / UIScale);
 
             if (_isMapFreeEnabled)
             {
@@ -537,7 +542,7 @@ namespace LoneEftDmaRadar.UI
 
         private static void DrawStatusMessage(SKCanvas canvas, AppState state)
         {
-            var bounds = new SKRect(0, 0, _window.Size.X, _window.Size.Y);
+            var bounds = new SKRect(0, 0, _window.Size.X / UIScale, _window.Size.Y / UIScale);
 
             // Base text (no trailing dots) and how many dots to draw
             string baseText;
@@ -850,7 +855,7 @@ namespace LoneEftDmaRadar.UI
                 using var paint = new SKPaint
                 {
                     Style = SKPaintStyle.Stroke,
-                    StrokeWidth = 4 * Config.UI.UIScale,
+                    StrokeWidth = 4,
                     Color = SKPaints.PaintMapPing.Color.WithAlpha((byte)(alpha * 255)),
                     IsAntialias = true
                 };
@@ -895,7 +900,7 @@ namespace LoneEftDmaRadar.UI
                 return;
 
             var pos = mouse.Position;
-            var mousePos = new Vector2(pos.X, pos.Y);
+            var mousePos = new Vector2(pos.X, pos.Y) / UIScale;
 
             if (button == MouseButton.Left)
             {
@@ -945,7 +950,7 @@ namespace LoneEftDmaRadar.UI
                 return;
             }
 
-            var mousePos = new Vector2(position.X, position.Y);
+            var mousePos = new Vector2(position.X, position.Y) / UIScale;
 
             if (_mouseDown && _isMapFreeEnabled)
             {

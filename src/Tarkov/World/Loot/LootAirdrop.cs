@@ -65,11 +65,11 @@ namespace LoneEftDmaRadar.Tarkov.World.Loot
             }
             else // loot is level with player
             {
-                var size = 4 * Program.Config.UI.UIScale;
+                const float size = 4f;
                 canvas.DrawCircle(point, size, SKPaints.ShapeOutline);
                 canvas.DrawCircle(point, size, SKPaints.PaintImportantLoot);
             }
-            point.Offset(7 * Program.Config.UI.UIScale, 3 * Program.Config.UI.UIScale);
+            point.Offset(7f, 3f);
 
             canvas.DrawText(
                 this.Name,
