@@ -652,10 +652,37 @@ namespace LoneEftDmaRadar.UI
                 // Draw main menu bar
                 if (ImGui.BeginMainMenuBar())
                 {
+                    // Map mode toggle (far-left)
+                    bool isMapFree = IsMapFreeEnabled;
+                    if (isMapFree)
+                    {
+                        ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.2f, 0.6f, 0.2f, 1.0f));
+                        ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(0.3f, 0.7f, 0.3f, 1.0f));
+                        ImGui.PushStyleColor(ImGuiCol.ButtonActive, new Vector4(0.1f, 0.5f, 0.1f, 1.0f));
+                    }
+
+                    if (ImGui.Button(isMapFree ? "Map Free" : "Map Follow"))
+                    {
+                        IsMapFreeEnabled = !isMapFree;
+                        if (isMapFree) // Was free, now switching back to follow
+                        {
+                            MapPanPosition = Vector2.Zero;
+                        }
+                    }
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip(isMapFree ? "Free map panning (drag to move map)" : "Follow player (map centered on you)");
+
+                    if (isMapFree)
+                        ImGui.PopStyleColor(3);
+
+                    ImGui.Separator();
+
                     if (ImGui.MenuItem("Settings", null, SettingsPanel.IsOpen))
                     {
                         SettingsPanel.IsOpen = !SettingsPanel.IsOpen;
                     }
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip("Open radar settings");
 
                     ImGui.Separator();
 
@@ -663,10 +690,14 @@ namespace LoneEftDmaRadar.UI
                     {
                         _isWebRadarOpen = !_isWebRadarOpen;
                     }
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip("Open Web Radar Server Configuration");
                     if (ImGui.MenuItem("Loot Filters", null, _isLootFiltersOpen))
                     {
                         _isLootFiltersOpen = !_isLootFiltersOpen;
                     }
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip("Open loot filters configuration");
 
                     // Display current map and FPS on the right
                     string mapName = EftMapManager.Map?.Config?.Name ?? "No Map";
