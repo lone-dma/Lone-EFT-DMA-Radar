@@ -684,8 +684,6 @@ namespace LoneEftDmaRadar.UI
                     if (ImGui.IsItemHovered())
                         ImGui.SetTooltip("Open radar settings");
 
-                    ImGui.Separator();
-
                     if (ImGui.MenuItem("Web Radar", null, _isWebRadarOpen))
                     {
                         _isWebRadarOpen = !_isWebRadarOpen;
