@@ -70,9 +70,9 @@ namespace LoneEftDmaRadar.DMA
         public static GameWorld Game { get; private set; }
         public static QuestManager QuestManager => Game?.QuestManager;
 
-        internal static async Task ModuleInitAsync()
+        internal static Task ModuleInitAsync()
         {
-            await Task.Run(() =>
+            return Task.Run(() =>
             {
                 FpgaAlgo fpgaAlgo = Program.Config.DMA.FpgaAlgo;
                 bool useMemMap = Program.Config.DMA.MemMapEnabled;
