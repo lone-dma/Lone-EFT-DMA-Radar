@@ -25,6 +25,11 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
         {
             try
             {
+                if (Cache.GameObjectManager.IsValidUserVA())
+                {
+                    Logging.WriteLine("GOM Initialized via Cache.");
+                    return; // Already initialized
+                }
                 try
                 {
                     const string signature = "48 89 05 ?? ?? ?? ?? 48 83 C4 ?? C3 33 C9";
@@ -33,14 +38,14 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
                     int rva = Memory.ReadValueEnsure<int>(gomSig + 3);
                     var gomPtr = Memory.ReadValueEnsure<VmmPointer>(gomSig.AddRVA(7, rva));
                     gomPtr.ThrowIfInvalidUserVA();
-                    Logging.WriteLine("GOM Located via Signature.");
+                    Logging.WriteLine("GOM Initialized via Signature.");
                     Cache.GameObjectManager = gomPtr;
                 }
                 catch
                 {
                     var gomPtr = Memory.ReadValueEnsure<VmmPointer>(unityBase + UnitySDK.UnityOffsets.GameObjectManager);
                     gomPtr.ThrowIfInvalidUserVA();
-                    Logging.WriteLine("GOM Located via Hardcoded Offset.");
+                    Logging.WriteLine("GOM Initialized via Hardcoded Offset.");
                     Cache.GameObjectManager = gomPtr;
                 }
             }
