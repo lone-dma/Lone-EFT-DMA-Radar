@@ -19,14 +19,6 @@
 	</ItemGroup>
 
 	<PropertyGroup>
-		<!-- GC Tuning for optimal performance -->
-		<ServerGarbageCollection>false</ServerGarbageCollection>
-		<ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
-		<!-- DATAS GC Mode | https://learn.microsoft.com/en-us/dotnet/core/runtime-config/garbage-collector#enabling-or-disabling-datas -->
-		<GarbageCollectionAdaptationMode>1</GarbageCollectionAdaptationMode>
-	</PropertyGroup>
-
-	<PropertyGroup>
 		<PublishAot>true</PublishAot>
 		<HighEntropyVA>true</HighEntropyVA>
 		<OptimizationPreference>Speed</OptimizationPreference>
