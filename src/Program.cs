@@ -70,7 +70,10 @@ namespace LoneEftDmaRadar
                 GlfwWindowing.Use();
                 _mutex = new Mutex(true, MUTEX_ID, out bool singleton);
                 if (!singleton)
-                    throw new InvalidOperationException("The application is already running.");
+                {
+                    MessageBox.Show("The application is already running!", Name, MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxOptions.DefaultDesktopOnly);
+                    Environment.Exit(0);
+                }
                 Config = EftDmaConfig.Load();
                 ServiceProvider = BuildServiceProvider();
                 HttpClientFactory = ServiceProvider.GetRequiredService<IHttpClientFactory>();
