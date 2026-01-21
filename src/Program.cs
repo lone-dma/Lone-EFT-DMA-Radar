@@ -70,10 +70,7 @@ namespace LoneEftDmaRadar
                 GlfwWindowing.Use();
                 _mutex = new Mutex(true, MUTEX_ID, out bool singleton);
                 if (!singleton)
-                {
-                    MessageBox.Show("The application is already running!", Name, MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxOptions.DefaultDesktopOnly);
-                    Environment.Exit(0);
-                }
+                    throw new InvalidOperationException("The application is already running.");
                 Config = EftDmaConfig.Load();
                 ServiceProvider = BuildServiceProvider();
                 HttpClientFactory = ServiceProvider.GetRequiredService<IHttpClientFactory>();
@@ -92,8 +89,9 @@ namespace LoneEftDmaRadar
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString(), Name, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxOptions.DefaultDesktopOnly);
-                throw;
+                string error = $"FATAL ERROR -> {ex}";
+                MessageBox.Show(error, Name, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxOptions.DefaultDesktopOnly);
+                Environment.FailFast(error);
             }
         }
 
@@ -106,8 +104,9 @@ namespace LoneEftDmaRadar
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString(), Name, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxOptions.DefaultDesktopOnly);
-                throw;
+                string error = $"FATAL ERROR -> {ex}";
+                MessageBox.Show(error, Name, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxOptions.DefaultDesktopOnly);
+                Environment.FailFast(error);
             }
         }
 
