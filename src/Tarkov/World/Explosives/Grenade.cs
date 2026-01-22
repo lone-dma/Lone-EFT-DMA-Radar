@@ -62,7 +62,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Explosives
                 _isSmoke = true;
                 return;
             }
-            var ti = Memory.ReadPtrChain(baseAddr, false, UnitySDK.UnityOffsets.TransformChain);
+            var ti = Memory.ReadPtrChain(baseAddr, false, UnityOffsets.TransformChain);
             _transform = new UnityTransform(ti);
         }
 

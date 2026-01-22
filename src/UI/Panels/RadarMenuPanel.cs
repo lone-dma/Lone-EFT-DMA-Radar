@@ -26,8 +26,6 @@ SOFTWARE.
  *
 */
 
-using ImGuiNET;
-
 namespace LoneEftDmaRadar.UI.Panels
 {
     /// <summary>

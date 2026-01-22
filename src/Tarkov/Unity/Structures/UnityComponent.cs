@@ -3,9 +3,9 @@
     [StructLayout(LayoutKind.Explicit)]
     public readonly struct UnityComponent // MonoBehaviour : Behaviour : << Component >> : EditorExtension : Object
     {
-        [FieldOffset((int)UnitySDK.UnityOffsets.Component_ObjectClassOffset)]
+        [FieldOffset((int)UnityOffsets.Component_ObjectClassOffset)]
         public readonly ulong ObjectClass; // m_Object
-        [FieldOffset((int)UnitySDK.UnityOffsets.Component_GameObjectOffset)]
+        [FieldOffset((int)UnityOffsets.Component_GameObjectOffset)]
         public readonly ulong GameObject; // m_GameObject
 
         /// <summary>

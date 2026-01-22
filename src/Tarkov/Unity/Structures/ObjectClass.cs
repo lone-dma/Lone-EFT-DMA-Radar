@@ -11,7 +11,7 @@
         /// </summary>
         public const uint MonoBehaviourOffset = 0x10;
 
-        public static uint[] To_GameObject { get; } = new[] { MonoBehaviourOffset, UnitySDK.UnityOffsets.Component_GameObjectOffset };
+        public static uint[] To_GameObject { get; } = new[] { MonoBehaviourOffset, UnityOffsets.Component_GameObjectOffset };
         public static uint[] To_NamePtr { get; } = new uint[] { 0x0, 0x10 };
 
         /// <summary>

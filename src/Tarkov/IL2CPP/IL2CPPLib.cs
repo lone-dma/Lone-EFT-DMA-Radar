@@ -113,12 +113,7 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
         {
             try
             {
-                // mov rax, cs:qword_59759D8
-                // lea     r14, [rax+rsi * 8]
-                // mov rdi, [r14]
-                const string pattern = "48 8B 05 ? ? ? ? 4C 8D 34 F0 49 8B 3E";
-
-                ulong sig = _vmm.FindSignature(_pid, pattern, module.vaBase, module.vaBase + module.cbImageSize);
+                ulong sig = _vmm.FindSignature(_pid, IL2CPPOffsets.TypeInfoDefinitionTableSig, module.vaBase, module.vaBase + module.cbImageSize);
                 sig.ThrowIfInvalidUserVA(nameof(sig));
 
                 int disp32 = Memory.ReadValue<int>(sig + 3);
@@ -129,7 +124,7 @@ namespace LoneEftDmaRadar.Tarkov.IL2CPP
             catch (Exception ex)
             {
                 Logging.WriteLine($"Signature scan failed for TypeInfoDefinitionTable: {ex}. Falling back to static offsets.");
-                ulong staticOffset = module.vaBase + 0x598BAD8;
+                ulong staticOffset = module.vaBase + IL2CPPOffsets.TypeInfoDefinitionTable;
                 gTypeInfoDefinitionTable = Memory.ReadValue<ulong>(staticOffset);
                 gTypeInfoDefinitionTable.ThrowIfInvalidUserVA(nameof(gTypeInfoDefinitionTable));
             }
