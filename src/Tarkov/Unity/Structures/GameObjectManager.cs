@@ -43,7 +43,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
                 }
                 catch
                 {
-                    var gomPtr = Memory.ReadValueEnsure<VmmPointer>(unityBase + UnitySDK.UnityOffsets.GameObjectManager);
+                    var gomPtr = Memory.ReadValueEnsure<VmmPointer>(unityBase + UnityOffsets.GameObjectManager);
                     gomPtr.ThrowIfInvalidUserVA();
                     Logging.WriteLine("GOM Initialized via Hardcoded Offset.");
                     Cache.GameObjectManager = gomPtr;
@@ -84,7 +84,7 @@ namespace LoneEftDmaRadar.Tarkov.Unity.Structures
             {
                 while (currentObject.ThisObject != 0x0 && currentObject.ThisObject != lastObject.ThisObject)
                 {
-                    var objectNamePtr = Memory.ReadPtr(currentObject.ThisObject + UnitySDK.UnityOffsets.GameObject_NameOffset);
+                    var objectNamePtr = Memory.ReadPtr(currentObject.ThisObject + UnityOffsets.GameObject_NameOffset);
                     var objectNameStr = Memory.ReadUtf8String(objectNamePtr, 64);
                     if (objectNameStr.Equals(objectName, StringComparison.OrdinalIgnoreCase))
                         return currentObject.ThisObject;

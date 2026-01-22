@@ -29,7 +29,6 @@ SOFTWARE.
 using LoneEftDmaRadar.Misc;
 using LoneEftDmaRadar.Misc.Workers;
 using LoneEftDmaRadar.Tarkov.IL2CPP;
-using LoneEftDmaRadar.Tarkov.Unity;
 using LoneEftDmaRadar.Tarkov.Unity.Structures;
 using LoneEftDmaRadar.Tarkov.World.Exits;
 using LoneEftDmaRadar.Tarkov.World.Explosives;
@@ -867,13 +866,13 @@ namespace LoneEftDmaRadar.Tarkov.World
                 try
                 {
                     gameObject.ThisObject.ThrowIfInvalidUserVA(nameof(gameObject));
-                    var objectNamePtr = Memory.ReadPtr(gameObject.ThisObject + UnitySDK.UnityOffsets.GameObject_NameOffset);
+                    var objectNamePtr = Memory.ReadPtr(gameObject.ThisObject + UnityOffsets.GameObject_NameOffset);
                     var objectNameStr = Memory.ReadUtf8String(objectNamePtr, 64);
                     if (objectNameStr.Equals("GameWorld", StringComparison.OrdinalIgnoreCase))
                     {
                         try
                         {
-                            var gameWorld = Memory.ReadPtrChain(gameObject.ThisObject, true, UnitySDK.UnityOffsets.GameWorldChain);
+                            var gameWorld = Memory.ReadPtrChain(gameObject.ThisObject, true, UnityOffsets.GameWorldChain);
                             /// Get Selected Map
                             var mapPtr = Memory.ReadValue<ulong>(gameWorld + Offsets.GameWorld.LocationId);
                             if (mapPtr == 0x0) // Offline Mode
