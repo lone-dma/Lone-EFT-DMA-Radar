@@ -64,6 +64,14 @@ namespace LoneEftDmaRadar.Tarkov
         /// All Task Zones mapped by MapID -> ZoneID -> Position.
         /// </summary>
         public static FrozenDictionary<string, FrozenDictionary<string, Vector3>> TaskZones { get; private set; }
+        /// <summary>
+        /// Event fired when data is updated. Reference the <see cref="TarkovDataManager"/> static properties for updated data.
+        /// </summary>
+        public static event EventHandler DataUpdated;
+        private static void OnDataUpdated()
+        {
+            DataUpdated?.Invoke(null, EventArgs.Empty);
+        }
 
         #region Startup
 
@@ -159,6 +167,7 @@ namespace LoneEftDmaRadar.Tarkov
             var maps = data.Maps.ToDictionary(x => x.NameId, StringComparer.OrdinalIgnoreCase) ??
                 new Dictionary<string, TarkovDevTypes.MapElement>(StringComparer.OrdinalIgnoreCase);
             MapData = maps.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
+            OnDataUpdated();
         }
 
         /// <summary>

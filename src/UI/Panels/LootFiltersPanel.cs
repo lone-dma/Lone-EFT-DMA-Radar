@@ -53,8 +53,7 @@ namespace LoneEftDmaRadar.UI.Panels
         private static string _filterColorHex = "#FFFFFF";
         private static readonly Dictionary<int, Vector3> _entryColors = new();
         private static readonly Dictionary<int, string> _entryColorHexes = new();
-
-        // Filter management state (moved from RadarUIState)
+        // Filter state
         private static readonly List<string> _filterNames = new();
         private static readonly List<LootFilterEntry> _currentFilterEntries = new();
 
@@ -63,7 +62,7 @@ namespace LoneEftDmaRadar.UI.Panels
         /// <summary>
         /// Currently selected filter name.
         /// </summary>
-        public static string SelectedFilterName
+        private static string SelectedFilterName
         {
             get => Config.LootFilters.Selected;
             set
@@ -74,6 +73,20 @@ namespace LoneEftDmaRadar.UI.Panels
                     RefreshCurrentFilterEntries();
                 }
             }
+        }
+
+        static LootFiltersPanel()
+        {
+            TarkovDataManager.DataUpdated += TarkovDataManager_DataUpdated;
+        }
+
+
+        private static void TarkovDataManager_DataUpdated(object sender, EventArgs e)
+        {
+            _ = RadarWindow.Dispatcher.InvokeAsync(() =>
+            {
+                Initialize(); // Re-initialize on data update to ensure filters properly set,etc.
+            });
         }
 
         /// <summary>
