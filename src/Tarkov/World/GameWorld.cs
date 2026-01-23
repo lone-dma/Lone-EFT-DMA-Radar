@@ -630,8 +630,8 @@ namespace LoneEftDmaRadar.Tarkov.World
             try
             {
                 // Check if we should process
-                if (!MapID.Equals("tarkovstreets", StringComparison.OrdinalIgnoreCase) ||
-                    !MapID.Equals("woods", StringComparison.OrdinalIgnoreCase) ||
+                if (!(MapID.Equals("tarkovstreets", StringComparison.OrdinalIgnoreCase) || 
+                    MapID.Equals("woods", StringComparison.OrdinalIgnoreCase)) ||
                     _rgtPlayers.Any(p => p is BtrPlayer))
                 {
                     return;
