@@ -191,26 +191,6 @@ namespace LoneEftDmaRadar.DMA
 
         #endregion
 
-        #region Restart Radar
-
-        private static readonly Lock _restartSync = new();
-        private static CancellationTokenSource _cts = new();
-
-        /// <summary>
-        /// Signal the Radar to restart the raid/game loop.
-        /// </summary>
-        public static void RestartRadar()
-        {
-            lock (_restartSync)
-            {
-                var old = Interlocked.Exchange(ref _cts, new());
-                old.Cancel();
-                old.Dispose();
-            }
-        }
-
-        #endregion
-
         #region Startup / Main Loop
 
         /// <summary>
@@ -250,32 +230,30 @@ namespace LoneEftDmaRadar.DMA
             {
                 try
                 {
-                    var ct = _cts.Token;
-                    using (var game = Game = GameWorld.CreateGameInstance(ct))
+                    using (var game = Game = GameWorld.CreateGameInstance())
                     {
                         OnRaidStarted();
                         game.Start();
                         while (game.InRaid)
                         {
-                            ct.ThrowIfCancellationRequested();
                             game.Refresh();
                             Thread.Sleep(133);
                         }
                     }
                 }
-                catch (OperationCanceledException ex) // Restart Radar
+                catch (OperationCanceledException) // Restart Radar
                 {
-                    Logging.WriteLine(ex.Message);
+                    Logging.WriteLine("User requested raid restart.");
                     continue;
                 }
-                catch (ProcessNotRunningException ex) // Process Closed
+                catch (ProcessNotRunningException) // Process Closed
                 {
-                    Logging.WriteLine(ex.Message);
+                    Logging.WriteLine("Process is not running!");
                     break;
                 }
                 catch (Exception ex)
                 {
-                    Logging.WriteLine($"Unhandled Exception in Game Loop: {ex}");
+                    Logging.WriteLine($"*** Unhandled Exception in Game Loop: {ex}");
                     break;
                 }
                 finally
@@ -671,10 +649,7 @@ namespace LoneEftDmaRadar.DMA
 
         private sealed class ProcessNotRunningException : Exception
         {
-            public ProcessNotRunningException()
-                : base("Process is not running!")
-            {
-            }
+            public ProcessNotRunningException() : base() { }
         }
 
         #endregion
