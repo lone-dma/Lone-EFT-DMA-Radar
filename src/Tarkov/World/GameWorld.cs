@@ -203,10 +203,6 @@ namespace LoneEftDmaRadar.Tarkov.World
                     Logging.WriteLine($"Valid GameWorld Found! {instance}");
                     return instance;
                 }
-                catch (OperationCanceledException)
-                {
-                    throw;
-                }
                 catch (Exception ex)
                 {
                     Logging.WriteLine($"ERROR Instantiating Game Instance: {ex}");
@@ -234,10 +230,6 @@ namespace LoneEftDmaRadar.Tarkov.World
                 Lookup.Find(out ulong gameWorld, out string map);
                 return new GameWorld(gameWorld, map);
             }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
             catch (Exception ex)
             {
                 throw new InvalidOperationException("ERROR Getting GameWorld", ex);
@@ -249,29 +241,13 @@ namespace LoneEftDmaRadar.Tarkov.World
         /// </summary>
         public void Refresh()
         {
-            _cts.Token.ThrowIfCancellationRequested();
-            try
-            {
-                ThrowIfRaidEnded();
-                if (MapID.Equals("tarkovstreets", StringComparison.OrdinalIgnoreCase) ||
-                    MapID.Equals("woods", StringComparison.OrdinalIgnoreCase))
-                    TryAllocateBTR();
-                _rgtPlayers.Refresh(); // Check for new players, add to list, etc.
-            }
-            catch (RaidEndedException) // Raid Ended
-            {
-                Logging.WriteLine("Raid has ended!");
-                Dispose();
-            }
-            catch (Exception ex)
-            {
-                Logging.WriteLine($"CRITICAL ERROR - Raid ended due to unhandled exception: {ex}");
-                throw;
-            }
+            ThrowIfRaidEnded();
+            ProcessBTR();
+            _rgtPlayers.Refresh(); // Check for new players, add to list, etc.
         }
 
         /// <summary>
-        /// Request a Raid Restart by terminating the current instance.
+        /// Request a Radar Restart by terminating the current instance.
         /// </summary>
         public void Restart()
         {
@@ -279,11 +255,13 @@ namespace LoneEftDmaRadar.Tarkov.World
         }
 
         /// <summary>
-        /// Throws an exception if the current raid instance has ended.
+        /// Throws an exception if the current raid instance should be terminated.
         /// </summary>
+        /// <exception cref="OperationCanceledException"></exception>
         /// <exception cref="RaidEndedException"></exception>
         private void ThrowIfRaidEnded()
         {
+            _cts.Token.ThrowIfCancellationRequested(); // Check if user requested radar restart
             for (int i = 0; i < 5; i++) // Re-attempt if read fails -- 5 times
             {
                 try
@@ -292,7 +270,7 @@ namespace LoneEftDmaRadar.Tarkov.World
                         return;
                 }
                 catch { }
-                Thread.Sleep(50); // Small delay before retry
+                Thread.Sleep(67); // Small delay before retry
             }
             throw new RaidEndedException(); // Still not valid? Raid must have ended.
         }
@@ -644,14 +622,21 @@ namespace LoneEftDmaRadar.Tarkov.World
         #region BTR Vehicle
 
         /// <summary>
-        /// Checks if there is a Bot attached to the BTR Turret and re-allocates the player instance.
+        /// Processes BTR Vehicle and allocates BTR Player if found.
+        /// No-op if map is not Streets/Woods, or if BTR Player already allocated.
         /// </summary>
-        public void TryAllocateBTR()
+        public void ProcessBTR()
         {
             try
             {
-                if (_rgtPlayers.Any(p => p is BtrPlayer))
+                // Check if we should process
+                if (!MapID.Equals("tarkovstreets", StringComparison.OrdinalIgnoreCase) ||
+                    !MapID.Equals("woods", StringComparison.OrdinalIgnoreCase) ||
+                    _rgtPlayers.Any(p => p is BtrPlayer))
+                {
                     return;
+                }
+                // OK -> Process
                 var btrController = Memory.ReadPtr(this + Offsets.GameWorld.BtrController);
                 var btrView = Memory.ReadPtr(btrController + Offsets.BtrController.BtrView);
                 var btrTurretView = Memory.ReadPtr(btrView + Offsets.BTRView.turret);
@@ -685,7 +670,7 @@ namespace LoneEftDmaRadar.Tarkov.World
 
         #region Misc
 
-        private sealed class RaidEndedException : Exception
+        public sealed class RaidEndedException : Exception
         {
             public RaidEndedException() : base() { }
         }

@@ -241,12 +241,17 @@ namespace LoneEftDmaRadar.DMA
                         }
                     }
                 }
-                catch (OperationCanceledException) // Restart Radar
+                catch (OperationCanceledException)
                 {
-                    Logging.WriteLine("User requested raid restart.");
+                    Logging.WriteLine("Radar restart requested by user!");
                     continue;
                 }
-                catch (ProcessNotRunningException) // Process Closed
+                catch (GameWorld.RaidEndedException)
+                {
+                    Logging.WriteLine("Raid has ended!");
+                    continue;
+                }
+                catch (ProcessNotRunningException)
                 {
                     Logging.WriteLine("Process is not running!");
                     break;
