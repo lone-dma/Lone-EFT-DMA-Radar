@@ -59,6 +59,7 @@ namespace LoneEftDmaRadar.Tarkov.World
         /// </summary>
         private ulong Base { get; }
 
+        private readonly CancellationTokenSource _cts = new();
         private readonly RegisteredPlayers _rgtPlayers;
         private readonly ExplosivesManager _explosivesManager;
         private readonly WorkerThread _t1;
@@ -191,15 +192,14 @@ namespace LoneEftDmaRadar.Tarkov.World
         /// <summary>
         /// Blocks until a World Singleton Instance can be instantiated.
         /// </summary>
-        public static GameWorld CreateGameInstance(CancellationToken ct)
+        public static GameWorld CreateGameInstance()
         {
             while (true)
             {
-                ct.ThrowIfCancellationRequested();
                 Memory.ThrowIfProcessNotRunning();
                 try
                 {
-                    var instance = GetGameWorld(ct);
+                    var instance = GetGameWorld();
                     Logging.WriteLine($"Valid GameWorld Found! {instance}");
                     return instance;
                 }
@@ -227,12 +227,11 @@ namespace LoneEftDmaRadar.Tarkov.World
         /// Loads Game World resources.
         /// </summary>
         /// <returns>True if Raid has started, otherwise False.</returns>
-        private static GameWorld GetGameWorld(CancellationToken ct)
+        private static GameWorld GetGameWorld()
         {
-            ct.ThrowIfCancellationRequested();
             try
             {
-                Lookup.Find(ct, out ulong gameWorld, out string map);
+                Lookup.Find(out ulong gameWorld, out string map);
                 return new GameWorld(gameWorld, map);
             }
             catch (OperationCanceledException)
@@ -250,6 +249,7 @@ namespace LoneEftDmaRadar.Tarkov.World
         /// </summary>
         public void Refresh()
         {
+            _cts.Token.ThrowIfCancellationRequested();
             try
             {
                 ThrowIfRaidEnded();
@@ -258,9 +258,9 @@ namespace LoneEftDmaRadar.Tarkov.World
                     TryAllocateBTR();
                 _rgtPlayers.Refresh(); // Check for new players, add to list, etc.
             }
-            catch (RaidEndedException ex) // Raid Ended
+            catch (RaidEndedException) // Raid Ended
             {
-                Logging.WriteLine(ex.Message);
+                Logging.WriteLine("Raid has ended!");
                 Dispose();
             }
             catch (Exception ex)
@@ -268,6 +268,14 @@ namespace LoneEftDmaRadar.Tarkov.World
                 Logging.WriteLine($"CRITICAL ERROR - Raid ended due to unhandled exception: {ex}");
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Request a Raid Restart by terminating the current instance.
+        /// </summary>
+        public void Restart()
+        {
+            _cts.Cancel();
         }
 
         /// <summary>
@@ -666,6 +674,7 @@ namespace LoneEftDmaRadar.Tarkov.World
         {
             if (Interlocked.Exchange(ref _disposed, true) == false)
             {
+                _cts.Dispose();
                 _t1?.Dispose();
                 _t2?.Dispose();
                 _t3?.Dispose();
@@ -678,10 +687,7 @@ namespace LoneEftDmaRadar.Tarkov.World
 
         private sealed class RaidEndedException : Exception
         {
-            public RaidEndedException()
-                : base("Raid has ended!")
-            {
-            }
+            public RaidEndedException() : base() { }
         }
 
         public override string ToString()
@@ -694,9 +700,8 @@ namespace LoneEftDmaRadar.Tarkov.World
         /// </summary>
         private static class Lookup
         {
-            public static void Find(CancellationToken ct, out ulong gameWorld, out string map)
+            public static void Find(out ulong gameWorld, out string map)
             {
-                ct.ThrowIfCancellationRequested();
                 Logging.WriteLine("Searching for GameWorld...");
 
                 using var searchCts = new CancellationTokenSource();
@@ -705,14 +710,13 @@ namespace LoneEftDmaRadar.Tarkov.World
                     Task<GameWorldResult> winner = null;
                     var tasks = new List<Task<GameWorldResult>>()
                     {
-                        Task.Run(() => FindViaIL2CPP(searchCts.Token, ct)),
-                        Task.Run(() => FindViaGOM(searchCts.Token, ct))
+                        Task.Run(() => FindViaIL2CPP(searchCts.Token)),
+                        Task.Run(() => FindViaGOM(searchCts.Token))
                     };
 
                     while (tasks.Count > 1) // IL2CPP will never exit normally
                     {
                         var finished = Task.WhenAny(tasks).GetAwaiter().GetResult();
-                        ct.ThrowIfCancellationRequested();
                         tasks.Remove(finished);
 
                         if (finished.Status == TaskStatus.RanToCompletion)
@@ -737,12 +741,11 @@ namespace LoneEftDmaRadar.Tarkov.World
             /// <summary>
             /// Finds GameWorld using IL2CPP interop.
             /// </summary>
-            private static GameWorldResult FindViaIL2CPP(CancellationToken ct1, CancellationToken ct2)
+            private static GameWorldResult FindViaIL2CPP(CancellationToken ct1)
             {
                 while (true)
                 {
                     ct1.ThrowIfCancellationRequested();
-                    ct2.ThrowIfCancellationRequested();
                     try
                     {
                         if (IL2CPPLib.TryGetGameWorld(out ulong gameWorld, out string map))
@@ -764,7 +767,7 @@ namespace LoneEftDmaRadar.Tarkov.World
             /// <summary>
             /// Finds GameWorld using Unity GameObjectManager with parallel subtasks.
             /// </summary>
-            private static GameWorldResult FindViaGOM(CancellationToken ct1, CancellationToken ct2)
+            private static GameWorldResult FindViaGOM(CancellationToken ct)
             {
                 var gom = GameObjectManager.Get();
                 var firstObject = Memory.ReadValue<LinkedListObject>(gom.ActiveNodes);
@@ -779,15 +782,14 @@ namespace LoneEftDmaRadar.Tarkov.World
                     Task<GameWorldResult> winner = null;
                     var tasks = new List<Task<GameWorldResult>>()
                     {
-                        Task.Run(() => GOM_ReadShallow(gomCts.Token, ct1, ct2)),
-                        Task.Run(() => GOM_ReadForward(firstObject, lastObject, gomCts.Token, ct1, ct2))
+                        Task.Run(() => GOM_ReadShallow(gomCts.Token, ct)),
+                        Task.Run(() => GOM_ReadForward(firstObject, lastObject, gomCts.Token, ct))
                     };
 
                     while (tasks.Count > 1) // Shallow will never exit normally
                     {
                         var finished = Task.WhenAny(tasks).GetAwaiter().GetResult();
-                        ct1.ThrowIfCancellationRequested();
-                        ct2.ThrowIfCancellationRequested();
+                        ct.ThrowIfCancellationRequested();
                         tasks.Remove(finished);
 
                         if (finished.Status == TaskStatus.RanToCompletion)
@@ -808,14 +810,13 @@ namespace LoneEftDmaRadar.Tarkov.World
                 }
             }
 
-            private static GameWorldResult GOM_ReadShallow(CancellationToken gomCt, CancellationToken ct1, CancellationToken ct2)
+            private static GameWorldResult GOM_ReadShallow(CancellationToken gomCt, CancellationToken ct)
             {
                 const int maxDepth = 10000;
                 while (true)
                 {
                     gomCt.ThrowIfCancellationRequested();
-                    ct1.ThrowIfCancellationRequested();
-                    ct2.ThrowIfCancellationRequested();
+                    ct.ThrowIfCancellationRequested();
                     try
                     {
                         // This implementation is completely self-contained to keep memory state fresh on re-loops
@@ -825,8 +826,7 @@ namespace LoneEftDmaRadar.Tarkov.World
                         while (currentObject.ThisObject.IsValidUserVA())
                         {
                             gomCt.ThrowIfCancellationRequested();
-                            ct1.ThrowIfCancellationRequested();
-                            ct2.ThrowIfCancellationRequested();
+                            ct.ThrowIfCancellationRequested();
                             if (iterations++ >= maxDepth)
                                 break;
                             if (ParseGameWorldGameObject(ref currentObject) is GameWorldResult result)
@@ -843,13 +843,12 @@ namespace LoneEftDmaRadar.Tarkov.World
                 }
             }
 
-            private static GameWorldResult GOM_ReadForward(LinkedListObject currentObject, LinkedListObject lastObject, CancellationToken gomCt, CancellationToken ct1, CancellationToken ct2)
+            private static GameWorldResult GOM_ReadForward(LinkedListObject currentObject, LinkedListObject lastObject, CancellationToken gomCt, CancellationToken ct)
             {
                 while (currentObject.ThisObject != lastObject.ThisObject)
                 {
                     gomCt.ThrowIfCancellationRequested();
-                    ct1.ThrowIfCancellationRequested();
-                    ct2.ThrowIfCancellationRequested();
+                    ct.ThrowIfCancellationRequested();
                     if (ParseGameWorldGameObject(ref currentObject) is GameWorldResult result)
                     {
                         Logging.WriteLine("GameWorld Found! (GOM Forward)");

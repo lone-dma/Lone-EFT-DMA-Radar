@@ -132,7 +132,7 @@ namespace LoneEftDmaRadar.UI.Panels
 
                 if (ImGui.Button("Restart Radar"))
                 {
-                    Memory.RestartRadar();
+                    Memory.Game?.Restart();
                 }
                 if (ImGui.IsItemHovered())
                     ImGui.SetTooltip("Restart the radar memory reader");
