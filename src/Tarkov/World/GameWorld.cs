@@ -74,11 +74,11 @@ namespace LoneEftDmaRadar.Tarkov.World
         public bool InRaid => !_disposed;
         public IReadOnlyCollection<AbstractPlayer> Players => _rgtPlayers;
         public IReadOnlyCollection<IExplosiveItem> Explosives => _explosivesManager;
-        public LocalPlayer LocalPlayer => _rgtPlayers?.LocalPlayer;
+        public LocalPlayer LocalPlayer => _rgtPlayers.LocalPlayer;
         public LootManager Loot { get; }
         public QuestManager QuestManager { get; }
-        public IReadOnlyList<IExitPoint> Exits { get; }
-        public IReadOnlyList<IWorldHazard> Hazards { get; }
+        public IReadOnlyCollection<IExitPoint> Exits { get; }
+        public IReadOnlyCollection<IWorldHazard> Hazards { get; }
         public bool RaidStarted { get; private set; }
 
         private GameWorld() { }
@@ -290,6 +290,34 @@ namespace LoneEftDmaRadar.Tarkov.World
             catch
             {
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Processes BTR Vehicle and allocates BTR Player if found.
+        /// No-op if map is not Streets/Woods, or if BTR Player already allocated.
+        /// </summary>
+        private void ProcessBTR()
+        {
+            try
+            {
+                // Check if we should process
+                if (!(MapID.Equals("tarkovstreets", StringComparison.OrdinalIgnoreCase) ||
+                    MapID.Equals("woods", StringComparison.OrdinalIgnoreCase)) ||
+                    _rgtPlayers.Any(p => p is BtrPlayer))
+                {
+                    return;
+                }
+                // OK -> Process
+                var btrController = Memory.ReadPtr(this + Offsets.GameWorld.BtrController);
+                var btrView = Memory.ReadPtr(btrController + Offsets.BtrController.BtrView);
+                var btrTurretView = Memory.ReadPtr(btrView + Offsets.BTRView.turret);
+                var btrOperator = Memory.ReadPtr(btrTurretView + Offsets.BTRTurretView._bot);
+                _rgtPlayers.TryAllocateBTR(btrView, btrOperator);
+            }
+            catch (Exception ex)
+            {
+                Logging.WriteLine($"ERROR Allocating BTR: {ex}");
             }
         }
 
@@ -615,38 +643,6 @@ namespace LoneEftDmaRadar.Tarkov.World
         private void ExplosivesWorker_PerformWork(object sender, WorkerThreadArgs e)
         {
             _explosivesManager.Refresh(e.CancellationToken);
-        }
-
-        #endregion
-
-        #region BTR Vehicle
-
-        /// <summary>
-        /// Processes BTR Vehicle and allocates BTR Player if found.
-        /// No-op if map is not Streets/Woods, or if BTR Player already allocated.
-        /// </summary>
-        public void ProcessBTR()
-        {
-            try
-            {
-                // Check if we should process
-                if (!(MapID.Equals("tarkovstreets", StringComparison.OrdinalIgnoreCase) || 
-                    MapID.Equals("woods", StringComparison.OrdinalIgnoreCase)) ||
-                    _rgtPlayers.Any(p => p is BtrPlayer))
-                {
-                    return;
-                }
-                // OK -> Process
-                var btrController = Memory.ReadPtr(this + Offsets.GameWorld.BtrController);
-                var btrView = Memory.ReadPtr(btrController + Offsets.BtrController.BtrView);
-                var btrTurretView = Memory.ReadPtr(btrView + Offsets.BTRView.turret);
-                var btrOperator = Memory.ReadPtr(btrTurretView + Offsets.BTRTurretView._bot);
-                _rgtPlayers.TryAllocateBTR(btrView, btrOperator);
-            }
-            catch (Exception ex)
-            {
-                Logging.WriteLine($"ERROR Allocating BTR: {ex}");
-            }
         }
 
         #endregion
