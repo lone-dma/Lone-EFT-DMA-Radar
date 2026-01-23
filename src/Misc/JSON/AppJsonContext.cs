@@ -76,7 +76,6 @@ namespace LoneEftDmaRadar.Misc.JSON
     // Enums
     [JsonSerializable(typeof(LootFilterEntryType))]
     [JsonSerializable(typeof(LootPriceMode))]
-    [JsonSerializable(typeof(FpgaAlgo))]
     [JsonSerializable(typeof(ColorPickerOption))]
     [JsonSerializable(typeof(Win32VirtualKey))]
     // Dictionary types
