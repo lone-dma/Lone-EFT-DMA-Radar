@@ -131,45 +131,52 @@ namespace LoneEftDmaRadar.UI.Widgets
                     ImGui.TableNextColumn();
 
                     ImGui.PushID(player.Id);
-                    _ = ImGui.Selectable("##row", ref rowSelected, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick);
-
-                    if (ImGui.IsItemHovered())
+                    try
                     {
-                        if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+                        _ = ImGui.Selectable("##row", ref rowSelected, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick);
+
+                        if (ImGui.IsItemHovered())
                         {
-                            RadarWindow.PingMapEntity(player);
+                            if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+                            {
+                                RadarWindow.PingMapEntity(player);
+                                break;
+                            }
+                            else if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
+                            {
+                                player.SetFocus(!player.IsFocused);
+                                break;
+                            }
                         }
-                        else if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
-                        {
-                            player.SetFocus(!player.IsFocused);
-                        }
+
+                        // Render row contents on top of the selectable.
+                        ImGui.SameLine();
+                        ImGui.TextColored(rowColor, player.Name ?? "--");
+
+                        // Column 1: Group
+                        ImGui.TableNextColumn();
+                        ImGui.TextColored(rowColor, player.GroupId == AbstractPlayer.SoloGroupId ? "--" : player.GroupId.ToString());
+
+                        // Column 2: In Hands
+                        ImGui.TableNextColumn();
+                        ImGui.TextColored(rowColor, player.Equipment?.InHands?.ShortName ?? "--");
+
+                        // Column 3: Secure
+                        ImGui.TableNextColumn();
+                        ImGui.TextColored(rowColor, player.Equipment?.SecuredContainer?.ShortName ?? "--");
+
+                        // Column 4: Value
+                        ImGui.TableNextColumn();
+                        ImGui.TextColored(rowColor, Utilities.FormatNumberKM(player.Equipment?.Value ?? 0).ToString() ?? "--");
+
+                        // Column 5: Dist
+                        ImGui.TableNextColumn();
+                        ImGui.TextColored(rowColor, ((int)Vector3.Distance(player.Position, localPlayer.Position)).ToString());
                     }
-
-                    // Render row contents on top of the selectable.
-                    ImGui.SameLine();
-                    ImGui.TextColored(rowColor, player.Name ?? "--");
-
-                    // Column 1: Group
-                    ImGui.TableNextColumn();
-                    ImGui.TextColored(rowColor, player.GroupId == AbstractPlayer.SoloGroupId ? "--" : player.GroupId.ToString());
-
-                    // Column 2: In Hands
-                    ImGui.TableNextColumn();
-                    ImGui.TextColored(rowColor, player.Equipment?.InHands?.ShortName ?? "--");
-
-                    // Column 3: Secure
-                    ImGui.TableNextColumn();
-                    ImGui.TextColored(rowColor, player.Equipment?.SecuredContainer?.ShortName ?? "--");
-
-                    // Column 4: Value
-                    ImGui.TableNextColumn();
-                    ImGui.TextColored(rowColor, Utilities.FormatNumberKM(player.Equipment?.Value ?? 0).ToString() ?? "--");
-
-                    // Column 5: Dist
-                    ImGui.TableNextColumn();
-                    ImGui.TextColored(rowColor, ((int)Vector3.Distance(player.Position, localPlayer.Position)).ToString());
-
-                    ImGui.PopID();
+                    finally
+                    {
+                        ImGui.PopID();
+                    }
                 }
 
                 ImGui.EndTable();
