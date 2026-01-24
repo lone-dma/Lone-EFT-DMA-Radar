@@ -600,7 +600,7 @@ namespace LoneEftDmaRadar.DMA
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static VmmScatterMap CreateScatterMap() =>
-            _vmm.CreateScatterMap(_pid);
+            new VmmScatterMap(_vmm, _pid);
 
         /// <summary>
         /// Creates a new <see cref="VmmScatter"/>.
@@ -609,7 +609,7 @@ namespace LoneEftDmaRadar.DMA
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static VmmScatter CreateScatter(VmmFlags flags = VmmFlags.NONE) =>
-            _vmm.CreateScatter(_pid, flags);
+            new VmmScatter(_vmm, _pid, flags);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong FindSignature(string signature)
