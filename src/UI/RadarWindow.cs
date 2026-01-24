@@ -355,9 +355,9 @@ namespace LoneEftDmaRadar.UI
             _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.StencilBufferBit | ClearBufferMask.DepthBufferBit);
 
             var canvas = _skSurface.Canvas;
+            canvas.Save();
             try
             {
-                canvas.Save();
                 canvas.Scale(RadarScale, RadarScale);
                 if (state == AppState.InRaid && LocalPlayer is LocalPlayer localPlayer && EftMapManager.LoadMap(MapID) is IEftMap map)
                 {

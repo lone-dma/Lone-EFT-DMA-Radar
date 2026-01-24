@@ -114,10 +114,9 @@ namespace LoneEftDmaRadar.UI.Widgets
 
             // Draw to Skia surface
             var canvas = _surface.Canvas;
-
+            canvas.Save();
             try
             {
-                canvas.Save();
                 canvas.Scale(scale, scale);
 
                 if (Program.State == AppState.InRaid && LocalPlayer is LocalPlayer localPlayer)
