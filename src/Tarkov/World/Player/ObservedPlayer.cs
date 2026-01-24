@@ -264,7 +264,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         /// <summary>
         /// Sync Player Information.
         /// </summary>
-        public override void OnRegRefresh(VmmScatterSlim scatter, ISet<ulong> registered, bool? isActiveParam = null)
+        public override void OnRegRefresh(VmmScatter scatter, ISet<ulong> registered, bool? isActiveParam = null)
         {
             if (isActiveParam is not bool isActive)
                 isActive = registered.Contains(this);
