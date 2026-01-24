@@ -37,7 +37,7 @@ namespace LoneEftDmaRadar.UI.Skia
         /// </summary>
         /// <param name="brightnessFactor">Adjust this value between 0 (black) and 1 (original brightness), where values less than 1 reduce brightness</param>
         /// <returns>SKColorFilter Object.</returns>
-        public static SKColorFilter GetDarkModeColorFilter(float brightnessFactor)
+        private static SKColorFilter GetDarkModeColorFilter(float brightnessFactor)
         {
             float[] colorMatrix = {
                 brightnessFactor, 0, 0, 0, 0, // Red channel
@@ -52,13 +52,15 @@ namespace LoneEftDmaRadar.UI.Skia
 
         public static SKPaint PaintBitmap { get; } = new()
         {
-            IsAntialias = false
+            IsAntialias = false,
+            ColorFilter = GetDarkModeColorFilter(0.7f),
         };
 
         public static SKPaint PaintBitmapAlpha { get; } = new()
         {
             Color = SKColor.Empty.WithAlpha(127),
             IsAntialias = false,
+            ColorFilter = GetDarkModeColorFilter(0.7f)
         };
 
         public static SKPaint PaintConnectorGroup { get; } = new()

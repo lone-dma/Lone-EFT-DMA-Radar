@@ -107,6 +107,9 @@ namespace LoneEftDmaRadar.UI
         [MethodImpl(MethodImplOptions.NoInlining)]
         internal static void Run() => _window.Run();
 
+        /// <summary>
+        /// Event is called when the window is loaded.
+        /// </summary>
         private static void OnLoad()
         {
             _gl = GL.GetApi(_window);
@@ -157,7 +160,8 @@ namespace LoneEftDmaRadar.UI
 
             ApplyCustomImGuiStyle();
 
-            _load = OnLoadAsync(); // Load remaining modules and UI components asynchronously
+            // We have the window/ui ready, now we can finish loading everything else
+            _load = OnLoadAsync();
             _window.Update += OnLoadAsync_Update;
         }
 
@@ -176,15 +180,9 @@ namespace LoneEftDmaRadar.UI
         /// </summary>
         private static async Task OnLoadAsync()
         {
-            SKPaints.PaintBitmap.ColorFilter = SKPaints.GetDarkModeColorFilter(0.7f);
-            SKPaints.PaintBitmapAlpha.ColorFilter = SKPaints.GetDarkModeColorFilter(0.7f);
-            var tarkovDataManager = TarkovDataManager.ModuleInitAsync();
-            var eftMapManager = EftMapManager.ModuleInitAsync();
-            var memoryInterface = Memory.ModuleInitAsync();
+            await ConfigureRadarAsync();
 
-            // Wait for all tasks
-            await Task.WhenAll(tarkovDataManager, eftMapManager, memoryInterface);
-            // Setup mouse events on the shared input context
+            // Finish loading the rest of the interface
             foreach (var mouse in _input.Mice)
             {
                 mouse.MouseDown += OnMouseDown;
@@ -216,6 +214,20 @@ namespace LoneEftDmaRadar.UI
 
             // Ready
             Program.UpdateState(AppState.ProcessNotStarted);
+        }
+
+        /// <summary>
+        /// Configure async Radar Modules (non-ui).
+        /// </summary>
+        /// <returns></returns>
+        private static Task ConfigureRadarAsync()
+        {
+            var tarkovDataManager = TarkovDataManager.ModuleInitAsync();
+            var eftMapManager = EftMapManager.ModuleInitAsync();
+            var memoryInterface = Memory.ModuleInitAsync();
+
+            // Wait for all tasks
+            return Task.WhenAll(tarkovDataManager, eftMapManager, memoryInterface);
         }
 
         private static void CreateSkiaSurface()
