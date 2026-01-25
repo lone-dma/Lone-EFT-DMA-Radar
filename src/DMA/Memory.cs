@@ -145,6 +145,10 @@ namespace LoneEftDmaRadar.DMA
                 }
                 catch (Exception ex)
                 {
+                    if (ex is VmmException vmmEx)
+                    {
+                        PromptClearVmmCache(vmmEx);
+                    }
                     throw new InvalidOperationException(
                     "DMA Initialization Failed!\n\n" +
                     $"Reason: {ex.Message}\n\n" +
@@ -158,6 +162,36 @@ namespace LoneEftDmaRadar.DMA
                     "4. Make sure all Setup Steps are completed (See DMA Setup Guide/Wiki for additional troubleshooting).");
                 }
             });
+        }
+
+        private static void PromptClearVmmCache(VmmException ex)
+        {
+            var prompt = MessageBox.Show(
+                messageBoxText: $"DMA: {ex.Message}\n\n" +
+                $"Would you like to reset your Cached Memory Map & Symbols? (Recommended)",
+                caption: Program.Name,
+                button: MessageBoxButton.YesNo,
+                icon: MessageBoxImage.Warning,
+                options: MessageBoxOptions.DefaultDesktopOnly);
+            if (prompt == UI.Misc.MessageBoxResult.Yes)
+            {
+                if (File.Exists(_mmap))
+                {
+                    File.Delete(_mmap);
+                }
+                var symbolsPath = new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, "Symbols"));
+                if (symbolsPath.Exists)
+                {
+                    symbolsPath.Delete(recursive: true);
+                }
+                MessageBox.Show(
+                    messageBoxText: "Cache & Symbols reset! Please restart the Radar now.",
+                    caption: Program.Name,
+                    button: MessageBoxButton.OK,
+                    icon: MessageBoxImage.Information,
+                    options: MessageBoxOptions.DefaultDesktopOnly);
+                Environment.Exit(0);
+            }
         }
 
         /// <summary>
