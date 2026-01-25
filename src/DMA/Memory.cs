@@ -167,7 +167,7 @@ namespace LoneEftDmaRadar.DMA
         private static void PromptClearVmmCache(VmmException ex)
         {
             var prompt = MessageBox.Show(
-                messageBoxText: $"DMA: {ex.Message}\n\n" +
+                messageBoxText: $"DMA ERROR: {ex.Message}\n\n" +
                 $"Would you like to reset your Cached Memory Map & Symbols? (Recommended)",
                 caption: Program.Name,
                 button: MessageBoxButton.YesNo,
@@ -185,7 +185,7 @@ namespace LoneEftDmaRadar.DMA
                     symbolsPath.Delete(recursive: true);
                 }
                 MessageBox.Show(
-                    messageBoxText: "Cache & Symbols reset! Please restart the Radar now.",
+                    messageBoxText: "DMA Cache reset! Please restart the Radar now.",
                     caption: Program.Name,
                     button: MessageBoxButton.OK,
                     icon: MessageBoxImage.Information,
