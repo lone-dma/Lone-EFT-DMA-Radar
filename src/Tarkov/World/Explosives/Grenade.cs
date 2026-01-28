@@ -69,7 +69,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Explosives
         /// <summary>
         /// Get the updated Position of this Grenade.
         /// </summary>
-        public void OnRefresh(VmmScatterSlim scatter)
+        public void OnRefresh(VmmScatterManaged scatter)
         {
             if (_isSmoke)
             {

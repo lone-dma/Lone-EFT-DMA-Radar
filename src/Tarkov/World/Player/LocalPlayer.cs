@@ -87,7 +87,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
             }
         }
 
-        public override void OnRealtimeLoop(VmmScatterSlim scatter)
+        public override void OnRealtimeLoop(VmmScatterManaged scatter)
         {
             try
             {
@@ -130,7 +130,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
             }
         }
 
-        public override void OnValidateTransforms(VmmScatterSlim round1, VmmScatterSlim round2)
+        public override void OnValidateTransforms(VmmScatterManaged round1, VmmScatterManaged round2)
         {
             try
             {

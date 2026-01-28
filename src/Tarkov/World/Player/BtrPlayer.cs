@@ -60,7 +60,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         /// Give this function it's own unique Index.
         /// </summary>
         /// <param name="index">Scatter read index to read off of.</param>
-        public override void OnRealtimeLoop(VmmScatterSlim scatter)
+        public override void OnRealtimeLoop(VmmScatterManaged scatter)
         {
             scatter.PrepareReadValue<Vector3>(_posAddr);
             scatter.Completed += (sender, s) =>
