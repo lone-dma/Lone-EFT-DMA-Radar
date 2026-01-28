@@ -58,7 +58,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Explosives
             _position.ThrowIfAbnormal("Tripwire Position");
         }
 
-        public void OnRefresh(VmmScatterSlim scatter)
+        public void OnRefresh(VmmScatterManaged scatter)
         {
             if (_destroyed)
             {

@@ -376,7 +376,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         /// <param nickName="scatter"></param>
         /// <param nickName="registered"></param>
         /// <param nickName="isActiveParam"></param>
-        public virtual void OnRegRefresh(VmmScatterSlim scatter, ISet<ulong> registered, bool? isActiveParam = null)
+        public virtual void OnRegRefresh(VmmScatterManaged scatter, ISet<ulong> registered, bool? isActiveParam = null)
         {
             if (isActiveParam is not bool isActive)
                 isActive = registered.Contains(this);
@@ -430,7 +430,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         /// Executed on each Realtime Loop.
         /// </summary>
         /// <param nickName="index">Scatter read index dedicated to this player.</param>
-        public virtual void OnRealtimeLoop(VmmScatterSlim scatter)
+        public virtual void OnRealtimeLoop(VmmScatterManaged scatter)
         {
             scatter.PrepareReadValue<Vector2>(RotationAddress); // Rotation
             scatter.PrepareReadArray<TrsX>(SkeletonRoot.VerticesAddr, SkeletonRoot.Count); // ESP Vertices
@@ -475,7 +475,7 @@ namespace LoneEftDmaRadar.Tarkov.World.Player
         /// </summary>
         /// <param nickName="round1">Index (round 1)</param>
         /// <param nickName="round2">Index (round 2)</param>
-        public virtual void OnValidateTransforms(VmmScatterSlim round1, VmmScatterSlim round2)
+        public virtual void OnValidateTransforms(VmmScatterManaged round1, VmmScatterManaged round2)
         {
             round1.PrepareReadPtr(SkeletonRoot.TransformInternal + UnityOffsets.TransformAccess_HierarchyOffset); // Bone Hierarchy
             round1.Completed += (sender, x1) =>
