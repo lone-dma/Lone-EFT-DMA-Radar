@@ -28,6 +28,12 @@ SOFTWARE.
 
 namespace LoneEftDmaRadar.Misc.Workers
 {
+    /// <summary>
+    /// Encapsulates a worker thread that can perform periodic work on a separate managed thread.
+    /// </summary>
+    /// <remarks>
+    /// IMPORTANT: Must call <see cref="Dispose"/> or the thread will never exit.
+    /// </remarks>
     public sealed class WorkerThread : IDisposable
     {
         private readonly CancellationTokenSource _cts = new();
@@ -78,6 +84,7 @@ namespace LoneEftDmaRadar.Misc.Workers
         /// </summary>
         public void Start()
         {
+            ObjectDisposedException.ThrowIf(_disposed, this);
             if (Interlocked.Exchange(ref _started, true) == false)
             {
                 new Thread(Worker)
@@ -94,7 +101,8 @@ namespace LoneEftDmaRadar.Misc.Workers
             Logging.WriteLine($"[WorkerThread] '{Name}' thread starting...");
             bool shouldSleep = SleepDuration > TimeSpan.Zero;
             bool shouldDynamicSleep = shouldSleep && SleepMode == WorkerThreadSleepMode.DynamicSleep;
-            while (!_disposed)
+            CancellationToken ct = _args.CancellationToken;
+            while (!ct.IsCancellationRequested)
             {
                 long start = shouldDynamicSleep ?
                     Stopwatch.GetTimestamp() : default;
@@ -108,7 +116,8 @@ namespace LoneEftDmaRadar.Misc.Workers
                 }
                 finally
                 {
-                    if (shouldDynamicSleep)
+                    if (ct.IsCancellationRequested) { } // no-op let thread exit
+                    else if (shouldDynamicSleep)
                     {
                         long end = Stopwatch.GetTimestamp();
                         var duration = SleepDuration - Stopwatch.GetElapsedTime(start, end);
