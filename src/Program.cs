@@ -132,9 +132,7 @@ namespace LoneEftDmaRadar
 
         private static void OnShutdown()
         {
-            Logging.WriteLine("Saving Config and Closing DMA Connection...");
             Config.Save();
-            Memory.Close();
             Logging.WriteLine("Exiting...");
         }
 
