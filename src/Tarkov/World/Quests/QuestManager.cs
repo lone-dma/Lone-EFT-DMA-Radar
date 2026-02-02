@@ -1,4 +1,8 @@
-﻿using Collections.Pooled;
+﻿/*
+ * Lone EFT DMA Radar - Copyright (c) 2026 Lone DMA
+ * Licensed under GNU AGPLv3. See https://www.gnu.org/licenses/agpl-3.0.html
+ */
+using Collections.Pooled;
 using LoneEftDmaRadar.Tarkov.Unity.Collections;
 using LoneEftDmaRadar.Web.TarkovDev;
 using System.Collections.Frozen;

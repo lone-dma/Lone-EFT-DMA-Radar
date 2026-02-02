@@ -1,4 +1,8 @@
-﻿namespace LoneEftDmaRadar.Misc.JSON
+﻿/*
+ * Lone EFT DMA Radar - Copyright (c) 2026 Lone DMA
+ * Licensed under GNU AGPLv3. See https://www.gnu.org/licenses/agpl-3.0.html
+ */
+namespace LoneEftDmaRadar.Misc.JSON
 {
     public sealed class Vector2JsonConverter : JsonConverter<Vector2>
     {
@@ -48,3 +52,4 @@
         }
     }
 }
+

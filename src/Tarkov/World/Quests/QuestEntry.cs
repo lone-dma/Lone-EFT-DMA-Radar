@@ -1,4 +1,8 @@
-﻿namespace LoneEftDmaRadar.Tarkov.World.Quests
+﻿/*
+ * Lone EFT DMA Radar - Copyright (c) 2026 Lone DMA
+ * Licensed under GNU AGPLv3. See https://www.gnu.org/licenses/agpl-3.0.html
+ */
+namespace LoneEftDmaRadar.Tarkov.World.Quests
 {
     /// <summary>
     /// Represents a quest entry with enable/disable functionality.
