@@ -111,7 +111,7 @@ namespace LoneEftDmaRadar.Misc.Workers
                     if (shouldDynamicSleep)
                     {
                         long end = Stopwatch.GetTimestamp();
-                        var duration = SleepDuration - TimeSpan.FromTicks(end - start);
+                        var duration = SleepDuration - Stopwatch.GetElapsedTime(start, end);
                         if (duration > TimeSpan.Zero)
                         {
                             Thread.Sleep(duration);
