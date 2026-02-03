@@ -6,6 +6,8 @@ I have since changed Lone EFT DMA Radar to be **READ-ONLY** and **RADAR-ONLY**.
 
 No feature requests in Issues please.
 
+Distribution of this software ***must include the source code*** per the AGPLv3 terms.
+
 ## 👋 Welcome
 This is the original Lone EFT DMA Radar by Lone, with some key differences from the original version:
 1. **Radar Only/No Memwrites.**
