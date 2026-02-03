@@ -21,9 +21,7 @@ This version is designed to be as safe as possible from any future detections, a
 If you find this software useful, _please_ consider donating! Every little bit helps :) [See here for Donations Info](https://github.com/lone-dma#-support-the-project)
  
 ## 💖 Special Thanks
-- @xx0m and @Mambo-Noob
-  - For keeping the DER Community running, and doing an awesome job keeping the other eft-dma-radar fork maintained. Thank you!
+- @xx0m, @Mambo-Noob, and Keeegi
+  - For for your partnership and collaboration on EFT Reversing. Thank you!
 - Marazm
   - For your hard work on maps, and your willingness to contribute them to the open domain. Thank you!
-- Keeegi
-  - For your helpful insights on Unity/IL2CPP Reversing. Thank you!
