@@ -60,7 +60,7 @@
 	<PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.2.0" />
 	<PackageReference Include="Svg.Skia" Version="3.4.1" />
 	<PackageReference Include="Velopack" Version="0.0.1298" />
-	<PackageReference Include="VmmSharpEx" Version="3.200.2" />
+	<PackageReference Include="VmmSharpEx" Version="3.200.3" />
 	<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	<PackageReference Include="Open.Nat.V2" Version="3.1.1" />
   </ItemGroup>
