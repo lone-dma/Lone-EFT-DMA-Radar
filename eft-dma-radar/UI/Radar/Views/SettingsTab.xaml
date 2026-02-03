@@ -1,0 +1,315 @@
+﻿<UserControl x:Class="eft_dma_radar.UI.Radar.Views.SettingsTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:eft_dma_radar.UI.Radar.Views"
+             xmlns:vm="clr-namespace:eft_dma_radar.UI.Radar.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             Padding="10">
+
+    <d:UserControl.DataContext>
+        <d:DesignInstance Type="{x:Type vm:SettingsViewModel}"
+                          IsDesignTimeCreatable="False" />
+    </d:UserControl.DataContext>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Orientation="Vertical"
+                    Margin="0,0,0,10">
+
+            <!-- Radar / General Settings -->
+            <GroupBox Header="Radar / General Settings"
+                      Margin="0,0,0,12">
+                <StackPanel>
+
+                    <!-- help text -->
+                    <TextBlock TextWrapping="Wrap"
+                               Margin="0,0,0,12"
+                               FontStyle="Italic">
+Zoom In: F1 / Mouse Wheel Up<LineBreak />
+Zoom Out: F2 / Mouse Wheel Down<LineBreak />
+Toggle Fullscreen: F11
+                    </TextBlock>
+
+                    <!-- buttons -->
+                    <WrapPanel Margin="0,0,0,12">
+                        <Button Content="Restart Radar"
+                                ToolTip="Restarts the Radar for the current raid instance."
+                                Command="{Binding RestartRadarCommand}"
+                                MinWidth="100"
+                                Height="35"
+                                Margin="0,0,8,8" />
+                        <Button Content="Hotkey Manager"
+                                ToolTip="Opens the Hotkey Manager. This is used to create Custom Hotkeys that can be pressed IN GAME to control the Radar Application."
+                                IsEnabled="{Binding HotkeyManagerIsEnabled}"
+                                Command="{Binding OpenHotkeyManagerCommand}"
+                                MinWidth="100"
+                                Height="35"
+                                Margin="0,0,8,8" />
+                        <Button Content="Color Picker"
+                                ToolTip="Allows customizing entity colors on the Radar UI."
+                                IsEnabled="{Binding ColorPickerIsEnabled}"
+                                Command="{Binding OpenColorPickerCommand}"
+                                MinWidth="100"
+                                Height="35"
+                                Margin="0,0,8,8" />
+                        <Button Content="Backup Config"
+                                ToolTip="Backs up your configuration (Recommended)."
+                                Command="{Binding BackupConfigCommand}"
+                                MinWidth="100"
+                                Height="35"
+                                Margin="0,0,8,8" />
+                        <Button Content="Save Config"
+                                ToolTip="Forces a Config Save (this is still done automatically when closing the app)."
+                                Command="{Binding SaveConfigCommand}"
+                                MinWidth="100"
+                                Height="35"
+                                Margin="0,0,8,8" />
+                    </WrapPanel>
+
+                    <!-- sliders -->
+                    <WrapPanel Margin="0,0,0,12">
+                        <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,16,8">
+                            <TextBlock Text="Aimline Length"
+                                       VerticalAlignment="Center"
+                                       ToolTip="Sets the Aimline Length for Local Player/Teammates" />
+                            <Slider x:Name="AimlineLengthSlider"
+                                    Width="150"
+                                    Margin="8,0"
+                                    Minimum="10"
+                                    Maximum="1500"
+                                    SmallChange="1"
+                                    LargeChange="10"
+                                    Value="{Binding AimlineLength, Mode=TwoWay}" />
+                            <TextBlock Text="{Binding Value, ElementName=AimlineLengthSlider}"
+                                       VerticalAlignment="Center"
+                                       Margin="8,0,0,0" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,16,8">
+                            <TextBlock Text="Max Distance"
+                                       VerticalAlignment="Center"
+                                       ToolTip="Sets the 'Maximum Distance' for the Radar and many of its features. This will affect Hostile Aimlines, and ESP. In most cases you don't need to set this over 500." />
+                            <Slider x:Name="MaxDistSlider"
+                                    Width="150"
+                                    Margin="8,0"
+                                    Minimum="10"
+                                    Maximum="1500"
+                                    SmallChange="1"
+                                    LargeChange="10"
+                                    Value="{Binding MaxDistance, Mode=TwoWay}" />
+                            <TextBlock Text="{Binding Value, ElementName=MaxDistSlider}"
+                                       VerticalAlignment="Center"
+                                       Margin="8,0,0,0" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,16,8">
+                            <TextBlock Text="UI Scale"
+                                       VerticalAlignment="Center"
+                                       ToolTip="Sets the scaling factor for the Radar/User Interface. For high‑resolution monitors you may want to increase this." />
+                            <Slider x:Name="UIScaleSlider"
+                                    Width="150"
+                                    Margin="8,0"
+                                    Minimum="0.5"
+                                    Maximum="2.0"
+                                    SmallChange="0.01"
+                                    LargeChange="0.1"
+                                    Value="{Binding UIScale, Mode=TwoWay}" />
+                            <TextBlock Text="{Binding Value, ElementName=UIScaleSlider, StringFormat=F2}"
+                                       VerticalAlignment="Center"
+                                       Margin="8,0,0,0" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,16,8">
+                            <TextBlock Text="Container Distance"
+                                       VerticalAlignment="Center" />
+                            <Slider x:Name="ContainerDistSlider"
+                                    Width="150"
+                                    Margin="8,0"
+                                    Minimum="0"
+                                    Maximum="200"
+                                    SmallChange="1"
+                                    LargeChange="10"
+                                    Value="{Binding ContainerDistance, Mode=TwoWay}" />
+                            <TextBlock Text="{Binding Value, ElementName=ContainerDistSlider}"
+                                       VerticalAlignment="Center"
+                                       Margin="8,0,0,0" />
+                        </StackPanel>
+                    </WrapPanel>
+
+                    <!-- toggles -->
+                    <WrapPanel>
+                        <CheckBox Content="Show Map Setup Helper"
+                                  ToolTip="Toggles the 'Map Setup Helper' to assist with getting Map Bounds/Scaling"
+                                  IsChecked="{Binding ShowMapSetupHelper, Mode=TwoWay}"
+                                  Margin="0,0,16,8" />
+                        <CheckBox Content="ESP Widget"
+                                  ToolTip="Toggles the ESP 'Widget' that gives you a Mini ESP in the radar window. Can be moved."
+                                  IsChecked="{Binding ESPWidget, Mode=TwoWay}"
+                                  Margin="0,0,16,8" />
+                        <CheckBox Content="Player Info Widget"
+                                  ToolTip="Toggles the Player Info 'Widget' that gives you information about the players/bosses in your raid. Can be moved."
+                                  IsChecked="{Binding PlayerInfoWidget, Mode=TwoWay}"
+                                  Margin="0,0,16,8" />
+                        <CheckBox Content="Connect Groups"
+                                  ToolTip="Connects players that are grouped up via semi‑transparent green lines. Does not apply to your own party."
+                                  IsChecked="{Binding ConnectGroups, Mode=TwoWay}"
+                                  Margin="0,0,16,8" />
+                        <CheckBox Content="Hide Names"
+                                  ToolTip="Hides human player names from displaying in the Radar or Player Info Widget. Instead will show the (Height,Distance)."
+                                  IsChecked="{Binding HideNames, Mode=TwoWay}"
+                                  Margin="0,0,16,8" />
+                        <CheckBox Content="Show Mines"
+                                  IsChecked="{Binding ShowMines, Mode=TwoWay}"
+                                  Margin="0,0,16,8" />
+                        <CheckBox Content="Teammate Aimlines"
+                                  ToolTip="When enabled makes teammate aimlines the same length as the main player."
+                                  IsChecked="{Binding TeammateAimlines, Mode=TwoWay}"
+                                  Margin="0,0,16,8" />
+                        <CheckBox Content="AI Aimlines"
+                                  ToolTip="Enables dynamic aimlines for AI Players. When you are being aimed at the aimlines will extend."
+                                  IsChecked="{Binding AIAimlines, Mode=TwoWay}"
+                                  Margin="0,0,0,8" />
+                    </WrapPanel>
+
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Loot -->
+            <GroupBox Header="Loot"
+                      Margin="0,0,0,12">
+                <StackPanel>
+                    <WrapPanel Margin="0,0,0,8">
+                        <CheckBox Content="Show Loot (F3)"
+                                  ToolTip="Toggles displaying Loot on the Radar/ESP."
+                                  IsChecked="{Binding ShowLoot, Mode=TwoWay}"
+                                  Margin="0,0,16,8" />
+                        <CheckBox Content="Show Loot Wishlist"
+                                  ToolTip="Tracks loot on your account's Loot Wishlist (Manual Adds Only, does not work for Automatically Added Items)."
+                                  IsChecked="{Binding LootWishlist, Mode=TwoWay}"
+                                  Margin="0,0,16,8" />
+                        <CheckBox Content="Show Static Containers"
+                                  ToolTip="Shows static containers on the map. Due to recent Tarkov Anti‑Cheat Measures, you cannot see what the contents are however."
+                                  IsChecked="{Binding ShowStaticContainers, Mode=TwoWay}"
+                                  Margin="0,0,16,8" />
+                    </WrapPanel>
+
+                    <GroupBox Header="Static Containers"
+                              Margin="10,0,0,0"
+                              IsEnabled="{Binding ShowStaticContainers}">
+                        <StackPanel Margin="0,4,0,0">
+                            <WrapPanel Margin="0,0,0,8">
+                                <CheckBox Content="Select All"
+                                          ToolTip="Selects all container types for display on the map."
+                                          IsChecked="{Binding StaticContainersSelectAll, Mode=TwoWay}"
+                                          Margin="0,0,16,8" />
+                                <CheckBox Content="Hide Searched"
+                                          ToolTip="Hides containers that have already been searched by a networked entity (usually ONLY yourself)."
+                                          IsChecked="{Binding StaticContainersHideSearched, Mode=TwoWay}"
+                                          Margin="0,0,16,8" />
+                            </WrapPanel>
+
+                            <TextBlock Text="Tracked Containers"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,4,8" />
+
+                            <ListBox ItemsSource="{Binding StaticContainers}"
+                                     Height="250"
+                                     ScrollViewer.CanContentScroll="True">
+                                <!-- Use a VirtualizingStackPanel as the items host -->
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel IsVirtualizing="True"
+                                                                VirtualizationMode="Recycling" />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Content="{Binding Name}"
+                                                  IsChecked="{Binding IsTracked, Mode=TwoWay}" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </StackPanel>
+                    </GroupBox>
+
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Quest Helper -->
+            <GroupBox Header="Quest Helper"
+                      Margin="0,0,0,12">
+                <DockPanel LastChildFill="True"
+                           Margin="0,4,0,0">
+                    <CheckBox Content="Enabled"
+                              ToolTip="Toggles the Quest Helper feature. This will display Items and Zones that you need to pickup/visit for quests that you currently have active."
+                              IsChecked="{Binding QuestHelperEnabled, Mode=TwoWay}"
+                              DockPanel.Dock="Left"
+                              Margin="0,0,8,0" />
+                    <TextBlock Text="Tracked Quests"
+                               VerticalAlignment="Center"
+                               Margin="0,0,4,8" />
+                    <ListBox ItemsSource="{Binding CurrentQuests}"
+                             IsEnabled="{Binding QuestHelperEnabled}"
+                             Height="250"
+                             ToolTip="Active Quest List (populates once you are in raid). Uncheck a quest to untrack it."
+                             ScrollViewer.CanContentScroll="True">
+
+                        <!-- 1) Define the panel *with* virtualization baked in -->
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel VirtualizingStackPanel.IsVirtualizing="True"
+                                                        VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                                        IsItemsHost="True" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+
+                        <!-- 2) Your existing template -->
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox Content="{Binding Name}"
+                                          IsChecked="{Binding IsEnabled, Mode=TwoWay}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </GroupBox>
+            
+            <!-- Monitor Info (ESP) -->
+            <GroupBox Header="Monitor Info (ESP)">
+                <WrapPanel VerticalAlignment="Center"
+                           Margin="0,4,0,0">
+                    <TextBlock Text="Width:"
+                               VerticalAlignment="Center"
+                               Margin="0,0,4,8"
+                               ToolTip="The resolution Width of your Game PC Monitor that Tarkov runs on. This must be correctly set for ESP to function properly." />
+                    <TextBox Width="100"
+                             Text="{Binding MonitorWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="0,0,16,8" />
+                    <TextBlock Text="Height:"
+                               VerticalAlignment="Center"
+                               Margin="0,0,4,8"
+                               ToolTip="The resolution Height of your Game PC Monitor that Tarkov runs on. This must be correctly set for ESP to function properly." />
+                    <TextBox Width="100"
+                             Text="{Binding MonitorHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="0,0,16,8" />
+                    <Button Content="Auto-Detect"
+                            ToolTip="Automatically detects the resolution of your Game PC Monitor that Tarkov runs on, and sets the Width/Height fields. Game must be running."
+                            Command="{Binding MonitorDetectResCommand}"
+                            MinWidth="80"
+                            Margin="0,0,0,8" />
+                </WrapPanel>
+            </GroupBox>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

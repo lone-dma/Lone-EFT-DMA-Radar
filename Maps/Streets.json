@@ -1,0 +1,46 @@
+{
+  "mapID": [ "tarkovstreets" ],
+  "x": 283,
+  "y": 534,
+  "scale": 1.0008,
+  "svgScale": 4.00,
+  "mapLayers": [
+    {
+      "minHeight": null,
+	  "maxHeight": null,
+      "filename": "Streets.svg"
+    },
+	    {
+      "minHeight": null,
+	  "maxHeight": -0.7,
+	  "dimBaseLayer": false,
+      "filename": "Streets_-1f.svg"
+    },
+	    {
+      "minHeight": -0.7,
+	  "maxHeight": null,
+	  "dimBaseLayer": false,
+      "filename": "Streets_1f.svg"
+    },
+	    {
+      "minHeight": 4.5,
+	  "maxHeight": 7,
+      "filename": "Streets_2f.svg"
+    },
+	    {
+      "minHeight": 7,
+	  "maxHeight": 9.7,
+      "filename": "Streets_3f.svg"
+    },
+	    {
+      "minHeight": 9.7,
+	  "maxHeight": 12.7,
+      "filename": "Streets_4f.svg"
+    },
+	    {
+      "minHeight": 12.7,
+	  "maxHeight": null,
+      "filename": "Streets_5f.svg"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+	"mapID": [ "default" ],
+	"x": 640,
+	"y": 360,
+	"scale": 1.00,
+	"svgScale": 1.00,
+	"mapLayers": [
+		{
+			"minHeight": null,
+			"maxHeight": null,
+			"filename": "default.svg"
+		}
+	]
+}

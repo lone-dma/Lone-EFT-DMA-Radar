@@ -1,0 +1,14 @@
+{
+	"mapID": ["Labyrinth"],
+	"x": 256,
+	"y": 374,
+	"scale": 5,
+	"svgScale" : 2.00,
+	"mapLayers": [
+		{
+			"minHeight": null,
+			"maxHeight": null,
+			"filename": "Labyrinth.svg"
+		}
+	]
+}

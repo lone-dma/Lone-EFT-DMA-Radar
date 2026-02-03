@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="svg1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1613.2 1114.6">
+  <!-- Generator: Adobe Illustrator 29.0.1, SVG Export Plug-In . SVG Version: 2.1.0 Build 192)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #987f00;
+      }
+
+      .st1 {
+        fill: #666;
+      }
+    </style>
+  </defs>
+  <g id="Underground_Level">
+    <g id="Stairs-U">
+      <g id="Stairs-U-A">
+        <path class="st0" d="M831.7,801.1v2.5h-1.7v-5h1.7v2.5ZM859.9,801.1v2.5h-1.7v-4.9h1.7v2.5h0ZM842.5,794.5v1.1h-2.1v-2.1h2.1v1.1h0ZM849.6,794.5v1.1h-2.1v-2.2h2.1v1.1ZM839.7,789.4v.9h-4.8v-1.8h4.7v.9h0ZM855,789.4v.9h-4.8v-1.8h4.7v.9h0ZM843.8,782.5v2.7h-1.4v-5.4h1.4v2.7Z"/>
+        <path id="p1111" class="st0" d="M847.5,782.5v2.7h-1.4v-5.4h1.4v2.7Z"/>
+      </g>
+      <g id="Stairs-U-W">
+        <g id="Stairs-Common-W">
+          <path class="st0" d="M896,728.5v3.3h-1.4v-2.1h-.5v2.1h-1.4v-4.2h3.2v.9h.1ZM889.5,744.4v.7h-1v1.5h-1.4v-3h2.4v.7h0ZM892.4,744.7v2h-1.4v-1.5h-1v-1.4h2.4v1h0ZM953.1,733.3v2.2h-3v-4.5h1.4v2.6h.2v-2.6h1.4v2.2h0Z"/>
+        </g>
+      </g>
+    </g>
+    <g id="Floors-U">
+      <path id="Floor-U-A" class="st1" d="M841.9,808.2v-6.8h-.4v-.3h3.3v.3h-2.7v6.8h5.6v-6.8h-1.2v-.3h5.3v-.5h.4v.5h5.6v-2.6h-5.6v.4h-.4v-.6h0v-.2h6.4v.4h1.7v-.4h0v-2.7h-7.2v-.3h1.3v-4.7h-4.4v4.8h1.3v.3h-3.7v3.2h-2.5v-.3h2.2v-4.7h-4.4v4.7h.5v.3h-.8v-3.1h-12.6v2.6h0v.4h1.7v-.4h6.4v.2h0v.5h-.4v-.4h-5.6v2.6h5.6v-.5h.4v.5h1.7v.3h-4v6.8h6.4ZM849.5,793.5v-3.2h.7v-1.8h-4.3v.9l.2.2.2.2h0v.2l-.2-.2-.2-.2v-2.4l.2-.2.2-.2h0v.2l-.2.2-.2.2v.9h1.6v-.8h.3v.8h6.3v-6.4h-6.3v3.9h-.3v-.5h-2v-.4h.4v-3h-1.8v3h.4v.4h-2v.5h-.3v-3.9h-6.4v6.4h6.4v-.8h.3v.8h1.6v-.9l-.2-.2-.2-.2h0v-.2l.2.2.2.2v2.4l-.2.2-.2.2h0v-.2l.2-.2.2-.2v-.9h-4.3v1.8h.7v3.2h9.2-.2Z"/>
+      <path id="Floor-U-W" class="st1" d="M943.5,722.4v3.1h0v9.7h.2v-5.4h4.3v1.4h.3v-.2h0v-5.5h7.9v5.5h-4.4v2.5h-.2v-2.5h-1.6v.3h0v4.5h3.2v1.6h-9.4v-.7h-.2v.7h-38v-6.4h-4.2v.2h3.9v6.1h-6.2v-6.1h.7v-.2h-1v6.4h-6.4v6.1h-5.5v3.2h1.7v-1.5h1v-1.4h.5v1.4h1v1.5h1.4v3.2h-9v-1h-.2v1h-21.6v-17.9h24.8v8.7h-9.6v5.3h4.2v-.3h-.8v-4.8h3.1v4.8h-.8v.3h.8v.6h.2v-.9h0v-4.8h3.2v-9h6.2v-6.3h.5v-.2h-.5v-3h3.3v3h-1.3v.2h1.8v-.2h-.3v-3.2h-3.5v-2.9h6.1v6.1h-.7v.2h7.4v-6.3h38v3.1h-.3Z"/>
+    </g>
+  </g>
+</svg>

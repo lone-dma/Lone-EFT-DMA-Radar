@@ -1,0 +1,39 @@
+{
+	"mapID": [
+	"Sandbox",
+	"Sandbox_high"
+	],
+	"x": 99.5,
+	"y": 364.2,
+	"scale": 1,
+	"svgScale": 16.00,
+	"mapLayers": [
+		{
+			"minHeight": null,
+			"maxHeight": null,
+			"filename": "GroundZero.svg"
+		},
+				{
+			"minHeight": null,
+			"maxHeight": 16,
+			"dimBaseLayer": false,
+			"filename": "GroundZero_-1f.svg"
+		},
+				{
+			"minHeight": 16,
+			"maxHeight": 26,
+			"dimBaseLayer": false,
+			"filename": "GroundZero_1f.svg"
+		},
+				{
+			"minHeight": 26,
+			"maxHeight": 31,
+			"filename": "GroundZero_2f.svg"
+		},
+				{
+			"minHeight": 31,
+			"maxHeight": null,
+			"filename": "GroundZero_3f.svg"
+		}
+	]
+}

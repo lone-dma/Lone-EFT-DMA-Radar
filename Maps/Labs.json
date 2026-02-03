@@ -1,0 +1,24 @@
+{
+	"mapID": [ "laboratory" ],
+	"x": 3115,
+	"y": -1095,
+	"scale": 8.3,
+	"svgScale": 2.00,
+	"mapLayers": [
+		{
+			"minHeight": null,
+			"maxHeight": -1,
+			"filename": "Labs_-1f.svg"
+		},
+		{
+			"minHeight": -1,
+			"maxHeight": 3,
+			"filename": "Labs_1f.svg"
+		},
+		{
+			"minHeight": 3,
+			"maxHeight": null,
+			"filename": "Labs_2f.svg"
+		}
+	]
+}

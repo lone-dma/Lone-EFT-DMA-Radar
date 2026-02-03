@@ -1,0 +1,14 @@
+{
+	"mapID": ["lighthouse"],
+	"x": 544,
+	"y": 721.5,
+	"scale": 1,
+	"svgScale": 3.5,
+	"mapLayers": [
+		{
+			"minHeight": null,
+			"maxHeight": null,
+			"filename": "Lighthouse.svg"
+		}
+	]
+}

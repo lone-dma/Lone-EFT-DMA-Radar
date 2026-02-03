@@ -1,0 +1,35 @@
+{
+  "mapID": ["shoreline"],
+  "x": 1096,
+  "y": 648,
+  "scale": 0.995,
+  "svgScale": 3.5,
+  "mapLayers": [
+    {
+      "minHeight": null,
+	  "maxHeight": null,
+	  "dimBaseLayer": false,
+      "filename": "Shoreline.svg"
+    },
+	    {
+      "minHeight": null,
+	  "maxHeight": -6,
+      "filename": "Shoreline_-1f.svg"
+    },
+	    {
+      "minHeight": -4,
+	  "maxHeight": -2,
+      "filename": "Shoreline_1f.svg"
+    },
+	{
+      "minHeight": -1,
+	  "maxHeight": 1,
+      "filename": "Shoreline_2f.svg"
+    },
+	    {
+      "minHeight": 2,
+	  "maxHeight": null,
+      "filename": "Shoreline_3f.svg"
+    }
+  ]
+}

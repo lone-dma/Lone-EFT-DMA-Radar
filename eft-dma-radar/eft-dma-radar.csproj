@@ -1,0 +1,94 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <RootNamespace>eft_dma_radar</RootNamespace>
+    <Nullable>warnings</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+	<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	<Platforms>x64</Platforms>
+	<Configurations>Debug;Release</Configurations>
+	<ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+	<ServerGarbageCollection>true</ServerGarbageCollection>
+	<ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+	<RetainVMGarbageCollection>true</RetainVMGarbageCollection>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<!-- enable RDP GPU acceleration in .NET 8 and later -->
+		<RuntimeHostConfigurationOption Include="Switch.System.Windows.Media.EnableHardwareAccelerationInRdp" Value="true" />
+	</ItemGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+		<DebugType>none</DebugType>
+		<DebugSymbols>false</DebugSymbols>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<DebugType>none</DebugType>
+		<DebugSymbols>false</DebugSymbols>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+	  <DebugType>none</DebugType>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+	  <DebugType>none</DebugType>
+	</PropertyGroup>
+
+
+	<ItemGroup Condition="'$(Configuration)' != 'Commercial'">
+		<Content Include="..\leechcore_driver.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="..\dbghelp.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="..\FTD3XX.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="..\leechcore.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="..\Resources\Maps.bin">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="..\symsrv.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="..\vcruntime140.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="..\vmm.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="..\tinylz4.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="..\Resources\NeoSansStdRegular.otf" />
+		<EmbeddedResource Include="..\Resources\DEFAULT_DATA.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
+		<PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.7.0" />
+		<PackageReference Include="Microsoft.Extensions.ObjectPool" Version="9.0.8" />
+		<PackageReference Include="SkiaSharp.Views.WPF" Version="3.119.0" />
+		<PackageReference Include="Svg.Skia" Version="3.0.4" />
+		<PackageReference Include="Extended.Wpf.Toolkit" Version="4.7.25104.5739" />
+		<PackageReference Include="TwitchLib.Api" Version="3.9.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="vmmsharp">
+	    <HintPath>..\vmmsharp.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
+</Project>

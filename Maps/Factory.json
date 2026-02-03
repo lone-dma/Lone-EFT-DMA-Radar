@@ -1,0 +1,32 @@
+{
+  "mapID": [
+    "factory4_day",
+    "factory4_night"
+  ],
+  "x": 64.9,
+  "y": 67,
+  "scale": 0.994,
+  "svgScale": 36.00,
+  "mapLayers": [
+    {
+		"minHeight": null,
+		"maxHeight": null,
+		"filename": "Factory.svg"
+    },
+    {
+		"minHeight": null,
+		"maxHeight": -0.8,
+		"filename": "Factory_-1f.svg"
+    },
+	    {
+		"minHeight": 2.8,
+		"maxHeight": 6.5,
+		"filename": "Factory_2f.svg"
+    },
+	    {
+		"minHeight": 6.5,
+		"maxHeight": null,
+		"filename": "Factory_3f.svg"
+    }
+  ]
+}
