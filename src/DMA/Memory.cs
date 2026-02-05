@@ -457,33 +457,6 @@ namespace LoneEftDmaRadar.DMA
         }
 
         /// <summary>
-        /// Read memory into a Buffer of type <typeparamref name="T"/> and ensure the read is correct.
-        /// </summary>
-        /// <typeparam name="T">Value Type <typeparamref name="T"/></typeparam>
-        /// <param name="addr">Virtual Address to read from.</param>
-        /// <param name="span">Buffer to receive memory read in.</param>
-        public static void ReadSpanEnsure<T>(ulong addr, Span<T> span)
-            where T : unmanaged
-        {
-            uint cb = (uint)checked(Unsafe.SizeOf<T>() * span.Length);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(cb, MAX_READ_SIZE, nameof(cb));
-            var buffer2 = new T[span.Length].AsSpan();
-            var buffer3 = new T[span.Length].AsSpan();
-            if (!_vmm.MemReadSpan(_pid, addr, buffer3, VmmFlags.NOCACHE))
-                throw new VmmException("Memory Read Failed!");
-            Thread.SpinWait(5);
-            if (!_vmm.MemReadSpan(_pid, addr, buffer2, VmmFlags.NOCACHE))
-                throw new VmmException("Memory Read Failed!");
-            Thread.SpinWait(5);
-            if (!_vmm.MemReadSpan(_pid, addr, span, VmmFlags.NOCACHE))
-                throw new VmmException("Memory Read Failed!");
-            if (!span.SequenceEqual(buffer2) || !span.SequenceEqual(buffer3) || !buffer2.SequenceEqual(buffer3))
-            {
-                throw new VmmException("Memory Read Failed!");
-            }
-        }
-
-        /// <summary>
         /// Read an array of type <typeparamref name="T"/> from memory.
         /// The first element begins reading at 0x0 and the array is assumed to be contiguous.
         /// IMPORTANT: You must call <see cref="IDisposable.Dispose"/> on the returned SharedArray when done."/>
