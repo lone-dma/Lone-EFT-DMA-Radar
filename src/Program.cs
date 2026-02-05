@@ -80,7 +80,6 @@ namespace LoneEftDmaRadar
                 ServiceProvider = BuildServiceProvider();
                 HttpClientFactory = ServiceProvider.GetRequiredService<IHttpClientFactory>();
                 SetHighPerformanceMode();
-                AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
                 AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
                 var updater = new UpdateManager(
                     source: new GithubSource(
@@ -122,23 +121,12 @@ namespace LoneEftDmaRadar
         }
 
         private static void CurrentDomain_ProcessExit(object sender, EventArgs e) => OnShutdown();
-        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            if (e.ExceptionObject is Exception ex)
-            {
-                Logging.WriteLine($"*** UNHANDLED EXCEPTION (Terminating: {e.IsTerminating}): {ex}");
-            }
-            if (e.IsTerminating)
-            {
-                OnShutdown();
-            }
-        }
 
         private static void OnShutdown()
         {
+            Logging.WriteLine("Process exiting...");
             Config.Save();
             Memory.Close();
-            Logging.WriteLine("Exiting...");
         }
 
         /// <summary>
