@@ -54,7 +54,7 @@ namespace LoneEftDmaRadar.UI.Panels
         public static void Draw()
         {
             bool isOpen = _isOpen;
-            if (!ImGui.Begin("Settings", ref isOpen, ImGuiWindowFlags.AlwaysAutoResize))
+            if (!ImGui.Begin("设置", ref isOpen, ImGuiWindowFlags.AlwaysAutoResize))
             {
                 _isOpen = isOpen;
                 ImGui.End();
@@ -79,55 +79,55 @@ namespace LoneEftDmaRadar.UI.Panels
 
         private static void DrawGeneralTab()
         {
-            if (ImGui.BeginTabItem("General"))
+            if (ImGui.BeginTabItem("常规"))
             {
-                ImGui.SeparatorText("Tools");
+                ImGui.SeparatorText("工具");
 
-                if (ImGui.Button("Hotkey Manager"))
+                if (ImGui.Button("热键管理"))
                 {
                     HotkeyManagerPanel.IsOpen = true;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Configure keyboard hotkeys for radar functions");
+                    ImGui.SetTooltip("配置雷达功能的键盘热键");
                 ImGui.SameLine();
-                if (ImGui.Button("Color Picker"))
+                if (ImGui.Button("颜色选择"))
                 {
                     ColorPickerPanel.IsOpen = true;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Customize colors for players, loot, and UI elements");
+                    ImGui.SetTooltip("自定义玩家、物品和UI元素的颜色");
                 ImGui.SameLine();
-                if (ImGui.Button("Map Setup Helper##btn"))
+                if (ImGui.Button("地图设置助手##btn"))
                 {
                     MapSetupHelperPanel.IsOpen = true;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Adjust map calibration settings (X, Y, Scale)");
+                    ImGui.SetTooltip("调整地图校准设置 (X, Y, 缩放)");
 
                 ImGui.Separator();
 
-                if (ImGui.Button("Restart Radar"))
+                if (ImGui.Button("重启雷达"))
                 {
                     Memory.Game?.Restart();
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Restart the radar memory reader");
+                    ImGui.SetTooltip("重启雷达内存读取器");
                 ImGui.SameLine();
-                if (ImGui.Button("Backup Config"))
+                if (ImGui.Button("备份配置"))
                 {
                     BackupConfig();
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Create a backup of your current configuration");
+                    ImGui.SetTooltip("创建当前配置的备份");
                 ImGui.SameLine();
-                if (ImGui.Button("Open Config Folder"))
+                if (ImGui.Button("打开配置文件夹"))
                 {
                     OpenConfigFolder();
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Open the folder containing configuration files");
+                    ImGui.SetTooltip("打开包含配置文件的文件夹");
 
-                ImGui.SeparatorText("Display Settings");
+                ImGui.SeparatorText("显示设置");
 
                 // Initialize pending scales
                 if (!_pendingScalesInitialized)
@@ -138,16 +138,16 @@ namespace LoneEftDmaRadar.UI.Panels
                 }
 
                 // Radar Scale
-                ImGui.SliderFloat("Radar Scale", ref _pendingRadarScale, 0.5f, 2.0f, "%.1f");
+                ImGui.SliderFloat("雷达缩放", ref _pendingRadarScale, 0.5f, 2.0f, "%.1f");
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Scale the radar map and aimview widget");
+                    ImGui.SetTooltip("缩放雷达地图和瞄准视图");
 
                 bool radarScaleDirty = MathF.Abs(_pendingRadarScale - Config.UI.RadarScale) > 0.0001f;
 
                 ImGui.SameLine();
                 if (!radarScaleDirty)
                     ImGui.BeginDisabled();
-                if (ImGui.Button("Apply##RadarScale"))
+                if (ImGui.Button("应用##RadarScale"))
                 {
                     Config.UI.RadarScale = _pendingRadarScale;
                 }
@@ -155,16 +155,16 @@ namespace LoneEftDmaRadar.UI.Panels
                     ImGui.EndDisabled();
 
                 // Menu Scale
-                ImGui.SliderFloat("Menu Scale", ref _pendingMenuScale, 0.5f, 2.0f, "%.1f");
+                ImGui.SliderFloat("菜单缩放", ref _pendingMenuScale, 0.5f, 2.0f, "%.1f");
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Scale ImGui menus and windows");
+                    ImGui.SetTooltip("缩放菜单和窗口");
 
                 bool menuScaleDirty = MathF.Abs(_pendingMenuScale - Config.UI.MenuScale) > 0.0001f;
 
                 ImGui.SameLine();
                 if (!menuScaleDirty)
                     ImGui.BeginDisabled();
-                if (ImGui.Button("Apply##MenuScale"))
+                if (ImGui.Button("应用##MenuScale"))
                 {
                     Config.UI.MenuScale = _pendingMenuScale;
                     RadarWindow.ApplyCustomImGuiStyle(); // Refresh ImGui style with new scale
@@ -174,77 +174,77 @@ namespace LoneEftDmaRadar.UI.Panels
 
                 // Zoom
                 int zoom = Config.UI.Zoom;
-                if (ImGui.SliderInt("Zoom (F1/F2)", ref zoom, 1, 200))
+                if (ImGui.SliderInt("缩放 (F1/F2)", ref zoom, 1, 200))
                 {
                     Config.UI.Zoom = zoom;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Map zoom level (lower = more zoomed in)");
+                    ImGui.SetTooltip("地图缩放级别 (越小越放大)");
 
                 // Aimline Length
                 int aimlineLength = Config.UI.AimLineLength;
-                if (ImGui.SliderInt("Aimline Length", ref aimlineLength, 0, 1500))
+                if (ImGui.SliderInt("瞄准线长度", ref aimlineLength, 0, 1500))
                 {
                     Config.UI.AimLineLength = aimlineLength;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Length of player aim direction lines");
+                    ImGui.SetTooltip("玩家瞄准方向线的长度");
 
                 // Max Distance (snaps to nearest 25)
                 int maxDistanceRaw = (int)Config.UI.MaxDistance;
                 int maxDistance = (int)(MathF.Round(maxDistanceRaw / 25f) * 25);
-                if (ImGui.SliderInt("Max Distance", ref maxDistance, 50, 1500, "%d"))
+                if (ImGui.SliderInt("最大距离", ref maxDistance, 50, 1500, "%d"))
                 {
                     maxDistance = (int)(MathF.Round(maxDistance / 25f) * 25);
                     maxDistance = Math.Clamp(maxDistance, 50, 1500);
                     Config.UI.MaxDistance = maxDistance;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Maximum distance to render targets in aimview");
+                    ImGui.SetTooltip("瞄准视图中渲染目标的最大距离");
 
-                ImGui.SeparatorText("Widgets");
+                ImGui.SeparatorText("小部件");
 
                 bool aimviewWidget = Config.AimviewWidget.Enabled;
-                if (ImGui.Checkbox("Aimview Widget", ref aimviewWidget))
+                if (ImGui.Checkbox("瞄准视图", ref aimviewWidget))
                 {
                     Config.AimviewWidget.Enabled = aimviewWidget;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("3D view showing players in your field of view");
+                    ImGui.SetTooltip("显示视野内玩家的3D视图");
 
                 bool infoWidget = Config.InfoWidget.Enabled;
-                if (ImGui.Checkbox("Player Info Widget", ref infoWidget))
+                if (ImGui.Checkbox("玩家信息", ref infoWidget))
                 {
                     Config.InfoWidget.Enabled = infoWidget;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Displays a list of nearby players with details");
+                    ImGui.SetTooltip("显示附近玩家的详细列表");
 
                 bool lootWidget = Config.LootWidget.Enabled;
-                if (ImGui.Checkbox("Loot Widget", ref lootWidget))
+                if (ImGui.Checkbox("物品列表", ref lootWidget))
                 {
                     Config.LootWidget.Enabled = lootWidget;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Displays a sortable table of filtered loot items");
+                    ImGui.SetTooltip("显示可排序的物品列表");
 
-                ImGui.SeparatorText("Visibility");
+                ImGui.SeparatorText("可见性");
 
                 bool showExfils = Config.UI.ShowExfils;
-                if (ImGui.Checkbox("Show Exfils", ref showExfils))
+                if (ImGui.Checkbox("显示撤离点", ref showExfils))
                 {
                     Config.UI.ShowExfils = showExfils;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Show extraction points on the map");
+                    ImGui.SetTooltip("在地图上显示撤离点");
 
                 bool showHazards = Config.UI.ShowHazards;
-                if (ImGui.Checkbox("Show Hazards", ref showHazards))
+                if (ImGui.Checkbox("显示危险区域", ref showHazards))
                 {
                     Config.UI.ShowHazards = showHazards;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Show mines, sniper zones, and other hazards");
+                    ImGui.SetTooltip("显示地雷、狙击区和其他危险区域");
 
                 ImGui.EndTabItem();
             }
@@ -252,43 +252,43 @@ namespace LoneEftDmaRadar.UI.Panels
 
         private static void DrawPlayersTab()
         {
-            if (ImGui.BeginTabItem("Players"))
+            if (ImGui.BeginTabItem("玩家"))
             {
-                ImGui.SeparatorText("Player Display");
+                ImGui.SeparatorText("玩家显示");
 
                 bool teammateAimlines = Config.UI.TeammateAimlines;
-                if (ImGui.Checkbox("Teammate Aimlines", ref teammateAimlines))
+                if (ImGui.Checkbox("队友瞄准线", ref teammateAimlines))
                 {
                     Config.UI.TeammateAimlines = teammateAimlines;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Show aim direction lines for teammates");
+                    ImGui.SetTooltip("显示队友的瞄准方向线");
 
                 bool aiAimlines = Config.UI.AIAimlines;
-                if (ImGui.Checkbox("AI Aimlines", ref aiAimlines))
+                if (ImGui.Checkbox("AI瞄准线", ref aiAimlines))
                 {
                     Config.UI.AIAimlines = aiAimlines;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Show dynamic aim lines for AI players");
+                    ImGui.SetTooltip("显示AI玩家的动态瞄准线");
 
                 bool connectGroups = Program.Config.UI.ConnectGroups;
-                if (ImGui.Checkbox("Connect Groups", ref connectGroups))
+                if (ImGui.Checkbox("连接小队", ref connectGroups))
                 {
                     Program.Config.UI.ConnectGroups = connectGroups;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Draw lines between grouped players");
+                    ImGui.SetTooltip("在小队玩家之间画线");
 
-                ImGui.SeparatorText("Misc");
+                ImGui.SeparatorText("其他");
 
                 bool autoGroups = Config.Misc.AutoGroups;
-                if (ImGui.Checkbox("Auto Groups", ref autoGroups))
+                if (ImGui.Checkbox("自动分组", ref autoGroups))
                 {
                     Config.Misc.AutoGroups = autoGroups;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Best-effort: automatically infer groups before raid start based on proximity");
+                    ImGui.SetTooltip("尽力尝试：根据距离在战局开始前自动推断小队");
 
                 ImGui.EndTabItem();
             }
@@ -296,17 +296,17 @@ namespace LoneEftDmaRadar.UI.Panels
 
         private static void DrawLootTab()
         {
-            if (ImGui.BeginTabItem("Loot"))
+            if (ImGui.BeginTabItem("物品"))
             {
-                ImGui.SeparatorText("Loot Settings");
+                ImGui.SeparatorText("物品设置");
 
                 bool lootEnabled = Config.Loot.Enabled;
-                if (ImGui.Checkbox("Show Loot (F3)", ref lootEnabled))
+                if (ImGui.Checkbox("显示物品 (F3)", ref lootEnabled))
                 {
                     Config.Loot.Enabled = lootEnabled;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Toggle loot display on the radar");
+                    ImGui.SetTooltip("在雷达上显示/隐藏物品");
 
                 if (!lootEnabled)
                 {
@@ -314,12 +314,12 @@ namespace LoneEftDmaRadar.UI.Panels
                 }
 
                 bool showWishlist = Config.Loot.ShowWishlist;
-                if (ImGui.Checkbox("Show Wishlist Items", ref showWishlist))
+                if (ImGui.Checkbox("显示愿望清单物品", ref showWishlist))
                 {
                     Config.Loot.ShowWishlist = showWishlist;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Highlight items from your Tarkov wishlist");
+                    ImGui.SetTooltip("高亮显示塔科夫愿望清单中的物品");
 
                 if (!lootEnabled)
                 {
@@ -332,15 +332,15 @@ namespace LoneEftDmaRadar.UI.Panels
 
         private static void DrawContainersTab()
         {
-            if (ImGui.BeginTabItem("Containers"))
+            if (ImGui.BeginTabItem("容器"))
             {
                 bool containersEnabled = Config.Containers.Enabled;
-                if (ImGui.Checkbox("Show Containers", ref containersEnabled))
+                if (ImGui.Checkbox("显示容器", ref containersEnabled))
                 {
                     Config.Containers.Enabled = containersEnabled;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Show lootable containers on the radar");
+                    ImGui.SetTooltip("在雷达上显示可搜刮的容器");
 
                 if (!containersEnabled)
                 {
@@ -348,15 +348,15 @@ namespace LoneEftDmaRadar.UI.Panels
                 }
 
                 float drawDistance = Config.Containers.DrawDistance;
-                if (ImGui.SliderFloat("Draw Distance", ref drawDistance, 10, 500))
+                if (ImGui.SliderFloat("显示距离", ref drawDistance, 10, 500))
                 {
                     Config.Containers.DrawDistance = drawDistance;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Maximum distance to show containers");
+                    ImGui.SetTooltip("显示容器的最大距离");
 
                 bool selectAll = Config.Containers.SelectAll;
-                if (ImGui.Checkbox("Select All", ref selectAll))
+                if (ImGui.Checkbox("全选", ref selectAll))
                 {
                     Config.Containers.SelectAll = selectAll;
                     if (_containerEntries is not null)
@@ -368,9 +368,9 @@ namespace LoneEftDmaRadar.UI.Panels
                     }
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Toggle all container types");
+                    ImGui.SetTooltip("切换所有容器类型");
 
-                ImGui.SeparatorText("Container Types");
+                ImGui.SeparatorText("容器类型");
 
                 if (_containerEntries is not null)
                 {
@@ -399,17 +399,17 @@ namespace LoneEftDmaRadar.UI.Panels
 
         private static void DrawQuestHelperTab()
         {
-            if (ImGui.BeginTabItem("Quest Helper"))
+            if (ImGui.BeginTabItem("任务助手"))
             {
                 bool questHelperEnabled = Config.QuestHelper.Enabled;
-                if (ImGui.Checkbox("Enable Quest Helper", ref questHelperEnabled))
+                if (ImGui.Checkbox("启用任务助手", ref questHelperEnabled))
                 {
                     Config.QuestHelper.Enabled = questHelperEnabled;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Show quest objectives and items on the radar");
+                    ImGui.SetTooltip("在雷达上显示任务目标和物品");
 
-                ImGui.SeparatorText("Active Quests");
+                ImGui.SeparatorText("当前任务");
 
                 if (Memory.QuestManager?.Quests is IReadOnlyDictionary<string, Tarkov.World.Quests.QuestEntry> quests)
                 {
@@ -432,7 +432,7 @@ namespace LoneEftDmaRadar.UI.Panels
                 }
                 else
                 {
-                    ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "No active quests (not in raid)");
+                    ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "没有活跃任务 (不在战局中)");
                 }
 
                 ImGui.EndTabItem();
@@ -441,14 +441,14 @@ namespace LoneEftDmaRadar.UI.Panels
 
         private static void DrawAboutTab()
         {
-            if (ImGui.BeginTabItem("About"))
+            if (ImGui.BeginTabItem("关于"))
             {
                 ImGui.Text(Program.Name);
                 ImGui.Separator();
-                ImGui.TextWrapped("A DMA-based radar for Escape From Tarkov.");
+                ImGui.TextWrapped("基于DMA的逃离塔科夫雷达工具。");
 
                 ImGui.Spacing();
-                if (ImGui.Button("Visit Website"))
+                if (ImGui.Button("访问网站"))
                 {
                     try
                     {
@@ -469,11 +469,11 @@ namespace LoneEftDmaRadar.UI.Panels
             {
                 var backupFile = Path.Combine(Program.ConfigPath.FullName, $"{EftDmaConfig.Filename}.userbak");
                 File.WriteAllText(backupFile, JsonSerializer.Serialize(Program.Config, AppJsonContext.Default.EftDmaConfig));
-                MessageBox.Show(RadarWindow.Handle, $"Backed up to {backupFile}", "Backup Config", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(RadarWindow.Handle, $"已备份到 {backupFile}", "备份配置", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(RadarWindow.Handle, $"Error: {ex.Message}", "Backup Config", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(RadarWindow.Handle, $"错误: {ex.Message}", "备份配置", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -485,7 +485,7 @@ namespace LoneEftDmaRadar.UI.Panels
             }
             catch (Exception ex)
             {
-                MessageBox.Show(RadarWindow.Handle, $"Error: {ex.Message}", "Open Config", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(RadarWindow.Handle, $"错误: {ex.Message}", "打开配置", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

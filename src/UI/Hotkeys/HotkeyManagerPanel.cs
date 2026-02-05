@@ -68,7 +68,7 @@ namespace LoneEftDmaRadar.UI.Hotkeys
             bool isOpen = IsOpen;
 
             ImGui.SetNextWindowSize(new Vector2(550, 450), ImGuiCond.FirstUseEver);
-            if (!ImGui.Begin("Hotkey Manager", ref isOpen))
+            if (!ImGui.Begin("热键管理", ref isOpen))
             {
                 IsOpen = isOpen;
                 ImGui.End();
@@ -84,7 +84,7 @@ namespace LoneEftDmaRadar.UI.Hotkeys
             }
 
             // Current Bindings Section
-            ImGui.Text("Current Hotkey Bindings:");
+            ImGui.Text("当前热键绑定:");
             ImGui.Separator();
 
             DrawCurrentBindingsTable();
@@ -94,7 +94,7 @@ namespace LoneEftDmaRadar.UI.Hotkeys
             ImGui.Spacing();
 
             // Add New Binding Section
-            ImGui.Text("Add New Binding:");
+            ImGui.Text("添加新绑定:");
 
             DrawAddBindingSection();
 
@@ -114,8 +114,8 @@ namespace LoneEftDmaRadar.UI.Hotkeys
                 ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg,
                 new Vector2(0, 250)))
             {
-                ImGui.TableSetupColumn("Action", ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableSetupColumn("Key", ImGuiTableColumnFlags.WidthFixed, 120);
+                ImGui.TableSetupColumn("功能", ImGuiTableColumnFlags.WidthStretch);
+                ImGui.TableSetupColumn("按键", ImGuiTableColumnFlags.WidthFixed, 120);
                 ImGui.TableSetupColumn("##Remove", ImGuiTableColumnFlags.WidthFixed, 60);
                 ImGui.TableHeadersRow();
 
@@ -137,7 +137,7 @@ namespace LoneEftDmaRadar.UI.Hotkeys
                     }
                     else
                     {
-                        ImGui.TextColored(new Vector4(0.5f, 0.5f, 0.5f, 1f), "(Not Set)");
+                        ImGui.TextColored(new Vector4(0.5f, 0.5f, 0.5f, 1f), "(未设置)");
                     }
 
                     // Remove button
@@ -145,7 +145,7 @@ namespace LoneEftDmaRadar.UI.Hotkeys
                     if (currentKey.HasValue)
                     {
                         ImGui.PushID($"remove_{controller.Name}");
-                        if (ImGui.SmallButton("Remove"))
+                        if (ImGui.SmallButton("移除"))
                         {
                             _keyToRemove = currentKey.Value;
                         }
@@ -161,29 +161,29 @@ namespace LoneEftDmaRadar.UI.Hotkeys
         {
             if (_actionNames is null || _actionNames.Length == 0)
             {
-                ImGui.TextColored(new Vector4(1f, 0.5f, 0.5f, 1f), "No actions registered yet.");
+                ImGui.TextColored(new Vector4(1f, 0.5f, 0.5f, 1f), "尚未注册任何功能。");
                 return;
             }
 
             // Action dropdown
             ImGui.SetNextItemWidth(250);
-            if (ImGui.Combo("Action", ref _selectedActionIndex, _actionNames, _actionNames.Length))
+            if (ImGui.Combo("功能", ref _selectedActionIndex, _actionNames, _actionNames.Length))
             {
                 // Selection changed
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Select the action to bind");
+                ImGui.SetTooltip("选择要绑定的功能");
 
             ImGui.SameLine();
 
             // Key dropdown
             ImGui.SetNextItemWidth(150);
-            if (ImGui.Combo("Key", ref _selectedKeyIndex, _keyNames, _keyNames.Length))
+            if (ImGui.Combo("按键", ref _selectedKeyIndex, _keyNames, _keyNames.Length))
             {
                 // Selection changed
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Select the key to bind");
+                ImGui.SetTooltip("选择要绑定的按键");
 
             ImGui.SameLine();
 
@@ -194,7 +194,7 @@ namespace LoneEftDmaRadar.UI.Hotkeys
             if (!canAdd)
                 ImGui.BeginDisabled();
 
-            if (ImGui.Button("Add"))
+            if (ImGui.Button("添加"))
             {
                 if (canAdd)
                 {
@@ -224,15 +224,15 @@ namespace LoneEftDmaRadar.UI.Hotkeys
                 }
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Add the hotkey binding");
+                ImGui.SetTooltip("添加热键绑定");
 
             if (!canAdd)
                 ImGui.EndDisabled();
 
             // Help text
             ImGui.Spacing();
-            ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "Tip: Select an action and key, then click Add to bind.");
-            ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "Adding a binding will replace any existing binding for that action or key.");
+            ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "提示: 选择一个功能和按键，然后点击添加进行绑定。");
+            ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "添加绑定将替换该功能或按键的现有绑定。");
         }
 
         private static Win32VirtualKey? GetCurrentHotkeyKey(string actionName)

@@ -140,7 +140,7 @@ namespace LoneEftDmaRadar.UI.Widgets
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(300, 300), ImGuiCond.FirstUseEver);
 
             bool isOpen = IsOpen;
-            if (!ImGui.Begin("Aimview", ref isOpen, ImGuiWindowFlags.None))
+            if (!ImGui.Begin("瞄准视图", ref isOpen, ImGuiWindowFlags.None))
             {
                 IsOpen = isOpen;
                 ImGui.End();
@@ -168,7 +168,7 @@ namespace LoneEftDmaRadar.UI.Widgets
             }
             else
             {
-                ImGui.Text("Surface not available");
+                ImGui.Text("表面不可用");
             }
 
             ImGui.End();

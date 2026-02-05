@@ -63,7 +63,7 @@ namespace LoneEftDmaRadar.UI.Widgets
             bool isOpen = IsOpen;
             var windowFlags = ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoScrollbar;
 
-            if (!ImGui.Begin("Player Info", ref isOpen, windowFlags))
+            if (!ImGui.Begin("玩家信息", ref isOpen, windowFlags))
             {
                 IsOpen = isOpen;
                 ImGui.End();
@@ -73,7 +73,7 @@ namespace LoneEftDmaRadar.UI.Widgets
 
             if (filteredPlayers.Count == 0)
             {
-                ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "No hostile players detected");
+                ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "未检测到敌对玩家");
                 ImGui.End();
                 return;
             }
@@ -89,12 +89,12 @@ namespace LoneEftDmaRadar.UI.Widgets
             if (ImGui.BeginTable("PlayersTable", 6, tableFlags))
             {
                 // New compact column layout
-                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthFixed, 65f);
-                ImGui.TableSetupColumn("Grp", ImGuiTableColumnFlags.WidthFixed, 25f);
-                ImGui.TableSetupColumn("In Hands", ImGuiTableColumnFlags.WidthFixed, 115f);
-                ImGui.TableSetupColumn("Secure", ImGuiTableColumnFlags.WidthFixed, 45f);
-                ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthFixed, 45f);
-                ImGui.TableSetupColumn("Dist", ImGuiTableColumnFlags.WidthFixed, 35f);
+                ImGui.TableSetupColumn("名称", ImGuiTableColumnFlags.WidthFixed, 65f);
+                ImGui.TableSetupColumn("组", ImGuiTableColumnFlags.WidthFixed, 25f);
+                ImGui.TableSetupColumn("手持", ImGuiTableColumnFlags.WidthFixed, 115f);
+                ImGui.TableSetupColumn("安全箱", ImGuiTableColumnFlags.WidthFixed, 45f);
+                ImGui.TableSetupColumn("价值", ImGuiTableColumnFlags.WidthFixed, 45f);
+                ImGui.TableSetupColumn("距离", ImGuiTableColumnFlags.WidthFixed, 35f);
                 ImGui.TableHeadersRow();
 
                 bool mouseOp = false;

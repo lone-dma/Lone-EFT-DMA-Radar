@@ -119,13 +119,13 @@ namespace LoneEftDmaRadar.UI.Panels
         /// </summary>
         public static void Draw()
         {
-            ImGui.SeparatorText("Filter Selection");
+            ImGui.SeparatorText("过滤器选择");
 
             // Filter dropdown
             if (_filterNames.Count > 0)
             {
                 string currentFilter = SelectedFilterName ?? string.Empty;
-                if (ImGui.BeginCombo("Active Filter", currentFilter))
+                if (ImGui.BeginCombo("当前过滤器", currentFilter))
                 {
                     for (int i = 0; i < _filterNames.Count; i++)
                     {
@@ -143,51 +143,51 @@ namespace LoneEftDmaRadar.UI.Panels
                     ImGui.EndCombo();
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Select which loot filter to edit");
+                    ImGui.SetTooltip("选择要编辑的物品过滤器");
             }
 
             // Filter management buttons
-            if (ImGui.Button("Add Filter"))
+            if (ImGui.Button("添加过滤器"))
             {
                 _newFilterName = string.Empty;
                 _showAddFilterPopup = true;
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Create a new loot filter");
+                ImGui.SetTooltip("创建新的物品过滤器");
             ImGui.SameLine();
-            if (ImGui.Button("Rename"))
+            if (ImGui.Button("重命名"))
             {
                 _renameFilterName = SelectedFilterName ?? string.Empty;
                 _showRenamePopup = true;
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Rename the current filter");
+                ImGui.SetTooltip("重命名当前过滤器");
             ImGui.SameLine();
-            if (ImGui.Button("Delete"))
+            if (ImGui.Button("删除"))
             {
                 DeleteCurrentFilter();
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Delete the current filter");
+                ImGui.SetTooltip("删除当前过滤器");
 
             // Add Filter Popup
             if (_showAddFilterPopup)
             {
-                ImGui.OpenPopup("Add Filter");
+                ImGui.OpenPopup("添加过滤器");
             }
-            if (ImGui.BeginPopupModal("Add Filter", ref _showAddFilterPopup, ImGuiWindowFlags.AlwaysAutoResize))
+            if (ImGui.BeginPopupModal("添加过滤器", ref _showAddFilterPopup, ImGuiWindowFlags.AlwaysAutoResize))
             {
-                ImGui.Text("Enter the name of the new loot filter:");
+                ImGui.Text("输入新过滤器的名称:");
                 ImGui.InputText("##NewFilterName", ref _newFilterName, 64);
 
-                if (ImGui.Button("Create", new Vector2(120, 0)))
+                if (ImGui.Button("创建", new Vector2(120, 0)))
                 {
                     AddFilter(_newFilterName);
                     _showAddFilterPopup = false;
                     ImGui.CloseCurrentPopup();
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("Cancel", new Vector2(120, 0)))
+                if (ImGui.Button("取消", new Vector2(120, 0)))
                 {
                     _showAddFilterPopup = false;
                     ImGui.CloseCurrentPopup();
@@ -198,21 +198,21 @@ namespace LoneEftDmaRadar.UI.Panels
             // Rename Popup
             if (_showRenamePopup)
             {
-                ImGui.OpenPopup("Rename Filter");
+                ImGui.OpenPopup("重命名过滤器");
             }
-            if (ImGui.BeginPopupModal("Rename Filter", ref _showRenamePopup, ImGuiWindowFlags.AlwaysAutoResize))
+            if (ImGui.BeginPopupModal("重命名过滤器", ref _showRenamePopup, ImGuiWindowFlags.AlwaysAutoResize))
             {
-                ImGui.Text("Enter the new filter name:");
+                ImGui.Text("输入新的过滤器名称:");
                 ImGui.InputText("##RenameFilterName", ref _renameFilterName, 64);
 
-                if (ImGui.Button("Rename", new Vector2(120, 0)))
+                if (ImGui.Button("重命名", new Vector2(120, 0)))
                 {
                     RenameCurrentFilter(_renameFilterName);
                     _showRenamePopup = false;
                     ImGui.CloseCurrentPopup();
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("Cancel", new Vector2(120, 0)))
+                if (ImGui.Button("取消", new Vector2(120, 0)))
                 {
                     _showRenamePopup = false;
                     ImGui.CloseCurrentPopup();
@@ -227,15 +227,15 @@ namespace LoneEftDmaRadar.UI.Panels
             if (currentFilterObj is not null)
             {
                 bool filterEnabled = currentFilterObj.Enabled;
-                if (ImGui.Checkbox("Filter Enabled", ref filterEnabled))
+                if (ImGui.Checkbox("启用过滤器", ref filterEnabled))
                 {
                     currentFilterObj.Enabled = filterEnabled;
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Enable or disable this filter");
+                    ImGui.SetTooltip("启用或禁用此过滤器");
 
                 // Filter color with color picker
-                ImGui.Text("Filter Color:");
+                ImGui.Text("过滤器颜色:");
                 ImGui.SameLine();
 
                 // Color preview button
@@ -245,7 +245,7 @@ namespace LoneEftDmaRadar.UI.Panels
                     ImGui.OpenPopup("FilterColorPicker");
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Click to change filter color");
+                    ImGui.SetTooltip("点击更改过滤器颜色");
 
                 // Color picker popup
                 if (ImGui.BeginPopup("FilterColorPicker"))
@@ -259,7 +259,7 @@ namespace LoneEftDmaRadar.UI.Panels
                 }
 
                 ImGui.SameLine();
-                if (ImGui.Button("Apply to all"))
+                if (ImGui.Button("应用到全部"))
                 {
                     string filterColor = currentFilterObj.Color;
                     foreach (var entry in _currentFilterEntries)
@@ -270,18 +270,18 @@ namespace LoneEftDmaRadar.UI.Panels
                     _entryColorHexes.Clear();
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Reset all entries to inherit filter color");
+                    ImGui.SetTooltip("将所有条目重置为继承过滤器颜色");
             }
 
-            ImGui.SeparatorText("Add Item to Filter");
+            ImGui.SeparatorText("添加物品到过滤器");
 
             // Item search
-            if (ImGui.InputText("Search Items", ref _itemSearchText, 128))
+            if (ImGui.InputText("搜索物品", ref _itemSearchText, 128))
             {
                 FilterItems();
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Search for items to add to the filter");
+                ImGui.SetTooltip("搜索要添加到过滤器的物品");
 
             // Item list
             if (ImGui.BeginListBox("##ItemList", new Vector2(-1, 150)))
@@ -300,24 +300,24 @@ namespace LoneEftDmaRadar.UI.Panels
                 ImGui.EndListBox();
             }
 
-            if (ImGui.Button("Add Selected Item") && _selectedItemIndex >= 0 && _selectedItemIndex < _filteredItems.Count)
+            if (ImGui.Button("添加选中物品") && _selectedItemIndex >= 0 && _selectedItemIndex < _filteredItems.Count)
             {
                 AddItemToFilter(_filteredItems[_selectedItemIndex]);
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Add the selected item to this filter");
+                ImGui.SetTooltip("将选中的物品添加到此过滤器");
 
-            ImGui.SeparatorText("Filter Entries");
+            ImGui.SeparatorText("过滤器条目");
 
             // Entries table
             var tableFlags = ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable;
             if (ImGui.BeginTable("FilterEntriesTable", 5, tableFlags, new Vector2(0, 200)))
             {
-                ImGui.TableSetupColumn("Enabled", ImGuiTableColumnFlags.WidthFixed, 60);
-                ImGui.TableSetupColumn("Item", ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableSetupColumn("Type", ImGuiTableColumnFlags.WidthFixed, 100);
-                ImGui.TableSetupColumn("Color", ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.NoSort, 100);
-                ImGui.TableSetupColumn("Remove", ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.NoSort, 60);
+                ImGui.TableSetupColumn("启用", ImGuiTableColumnFlags.WidthFixed, 60);
+                ImGui.TableSetupColumn("物品", ImGuiTableColumnFlags.WidthStretch);
+                ImGui.TableSetupColumn("类型", ImGuiTableColumnFlags.WidthFixed, 100);
+                ImGui.TableSetupColumn("颜色", ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.NoSort, 100);
+                ImGui.TableSetupColumn("移除", ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.NoSort, 60);
                 ImGui.TableHeadersRow();
 
                 // Apply sorting to the underlying list when requested by ImGui.
@@ -394,7 +394,7 @@ namespace LoneEftDmaRadar.UI.Panels
                             entry.Color = newHex;
                         }
                         ImGui.Separator();
-                        if (ImGui.Button("Inherit from filter"))
+                        if (ImGui.Button("继承过滤器颜色"))
                         {
                             entry.Color = filterColorHex; // Set to filter color to indicate inheritance
                             TryParseHex(filterColorHex, out entryColor);
@@ -408,7 +408,7 @@ namespace LoneEftDmaRadar.UI.Panels
                     ImGui.SameLine();
                     if (inheritsColor)
                     {
-                        ImGui.TextDisabled("(inherited)");
+                        ImGui.TextDisabled("(继承)");
                     }
 
                     // Remove button
@@ -517,7 +517,7 @@ namespace LoneEftDmaRadar.UI.Panels
         private static string GetItemName(string bsgId)
         {
             if (string.IsNullOrEmpty(bsgId))
-                return "(Unknown)";
+                return "(未知)";
             if (TarkovDataManager.AllItems.TryGetValue(bsgId, out var item))
                 return item.Name;
             return bsgId;
@@ -540,7 +540,7 @@ namespace LoneEftDmaRadar.UI.Panels
                     Entries = new()
                 }))
                 {
-                    MessageBox.Show(RadarWindow.Handle, "That filter already exists.", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(RadarWindow.Handle, "该过滤器已存在。", "物品过滤", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -552,7 +552,7 @@ namespace LoneEftDmaRadar.UI.Panels
             }
             catch (Exception ex)
             {
-                MessageBox.Show(RadarWindow.Handle, $"Error adding filter: {ex.Message}", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(RadarWindow.Handle, $"添加过滤器出错: {ex.Message}", "物品过滤", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -577,12 +577,12 @@ namespace LoneEftDmaRadar.UI.Panels
                 }
                 else
                 {
-                    MessageBox.Show(RadarWindow.Handle, "Rename failed.", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(RadarWindow.Handle, "重命名失败。", "物品过滤", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(RadarWindow.Handle, $"Error renaming filter: {ex.Message}", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(RadarWindow.Handle, $"重命名过滤器出错: {ex.Message}", "物品过滤", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -591,11 +591,11 @@ namespace LoneEftDmaRadar.UI.Panels
             string name = SelectedFilterName;
             if (string.IsNullOrEmpty(name))
             {
-                MessageBox.Show(RadarWindow.Handle, "No loot filter selected!", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(RadarWindow.Handle, "未选择物品过滤器！", "物品过滤", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            var result = MessageBox.Show(RadarWindow.Handle, $"Are you sure you want to delete '{name}'?", "Loot Filter",
+            var result = MessageBox.Show(RadarWindow.Handle, $"确定要删除 '{name}' 吗？", "物品过滤",
                 MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result != MessageBoxResult.Yes)
                 return;
@@ -604,7 +604,7 @@ namespace LoneEftDmaRadar.UI.Panels
             {
                 if (!Config.LootFilters.Filters.TryRemove(name, out _))
                 {
-                    MessageBox.Show(RadarWindow.Handle, "Remove failed.", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(RadarWindow.Handle, "删除失败。", "物品过滤", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
@@ -623,7 +623,7 @@ namespace LoneEftDmaRadar.UI.Panels
             }
             catch (Exception ex)
             {
-                MessageBox.Show(RadarWindow.Handle, $"Error deleting filter: {ex.Message}", "Loot Filter", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(RadarWindow.Handle, $"删除过滤器出错: {ex.Message}", "物品过滤", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

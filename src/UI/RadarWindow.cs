@@ -539,19 +539,19 @@ namespace LoneEftDmaRadar.UI
             switch (state)
             {
                 case AppState.Initializing:
-                    baseText = "Initializing";
+                    baseText = "正在初始化";
                     dotCount = _statusOrder; // 1..3
                     break;
                 case AppState.ProcessNotStarted:
-                    baseText = "Game Process Not Running!";
+                    baseText = "游戏进程未运行！";
                     dotCount = 0;
                     break;
                 case AppState.ProcessStarting:
-                    baseText = "Starting Up";
+                    baseText = "正在启动";
                     dotCount = _statusOrder; // 1..3
                     break;
                 case AppState.WaitingForRaid:
-                    baseText = "Waiting for Raid Start";
+                    baseText = "等待战局开始";
                     dotCount = _statusOrder; // 1..3
                     break;
                 default:
@@ -649,7 +649,7 @@ namespace LoneEftDmaRadar.UI
                         ImGui.PushStyleColor(ImGuiCol.ButtonActive, new Vector4(0.1f, 0.5f, 0.1f, 1.0f));
                     }
 
-                    if (ImGui.Button(isMapFree ? "Map Free" : "Map Follow"))
+                    if (ImGui.Button(isMapFree ? "自由视角" : "跟随玩家"))
                     {
                         IsMapFreeEnabled = !isMapFree;
                         if (isMapFree) // Was free, now switching back to follow
@@ -658,32 +658,32 @@ namespace LoneEftDmaRadar.UI
                         }
                     }
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip(isMapFree ? "Free map panning (drag to move map)" : "Follow player (map centered on you)");
+                        ImGui.SetTooltip(isMapFree ? "自由移动地图 (拖拽移动)" : "跟随玩家 (地图以你为中心)");
 
                     if (isMapFree)
                         ImGui.PopStyleColor(3);
 
                     ImGui.Separator();
 
-                    if (ImGui.MenuItem("Settings", null, SettingsPanel.IsOpen))
+                    if (ImGui.MenuItem("设置", null, SettingsPanel.IsOpen))
                     {
                         SettingsPanel.IsOpen = !SettingsPanel.IsOpen;
                     }
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip("Open radar settings");
+                        ImGui.SetTooltip("打开雷达设置");
 
-                    if (ImGui.MenuItem("Web Radar", null, _isWebRadarOpen))
+                    if (ImGui.MenuItem("网络雷达", null, _isWebRadarOpen))
                     {
                         _isWebRadarOpen = !_isWebRadarOpen;
                     }
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip("Open Web Radar Server Configuration");
-                    if (ImGui.MenuItem("Loot Filters", null, _isLootFiltersOpen))
+                        ImGui.SetTooltip("打开网络雷达服务器配置");
+                    if (ImGui.MenuItem("物品过滤", null, _isLootFiltersOpen))
                     {
                         _isLootFiltersOpen = !_isLootFiltersOpen;
                     }
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip("Open loot filters configuration");
+                        ImGui.SetTooltip("打开物品过滤器配置");
 
                     // Display current map and FPS on the right
                     string mapName = EftMapManager.Map?.Config?.Name ?? "No Map";
@@ -766,11 +766,11 @@ namespace LoneEftDmaRadar.UI
         {
             bool isOpen = _isLootFiltersOpen;
             ImGui.SetNextWindowSize(new Vector2(900, 700), ImGuiCond.FirstUseEver);
-            if (ImGui.Begin("Loot Filters", ref isOpen))
+            if (ImGui.Begin("物品过滤", ref isOpen))
             {
                 LootFiltersPanel.Draw();
                 ImGui.Separator();
-                if (ImGui.Button("Apply & Close"))
+                if (ImGui.Button("应用并关闭"))
                 {
                     LootFiltersPanel.RefreshLootFilter();
                     isOpen = false; // close the window this frame
@@ -791,7 +791,7 @@ namespace LoneEftDmaRadar.UI
         {
             bool isOpen = _isWebRadarOpen;
             ImGui.SetNextWindowSize(new Vector2(450, 350), ImGuiCond.FirstUseEver);
-            if (ImGui.Begin("Web Radar", ref isOpen))
+            if (ImGui.Begin("网络雷达", ref isOpen))
             {
                 WebRadarPanel.Draw();
             }
@@ -1431,24 +1431,57 @@ namespace LoneEftDmaRadar.UI
         private static unsafe void ConfigureImGuiFonts(float basePixelSize)
         {
             var io = ImGui.GetIO();
-            var fontBytes = LoadEmbeddedFontBytes();
-
-            if (fontBytes is null || fontBytes.Length == 0)
-                return; // Fall back to default font
-
             io.Fonts.Clear();
 
-            var cfg = new ImFontConfigPtr(ImGuiNET.ImGuiNative.ImFontConfig_ImFontConfig());
-            cfg.OversampleH = 3;
-            cfg.OversampleV = 2;
-            cfg.PixelSnapH = true;
-
-            fixed (byte* pFont = fontBytes)
+            // Try to load Chinese font from system
+            string[] chineseFontPaths = new[]
             {
-                io.Fonts.AddFontFromMemoryTTF((nint)pFont, fontBytes.Length, basePixelSize, cfg);
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "msyh.ttc"),    // 微软雅黑
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "msyhbd.ttc"), // 微软雅黑粗体
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "simhei.ttf"), // 黑体
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "simsun.ttc"), // 宋体
+            };
+
+            string chineseFontPath = null;
+            foreach (var path in chineseFontPaths)
+            {
+                if (File.Exists(path))
+                {
+                    chineseFontPath = path;
+                    break;
+                }
             }
 
-            cfg.Destroy();
+            if (chineseFontPath is not null)
+            {
+                // Load Chinese font with full Chinese glyph ranges
+                var cfg = new ImFontConfigPtr(ImGuiNET.ImGuiNative.ImFontConfig_ImFontConfig());
+                cfg.OversampleH = 2;
+                cfg.OversampleV = 1;
+                cfg.PixelSnapH = true;
+
+                // Get glyph ranges for Chinese characters
+                io.Fonts.AddFontFromFileTTF(chineseFontPath, basePixelSize, cfg, io.Fonts.GetGlyphRangesChineseFull());
+                cfg.Destroy();
+            }
+            else
+            {
+                // Fall back to embedded font (English only)
+                var fontBytes = LoadEmbeddedFontBytes();
+                if (fontBytes is not null && fontBytes.Length > 0)
+                {
+                    var cfg = new ImFontConfigPtr(ImGuiNET.ImGuiNative.ImFontConfig_ImFontConfig());
+                    cfg.OversampleH = 3;
+                    cfg.OversampleV = 2;
+                    cfg.PixelSnapH = true;
+
+                    fixed (byte* pFont = fontBytes)
+                    {
+                        io.Fonts.AddFontFromMemoryTTF((nint)pFont, fontBytes.Length, basePixelSize, cfg);
+                    }
+                    cfg.Destroy();
+                }
+            }
 
             static byte[] LoadEmbeddedFontBytes()
             {

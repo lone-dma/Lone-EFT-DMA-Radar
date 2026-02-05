@@ -80,7 +80,7 @@ namespace LoneEftDmaRadar.UI.Widgets
             bool isOpen = IsOpen;
             var windowFlags = ImGuiWindowFlags.None;
 
-            if (!ImGui.Begin("Loot", ref isOpen, windowFlags))
+            if (!ImGui.Begin("物品", ref isOpen, windowFlags))
             {
                 IsOpen = isOpen;
                 ImGui.End();
@@ -91,13 +91,13 @@ namespace LoneEftDmaRadar.UI.Widgets
             // Tabbed interface
             if (ImGui.BeginTabBar("LootTabBar"))
             {
-                if (ImGui.BeginTabItem("Loot List"))
+                if (ImGui.BeginTabItem("物品列表"))
                 {
                     DrawLootListTab(localPlayer, filteredLoot);
                     ImGui.EndTabItem();
                 }
 
-                if (ImGui.BeginTabItem("Options"))
+                if (ImGui.BeginTabItem("选项"))
                 {
                     DrawOptionsTab();
                     ImGui.EndTabItem();
@@ -118,7 +118,7 @@ namespace LoneEftDmaRadar.UI.Widgets
                 ApplyLootSearch();
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Search for specific items by name");
+                ImGui.SetTooltip("按名称搜索物品");
             if (!string.IsNullOrWhiteSpace(_searchText))
             {
                 ImGui.SameLine();
@@ -128,7 +128,7 @@ namespace LoneEftDmaRadar.UI.Widgets
                     ApplyLootSearch();
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Clear search");
+                    ImGui.SetTooltip("清除搜索");
             }
 
             ImGui.Separator();
@@ -139,7 +139,7 @@ namespace LoneEftDmaRadar.UI.Widgets
 
             if (lootList.Count == 0)
             {
-                ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "No loot detected");
+                ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "未检测到物品");
                 return;
             }
 
@@ -186,9 +186,9 @@ namespace LoneEftDmaRadar.UI.Widgets
                     distFlags |= ImGuiTableColumnFlags.PreferSortDescending;
                 }
 
-                ImGui.TableSetupColumn("Name", nameFlags, 0f, 0);
-                ImGui.TableSetupColumn("Value", valueFlags, 60f, 1);
-                ImGui.TableSetupColumn("Dist", distFlags, 45f, 2);
+                ImGui.TableSetupColumn("名称", nameFlags, 0f, 0);
+                ImGui.TableSetupColumn("价值", valueFlags, 60f, 1);
+                ImGui.TableSetupColumn("距离", distFlags, 45f, 2);
                 ImGui.TableHeadersRow();
 
                 // Handle sorting
@@ -259,9 +259,9 @@ namespace LoneEftDmaRadar.UI.Widgets
         private static void DrawOptionsTab()
         {
             // Value Thresholds - side by side
-            ImGui.Text("Min Value:");
+            ImGui.Text("最低价值:");
             ImGui.SameLine(150);
-            ImGui.Text("Valuable Min:");
+            ImGui.Text("贵重最低价值:");
 
             ImGui.SetNextItemWidth(140);
             int minValue = Config.Loot.MinValue;
@@ -271,7 +271,7 @@ namespace LoneEftDmaRadar.UI.Widgets
                 Memory.Loot?.RefreshFilter();
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Minimum value to display regular loot");
+                ImGui.SetTooltip("显示普通物品的最低价值");
             ImGui.SameLine(150);
             ImGui.SetNextItemWidth(140);
             int valuableMin = Config.Loot.MinValueValuable;
@@ -281,86 +281,86 @@ namespace LoneEftDmaRadar.UI.Widgets
                 Memory.Loot?.RefreshFilter();
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Minimum value to highlight as valuable");
+                ImGui.SetTooltip("高亮显示为贵重物品的最低价值");
 
             ImGui.Separator();
 
             // Price options on one line
             bool pricePerSlot = Config.Loot.PricePerSlot;
-            if (ImGui.Checkbox("Price per Slot", ref pricePerSlot))
+            if (ImGui.Checkbox("每格价格", ref pricePerSlot))
             {
                 Config.Loot.PricePerSlot = pricePerSlot;
                 Memory.Loot?.RefreshFilter();
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Calculate value based on price per inventory slot");
+                ImGui.SetTooltip("根据每个背包格子的价格计算价值");
             ImGui.SameLine(150);
-            ImGui.Text("Mode:");
+            ImGui.Text("模式:");
             ImGui.SameLine();
             int priceMode = (int)Config.Loot.PriceMode;
-            if (ImGui.RadioButton("Flea", ref priceMode, 0))
+            if (ImGui.RadioButton("跳蚤市场", ref priceMode, 0))
             {
                 Config.Loot.PriceMode = LootPriceMode.FleaMarket;
                 Memory.Loot?.RefreshFilter();
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Use flea market prices");
+                ImGui.SetTooltip("使用跳蚤市场价格");
             ImGui.SameLine();
-            if (ImGui.RadioButton("Trader", ref priceMode, 1))
+            if (ImGui.RadioButton("商人", ref priceMode, 1))
             {
                 Config.Loot.PriceMode = LootPriceMode.Trader;
                 Memory.Loot?.RefreshFilter();
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Use trader sell prices");
+                ImGui.SetTooltip("使用商人出售价格");
 
             ImGui.Separator();
 
             // Category toggles
             bool hideCorpses = Config.Loot.HideCorpses;
-            if (ImGui.Checkbox("Hide Corpses", ref hideCorpses))
+            if (ImGui.Checkbox("隐藏尸体", ref hideCorpses))
             {
                 Config.Loot.HideCorpses = hideCorpses;
                 Memory.Loot?.RefreshFilter();
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Hide player corpses from the radar");
+                ImGui.SetTooltip("在雷达上隐藏玩家尸体");
             ImGui.SameLine(150);
             bool showMeds = LootFilter.ShowMeds;
-            if (ImGui.Checkbox("Show Meds", ref showMeds))
+            if (ImGui.Checkbox("显示医疗用品", ref showMeds))
             {
                 LootFilter.ShowMeds = showMeds;
                 Memory.Loot?.RefreshFilter();
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Show medical items regardless of value");
+                ImGui.SetTooltip("无视价值显示医疗物品");
 
             bool showFood = LootFilter.ShowFood;
-            if (ImGui.Checkbox("Show Food", ref showFood))
+            if (ImGui.Checkbox("显示食物", ref showFood))
             {
                 LootFilter.ShowFood = showFood;
                 Memory.Loot?.RefreshFilter();
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Show food and drinks regardless of value");
+                ImGui.SetTooltip("无视价值显示食物和饮料");
             ImGui.SameLine(150);
             bool showBackpacks = LootFilter.ShowBackpacks;
-            if (ImGui.Checkbox("Show Backpacks", ref showBackpacks))
+            if (ImGui.Checkbox("显示背包", ref showBackpacks))
             {
                 LootFilter.ShowBackpacks = showBackpacks;
                 Memory.Loot?.RefreshFilter();
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Show backpacks regardless of value");
+                ImGui.SetTooltip("无视价值显示背包");
 
             bool showQuestItems = LootFilter.ShowQuestItems;
-            if (ImGui.Checkbox("Show Quest Items", ref showQuestItems))
+            if (ImGui.Checkbox("显示任务物品", ref showQuestItems))
             {
                 LootFilter.ShowQuestItems = showQuestItems;
                 Memory.Loot?.RefreshFilter();
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Show all static quest items on the map.");
+                ImGui.SetTooltip("在地图上显示所有静态任务物品。");
         }
 
         private static void SortLootList(PooledList<LootItem> list, Vector3 localPos)

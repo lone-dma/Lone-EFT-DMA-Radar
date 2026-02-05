@@ -19,7 +19,7 @@ namespace LoneEftDmaRadar.UI.Panels
         private static bool _upnpEnabled;
         private static readonly string _password;
         private static bool _isRunning;
-        private static string _startButtonText = "Start";
+        private static string _startButtonText = "启动";
         private static string _serverUrl = string.Empty;
         private static bool _uiEnabled = true;
 
@@ -40,7 +40,7 @@ namespace LoneEftDmaRadar.UI.Panels
         /// </summary>
         public static void Draw()
         {
-            ImGui.SeparatorText("Web Radar Server");
+            ImGui.SeparatorText("网络雷达服务器");
 
             if (!_uiEnabled)
             {
@@ -48,18 +48,18 @@ namespace LoneEftDmaRadar.UI.Panels
             }
 
             // Server Configuration
-            ImGui.Text("Bind Address:");
+            ImGui.Text("绑定地址:");
             ImGui.SetNextItemWidth(200);
             if (ImGui.InputText("##BindAddress", ref _bindAddress, 64))
             {
                 Config.WebRadar.IP = _bindAddress;
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("IP address to bind the server to (0.0.0.0 for all interfaces)");
+                ImGui.SetTooltip("服务器绑定的IP地址 (0.0.0.0 表示所有接口)");
             ImGui.SameLine();
-            ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "(e.g., 0.0.0.0 for all interfaces)");
+            ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "(例如: 0.0.0.0 表示所有接口)");
 
-            ImGui.Text("Port:");
+            ImGui.Text("端口:");
             ImGui.SetNextItemWidth(100);
             if (ImGui.InputText("##Port", ref _port, 6))
             {
@@ -69,9 +69,9 @@ namespace LoneEftDmaRadar.UI.Panels
                 }
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Port number for the web radar server");
+                ImGui.SetTooltip("网络雷达服务器的端口号");
 
-            ImGui.Text("Tick Rate (Hz):");
+            ImGui.Text("刷新率 (Hz):");
             ImGui.SetNextItemWidth(100);
             if (ImGui.InputText("##TickRate", ref _tickRate, 4))
             {
@@ -81,25 +81,25 @@ namespace LoneEftDmaRadar.UI.Panels
                 }
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Update frequency in Hz (higher = more responsive, more bandwidth)");
+                ImGui.SetTooltip("更新频率 (越高越流畅，但带宽占用更多)");
 
-            if (ImGui.Checkbox("Enable UPnP", ref _upnpEnabled))
+            if (ImGui.Checkbox("启用 UPnP", ref _upnpEnabled))
             {
                 Config.WebRadar.UPnP = _upnpEnabled;
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Automatically configure port forwarding on your router");
+                ImGui.SetTooltip("自动配置路由器的端口转发");
             ImGui.SameLine();
-            ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "(Automatic port forwarding)");
+            ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "(自动端口转发)");
 
             ImGui.Separator();
 
             // Password (read-only, auto-generated)
-            ImGui.Text("Session Password:");
+            ImGui.Text("会话密码:");
             ImGui.SameLine();
             ImGui.TextColored(new Vector4(0.2f, 0.8f, 0.2f, 1f), _password);
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Auto-generated password for this session");
+                ImGui.SetTooltip("自动生成的会话密码");
 
             if (!_uiEnabled)
             {
@@ -117,37 +117,37 @@ namespace LoneEftDmaRadar.UI.Panels
                 }
             }
             if (ImGui.IsItemHovered() && !_isRunning)
-                ImGui.SetTooltip("Start the web radar server");
+                ImGui.SetTooltip("启动网络雷达服务器");
 
             // Server URL
             if (!string.IsNullOrEmpty(_serverUrl))
             {
                 ImGui.Separator();
-                ImGui.Text("Server URL:");
+                ImGui.Text("服务器地址:");
                 ImGui.TextWrapped(_serverUrl);
 
-                if (ImGui.Button("Copy URL"))
+                if (ImGui.Button("复制地址"))
                 {
                     CopyUrlToClipboard();
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Copy the URL to share with teammates");
+                    ImGui.SetTooltip("复制地址以分享给队友");
             }
 
             ImGui.Separator();
 
             // Instructions
-            ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "Instructions:");
-            ImGui.BulletText("Configure the server settings above");
-            ImGui.BulletText("Click 'Start' to begin the web radar server");
-            ImGui.BulletText("Share the generated URL with teammates");
-            ImGui.BulletText("They can view the radar in their web browser");
+            ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1f), "使用说明:");
+            ImGui.BulletText("在上方配置服务器设置");
+            ImGui.BulletText("点击'启动'开始网络雷达服务器");
+            ImGui.BulletText("将生成的地址分享给队友");
+            ImGui.BulletText("他们可以在浏览器中查看雷达");
         }
 
         private static async void StartServer()
         {
             _uiEnabled = false;
-            _startButtonText = "Starting...";
+            _startButtonText = "启动中...";
 
             try
             {
@@ -159,14 +159,14 @@ namespace LoneEftDmaRadar.UI.Panels
                 await WebRadarServer.StartAsync(bindIP, port, tickRate, _upnpEnabled);
 
                 _isRunning = true;
-                _startButtonText = "Running...";
+                _startButtonText = "运行中...";
                 _serverUrl = $"https://webradar.lone-dma.org/?host={externalIP}&port={port}&password={_password}";
             }
             catch (Exception ex)
             {
-                MessageBox.Show(RadarWindow.Handle, $"ERROR Starting Web Radar Server: {ex.Message}", "Web Radar",
+                MessageBox.Show(RadarWindow.Handle, $"启动网络雷达服务器出错: {ex.Message}", "网络雷达",
                     MessageBoxButton.OK, MessageBoxImage.Error);
-                _startButtonText = "Start";
+                _startButtonText = "启动";
                 _uiEnabled = true;
             }
         }
@@ -178,13 +178,13 @@ namespace LoneEftDmaRadar.UI.Panels
                 if (!string.IsNullOrWhiteSpace(_serverUrl))
                 {
                     Clipboard.SetText(_serverUrl);
-                    MessageBox.Show(RadarWindow.Handle, "Web Radar URL copied to clipboard.", "Web Radar",
+                    MessageBox.Show(RadarWindow.Handle, "网络雷达地址已复制到剪贴板。", "网络雷达",
                         MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(RadarWindow.Handle, $"Failed to copy URL: {ex.Message}", "Web Radar",
+                MessageBox.Show(RadarWindow.Handle, $"复制地址失败: {ex.Message}", "网络雷达",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

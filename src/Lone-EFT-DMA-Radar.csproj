@@ -18,34 +18,33 @@
 		<RuntimeHostConfigurationOption Include="Microsoft.AspNetCore.SignalR.Hub.IsCustomAwaitableSupported" Value="false" Trim="true" />
 	</ItemGroup>
 
-	<!-- Native AOT -->
 	<PropertyGroup>
 		<PublishAot>true</PublishAot>
-		<PublishTrimmed>true</PublishTrimmed>
-		<EnableAotAnalyzer>true</EnableAotAnalyzer>
-		<EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-		<EnableSingleFileAnalyzer>true</EnableSingleFileAnalyzer>
-		<MetricsSupport>false</MetricsSupport>
-		<MetadataUpdaterSupport>false</MetadataUpdaterSupport>
-		<EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
-		<EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
 		<HighEntropyVA>true</HighEntropyVA>
-		<DebuggerSupport>false</DebuggerSupport> <!-- Also removes symbols -->
+		<OptimizationPreference>Speed</OptimizationPreference>
+		<CetCompat>false</CetCompat>
+		<DebuggerSupport>true</DebuggerSupport>
 		<StackTraceSupport>true</StackTraceSupport>
-		<ControlFlowGuard>Guard</ControlFlowGuard>
-		<CetCompat>true</CetCompat>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+		<DebugType>none</DebugType>
+		<DebugSymbols>false</DebugSymbols>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<DebugType>none</DebugType>
+		<DebugSymbols>false</DebugSymbols>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 		<DebugType>none</DebugType>
-		<DebugSymbols>false</DebugSymbols>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
 		<DebugType>none</DebugType>
-		<DebugSymbols>false</DebugSymbols>
 	</PropertyGroup>
-	
+
 	<ItemGroup>
 		<EmbeddedResource Include="Resources\**\*.*" />
 	</ItemGroup>
@@ -61,7 +60,7 @@
 	<PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.2.0" />
 	<PackageReference Include="Svg.Skia" Version="3.4.1" />
 	<PackageReference Include="Velopack" Version="0.0.1298" />
-	<PackageReference Include="VmmSharpEx" Version="3.200.8" />
+	<PackageReference Include="VmmSharpEx" Version="3.200.3" />
 	<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	<PackageReference Include="Open.Nat.V2" Version="3.1.1" />
   </ItemGroup>

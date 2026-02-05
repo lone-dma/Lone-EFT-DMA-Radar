@@ -55,7 +55,7 @@ namespace LoneEftDmaRadar.UI.Panels
             bool isOpen = IsOpen;
             ImGui.SetNextWindowSize(new Vector2(350, 220), ImGuiCond.FirstUseEver);
 
-            if (ImGui.Begin("Map Setup Helper", ref isOpen))
+            if (ImGui.Begin("地图设置助手", ref isOpen))
             {
                 var currentMap = EftMapManager.Map?.Config;
 
@@ -71,14 +71,14 @@ namespace LoneEftDmaRadar.UI.Panels
                 }
 
                 // Current coordinates display
-                ImGui.Text("Current Coordinates:");
+                ImGui.Text("当前坐标:");
                 ImGui.TextColored(new Vector4(0.2f, 0.8f, 0.2f, 1f), Coords);
 
                 ImGui.Separator();
 
                 if (currentMap is null)
                 {
-                    ImGui.TextColored(new Vector4(1f, 0.5f, 0.5f, 1f), "No map loaded!");
+                    ImGui.TextColored(new Vector4(1f, 0.5f, 0.5f, 1f), "未加载地图！");
                 }
                 else
                 {
@@ -86,7 +86,7 @@ namespace LoneEftDmaRadar.UI.Panels
                     TickScanIfNeeded(currentMap);
 
                     // Map name display
-                    ImGui.Text($"Map: {currentMap.Name}");
+                    ImGui.Text($"地图: {currentMap.Name}");
                     ImGui.Spacing();
 
                     // X, Y inputs on same line
@@ -98,7 +98,7 @@ namespace LoneEftDmaRadar.UI.Panels
                             StopScan();
                     }
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip("Map X offset");
+                        ImGui.SetTooltip("地图X偏移");
                     ImGui.SameLine();
                     ImGui.SetNextItemWidth(120);
                     if (ImGui.InputFloat("##MapY", ref _y, 1f, 10f, "%.1f"))
@@ -107,10 +107,10 @@ namespace LoneEftDmaRadar.UI.Panels
                             StopScan();
                     }
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip("Map Y offset");
+                        ImGui.SetTooltip("地图Y偏移");
 
                     // Scale input
-                    ImGui.Text("Scale:");
+                    ImGui.Text("缩放:");
                     ImGui.SetNextItemWidth(120);
                     if (ImGui.InputFloat("##MapScale", ref _scale, 0.01f, 0.1f, "%.4f"))
                     {
@@ -118,36 +118,36 @@ namespace LoneEftDmaRadar.UI.Panels
                             StopScan();
                     }
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip("Map scale factor");
+                        ImGui.SetTooltip("地图缩放因子");
 
                     ImGui.Spacing();
                     ImGui.Separator();
                     ImGui.Spacing();
 
                     // Apply button
-                    if (ImGui.Button("Apply", new Vector2(80, 0)))
+                    if (ImGui.Button("应用", new Vector2(80, 0)))
                     {
                         ApplyMapValues(currentMap);
                     }
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip("Apply changes to the map");
+                        ImGui.SetTooltip("应用更改到地图");
 
                     ImGui.SameLine();
 
                     // Reset button
-                    if (ImGui.Button("Reset", new Vector2(80, 0)))
+                    if (ImGui.Button("重置", new Vector2(80, 0)))
                     {
                         StopScan();
                         LoadMapValues(currentMap);
                         _loadedMapKey = GetMapKey(currentMap);
                     }
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip("Reset to current map values");
+                        ImGui.SetTooltip("重置为当前地图值");
 
                     ImGui.SameLine();
 
                     // Scan button
-                    var scanLabel = _isScanning ? "Stop Scan" : "Scan X/Y";
+                    var scanLabel = _isScanning ? "停止扫描" : "扫描 X/Y";
                     if (ImGui.Button(scanLabel, new Vector2(100, 0)))
                     {
                         if (_isScanning)
@@ -160,7 +160,7 @@ namespace LoneEftDmaRadar.UI.Panels
                         }
                     }
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip("Step X/Y around 0,0 in ~25 increments to help find the map image");
+                        ImGui.SetTooltip("以~25为增量围绕0,0步进X/Y以帮助找到地图图像");
                 }
             }
             ImGui.End();
@@ -189,9 +189,9 @@ namespace LoneEftDmaRadar.UI.Panels
             ImGui.SetNextWindowBgAlpha(0.8f);
 
             bool visible = ShowOverlay;
-            if (ImGui.Begin("Map Setup Helper Overlay", ref visible, ImGuiWindowFlags.NoSavedSettings))
+            if (ImGui.Begin("地图设置助手覆盖层", ref visible, ImGuiWindowFlags.NoSavedSettings))
             {
-                ImGui.Text("Current Coordinates:");
+                ImGui.Text("当前坐标:");
                 ImGui.TextColored(new Vector4(0.2f, 0.8f, 0.2f, 1f), Coords);
             }
             ImGui.End();

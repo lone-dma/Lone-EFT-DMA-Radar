@@ -88,7 +88,7 @@ namespace LoneEftDmaRadar.UI.ColorPicker
         public static void Draw()
         {
             bool isOpen = IsOpen;
-            if (!ImGui.Begin("Color Picker", ref isOpen, ImGuiWindowFlags.AlwaysAutoResize))
+            if (!ImGui.Begin("颜色选择", ref isOpen, ImGuiWindowFlags.AlwaysAutoResize))
             {
                 IsOpen = isOpen;
                 ImGui.End();
@@ -96,7 +96,7 @@ namespace LoneEftDmaRadar.UI.ColorPicker
             }
             IsOpen = isOpen;
 
-            ImGui.Text("Select a color option to edit:");
+            ImGui.Text("选择要编辑的颜色选项:");
 
             // Color options list
             if (ImGui.BeginListBox("##ColorOptions", new Vector2(250, 300)))
@@ -122,14 +122,14 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                 ImGui.EndListBox();
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Select a UI element to customize its color");
+                ImGui.SetTooltip("选择要自定义颜色的UI元素");
 
             ImGui.Separator();
 
             // Color editor
             if (_selectedOption.HasValue)
             {
-                ImGui.Text($"Editing: {GetFriendlyName(_selectedOption.Value)}");
+                ImGui.Text($"编辑中: {GetFriendlyName(_selectedOption.Value)}");
 
                 // Color picker
                 if (ImGui.ColorPicker3("##ColorPicker", ref _editingColor))
@@ -139,7 +139,7 @@ namespace LoneEftDmaRadar.UI.ColorPicker
 
                 // Hex input
                 ImGui.SetNextItemWidth(100);
-                if (ImGui.InputText("Hex", ref _hexInput, 10))
+                if (ImGui.InputText("十六进制", ref _hexInput, 10))
                 {
                     if (TryParseHex(_hexInput, out var parsed))
                     {
@@ -147,24 +147,24 @@ namespace LoneEftDmaRadar.UI.ColorPicker
                     }
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Enter color as hex code (e.g., #FF0000)");
+                    ImGui.SetTooltip("输入十六进制颜色代码 (例如: #FF0000)");
 
                 ImGui.Spacing();
 
-                if (ImGui.Button("Apply"))
+                if (ImGui.Button("应用"))
                 {
                     ApplyColor(_selectedOption.Value, _editingColor);
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Apply the selected color");
+                    ImGui.SetTooltip("应用选中的颜色");
                 ImGui.SameLine();
-                if (ImGui.Button("Reset to Default"))
+                if (ImGui.Button("重置为默认"))
                 {
                     _editingColor = GetDefaultColor(_selectedOption.Value);
                     _hexInput = ColorToHex(_editingColor);
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Reset to the default color");
+                    ImGui.SetTooltip("重置为默认颜色");
             }
 
             ImGui.End();
@@ -174,27 +174,27 @@ namespace LoneEftDmaRadar.UI.ColorPicker
         {
             return option switch
             {
-                ColorPickerOption.LocalPlayer => "Local Player",
-                ColorPickerOption.FriendlyPlayer => "Teammate",
-                ColorPickerOption.PMCPlayer => "PMC (Enemy)",
+                ColorPickerOption.LocalPlayer => "本地玩家",
+                ColorPickerOption.FriendlyPlayer => "队友",
+                ColorPickerOption.PMCPlayer => "PMC (敌人)",
                 ColorPickerOption.ScavPlayer => "Scav",
-                ColorPickerOption.HumanScavPlayer => "Player Scav",
+                ColorPickerOption.HumanScavPlayer => "玩家Scav",
                 ColorPickerOption.BossPlayer => "Boss",
-                ColorPickerOption.RaiderPlayer => "Raider/Guard",
-                ColorPickerOption.FocusedPlayer => "Focused",
-                ColorPickerOption.RegularLoot => "Regular Loot",
-                ColorPickerOption.ValuableLoot => "Valuable Loot",
-                ColorPickerOption.WishlistLoot => "Wishlist Loot",
-                ColorPickerOption.ContainerLoot => "Container Loot",
-                ColorPickerOption.MedsFilterLoot => "Meds",
-                ColorPickerOption.FoodFilterLoot => "Food",
-                ColorPickerOption.BackpacksFilterLoot => "Backpacks",
-                ColorPickerOption.QuestHelperItems => "Quest Items",
-                ColorPickerOption.QuestHelperZones => "Quest Zones",
-                ColorPickerOption.Corpse => "Corpse",
-                ColorPickerOption.DeathMarker => "Death Marker",
-                ColorPickerOption.Explosives => "Explosives",
-                ColorPickerOption.MapPing => "Map Ping",
+                ColorPickerOption.RaiderPlayer => "Raider/警卫",
+                ColorPickerOption.FocusedPlayer => "关注目标",
+                ColorPickerOption.RegularLoot => "普通物品",
+                ColorPickerOption.ValuableLoot => "贵重物品",
+                ColorPickerOption.WishlistLoot => "愿望清单物品",
+                ColorPickerOption.ContainerLoot => "容器物品",
+                ColorPickerOption.MedsFilterLoot => "医疗用品",
+                ColorPickerOption.FoodFilterLoot => "食物",
+                ColorPickerOption.BackpacksFilterLoot => "背包",
+                ColorPickerOption.QuestHelperItems => "任务物品",
+                ColorPickerOption.QuestHelperZones => "任务区域",
+                ColorPickerOption.Corpse => "尸体",
+                ColorPickerOption.DeathMarker => "死亡标记",
+                ColorPickerOption.Explosives => "爆炸物",
+                ColorPickerOption.MapPing => "地图标记",
                 _ => option.ToString()
             };
         }
