@@ -120,9 +120,7 @@ namespace LoneEftDmaRadar
             Environment.FailFast(error);
         }
 
-        private static void CurrentDomain_ProcessExit(object sender, EventArgs e) => OnShutdown();
-
-        private static void OnShutdown()
+        private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
             Logging.WriteLine("Process exiting...");
             Config.Save();
