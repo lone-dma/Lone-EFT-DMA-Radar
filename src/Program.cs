@@ -137,6 +137,7 @@ namespace LoneEftDmaRadar
         private static void OnShutdown()
         {
             Config.Save();
+            Memory.Close();
             Logging.WriteLine("Exiting...");
         }
 

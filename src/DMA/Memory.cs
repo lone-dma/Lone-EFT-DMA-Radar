@@ -578,6 +578,14 @@ namespace LoneEftDmaRadar.DMA
         #region Misc
 
         /// <summary>
+        /// Close the FPGA connection.
+        /// </summary>
+        public static void Close()
+        {
+            _vmm.Dispose();
+        }
+
+        /// <summary>
         /// Creates a new <see cref="VmmScatterMap"/>.
         /// </summary>
         /// <returns></returns>
