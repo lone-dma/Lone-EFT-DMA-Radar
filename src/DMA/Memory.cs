@@ -582,7 +582,8 @@ namespace LoneEftDmaRadar.DMA
         /// </summary>
         public static void Close()
         {
-            _vmm.Dispose();
+            _vmm?.Dispose();
+            _vmm = null!;
         }
 
         /// <summary>
