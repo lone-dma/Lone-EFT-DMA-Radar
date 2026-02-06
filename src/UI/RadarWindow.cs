@@ -25,6 +25,7 @@ using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
+using System.Runtime.ExceptionServices;
 
 namespace LoneEftDmaRadar.UI
 {
@@ -1136,7 +1137,7 @@ namespace LoneEftDmaRadar.UI
                 }
 
                 using var sync = new ManualResetEventSlim();
-                Exception capturedEx = null;
+                ExceptionDispatchInfo edi = null;
                 _queue.Enqueue(() =>
                 {
                     try
@@ -1145,7 +1146,7 @@ namespace LoneEftDmaRadar.UI
                     }
                     catch (Exception ex)
                     {
-                        capturedEx = ex;
+                        edi = ExceptionDispatchInfo.Capture(ex);
                     }
                     finally
                     {
@@ -1154,9 +1155,7 @@ namespace LoneEftDmaRadar.UI
                 });
 
                 sync.Wait();
-
-                if (capturedEx is not null)
-                    throw new TargetInvocationException(capturedEx);
+                edi?.Throw();
             }
 
             /// <summary>
