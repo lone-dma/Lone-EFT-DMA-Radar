@@ -23,7 +23,7 @@ This version is designed to be as safe as possible from any future detections, a
 Join our exclusive [Supporter-Only Discord Server](https://discord.lone-dma.org/)! 😄
 
 ## 💸 Donations
-If you find this software useful, _please_ consider donating! Every little bit helps :) [See here for Donations Info](https://github.com/lone-dma#-support-the-project)
+If you find this software useful, _please_ consider donating — every little bit helps! [See here for Donations Info](https://github.com/lone-dma#-support-the-project).
  
 ## 💖 Special Thanks
 - @xx0m, @Mambo-Noob, and Keeegi
