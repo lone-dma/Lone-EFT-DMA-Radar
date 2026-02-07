@@ -4,14 +4,14 @@
 ## ⚠️ IMPORTANT Read First
 I have since changed Lone EFT DMA Radar to be **READ-ONLY** and **RADAR-ONLY**.
 
-No feature requests in Issues please.
+No feature requests in Issues please (we have a Suggestions channel in Discord). You are welcome to submit PRs, but I do not accept all contributions.
 
 Distribution of this software ***must include the source code*** per the AGPLv3 terms.
 
 ## 👋 Welcome
 This is the original Lone EFT DMA Radar by Lone, with some key differences from the original version:
 1. **Radar Only/No Memwrites.**
-3. New & Improved Silk.NET/ImGui Interface.
+3. New & Improved ~~WPF~~ Silk.NET/ImGui Interface.
 
 This version is designed to be as safe as possible from any future detections, and gives you the information that you need while allowing you to fully experience the game for yourself.
 
