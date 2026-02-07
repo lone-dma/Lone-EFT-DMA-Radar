@@ -8,6 +8,8 @@ No feature requests in Issues please (we have a Suggestions channel in Discord).
 
 Distribution of this software ***must include the source code*** per the AGPLv3 terms.
 
+This software is **FREE and OPEN SOURCE** under the AGPLv3 License. You do not need to pay for anything, but [supporting/donating](https://github.com/lone-dma/Lone-EFT-DMA-Radar/tree/master#-discord-user) is highly encouraged!
+
 ## 👋 Welcome
 This is the original Lone EFT DMA Radar by Lone, with some key differences from the original version:
 1. **Radar Only/No Memwrites.**
